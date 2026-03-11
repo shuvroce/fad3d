@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>FAD - Facade Analysis & Design v2.0</title>
+        <link rel="icon" href="../static/fav.png" type="image/png" />
+        <!-- <link rel="icon" href="{{ url_for('static', filename='fav.png') }}" type="image/png"> -->
+        <link rel="stylesheet" href="/static/app.css" />
+        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}"> -->
+    </head>
+
+    <body>
+        <header class="topbar" aria-label="Workspace controls">
+            <div class="topbar__left">
+                <div
+                    class="topbar__logo-badge"
+                    aria-label="Facade Report"
+                    role="img"
+                ></div>
+                <div class="topbar__header-btn">
+                    <button
+                        class="topbar__icon-btn"
+                        type="button"
+                        data-title="Dashboard"
+                        aria-label="Dashboard"
+                        id="dashboard-btn"
+                    >
+                        <svg
+                            class="topbar__icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M5 5h12l2 2v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1Z"
+                            ></path>
+                            <path d="M15 5v6H7V5"></path>
+                            <path d="M12 17.5v.01"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="topbar__icon-btn"
+                        type="button"
+                        data-title="Open"
+                        aria-label="Open"
+                        id="load-btn"
+                    >
+                        <svg
+                            class="topbar__icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M4 19h16a1 1 0 0 0 1-1v-7H9l-2-3H3v10a1 1 0 0 0 1 1Z"
+                            ></path>
+                            <path d="M4 8V6a1 1 0 0 1 1-1h5.5l2 3H22"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="topbar__icon-btn"
+                        type="button"
+                        data-title="Generate"
+                        aria-label="Generate"
+                        id="generate-btn"
+                    >
+                        <svg
+                            class="topbar__icon"
+                            viewBox="-6 -4 36 36"
+                            version="1.1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            fill="#000000"
+                        >
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            ></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g id="icomoon-ignore"></g>
+                                <path
+                                    d="M20.48 18.613l-1.12 7.84 7.627-1.173-2.987-3.040c1.013-1.867 1.6-3.947 1.6-6.24 0-7.093-5.707-12.8-12.8-12.8v1.067c6.453 0 11.733 5.28 11.733 11.733 0 1.973-0.48 3.787-1.333 5.44l-2.72-2.827zM20.587 25.173l0.64-4.267 3.52 3.627-4.16 0.64z"
+                                    fill="#000000"
+                                ></path>
+                                <path
+                                    d="M1.067 16c0-2.827 1.013-5.387 2.667-7.413l3.253 3.307 1.12-7.84-7.627 1.227 2.453 2.56c-1.813 2.187-2.933 5.067-2.933 8.16 0 7.093 5.707 12.8 12.8 12.8v-1.067c-6.453 0-11.733-5.28-11.733-11.733zM6.827 5.387l-0.64 4.267-3.52-3.627 4.16-0.64z"
+                                    fill="#000000"
+                                ></path>
+                            </g>
+                        </svg>
+                    </button>
+                    <button
+                        class="topbar__icon-btn"
+                        type="button"
+                        data-title="Save"
+                        aria-label="Save"
+                        id="download-btn"
+                    >
+                        <svg
+                            class="topbar__icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M5 5h12l2 2v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1Z"
+                            ></path>
+                            <path d="M15 5v6H7V5"></path>
+                            <path d="M12 17.5v.01"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <input
+                    type="file"
+                    id="yaml-file-input"
+                    accept=".yaml,.yml,text/yaml"
+                    hidden
+                />
+                <div class="topbar__projct-name" id="header-project-name">
+                    Project Name
+                </div>
+                <div id="topbar__status-notification" class="status"></div>
+            </div>
+
+            <div class="topbar__right">
+                <div class="topbar__license-container">
+                    <div>License status:</div>
+                    <div class="topbar__license" aria-label="License status">
+                        <span
+                            class="topbar__license-dot topbar__license-active"
+                            aria-hidden="true"
+                        ></span>
+                        <span class="topabr__license-text">Active</span>
+                    </div>
+                </div>
+
+                <div class="topbar__right-header-btn">
+                    <button
+                        class="topbar__header-icon-btn"
+                        type="button"
+                        aria-label="Support"
+                        id=""
+                    >
+                        <svg
+                            class="topbar__icon-svg"
+                            viewBox="-6 -4 36 36"
+                            version="1.1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            fill="#000000"
+                        >
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            ></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g id="icomoon-ignore"></g>
+                                <path
+                                    d="M20.48 18.613l-1.12 7.84 7.627-1.173-2.987-3.040c1.013-1.867 1.6-3.947 1.6-6.24 0-7.093-5.707-12.8-12.8-12.8v1.067c6.453 0 11.733 5.28 11.733 11.733 0 1.973-0.48 3.787-1.333 5.44l-2.72-2.827zM20.587 25.173l0.64-4.267 3.52 3.627-4.16 0.64z"
+                                    fill="#000000"
+                                ></path>
+                                <path
+                                    d="M1.067 16c0-2.827 1.013-5.387 2.667-7.413l3.253 3.307 1.12-7.84-7.627 1.227 2.453 2.56c-1.813 2.187-2.933 5.067-2.933 8.16 0 7.093 5.707 12.8 12.8 12.8v-1.067c-6.453 0-11.733-5.28-11.733-11.733zM6.827 5.387l-0.64 4.267-3.52-3.627 4.16-0.64z"
+                                    fill="#000000"
+                                ></path>
+                            </g>
+                        </svg>
+                        <p>Support</p>
+                    </button>
+
+                    <button
+                        class="topbar__header-icon-btn"
+                        type="button"
+                        aria-label="Help"
+                        id=""
+                    >
+                        <svg
+                            class="topbar__icon-svg"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path
+                                d="M9.5 9a2.5 2.5 0 0 1 4.5 1.3c0 1.7-2 2.1-2 3.2"
+                            ></path>
+                            <circle cx="12" cy="16.5" r="0.9"></circle>
+                        </svg>
+                        <p>Help</p>
+                    </button>
+
+                    <button
+                        class="topbar__header-icon-btn"
+                        type="button"
+                        aria-label="Learn"
+                        id=""
+                    >
+                        <svg
+                            class="topbar__icon-svg"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M5 5h12l2 2v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1Z"
+                            ></path>
+                            <path d="M15 5v6H7V5"></path>
+                            <path d="M12 17.5v.01"></path>
+                        </svg>
+                        <p>Learn</p>
+                    </button>
+
+                    <button
+                        class="topbar__header-icon-btn"
+                        type="button"
+                        aria-label="Setting"
+                        id=""
+                    >
+                        <svg
+                            class="topbar__icon-svg"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M4 19h16a1 1 0 0 0 1-1v-7H9l-2-3H3v10a1 1 0 0 0 1 1Z"
+                            ></path>
+                            <path d="M4 8V6a1 1 0 0 1 1-1h5.5l2 3H22"></path>
+                        </svg>
+                        <p>Setting</p>
+                    </button>
+                </div>
+
+                <div class="topbar__report-btn-container">
+                    <button class="topbar__btn-report">Report</button>
+                    <button class="topbar__btn-report-sub">▼</button>
+                </div>
+                <!-- <div class="topbar__user-meta" aria-label="Signed-in user">
+                <div class="topbar__user-name">Md. Akram Hossain</div>
+                <div class="topbar__user-role">Structural Engineer</div>
+            </div> -->
+                <div class="topbar__user-avatar" aria-hidden="true">
+                    <!-- <img src="{{ url_for('static', filename='dp.jpg') }}" alt="User avatar"> -->
+                    <img src="/static/dp.jpg" alt="User avatar" />
+                </div>
+
+                <div class="">
+                    <button
+                        class="theme__toggle"
+                        id="theme__toggle"
+                        aria-label="Toggle dark mode"
+                        data-title="Theme"
+                    >
+                        <svg
+                            id="theme-icon-sun"
+                            class="theme__icon sun hidden"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="12" y1="2" x2="12" y2="5"></line>
+                            <line x1="12" y1="19" x2="12" y2="22"></line>
+                            <line
+                                x1="4.22"
+                                y1="4.22"
+                                x2="6.34"
+                                y2="6.34"
+                            ></line>
+                            <line
+                                x1="17.66"
+                                y1="17.66"
+                                x2="19.78"
+                                y2="19.78"
+                            ></line>
+                            <line x1="2" y1="12" x2="5" y2="12"></line>
+                            <line x1="19" y1="12" x2="22" y2="12"></line>
+                            <line
+                                x1="4.22"
+                                y1="19.78"
+                                x2="6.34"
+                                y2="17.66"
+                            ></line>
+                            <line
+                                x1="17.66"
+                                y1="6.34"
+                                x2="19.78"
+                                y2="4.22"
+                            ></line>
+                        </svg>
+                        <svg
+                            id="theme-icon-moon"
+                            class="theme__icon moon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section class="floating__bar">
+            <div class="floating__bar-left">
+                <div class="floating__bar-left-button">
+                    <button class="floating__bar-btn">Wind</button>
+                    <button class="floating__bar-btn active">Facade</button>
+                </div>
+
+                <div class="floating__bar-left-button">
+                    <button class="floating__bar-btn">General</button>
+                    <button class="floating__bar-btn">Define</button>
+                </div>
+            </div>
+
+            <div class="floating__bar-right">
+                <button class="floating__bar-btn active">Model</button>
+                <button class="floating__bar-btn">DC Ratio</button>
+                <button class="floating__bar-btn">Deflection</button>
+            </div>
+        </section>
+
+        <section class="left__panel">
+            <div class="catbar" aria-label="Categories">
+                <!-- Category buttons will be dynamically created here -->
+                <button
+                    class="catbar__btn"
+                    id="cat-add"
+                    type="button"
+                    data-title="Add Category"
+                    aria-label="Add Category"
+                >
+                    <svg
+                        class="catbar__icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="input__box" id="input-container">
+                <!-- Categories will be dynamically created here -->
+            </div>
+        </section>
+        <button
+            class="left__panel-toggle-left"
+            type="button"
+            aria-label="Collapse left panel"
+            data-title="Collapse left panel"
+        >
+            <svg
+                class="panel__toggle-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path d="M14.5 6.5L9 12l5.5 5.5"></path>
+            </svg>
+        </button>
+
+        <section class="viewport__container"></section>
+
+        <section class="right__panel">
+            <div class="result__box">
+                <h2 class="result__heading">Design Summary</h2>
+
+                <!-- Tab Navigation -->
+                <div class="result__tabs">
+                    <button class="result__tab-btn" data-result-tab="wind">
+                        Wind
+                    </button>
+                    <button
+                        class="result__tab-btn active"
+                        data-result-tab="facade"
+                    >
+                        Facade
+                    </button>
+                </div>
+
+                <!-- Wind Tab Content -->
+                <div class="result__tab-content hidden" data-result-tab="wind">
+                    <!-- General Wind Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">General Wind</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item">
+                                <span class="result__label"
+                                    >Design Pressure:</span
+                                >
+                                <span class="result__value">1.25 kPa</span>
+                            </div>
+                            <div class="result__item">
+                                <span class="result__label"
+                                    >Velocity Pressure:</span
+                                >
+                                <span class="result__value">0.95 kPa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MWFRS Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">MWFRS</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item">
+                                <span class="result__label">Base Shear:</span>
+                                <span class="result__value">850 kN</span>
+                            </div>
+                            <div class="result__item">
+                                <span class="result__label"
+                                    >Overturning Moment:</span
+                                >
+                                <span class="result__value">12500 kN·m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- C&C Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">C&C</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item">
+                                <span class="result__label"
+                                    >Positive Pressure:</span
+                                >
+                                <span class="result__value">1.85 kPa</span>
+                            </div>
+                            <div class="result__item">
+                                <span class="result__label"
+                                    >Negative Pressure:</span
+                                >
+                                <span class="result__value">-2.45 kPa</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facade Tab Content -->
+                <div class="result__tab-content" data-result-tab="facade">
+                    <div class="result__category-label">
+                        <span>Category 1</span>
+                    </div>
+
+                    <!-- Glass Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">Glass</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item result__item-pass">
+                                <span class="result__label">Stress Ratio:</span>
+                                <span class="result__value"
+                                    >0.17
+                                    <span class="result__status">✔</span></span
+                                >
+                            </div>
+                            <div class="result__item result__item-pass">
+                                <span class="result__label">Deflection:</span>
+                                <span class="result__value"
+                                    >L/250
+                                    <span class="result__status">✔</span></span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frame Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">Frame</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item result__item-pass">
+                                <span class="result__label">Stress Ratio:</span>
+                                <span class="result__value"
+                                    >0.68
+                                    <span class="result__status">✔</span></span
+                                >
+                            </div>
+                            <div class="result__item result__item-fail">
+                                <span class="result__label"
+                                    >Buckling Ratio:</span
+                                >
+                                <span class="result__value"
+                                    >1.12
+                                    <span class="result__status">✗</span></span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connection Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">Connection</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item result__item-pass">
+                                <span class="result__label"
+                                    >Strength Ratio:</span
+                                >
+                                <span class="result__value"
+                                    >0.85
+                                    <span class="result__status">✔</span></span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anchor Results -->
+                    <div class="result__card">
+                        <div class="result__card-header">
+                            <h3 class="result__card-title">Anchor</h3>
+                            <button
+                                class="result__card-toggle"
+                                aria-label="Toggle section"
+                            >
+                                <svg
+                                    class="result__card-icon"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 9l6 6 6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result__card-body">
+                            <div class="result__item result__item-pass">
+                                <span class="result__label"
+                                    >Pullout Ratio:</span
+                                >
+                                <span class="result__value"
+                                    >0.42
+                                    <span class="result__status">✔</span></span
+                                >
+                            </div>
+                            <div class="result__item result__item-pass">
+                                <span class="result__label">Shear Ratio:</span>
+                                <span class="result__value"
+                                    >0.35
+                                    <span class="result__status">✔</span></span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <button
+            class="right__panel-toggle-right"
+            type="button"
+            aria-label="Collapse right panel"
+            data-title="Collapse right panel"
+        >
+            <svg
+                class="panel__toggle-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path d="M9.5 6.5L15 12l-5.5 5.5"></path>
+            </svg>
+        </button>
+
+        {% include "modals.html" %}
+
+        <script src="/static/js/app.js"></script>
+        <script src="/static/js/theme.js"></script>
+        <script src="/static/js/panelMode.js"></script>
+        <script src="/static/js/category.js"></script>
+        <script src="/static/js/results.js"></script>
+        <script src="/static/js/viewControls.js"></script>
+        <script src="/static/js/categoryIcons.js"></script>
+        <!-- <script src="{{ url_for('static', filename='js/app.js') }}"></script> -->
+        <!-- <script src="{{ url_for('static', filename='js/theme.js') }}"></script> -->
+        <!-- <script src="{{ url_for('static', filename='js/panelMode.js') }}"></script> -->
+        <!-- <script src="{{ url_for('static', filename='js/category.js') }}"></script> -->
+    </body>
+</html>
