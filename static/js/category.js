@@ -151,6 +151,11 @@ function renumberCategories() {
             newCategoryBtn.addEventListener("click", () => {
                 switchCategory(newCategoryNum);
             });
+
+            // Migrate icon to new category number
+            if (typeof reorderCategoryIcons === "function") {
+                reorderCategoryIcons(oldCategoryNum, newCategoryNum);
+            }
         }
 
         // Update remove button
@@ -242,6 +247,11 @@ function renumberCategories() {
             field.setAttribute("id", newFieldId);
         });
     });
+
+    // Reattach icon listeners after renumbering (cloned buttons lost their contextmenu handlers)
+    if (typeof reattachCategoryIconListeners === "function") {
+        reattachCategoryIconListeners();
+    }
 }
 
 // Function to create new category
@@ -284,6 +294,11 @@ function createCategory(categoryNum) {
     const catbar = document.querySelector(".catbar");
     const addBtn = document.querySelector("#cat-add");
     catbar.insertBefore(btnWrapper, addBtn);
+
+    // Attach pen icon listener now that button is in the DOM
+    if (typeof attachCategoryIconListener === "function") {
+        attachCategoryIconListener(categoryBtn);
+    }
 
     // Create category content
     const categoryContent = document.createElement("div");
@@ -383,7 +398,7 @@ function updateCategoryButtonTooltip(categoryNum, tooltipText) {
 }
 
 // Global function to initialize/reinitialize the entire category system
-function initializeCategories() {
+async function initializeCategories() {
     // Clear existing categories from DOM
     const inputContainer = document.getElementById("input-container");
     if (inputContainer) {
@@ -399,6 +414,8 @@ function initializeCategories() {
     // Reset category data
     categoryCount = 1;
     categoryNames.clear();
+
+    await ensureTemplatesLoaded();
 
     // Create first category
     createCategory(1);
@@ -420,8 +437,20 @@ function initializeCategories() {
     }
 }
 
+// Fetch and inject input-temp.html if not already included by Flask/Jinja2
+async function ensureTemplatesLoaded() {
+    if (document.getElementById("category-content-template")) return;
+    const response = await fetch("/templates/input-temp.html");
+    const html = await response.text();
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+}
+
 // Initialize event listeners
-function initializeCategoryManagement() {
+async function initializeCategoryManagement() {
+    await ensureTemplatesLoaded();
+
     // Create the first category by default
     categoryCount = 1;
     createCategory(1);

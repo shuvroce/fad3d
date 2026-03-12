@@ -128,19 +128,26 @@ function updateCategoryButtonIcon(categoryNum, icon) {
     }
 }
 
-// Function to handle right-click on category button
-function handleCategoryRightClick(event, categoryNum) {
-    event.preventDefault(); // Prevent default context menu
-    showIconSelector(categoryNum);
-}
-
-// Function to attach right-click listener to a category button
+// Function to attach pen-button trigger to a category button wrapper
 function attachCategoryIconListener(categoryBtn) {
     const categoryNum = parseInt(categoryBtn.getAttribute("data-category"));
+    const wrapper = categoryBtn.parentElement;
 
-    categoryBtn.addEventListener("contextmenu", (e) => {
-        handleCategoryRightClick(e, categoryNum);
+    // Avoid duplicate pen buttons
+    if (!wrapper || wrapper.querySelector(".catbar__pen-btn")) return;
+
+    const penBtn = document.createElement("button");
+    penBtn.className = "catbar__pen-btn";
+    penBtn.setAttribute("type", "button");
+    penBtn.setAttribute("aria-label", "Set category icon");
+    penBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
+
+    penBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showIconSelector(categoryNum);
     });
+
+    wrapper.appendChild(penBtn);
 
     // Restore icon if it exists
     const icon = categoryIcons.get(categoryNum);
@@ -149,8 +156,18 @@ function attachCategoryIconListener(categoryBtn) {
     }
 }
 
-// Global function to reattach icon listeners after category operations
+// Migrate icon from one category number to another (called during renumbering)
+function reorderCategoryIcons(oldNum, newNum) {
+    if (oldNum === newNum) return;
+    const icon = categoryIcons.get(oldNum);
+    categoryIcons.delete(oldNum);
+    if (icon) categoryIcons.set(newNum, icon);
+}
+
+// Global function to reattach icon listeners after category operations.
+// Re-adding pen buttons: remove old ones first so they're not duplicated after cloneNode.
 function reattachCategoryIconListeners() {
+    document.querySelectorAll(".catbar__pen-btn").forEach((btn) => btn.remove());
     document.querySelectorAll(".category__btn").forEach((btn) => {
         attachCategoryIconListener(btn);
     });
