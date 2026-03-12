@@ -9,9 +9,9 @@
     --topbar-height: 3.5rem;
     --floating-height: 2rem;
     --catbar-width: 3.8rem;
-    --input-field-width: 20rem;
+    --input-field-width: 22rem;
     --viewport-width: 60rem;
-    --result-width: 20rem;
+    --result-width: 25rem;
     --modal-width-max: 55rem;
     --modal-width-calculator: 18rem;
     --workspace-gap: 1rem;
@@ -833,7 +833,7 @@ body.theme__dark select {
     width: 23px;
     height: 23px;
     stroke: var(--text-primary);
-    /* stroke-width: 1.6; */
+    stroke-width: 1.6;
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -852,23 +852,90 @@ body.theme__dark select {
 }
 
 .topbar__report-btn-container {
+    position: relative;
     display: flex;
     gap: 0;
 }
 
 .topbar__btn-report {
     background-color: var(--btn-report);
-    color: var(--bg-primary);
+    color: white;
     padding: 5px 5px 5px 12px;
     border-radius: var(--radius-5) 0 0 var(--radius-5);
 }
 
+/* Hovering the Report text button highlights the whole group */
+.topbar__report-btn-container:has(.topbar__btn-report:hover) .topbar__btn-report,
+.topbar__report-btn-container:has(.topbar__btn-report:hover) .topbar__btn-report-sub {
+    background-color: var(--btn-report-hover);
+}
+
+/* Hovering only the arrow highlights just the arrow */
+.topbar__btn-report-sub:hover {
+    background-color: var(--btn-report-hover);
+}
+
 .topbar__btn-report-sub {
     background-color: var(--btn-report);
-    color: var(--bg-primary);
-    padding: 5px 10px 5px 5px;
+    color: white;
+    padding: 5px 8px;
     border-radius: 0 var(--radius-5) var(--radius-5) 0;
-    border-left: 1px solid #70d7fc;
+    display: flex;
+    align-items: center;
+}
+
+.report__chevron {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    transition: transform var(--transition-fast);
+}
+
+.topbar__btn-report-sub[aria-expanded="true"] .report__chevron {
+    transform: rotate(180deg);
+}
+
+.report__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 160px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    padding: 4px 0;
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.report__dropdown.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.report__dropdown-item {
+    width: 100%;
+    text-align: left;
+    padding: 7px 14px;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    background: none;
+    border-radius: 0;
+    white-space: nowrap;
+    transition: background-color var(--transition-fast);
+}
+
+.report__dropdown-item:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-active);
 }
 
 .topbar__user-avatar {
@@ -999,9 +1066,9 @@ body.theme__dark select {
     border-radius: 0;
 }
 
-.floating__bar-btn:not(:last-child) {
+/* .floating__bar-btn:not(:last-child) {
     border-right: 1px solid var(--border-header);
-}
+} */
 
 .floating__bar-btn:hover {
     /* background-color: var(--bg-body); */
@@ -1190,10 +1257,10 @@ body.theme__dark select {
 .input__box-nav {
     background: var(--bg-bullet);
     border-radius: var(--radius-5);
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 1.5rem;
     display: flex;
     gap: 0.5rem;
-    justify-content: center;
+    justify-content: space-between;
     vertical-align: middle;
 }
 
@@ -1206,9 +1273,9 @@ body.theme__dark select {
     border-radius: 0;
 }
 
-.input__box-nav-btn:not(:last-child) {
+/* .input__box-nav-btn:not(:last-child) {
     border-right: 1px solid var(--bg-primary);
-}
+} */
 
 .input__box-nav-btn:hover {
     /* background-color: var(--bg-body); */

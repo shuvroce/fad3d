@@ -293,129 +293,29 @@ function createCategory(categoryNum) {
             ? "input__category-content"
             : "input__category-content hidden";
     categoryContent.setAttribute("data-category", categoryNum);
-    categoryContent.innerHTML = `
-        <div>
-            <h2 class="input__category-heading" contenteditable="true" data-category="${categoryNum}" spellcheck="false">Category ${categoryNum}</h2>
-        </div>
-        <div class="input__box-nav">
-            <button class="input__box-nav-btn active" data-category="${categoryNum}" data-tab="glass">Glass</button>
-            <button class="input__box-nav-btn" data-category="${categoryNum}" data-tab="frame">Frame</button>
-            <button class="input__box-nav-btn" data-category="${categoryNum}" data-tab="conn">Conn.</button>
-            <button class="input__box-nav-btn" data-category="${categoryNum}" data-tab="anchor">Anchor.</button>
-        </div>
+    // Clone template and populate with category-specific data
+    const template = document.getElementById("category-content-template");
+    const clone = template.content.cloneNode(true);
 
-        <!-- Glass Tab Content -->
-        <div class="input__tab-content" data-category="${categoryNum}" data-tab="glass">
-            <div class="input__field">
-                <label for="cat${categoryNum}-glass-type">Glass Type</label>
-                <select id="cat${categoryNum}-glass-type">
-                    <option value="">Select glass type</option>
-                    <option value="tempered">Tempered</option>
-                    <option value="laminated">Laminated</option>
-                    <option value="insulated">Insulated</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-glass-thickness">Thickness</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-glass-thickness" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-glass-width">Width</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-glass-width" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-glass-height">Height</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-glass-height" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-        </div>
+    // Update all data-category attributes
+    clone.querySelectorAll("[data-category]").forEach((el) => {
+        el.setAttribute("data-category", categoryNum);
+    });
 
-        <!-- Frame Tab Content -->
-        <div class="input__tab-content hidden" data-category="${categoryNum}" data-tab="frame">
-            <div class="input__field">
-                <label for="cat${categoryNum}-frame-material">Frame Material</label>
-                <select id="cat${categoryNum}-frame-material">
-                    <option value="">Select material</option>
-                    <option value="aluminum">Aluminum</option>
-                    <option value="steel">Steel</option>
-                    <option value="composite">Composite</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-frame-profile">Profile Type</label>
-                <input type="text" id="cat${categoryNum}-frame-profile" placeholder="Enter profile">
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-frame-depth">Depth</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-frame-depth" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-        </div>
+    // Update all form field IDs (cat0 → catN)
+    clone.querySelectorAll("[id]").forEach((el) => {
+        el.id = el.id.replace("cat0", `cat${categoryNum}`);
+    });
 
-        <!-- Connection Tab Content -->
-        <div class="input__tab-content hidden" data-category="${categoryNum}" data-tab="conn">
-            <div class="input__field">
-                <label for="cat${categoryNum}-conn-type">Connection Type</label>
-                <select id="cat${categoryNum}-conn-type">
-                    <option value="">Select connection</option>
-                    <option value="bracket">Bracket</option>
-                    <option value="clip">Clip</option>
-                    <option value="bolt">Bolt</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-conn-spacing">Spacing</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-conn-spacing" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-conn-capacity">Load Capacity</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-conn-capacity" placeholder="0.0">
-                    <span class="input__unit">kN</span>
-                </div>
-            </div>
-        </div>
+    // Update all label for attributes
+    clone.querySelectorAll("label[for]").forEach((label) => {
+        label.setAttribute("for", label.getAttribute("for").replace("cat0", `cat${categoryNum}`));
+    });
 
-        <!-- Anchor Tab Content -->
-        <div class="input__tab-content hidden" data-category="${categoryNum}" data-tab="anchor">
-            <div class="input__field">
-                <label for="cat${categoryNum}-anchor-type">Anchor Type</label>
-                <select id="cat${categoryNum}-anchor-type">
-                    <option value="">Select anchor</option>
-                    <option value="expansion">Expansion</option>
-                    <option value="chemical">Chemical</option>
-                    <option value="concrete">Concrete</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-anchor-diameter">Diameter</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-anchor-diameter" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="cat${categoryNum}-anchor-embedment">Embedment Depth</label>
-                <div class="input__group">
-                    <input type="number" id="cat${categoryNum}-anchor-embedment" placeholder="0.0">
-                    <span class="input__unit">mm</span>
-                </div>
-            </div>
-        </div>
-    `;
+    // Set heading text
+    clone.querySelector(".input__category-heading").textContent = `Category ${categoryNum}`;
+
+    categoryContent.appendChild(clone);
 
     // Add category content to input container
     document.getElementById("input-container").appendChild(categoryContent);
