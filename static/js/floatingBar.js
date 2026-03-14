@@ -1,66 +1,84 @@
 // ============================
-// Floating Bar Modal Handlers
+// Floating Bar — Shared Utilities & Coordinator
 // ============================
 
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.style.display = "block";
+function openModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'block';
 }
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.style.display = "none";
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
 }
+
+// --- Define Submenu ---
+
+function initDefineSubmenu() {
+    const wrap = document.getElementById('define-wrap');
+    const btn  = document.getElementById('define-modal-btn');
+    const menu = document.getElementById('define-submenu');
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = menu.hidden;
+        menu.hidden = !opening;
+        wrap.classList.toggle('open', opening);
+    });
+
+    document.addEventListener('click', () => {
+        if (menu && !menu.hidden) {
+            menu.hidden = true;
+            wrap?.classList.remove('open');
+            const secSubmenu = document.getElementById('section-submenu');
+            const secWrap    = document.getElementById('section-submenu-wrap');
+            if (secSubmenu) secSubmenu.hidden = true;
+            secWrap?.classList.remove('open');
+        }
+    });
+
+    menu.addEventListener('click', (e) => e.stopPropagation());
+
+    // --- Section nested submenu ---
+    const sectionWrap    = document.getElementById('section-submenu-wrap');
+    const sectionTrigger = document.getElementById('section-submenu-trigger');
+    const sectionSubmenu = document.getElementById('section-submenu');
+    sectionTrigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = sectionSubmenu.hidden;
+        sectionSubmenu.hidden = !opening;
+        sectionWrap?.classList.toggle('open', opening);
+    });
+    sectionSubmenu?.addEventListener('click', (e) => e.stopPropagation());
+}
+
+// --- Escape key ---
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        ['general-modal', 'material-modal', 'section-modal'].forEach(closeModal);
+        const menu = document.getElementById('define-submenu');
+        if (menu) menu.hidden = true;
+        const nestedMenu = document.getElementById('section-submenu');
+        if (nestedMenu) nestedMenu.hidden = true;
+        document.getElementById('define-wrap')?.classList.remove('open');
+    }
+});
+
+// --- Init ---
 
 function initFloatingBarModals() {
-    // General Modal
-    const generalBtn = document.getElementById("general-modal-btn");
-    const closeGeneralBtn = document.getElementById("close-general-modal");
-    const cancelGeneralBtn = document.getElementById("cancel-general-modal");
-    const applyGeneralBtn = document.getElementById("apply-general-modal");
-
-    generalBtn?.addEventListener("click", () => openModal("general-modal"));
-    closeGeneralBtn?.addEventListener("click", () => closeModal("general-modal"));
-    cancelGeneralBtn?.addEventListener("click", () => closeModal("general-modal"));
-
-    applyGeneralBtn?.addEventListener("click", () => {
-        const projectName = document.getElementById("gen-project-name")?.value.trim();
-        if (projectName) {
-            const headerName = document.getElementById("header-project-name");
-            if (headerName) headerName.textContent = projectName;
-        }
-        closeModal("general-modal");
-    });
-
-    // Define Modal
-    const defineBtn = document.getElementById("define-modal-btn");
-    const closeDefineBtn = document.getElementById("close-define-modal");
-    const cancelDefineBtn = document.getElementById("cancel-define-modal");
-    const applyDefineBtn = document.getElementById("apply-define-modal");
-
-    defineBtn?.addEventListener("click", () => openModal("define-modal"));
-    closeDefineBtn?.addEventListener("click", () => closeModal("define-modal"));
-    cancelDefineBtn?.addEventListener("click", () => closeModal("define-modal"));
-    applyDefineBtn?.addEventListener("click", () => closeModal("define-modal"));
-
-    // Close on backdrop click
-    ["general-modal", "define-modal"].forEach((id) => {
-        document.getElementById(id)?.addEventListener("click", (e) => {
-            if (e.target === e.currentTarget) closeModal(id);
-        });
-    });
-
-    // Close on Escape key
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-            closeModal("general-modal");
-            closeModal("define-modal");
-        }
-    });
+    if (!_materials.length) _materials = DEFAULT_MATERIALS.map(m => ({ ...m }));
+    initGeneralModal();
+    initDefineSubmenu();
+    initMaterialModal();
+    initAlumSectionModal();
+    initSteelSectionModal();
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initFloatingBarModals);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFloatingBarModals);
 } else {
     initFloatingBarModals();
 }

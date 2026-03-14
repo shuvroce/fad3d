@@ -228,100 +228,162 @@
     </div>
 </div>
 
-<!-- Define Parameters Modal -->
-<div id="define-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="define-modal-title">
+<!-- Material Definition Modal -->
+<div id="material-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="material-modal-title">
     <div class="modal__dialog modal__dialog-large">
         <div class="modal__header">
-            <h2 class="modal__title" id="define-modal-title">Define Parameters</h2>
-            <button type="button" class="modal__close" id="close-define-modal" aria-label="Close modal">
+            <h2 class="modal__title" id="material-modal-title">Material Definitions</h2>
+            <button type="button" class="modal__close" id="close-material-modal" aria-label="Close modal">
                 <svg viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
-        <div class="modal__content">
-            <div class="modal__form-section">
-                <h3 class="modal__form-section-title">Wind Parameters</h3>
-                <div class="modal__form-grid">
-                    <div class="input__field">
-                        <label for="def-wind-region">Wind Region</label>
-                        <select id="def-wind-region">
-                            <option value="">Select region</option>
-                            <option value="A">Region A</option>
-                            <option value="B">Region B</option>
-                            <option value="C">Region C</option>
-                            <option value="D">Region D</option>
-                        </select>
-                    </div>
-                    <div class="input__field">
-                        <label for="def-terrain-cat">Terrain Category</label>
-                        <select id="def-terrain-cat">
-                            <option value="">Select category</option>
-                            <option value="TC1">TC 1</option>
-                            <option value="TC2">TC 2</option>
-                            <option value="TC2.5">TC 2.5</option>
-                            <option value="TC3">TC 3</option>
-                        </select>
-                    </div>
-                    <div class="input__field">
-                        <label for="def-design-wind-speed">Design Wind Speed</label>
-                        <div class="input__group">
-                            <input type="number" id="def-design-wind-speed" placeholder="0.0">
-                            <span class="input__unit">m/s</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="def-basic-pressure">Basic Wind Pressure</label>
-                        <div class="input__group">
-                            <input type="number" id="def-basic-pressure" placeholder="0.00">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="def-service-pressure">Service Pressure</label>
-                        <div class="input__group">
-                            <input type="number" id="def-service-pressure" placeholder="0.00">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="def-ultimate-pressure">Ultimate Pressure</label>
-                        <div class="input__group">
-                            <input type="number" id="def-ultimate-pressure" placeholder="0.00">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
+        <div class="modal__content define-modal__layout">
+            <div class="define-modal__list-pane">
+                <div class="define-modal__toolbar">
+                    <button type="button" class="modal__btn modal__btn-secondary" id="add-material-btn">+ Add</button>
                 </div>
+                <ul class="define-modal__list" id="material-list" aria-label="Materials"></ul>
             </div>
-            <div class="modal__form-section">
-                <h3 class="modal__form-section-title">Load Parameters</h3>
-                <div class="modal__form-grid">
+            <div class="define-modal__form-pane">
+                <p class="define-modal__empty" id="material-form-empty">Select or add a material</p>
+                <div class="define-modal__form" id="material-form" hidden>
                     <div class="input__field">
-                        <label for="def-load-method">Load Combination Method</label>
-                        <select id="def-load-method">
-                            <option value="lrfd">LRFD</option>
-                            <option value="asd">ASD</option>
+                        <label for="mat-name">Name</label>
+                        <input type="text" id="mat-name" placeholder="Material name">
+                    </div>
+                    <div class="input__field">
+                        <label for="mat-type">Type</label>
+                        <select id="mat-type">
+                            <option value="Aluminum">Aluminum</option>
+                            <option value="Steel">Steel</option>
                         </select>
                     </div>
                     <div class="input__field">
-                        <label for="def-dead-load-factor">Dead Load Factor</label>
-                        <input type="number" id="def-dead-load-factor" placeholder="1.2" step="0.1">
+                        <label for="mat-grade">Grade</label>
+                        <select id="mat-grade"><!-- populated by JS --></select>
                     </div>
                     <div class="input__field">
-                        <label for="def-live-load-factor">Live Load Factor</label>
-                        <input type="number" id="def-live-load-factor" placeholder="1.5" step="0.1">
+                        <label for="mat-e">Elastic Modulus</label>
+                        <div class="input__group">
+                            <input type="number" id="mat-e" placeholder="—" min="0" step="any">
+                            <span class="input__unit">GPa</span>
+                        </div>
                     </div>
                     <div class="input__field">
-                        <label for="def-deflection-limit">Deflection Limit (L/n)</label>
-                        <input type="number" id="def-deflection-limit" placeholder="175" step="25">
+                        <label for="mat-fy">Yield Strength</label>
+                        <div class="input__group">
+                            <input type="number" id="mat-fy" placeholder="—" min="0" step="any">
+                            <span class="input__unit">MPa</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal__footer">
-            <button type="button" class="modal__btn modal__btn-secondary" id="cancel-define-modal">Cancel</button>
-            <button type="button" class="modal__btn modal__btn-primary" id="apply-define-modal">Apply</button>
+            <button type="button" class="modal__btn modal__btn-primary" id="apply-material-modal">Apply</button>
+        </div>
+    </div>
+</div>
+
+<!-- Section Definition Modal -->
+<div id="section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="section-modal-title">
+    <div class="modal__dialog modal__dialog-large">
+        <div class="modal__header">
+            <h2 class="modal__title" id="section-modal-title">Section Definitions</h2>
+            <button type="button" class="modal__close" id="close-section-modal" aria-label="Close modal">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal__content define-modal__layout">
+            <div class="define-modal__list-pane">
+                <div class="define-modal__toolbar">
+                    <button type="button" class="modal__btn modal__btn-secondary" id="add-section-btn">+ Add</button>
+                </div>
+                <ul class="define-modal__list" id="section-list" aria-label="Sections"></ul>
+            </div>
+            <div class="define-modal__form-pane">
+                <p class="define-modal__empty" id="section-form-empty">Select or add a section</p>
+                <div class="define-modal__form" id="section-form" hidden>
+                    <div class="input__field">
+                        <label for="sec-name">Name</label>
+                        <input type="text" id="sec-name" placeholder="Section name">
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-grade">Grade</label>
+                        <select id="sec-grade"><!-- populated from _materials --></select>
+                    </div>
+                    <div class="input__field" id="sec-profile-type-row">
+                        <label for="sec-profile-type">Profile Type</label>
+                        <select id="sec-profile-type">
+                            <option value="predefined">Pre-defined</option>
+                            <option value="stick">Stick</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                    </div>
+                    <div class="input__field" id="sec-shape-row">
+                        <label for="sec-shape">Shape</label>
+                        <select id="sec-shape"><!-- populated by JS --></select>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-b">Width (B)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-b" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-d">Depth (d)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-d" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-tf">Flange Thickness (tf)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-tf" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-tw">Web Thickness (tw)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-tw" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-a">Area (A)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-a" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm²</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-ix">Moment of Inertia (Ix)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-ix" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm⁴</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="sec-sx">Section Modulus (Sx)</label>
+                        <div class="input__group">
+                            <input type="number" id="sec-sx" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm³</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button type="button" class="modal__btn modal__btn-primary" id="apply-section-modal">Apply</button>
         </div>
     </div>
 </div>

@@ -1069,6 +1069,7 @@ body.theme__dark select {
     left: 0.5rem;
     padding: 0;
     justify-content: space-between;
+    z-index: 20;
 }
 
 .floating__bar-left-button {
@@ -1079,7 +1080,19 @@ body.theme__dark select {
 
 .floating__bar-right {
     right: calc(var(--result-width) + 5rem);
+    background-color: transparent;
     /* transition: right 0.2s ease; */
+    justify-content: space-between;
+    padding: 0;
+    gap: 1rem;
+}
+
+.floating__bar-right-view {
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-2);
+    padding: 2px 5px;
+    display: flex;
+    gap: 0.5rem;
 }
 
 .floating__bar-right.collapsed {
@@ -1112,6 +1125,369 @@ body.theme__dark select {
     border-radius: var(--radius-5);
 }
 
+/* Define dropdown submenu */
+.floating__bar-define-wrap {
+    position: relative;
+    display: inline-flex;
+    z-index: 20;
+}
+
+.floating__bar-chevron {
+    width: 11px;
+    height: 11px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: middle;
+    margin-left: 3px;
+    transition: transform 0.2s ease;
+}
+
+.floating__bar-define-wrap.open > .floating__bar-btn > .floating__bar-chevron {
+    transform: rotate(180deg);
+}
+
+.floating__bar-submenu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    overflow: visible;
+    min-width: 110px;
+    z-index: 600;
+    animation: submenu-in 0.15s ease;
+}
+
+@keyframes submenu-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.floating__bar-submenu[hidden] {
+    display: none;
+}
+
+.floating__bar-submenu-btn {
+    display: block;
+    width: 100%;
+    padding: 0.45rem 1rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.floating__bar-submenu-btn:hover {
+    background: var(--bg-hover);
+}
+
+.floating__bar-submenu-item--nested {
+    position: relative;
+}
+
+.floating__bar-submenu-btn--nested {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.floating__bar-chevron--right {
+    width: 11px;
+    height: 11px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+
+.floating__bar-submenu-item--nested.open > .floating__bar-chevron--right,
+.floating__bar-submenu-item--nested.open .floating__bar-chevron--right {
+    transform: rotate(90deg);
+}
+
+.floating__bar-submenu--nested {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 2px);
+    min-width: 110px;
+    overflow: hidden;
+    z-index: 601;
+    animation: submenu-in 0.15s ease;
+}
+
+/* Define list (Material / Section modals) */
+.define-list__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid var(--border-primary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.define-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    min-height: 100px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.define-list__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 1.25rem;
+    transition: background 0.15s ease;
+}
+
+.define-list__item:hover {
+    background: var(--bg-hover);
+}
+
+.define-list__item.drag-over {
+    border-top: 2px solid var(--color-primary);
+}
+
+.define-list__drag-handle {
+    cursor: grab;
+    color: var(--text-secondary);
+    opacity: 0.4;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.define-list__drag-handle:active {
+    cursor: grabbing;
+}
+
+.define-list__item:hover .define-list__drag-handle {
+    opacity: 1;
+}
+
+.define-list__drag-handle svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    display: block;
+}
+
+.define-list__drag-col  { width: 22px; flex-shrink: 0; }
+.define-list__name-col  { flex: 1 1 auto; min-width: 80px; }
+.define-list__type-col  { flex: 0 0 90px; }
+.define-list__grade-col { flex: 0 0 110px; }
+.define-list__num-col   { flex: 0 0 72px; }
+.define-list__del-col   { width: 26px; flex-shrink: 0; }
+
+.define-list__input {
+    width: 100%;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-1);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+}
+
+.define-list__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.define-list__input--readonly {
+    background: var(--bg-tertiary, var(--bg-primary));
+    color: var(--text-secondary);
+    -webkit-text-fill-color: var(--text-secondary);
+    cursor: default;
+    border-color: transparent;
+    opacity: 1;
+    pointer-events: none;
+}
+
+.define-list__del-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 1px 4px;
+    border-radius: var(--radius-1);
+    font-size: 1rem;
+    line-height: 1;
+    transition: color 0.15s ease;
+}
+
+.define-list__del-btn:hover {
+    color: #e53935;
+}
+
+/* Define modal two-pane layout */
+.define-modal__layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 360px;
+    overflow: hidden;
+    padding: 0;
+}
+
+.define-modal__list-pane {
+    width: 185px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+}
+
+.define-modal__toolbar {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.define-modal__toolbar .modal__btn {
+    width: 100%;
+    font-size: 0.78rem;
+}
+
+.define-modal__list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.define-modal__list-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.42rem 0.6rem;
+    cursor: pointer;
+    transition: background 0.12s ease;
+    user-select: none;
+}
+
+.define-modal__list-item:hover { background: var(--bg-hover); }
+
+.define-modal__list-item.active {
+    background: var(--btn-selected);
+}
+
+.define-modal__list-item.drag-over {
+    border-top: 2px solid var(--color-primary);
+}
+
+.define-modal__drag-handle {
+    cursor: grab;
+    color: var(--text-secondary);
+    opacity: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.1s;
+}
+
+.define-modal__drag-handle svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+.define-modal__list-item:hover .define-modal__drag-handle { opacity: 1; }
+
+.define-modal__item-name {
+    flex: 1;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.define-modal__list-item.active .define-modal__item-name {
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.define-modal__del-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 1px 3px;
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0;
+    flex-shrink: 0;
+    transition: color 0.15s, opacity 0.1s;
+    border-radius: var(--radius-1);
+}
+
+.define-modal__list-item:hover .define-modal__del-btn { opacity: 1; }
+.define-modal__del-btn:hover { color: #e53935; }
+
+.define-modal__form-pane {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.define-modal__empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin: 0;
+    font-style: italic;
+}
+
+.define-modal__form {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.define-modal__form .input__field {
+    flex: unset;
+    min-width: unset;
+}
+
+.define-modal__form input[type="text"],
+.define-modal__form input[type="number"],
+.define-modal__form select {
+    min-width: unset;
+    flex: unset;
+    width: 100%;
+}
+
 /* leftbar */
 .left__panel {
     position: fixed;
@@ -1133,7 +1509,7 @@ body.theme__dark select {
     padding: 0.4rem;
     border-left: 1px solid var(--border-primary);
     border-radius: 0 var(--radius-1) var(--radius-1) 0;
-    z-index: 20;
+    z-index: 10;
     cursor: pointer;
     pointer-events: auto;
     /* transition: left 0.2s ease, var(--transition-bg), var(--transition-border); */
@@ -1603,7 +1979,7 @@ body.theme__dark select {
     padding: 0.4rem;
     border-right: 1px solid var(--border-primary);
     border-radius: var(--radius-1) 0 0 var(--radius-1);
-    z-index: 20;
+    z-index: 10;
     cursor: pointer;
     pointer-events: auto;
     /* transition: right 0.2s ease, var(--transition-bg), var(--transition-border); */

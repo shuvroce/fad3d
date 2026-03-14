@@ -152,14 +152,45 @@
 
             <div class="floating__bar-left-button">
                 <button class="floating__bar-btn" id="general-modal-btn">General</button>
-                <button class="floating__bar-btn" id="define-modal-btn">Define</button>
+                <div class="floating__bar-define-wrap" id="define-wrap">
+                    <button class="floating__bar-btn" id="define-modal-btn">
+                        Define
+                        <svg class="floating__bar-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 9l6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <div class="floating__bar-submenu" id="define-submenu" hidden>
+                        <button class="floating__bar-submenu-btn" id="material-modal-btn">Material</button>
+                        <div class="floating__bar-submenu-item floating__bar-submenu-item--nested"
+                            id="section-submenu-wrap">
+                            <button class="floating__bar-submenu-btn floating__bar-submenu-btn--nested"
+                                id="section-submenu-trigger">
+                                Section
+                                <svg class="floating__bar-chevron floating__bar-chevron--right" viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                            <div class="floating__bar-submenu floating__bar-submenu--nested" id="section-submenu"
+                                hidden>
+                                <button class="floating__bar-submenu-btn" id="section-alum-btn">Aluminum</button>
+                                <button class="floating__bar-submenu-btn" id="section-steel-btn">Steel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="floating__bar-right">
-            <button class="floating__bar-btn active">Model</button>
-            <button class="floating__bar-btn">DC Ratio</button>
-            <button class="floating__bar-btn">Deflection</button>
+            <div class="floating__bar-right-view">
+                <button class="floating__bar-btn">Figures</button>
+            </div>
+            <div class="floating__bar-right-view">
+                <button class="floating__bar-btn active">Model</button>
+                <button class="floating__bar-btn">DC Ratio</button>
+                <button class="floating__bar-btn">Deflection</button>
+            </div>
         </div>
     </section>
 
@@ -382,16 +413,6 @@
     {% include "modals.html" %}
     {% include "input-temp.html" %}
 
-    <script src="/static/js/app.js"></script>
-    <script src="/static/js/theme.js"></script>
-    <script src="/static/js/panelMode.js"></script>
-    <script src="/static/js/category.js"></script>
-    <script src="/static/js/results.js"></script>
-    <script src="/static/js/report.js"></script>
-    <script src="/static/js/viewControls.js"></script>
-    <script src="/static/js/categoryIcons.js"></script>
-    <script src="/static/js/floatingBar.js"></script>
-
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/panelMode.js') }}"></script>
@@ -400,6 +421,10 @@
     <script src="{{ url_for('static', filename='js/report.js') }}"></script>
     <script src="{{ url_for('static', filename='js/viewControls.js') }}"></script>
     <script src="{{ url_for('static', filename='js/categoryIcons.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/generalInfo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/materialProp.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/alumSecProp.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/steelSecProp.js') }}"></script>
     <script src="{{ url_for('static', filename='js/floatingBar.js') }}"></script>
 </body>
 
