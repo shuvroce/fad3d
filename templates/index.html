@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FAD - Facade Analysis & Design v2.0</title>
     <link rel="icon" href="../static/fav.png" type="image/png" />
-    <!-- <link rel="icon" href="{{ url_for('static', filename='fav.png') }}" type="image/png"> -->
+    <link rel="icon" href="{{ url_for('static', filename='fav.png') }}" type="image/png">
     <link rel="stylesheet" href="/static/app.css" />
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 </head>
 
 <body>
@@ -151,8 +151,8 @@
             </div>
 
             <div class="floating__bar-left-button">
-                <button class="floating__bar-btn">General</button>
-                <button class="floating__bar-btn">Define</button>
+                <button class="floating__bar-btn" id="general-modal-btn">General</button>
+                <button class="floating__bar-btn" id="define-modal-btn">Define</button>
             </div>
         </div>
 
@@ -390,10 +390,17 @@
     <script src="/static/js/report.js"></script>
     <script src="/static/js/viewControls.js"></script>
     <script src="/static/js/categoryIcons.js"></script>
-    <!-- <script src="{{ url_for('static', filename='js/app.js') }}"></script> -->
-    <!-- <script src="{{ url_for('static', filename='js/theme.js') }}"></script> -->
-    <!-- <script src="{{ url_for('static', filename='js/panelMode.js') }}"></script> -->
-    <!-- <script src="{{ url_for('static', filename='js/category.js') }}"></script> -->
+    <script src="/static/js/floatingBar.js"></script>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/panelMode.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/category.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/results.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/report.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/viewControls.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/categoryIcons.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/floatingBar.js') }}"></script>
 </body>
 
 </html>

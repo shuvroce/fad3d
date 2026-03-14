@@ -600,6 +600,48 @@ body.theme__dark select {
     max-width: 400px;
 }
 
+.modal__dialog-large {
+    max-width: 750px;
+}
+
+.modal__form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal__form-full {
+    flex: 1 1 100%;
+}
+
+.modal__form-section {
+    border-top: 1px solid var(--border-primary);
+}
+
+.modal__form-section:first-child {
+    border-top: none;
+}
+
+.modal__form-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    padding: 1.25rem 1.5rem 0;
+    margin: 0;
+}
+
+.modal__btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.modal__btn-primary:hover {
+    background: var(--color-primary-hover);
+}
+
 .modal__header {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border-primary);
