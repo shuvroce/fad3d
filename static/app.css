@@ -77,6 +77,9 @@
     --color-success: #22c55e;
     --color-danger: #ef4444;
 
+    --btn-primary: #223e5d;
+    --btn-primary-hover: #2e547f;
+
     --btn-danger: #dc3545;
     --btn-danger-hover: #c72d3c;
 
@@ -102,6 +105,8 @@ body.theme__dark {
     --bg-select: #1f1c1c;
     --bg-code: #141414;
     --bg-category: #1a2617;
+
+    --bg-bullet: #2d2d2d;
 
     /* Dark Theme - Text Colors */
     --text-primary: #e0e0e0;
@@ -139,14 +144,16 @@ body.theme__dark {
     --color-success: #22c55e;
     --color-danger: #ef4444;
 
-    --btn-primary: #223e5d;
-    --btn-primary-hover: #2e547f;
+    --btn-primary: #4071aa;
+    --btn-primary-hover: #77afef;
 
     --btn-accent: #9b6b04;
     --btn-accent-hover: #8f6305;
 
     --btn-danger: #eb3f50;
     --btn-danger-hover: #c04c58;
+
+    --btn-selected: #757063;
 
     --logo-image: var(--logo-image-dark);
     --logo-filter: brightness(0) invert(1);
@@ -1041,6 +1048,7 @@ body.theme__dark select {
     padding: 0.2rem 0.8rem;
     border: none;
     background: transparent;
+    color: var(--text-primary);
     font-size: 0.8rem;
     /* transition: color 0.2s; */
     border-radius: 0;
@@ -1051,13 +1059,14 @@ body.theme__dark select {
 } */
 
 .floating__bar-btn:hover {
-    /* background-color: var(--bg-body); */
-    /* border-radius: var(--radius-5); */
-    color: var(--btn-primary-hover);
+    background-color: var(--bg-body);
+    border-radius: var(--radius-5);
+    /* color: var(--btn-primary-hover); */
 }
 
 .floating__bar-btn.active {
     background-color: var(--btn-selected);
+    color: var(--text-primary);
     border-radius: var(--radius-5);
 }
 
@@ -1250,7 +1259,7 @@ body.theme__dark select {
     border-radius: var(--radius-3);
     box-shadow: 0 4px 16px rgba(0,0,0,0.14);
     padding: 4px 0;
-    min-width: 160px;
+    min-width: 120px;
     list-style: none;
     margin: 0;
     animation: fadeIn 0.1s ease;
@@ -1335,9 +1344,10 @@ body.theme__dark select {
 }
 
 .input__box-nav-btn {
-    padding: 0.15rem 0.5rem;
+    padding: 0.2rem 0.5rem;
     border: none;
     background: transparent;
+    color: var(--text-primary);
     font-size: 0.8rem;
     transition: color 0.2s;
     border-radius: 0;
@@ -1348,9 +1358,9 @@ body.theme__dark select {
 } */
 
 .input__box-nav-btn:hover {
-    /* background-color: var(--bg-body); */
-    /* border-radius: var(--radius-5); */
-    color: var(--btn-primary-hover);
+    background-color: var(--bg-hover);
+    border-radius: var(--radius-5);
+    /* color: var(--btn-primary-hover); */
 }
 
 .input__box-nav-btn.active {
