@@ -98,15 +98,12 @@ function renderMaterialList() {
 
 function showMaterialForm() {
     const form  = document.getElementById('material-form');
-    const empty = document.getElementById('material-form-empty');
-    if (!form || !empty) return;
+    if (!form) return;
     if (_selectedMatIdx < 0 || _selectedMatIdx >= _materials.length) {
         form.hidden = true;
-        empty.hidden = false;
         return;
     }
     form.hidden = false;
-    empty.hidden = true;
     const mat = _materials[_selectedMatIdx];
     document.getElementById('mat-name').value = mat.name  || '';
     document.getElementById('mat-type').value = mat.type  || 'Aluminum';

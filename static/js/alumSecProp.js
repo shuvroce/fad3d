@@ -137,15 +137,12 @@ function renderAlumSectionList() {
 
 function showAlumSectionForm() {
     const form  = document.getElementById('section-form');
-    const empty = document.getElementById('section-form-empty');
-    if (!form || !empty) return;
+    if (!form) return;
     if (_selectedAlumSecIdx < 0 || _selectedAlumSecIdx >= _alumSections.length) {
         form.hidden = true;
-        empty.hidden = false;
         return;
     }
     form.hidden = false;
-    empty.hidden = true;
     const sec         = _alumSections[_selectedAlumSecIdx];
     const profileType = sec.profileType || 'predefined';
 

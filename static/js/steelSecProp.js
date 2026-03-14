@@ -65,15 +65,12 @@ function renderSteelSectionList() {
 
 function showSteelSectionForm() {
     const form  = document.getElementById('section-form');
-    const empty = document.getElementById('section-form-empty');
-    if (!form || !empty) return;
+    if (!form) return;
     if (_selectedSteelSecIdx < 0 || _selectedSteelSecIdx >= _steelSections.length) {
         form.hidden = true;
-        empty.hidden = false;
         return;
     }
     form.hidden = false;
-    empty.hidden = true;
     const sec = _steelSections[_selectedSteelSecIdx];
 
     document.getElementById('sec-name').value = sec.name || '';
