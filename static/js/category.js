@@ -122,14 +122,34 @@ function renumberCategories() {
         document.querySelectorAll(".input__category-content"),
     );
 
+    // Snapshot all per-category data keyed by OLD number before any mutations
+    const oldNums = categoryWrappers.map((w) =>
+        parseInt(w.getAttribute("data-category")),
+    );
+    const nameSnapshot = new Map(oldNums.map((n) => [n, categoryNames.get(n)]));
+    const iconSnapshot =
+        typeof categoryIcons !== "undefined"
+            ? new Map(oldNums.map((n) => [n, categoryIcons.get(n)]))
+            : null;
+
+    // Rebuild Maps from scratch using the new sequential order
+    categoryNames.clear();
+    nameSnapshot.forEach((name, oldNum) => {
+        const newNum = oldNums.indexOf(oldNum) + 1;
+        if (name) categoryNames.set(newNum, name);
+    });
+    if (iconSnapshot && typeof categoryIcons !== "undefined") {
+        categoryIcons.clear();
+        iconSnapshot.forEach((icon, oldNum) => {
+            const newNum = oldNums.indexOf(oldNum) + 1;
+            if (icon) categoryIcons.set(newNum, icon);
+        });
+    }
+
     // Renumber each category wrapper and its content
     categoryWrappers.forEach((wrapper, index) => {
         const newCategoryNum = index + 1;
-        const oldCategoryNum = parseInt(wrapper.getAttribute("data-category"));
-
-        if (oldCategoryNum === newCategoryNum) {
-            return; // No change needed
-        }
+        const oldCategoryNum = oldNums[index];
 
         // Update wrapper data-category
         wrapper.setAttribute("data-category", newCategoryNum);
@@ -143,7 +163,10 @@ function renumberCategories() {
             categoryBtn.setAttribute("data-category", newCategoryNum);
             categoryBtn.setAttribute("data-title", customName);
             categoryBtn.setAttribute("aria-label", customName);
-            categoryBtn.textContent = newCategoryNum;
+
+            // Update index badge
+            const badge = categoryBtn.querySelector(".category__btn-badge");
+            if (badge) badge.textContent = newCategoryNum;
 
             // Re-attach click event
             categoryBtn.replaceWith(categoryBtn.cloneNode(true));
@@ -151,28 +174,10 @@ function renumberCategories() {
             newCategoryBtn.addEventListener("click", () => {
                 switchCategory(newCategoryNum);
             });
-
-            // Migrate icon to new category number
-            if (typeof reorderCategoryIcons === "function") {
-                reorderCategoryIcons(oldCategoryNum, newCategoryNum);
-            }
-        }
-
-        // Update remove button
-        const removeBtn = wrapper.querySelector(".catbar__remove-btn");
-        if (removeBtn) {
-            removeBtn.setAttribute("data-category", newCategoryNum);
-            removeBtn.setAttribute(
-                "aria-label",
-                `Remove Category ${newCategoryNum}`,
-            );
-
-            // Re-attach click event
-            removeBtn.replaceWith(removeBtn.cloneNode(true));
-            const newRemoveBtn = wrapper.querySelector(".catbar__remove-btn");
-            newRemoveBtn.addEventListener("click", (e) => {
+            newCategoryBtn.addEventListener("contextmenu", (e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                removeCategory(newCategoryNum);
+                showCategoryContextMenu(e, newCategoryNum);
             });
         }
     });
@@ -182,33 +187,20 @@ function renumberCategories() {
         const newCategoryNum = index + 1;
         const oldCategoryNum = parseInt(content.getAttribute("data-category"));
 
-        if (oldCategoryNum === newCategoryNum) {
-            return; // No change needed
-        }
-
         // Update content data-category
         content.setAttribute("data-category", newCategoryNum);
 
-        // Update h2 heading - preserve custom name if it exists
+        // Update h2 heading
         const heading = content.querySelector("h2");
         if (heading) {
-            const customName = categoryNames.get(oldCategoryNum);
-            if (customName) {
-                categoryNames.delete(oldCategoryNum);
-                categoryNames.set(newCategoryNum, customName);
-                heading.textContent = customName;
-            } else {
-                heading.textContent = `Category ${newCategoryNum}`;
-            }
+            const customName = categoryNames.get(newCategoryNum);
+            heading.textContent = customName || `Category ${newCategoryNum}`;
             heading.setAttribute("data-category", newCategoryNum);
         }
 
         // Update all tab buttons
         content.querySelectorAll(".input__box-nav-btn").forEach((tabBtn) => {
-            const tabName = tabBtn.getAttribute("data-tab");
             tabBtn.setAttribute("data-category", newCategoryNum);
-
-            // Re-attach click event
             tabBtn.replaceWith(tabBtn.cloneNode(true));
         });
 
@@ -230,27 +222,23 @@ function renumberCategories() {
 
         // Update all form field IDs and labels
         content.querySelectorAll("label[for]").forEach((label) => {
-            const forAttr = label.getAttribute("for");
-            const newForAttr = forAttr.replace(
-                /cat\d+/,
-                `cat${newCategoryNum}`,
+            label.setAttribute(
+                "for",
+                label.getAttribute("for").replace(/cat\d+/, `cat${newCategoryNum}`),
             );
-            label.setAttribute("for", newForAttr);
         });
 
         content.querySelectorAll("input[id], select[id]").forEach((field) => {
-            const fieldId = field.getAttribute("id");
-            const newFieldId = fieldId.replace(
-                /cat\d+/,
-                `cat${newCategoryNum}`,
+            field.setAttribute(
+                "id",
+                field.getAttribute("id").replace(/cat\d+/, `cat${newCategoryNum}`),
             );
-            field.setAttribute("id", newFieldId);
         });
     });
 
-    // Reattach icon listeners after renumbering (cloned buttons lost their contextmenu handlers)
-    if (typeof reattachCategoryIconListeners === "function") {
-        reattachCategoryIconListeners();
+    // Restore icons after renumber (icons already migrated in Map)
+    if (typeof reattachCategoryIcons === "function") {
+        reattachCategoryIcons();
     }
 }
 
@@ -260,6 +248,7 @@ function createCategory(categoryNum) {
     const btnWrapper = document.createElement("div");
     btnWrapper.className = "catbar__btn-wrapper";
     btnWrapper.setAttribute("data-category", categoryNum);
+    btnWrapper.setAttribute("draggable", "true");
 
     // Create category button
     const categoryBtn = document.createElement("button");
@@ -267,38 +256,40 @@ function createCategory(categoryNum) {
     categoryBtn.setAttribute("data-category", categoryNum);
     categoryBtn.setAttribute("data-title", `Category ${categoryNum}`);
     categoryBtn.setAttribute("aria-label", `Category ${categoryNum}`);
-    categoryBtn.textContent = categoryNum;
+
+    // Icon element (main content)
+    const iconEl = document.createElement("span");
+    iconEl.className = "category__btn-icon";
+    const iconKey = (typeof categoryIcons !== "undefined" && categoryIcons.get(categoryNum)) || (typeof DEFAULT_CATEGORY_ICON !== "undefined" ? DEFAULT_CATEGORY_ICON : null);
+    const iconDef = (typeof SVG_ICONS !== "undefined" && iconKey) ? SVG_ICONS[iconKey] : null;
+    iconEl.innerHTML = iconDef ? iconDef.svg : "";
+
+    // Index badge
+    const badge = document.createElement("span");
+    badge.className = "category__btn-badge";
+    badge.textContent = categoryNum;
+
+    categoryBtn.appendChild(iconEl);
+    categoryBtn.appendChild(badge);
 
     // Add click event to new category button
     categoryBtn.addEventListener("click", () => {
         switchCategory(categoryNum);
     });
 
-    // Create remove button for all categories
-    const removeBtn = document.createElement("button");
-    removeBtn.className = "catbar__remove-btn";
-    removeBtn.setAttribute("type", "button");
-    removeBtn.setAttribute("data-category", categoryNum);
-    removeBtn.setAttribute("aria-label", `Remove Category ${categoryNum}`);
-    removeBtn.textContent = "×";
-
-    removeBtn.addEventListener("click", (e) => {
+    // Right-click context menu
+    categoryBtn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        removeCategory(categoryNum);
+        showCategoryContextMenu(e, categoryNum);
     });
 
-    btnWrapper.appendChild(removeBtn);
     btnWrapper.appendChild(categoryBtn);
 
     // Insert before the add button
     const catbar = document.querySelector(".catbar");
     const addBtn = document.querySelector("#cat-add");
     catbar.insertBefore(btnWrapper, addBtn);
-
-    // Attach pen icon listener now that button is in the DOM
-    if (typeof attachCategoryIconListener === "function") {
-        attachCategoryIconListener(categoryBtn);
-    }
 
     // Create category content
     const categoryContent = document.createElement("div");
@@ -346,24 +337,28 @@ function createCategory(categoryNum) {
             });
         });
 
+    // Attach context menu to the new button
+    if (typeof initCategoryContextMenu === "function") {
+        initCategoryContextMenu();
+    }
+
     // Add event listener to category heading for editing
     const heading = categoryContent.querySelector(".input__category-heading");
     if (heading) {
-        // Save custom name on blur
+        // Save custom name on blur - read current category number dynamically
         heading.addEventListener("blur", () => {
+            const currentCatNum = parseInt(
+                heading.getAttribute("data-category"),
+            );
             const newName = heading.textContent.trim();
-            if (newName && newName !== `Category ${categoryNum}`) {
-                categoryNames.set(categoryNum, newName);
-                // Update button tooltip
-                updateCategoryButtonTooltip(categoryNum, newName);
+            const defaultName = `Category ${currentCatNum}`;
+            if (newName && newName !== defaultName) {
+                categoryNames.set(currentCatNum, newName);
+                updateCategoryButtonTooltip(currentCatNum, newName);
             } else {
-                categoryNames.delete(categoryNum);
-                heading.textContent = `Category ${categoryNum}`;
-                // Reset button tooltip
-                updateCategoryButtonTooltip(
-                    categoryNum,
-                    `Category ${categoryNum}`,
-                );
+                categoryNames.delete(currentCatNum);
+                heading.textContent = defaultName;
+                updateCategoryButtonTooltip(currentCatNum, defaultName);
             }
         });
 
@@ -447,6 +442,76 @@ async function ensureTemplatesLoaded() {
     document.body.appendChild(container);
 }
 
+// Drag-and-drop reordering of category buttons
+function initializeCategoryDragDrop() {
+    const catbar = document.querySelector(".catbar");
+    let dragSrc = null;
+
+    catbar.addEventListener("dragstart", (e) => {
+        const wrapper = e.target.closest(".catbar__btn-wrapper");
+        if (!wrapper) return;
+        dragSrc = wrapper;
+        e.dataTransfer.effectAllowed = "move";
+        setTimeout(() => wrapper.classList.add("dragging"), 0);
+    });
+
+    catbar.addEventListener("dragend", () => {
+        document.querySelectorAll(".catbar__btn-wrapper").forEach((w) => {
+            w.classList.remove("dragging", "drag-over-top", "drag-over-bottom");
+        });
+        dragSrc = null;
+    });
+
+    catbar.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (!dragSrc) return;
+        const wrapper = e.target.closest(".catbar__btn-wrapper");
+        document.querySelectorAll(".catbar__btn-wrapper").forEach((w) => {
+            w.classList.remove("drag-over-top", "drag-over-bottom");
+        });
+        if (wrapper && wrapper !== dragSrc) {
+            const rect = wrapper.getBoundingClientRect();
+            if (e.clientY < rect.top + rect.height / 2) {
+                wrapper.classList.add("drag-over-top");
+            } else {
+                wrapper.classList.add("drag-over-bottom");
+            }
+        }
+    });
+
+    catbar.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const targetWrapper = e.target.closest(".catbar__btn-wrapper");
+        if (!targetWrapper || !dragSrc || targetWrapper === dragSrc) return;
+
+        // Determine insert position based on cursor position
+        const rect = targetWrapper.getBoundingClientRect();
+        const insertBefore = e.clientY < rect.top + rect.height / 2;
+        const addBtn = document.querySelector("#cat-add");
+
+        if (insertBefore) {
+            catbar.insertBefore(dragSrc, targetWrapper);
+        } else {
+            catbar.insertBefore(dragSrc, targetWrapper.nextSibling || addBtn);
+        }
+
+        // Reorder category contents to match new catbar order
+        const inputContainer = document.getElementById("input-container");
+        document.querySelectorAll(".catbar__btn-wrapper").forEach((wrapper) => {
+            const catNum = parseInt(wrapper.getAttribute("data-category"));
+            const content = document.querySelector(`.input__category-content[data-category="${catNum}"]`);
+            if (content) inputContainer.appendChild(content);
+        });
+
+        // Get new index of dragged wrapper before renumbering
+        const newWrappers = Array.from(document.querySelectorAll(".catbar__btn-wrapper"));
+        const newCategoryNum = newWrappers.indexOf(dragSrc) + 1;
+
+        renumberCategories();
+        switchCategory(newCategoryNum);
+    });
+}
+
 // Initialize event listeners
 async function initializeCategoryManagement() {
     await ensureTemplatesLoaded();
@@ -462,6 +527,8 @@ async function initializeCategoryManagement() {
         createCategory(categoryCount);
         switchCategory(categoryCount);
     });
+
+    initializeCategoryDragDrop();
 }
 
 // Initialize when DOM is ready
