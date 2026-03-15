@@ -155,7 +155,7 @@
 <div id="general-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="general-modal-title">
     <div class="modal__dialog modal__dialog-large">
         <div class="modal__header">
-            <h2 class="modal__title" id="general-modal-title">General Settings</h2>
+            <h2 class="modal__title" id="general-modal-title">General</h2>
             <button type="button" class="modal__close" id="close-general-modal" aria-label="Close modal">
                 <svg viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18" />
@@ -166,58 +166,84 @@
         <div class="modal__content">
             <div class="modal__form-grid">
                 <div class="input__field">
+                    <label for="gen-project-number">Ref. No.</label>
+                    <input type="text" id="gen-project-number" placeholder="e.g. RFA-001/REV-02/AEL/NAVA/2026">
+                </div>
+                <div class="input__field">
                     <label for="gen-project-name">Project Name</label>
                     <input type="text" id="gen-project-name" placeholder="Enter project name">
                 </div>
                 <div class="input__field">
-                    <label for="gen-project-number">Project Number</label>
-                    <input type="text" id="gen-project-number" placeholder="e.g. PRJ-2024-001">
+                    <label for="gen-project-location">Project Location</label>
+                    <input type="text" id="gen-project-location" placeholder="e.g. Dhaka">
                 </div>
                 <div class="input__field">
-                    <label for="gen-client">Client</label>
+                    <label for="gen-client">Project Client</label>
                     <input type="text" id="gen-client" placeholder="Enter client name">
                 </div>
                 <div class="input__field">
-                    <label for="gen-location">Site Location</label>
-                    <input type="text" id="gen-location" placeholder="Enter site location">
+                    <label for="gen-rev">Revision No.</label>
+                    <input type="text" id="gen-rev" placeholder="0">
                 </div>
                 <div class="input__field">
-                    <label for="gen-design-code">Design Code</label>
-                    <select id="gen-design-code">
-                        <option value="">Select code</option>
-                        <option value="as4284">AS 4284</option>
-                        <option value="en13830">EN 13830</option>
-                        <option value="asce7">ASCE 7</option>
-                        <option value="nbc">NBC</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="gen-building-class">Building Class</label>
-                    <select id="gen-building-class">
-                        <option value="">Select class</option>
-                        <option value="I">Class I</option>
-                        <option value="II">Class II</option>
-                        <option value="III">Class III</option>
-                        <option value="IV">Class IV</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="gen-building-height">Building Height</label>
-                    <div class="input__group">
-                        <input type="number" id="gen-building-height" placeholder="0.0">
-                        <span class="input__unit">m</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="gen-floor-height">Floor-to-Floor Height</label>
-                    <div class="input__group">
-                        <input type="number" id="gen-floor-height" placeholder="0.0">
-                        <span class="input__unit">m</span>
-                    </div>
+                    <label for="gen-date">Date</label>
+                    <input type="text" id="gen-date" placeholder="June 28, 2025">
                 </div>
                 <div class="input__field modal__form-full">
                     <label for="gen-description">Description</label>
                     <textarea id="gen-description" rows="3" placeholder="Project description or notes..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal__include-area">
+                <p class="modal__include-heading">Include in Report?</p>
+                <div class="modal__include-checkbox">
+                    <div class="modal__include-checkbox-col">
+                        <label class="modal__checkbox-option" for="toc">
+                            <input type="checkbox" id="toc" name="include.toc" checked>
+                            <span>Table of Contents</span>
+                        </label>
+                        <label class="modal__checkbox-option" for="intro">
+                            <input type="checkbox" id="intro" name="include.intro" checked>
+                            <span>Introduction</span>
+                        </label>
+                        <label class="modal__checkbox-option modal__checkbox-option-sub" for="material-specs">
+                            <input type="checkbox" id="material-specs" name="include.material_specs" checked>
+                            <span>– Material Specifications</span>
+                        </label>
+                        <label class="modal__checkbox-option modal__checkbox-option-sub" for="design-consideration">
+                            <input type="checkbox" id="design-consideration" name="include.design_consideration"
+                                checked>
+                            <span>– Design Consideration</span>
+                        </label>
+                        <label class="modal__checkbox-option modal__checkbox-option-sub" for="idealization">
+                            <input type="checkbox" id="idealization" name="include.idealization" checked>
+                            <span>– Indealization of Cross-section</span>
+                        </label>
+                    </div>
+
+                    <div class="modal__include-checkbox-col">
+                        <label class="modal__checkbox-option" for="theory">
+                            <input type="checkbox" id="theory" name="include.theory" checked>
+                            <span>Theoretical Background</span>
+                        </label>
+                        <label class="modal__checkbox-option" for="moment-capacity">
+                            <input type="checkbox" id="moment-capacity" name="include.moment_capacity" checked>
+                            <span>Moment Capacity of Profiles</span>
+                        </label>
+                        <label class="modal__checkbox-option" for="wind-pressure">
+                            <input type="checkbox" id="wind-pressure" name="include.wind_pressure" checked>
+                            <span>Wind Pressure</span>
+                        </label>
+                        <label class="modal__checkbox-option" for="categories">
+                            <input type="checkbox" id="categories" name="include.categories" checked>
+                            <span>Categories</span>
+                        </label>
+                        <label class="modal__checkbox-option" for="reference">
+                            <input type="checkbox" id="reference" name="include.reference" checked>
+                            <span>References</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>

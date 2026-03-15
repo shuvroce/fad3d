@@ -220,6 +220,20 @@ function renumberCategories() {
                 tabContent.setAttribute("data-category", newCategoryNum);
             });
 
+        // Update glass type sub-sections
+        content
+            .querySelectorAll(".glass__type-fields")
+            .forEach((section) => {
+                section.setAttribute("data-category", newCategoryNum);
+            });
+
+        // Update frame variant sub-sections
+        content
+            .querySelectorAll(".frame__variant-fields")
+            .forEach((section) => {
+                section.setAttribute("data-category", newCategoryNum);
+            });
+
         // Update all form field IDs and labels
         content.querySelectorAll("label[for]").forEach((label) => {
             label.setAttribute(
@@ -342,6 +356,16 @@ function createCategory(categoryNum) {
         initCategoryContextMenu();
     }
 
+    // Initialize frame variant visibility for the new category
+    if (typeof syncFrameVariant === "function") {
+        syncFrameVariant(categoryNum);
+    }
+
+    // Initialize anchor variant visibility for the new category
+    if (typeof syncAnchorVariant === "function") {
+        syncAnchorVariant(categoryNum);
+    }
+
     // Add event listener to category heading for editing
     const heading = categoryContent.querySelector(".input__category-heading");
     if (heading) {
@@ -428,6 +452,7 @@ async function initializeCategories() {
             categoryCount++;
             createCategory(categoryCount);
             switchCategory(categoryCount);
+            populateFrameSectionDropdowns?.();
         });
     }
 }
@@ -526,6 +551,7 @@ async function initializeCategoryManagement() {
         categoryCount++;
         createCategory(categoryCount);
         switchCategory(categoryCount);
+        populateFrameSectionDropdowns?.();
     });
 
     initializeCategoryDragDrop();

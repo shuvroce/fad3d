@@ -16,7 +16,7 @@ const DEFAULT_ALUM_SECTIONS = [
     { name: 'Alum. Stick',  material: 'Aluminum', profileType: 'stick',      shape: '',             grade: '', b: '150', d: '65',  tf: '3', tw: '4', a: '',    ix: '',       sx: ''     },
 ];
 
-let _alumSections = [];
+let _alumSections = DEFAULT_ALUM_SECTIONS.map(s => ({ ...s }));
 let _selectedAlumSecIdx = -1;
 
 function populateAlumSecShapeOptions(selectedShape = null) {
@@ -281,9 +281,10 @@ function openAlumSectionModal() {
         showAlumSectionForm();
         document.getElementById('sec-name')?.focus();
     };
-    closeBtn.onclick = () => { syncAlumSectionFromForm(); closeModal('section-modal'); };
-    applyBtn.onclick = () => { syncAlumSectionFromForm(); closeModal('section-modal'); };
-    modal.onclick = (e) => { if (e.target === modal) { syncAlumSectionFromForm(); closeModal('section-modal'); } };
+    const dispatchChange = () => document.dispatchEvent(new CustomEvent('frame-sections-changed'));
+    closeBtn.onclick = () => { syncAlumSectionFromForm(); closeModal('section-modal'); dispatchChange(); };
+    applyBtn.onclick = () => { syncAlumSectionFromForm(); closeModal('section-modal'); dispatchChange(); };
+    modal.onclick = (e) => { if (e.target === modal) { syncAlumSectionFromForm(); closeModal('section-modal'); dispatchChange(); } };
 
     openModal('section-modal');
 }

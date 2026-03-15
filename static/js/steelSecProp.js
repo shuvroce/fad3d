@@ -6,7 +6,7 @@ const DEFAULT_STEEL_SECTIONS = [
     { name: 'Steel Section', material: 'Steel', profileType: 'manual', shape: '', grade: '', b: '100', d: '200', tf: '8', tw: '6', a: '6650', ix: '56900000', sx: '569000' },
 ];
 
-let _steelSections = [];
+let _steelSections = DEFAULT_STEEL_SECTIONS.map(s => ({ ...s }));
 let _selectedSteelSecIdx = -1;
 
 function applySteelSecEditability() {
@@ -183,9 +183,10 @@ function openSteelSectionModal() {
         showSteelSectionForm();
         document.getElementById('sec-name')?.focus();
     };
-    closeBtn.onclick = () => { syncSteelSectionFromForm(); closeModal('section-modal'); };
-    applyBtn.onclick = () => { syncSteelSectionFromForm(); closeModal('section-modal'); };
-    modal.onclick = (e) => { if (e.target === modal) { syncSteelSectionFromForm(); closeModal('section-modal'); } };
+    const dispatchChange = () => document.dispatchEvent(new CustomEvent('frame-sections-changed'));
+    closeBtn.onclick = () => { syncSteelSectionFromForm(); closeModal('section-modal'); dispatchChange(); };
+    applyBtn.onclick = () => { syncSteelSectionFromForm(); closeModal('section-modal'); dispatchChange(); };
+    modal.onclick = (e) => { if (e.target === modal) { syncSteelSectionFromForm(); closeModal('section-modal'); dispatchChange(); } };
 
     openModal('section-modal');
 }
