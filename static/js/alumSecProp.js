@@ -12,8 +12,8 @@ const ALUMINUM_PREDEFINED = {
 };
 
 const DEFAULT_ALUM_SECTIONS = [
-    { name: 'RHS 100×50×3', material: 'Aluminum', profileType: 'predefined', shape: 'RHS 100×50×3', grade: '', b: '100', d: '50',  tf: '3', tw: '3', a: '864', ix: '196000', sx: '7830' },
-    { name: 'Alum. Stick',  material: 'Aluminum', profileType: 'stick',      shape: '',             grade: '', b: '150', d: '65',  tf: '3', tw: '4', a: '',    ix: '',       sx: ''     },
+    { name: 'RHS 100×50×3', material: 'Aluminum', profileType: 'predefined', shape: 'RHS 100×50×3', grade: '', b: '100', d: '50', tf: '3', tw: '3', j: '', a: '864', ix: '196000', iy: '', y: '', x: '', plasticX: '', plasticY: '', mnYield: '', mnLb: '' },
+    { name: 'Alum. Stick',  material: 'Aluminum', profileType: 'stick',      shape: '',             grade: '', b: '150', d: '65', tf: '3', tw: '4', j: '', a: '',    ix: '',       iy: '', y: '', x: '', plasticX: '', plasticY: '', mnYield: '', mnLb: '' },
 ];
 
 let _alumSections = DEFAULT_ALUM_SECTIONS.map(s => ({ ...s }));
@@ -42,39 +42,93 @@ function populateAlumSecShapeOptions(selectedShape = null) {
 function fillPredefinedShape(shape) {
     const props = ALUMINUM_PREDEFINED[shape];
     if (!props) return;
-    ['b', 'd', 'tf', 'tw', 'a', 'ix', 'sx'].forEach(p => {
+    ['b', 'd', 'tf', 'tw', 'a', 'ix'].forEach(p => {
         const el = document.getElementById(`alum-sec-${p}`);
         if (el) el.value = props[p] || '';
     });
+    updateAlumCalcPanel();
 }
 
-function applyAlumSecEditability(profileType) {
-    const isPredefined  = profileType === 'predefined';
-    const dimsEditable  = profileType === 'stick' || profileType === 'manual';
-    const propsEditable = profileType === 'manual';
+function updateAlumCalcPanel() {
+    const profileType = document.getElementById('alum-sec-profile-type')?.value || 'predefined';
+    const v = id => parseFloat(document.getElementById(id)?.value) || 0;
 
-    const rules = {
-        'alum-sec-b':  dimsEditable,
-        'alum-sec-d':  dimsEditable,
-        'alum-sec-tf': dimsEditable,
-        'alum-sec-tw': dimsEditable,
-        'alum-sec-a':  propsEditable,
-        'alum-sec-ix': propsEditable,
-        'alum-sec-sx': propsEditable,
-    };
-    Object.entries(rules).forEach(([id, editable]) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.disabled = !editable;
-        el.classList.toggle('define-list__input--readonly', !editable);
-    });
+    const b  = v('alum-sec-b');
+    const d  = v('alum-sec-d');
+    const tf = v('alum-sec-tf');
+    const tw = v('alum-sec-tw');
 
-    const shapeSel = document.getElementById('alum-sec-shape');
-    if (shapeSel) {
-        shapeSel.disabled = !isPredefined;
-        shapeSel.classList.toggle('define-list__input--readonly', !isPredefined);
-        if (!isPredefined) shapeSel.value = '';
+    let A = 0, Ix = 0, Iy = 0, Sx = 0, Sy = 0, Zx = 0, J = 0;
+
+    if (profileType === 'predefined' || profileType === 'stick') {
+        // RHS/SHS box section formulas
+        if (b > 0 && d > 0 && tf > 0 && tw > 0) {
+            A  = 2 * b * tf + 2 * (d - 2 * tf) * tw;
+            Ix = (b * d ** 3 - (b - 2 * tw) * (d - 2 * tf) ** 3) / 12;
+            Iy = (d * b ** 3 - (d - 2 * tf) * (b - 2 * tw) ** 3) / 12;
+            Sx = d > 0 ? Ix / (d / 2) : 0;
+            Sy = b > 0 ? Iy / (b / 2) : 0;
+            // Plastic section modulus Zx
+            const di = d - 2 * tf;
+            const bi = b - 2 * tw;
+            Zx = (b * d ** 2 / 4) - (bi * di ** 2 / 4);
+            // Torsional constant J for thin-walled closed section
+            const Am        = (d - tf) * (b - tw);
+            const perimeter = 2 * ((d - tf) / tw + (b - tw) / tf);
+            J = perimeter > 0 ? 4 * Am ** 2 / perimeter : 0;
+        }
+    } else {
+        // manual: read stored/manual values directly
+        A  = v('alum-sec-a');
+        Ix = v('alum-sec-ix');
+        Iy = v('alum-sec-iy');
+        const y  = v('alum-sec-y')  || (d / 2);
+        const x  = v('alum-sec-x')  || (b / 2);
+        Sx = y  > 0 ? Ix / y  : 0;
+        Sy = x  > 0 ? Iy / x  : 0;
+        const py = v('alum-sec-plastic-x');
+        const pb = v('alum-sec-plastic-y');
+        Zx = A > 0 && (py + pb) > 0 ? (A / 2) * (py + pb) : 0;
+        J  = v('alum-sec-j');
     }
+
+    const rx = A > 0 ? Math.sqrt(Ix / A) : 0;
+    const ry = A > 0 ? Math.sqrt(Iy / A) : 0;
+
+    // Moment capacities
+    const mnYield = v('alum-sec-mn-yield');
+    const mnLb    = v('alum-sec-mn-lb');
+    const mnDes   = mnYield > 0 || mnLb > 0 ? Math.min(
+        mnYield > 0 ? mnYield : Infinity,
+        mnLb    > 0 ? mnLb    : Infinity
+    ) : 0;
+
+    const fmt = (n, dp = 1) => n > 0 ? n.toLocaleString('en', { maximumFractionDigits: dp }) : '—';
+
+    document.getElementById('calc-alum-a').textContent        = fmt(A);
+    document.getElementById('calc-alum-ix').textContent       = fmt(Ix);
+    document.getElementById('calc-alum-iy').textContent       = fmt(Iy);
+    document.getElementById('calc-alum-sx').textContent       = fmt(Sx);
+    document.getElementById('calc-alum-sy').textContent       = fmt(Sy);
+    document.getElementById('calc-alum-zx').textContent       = fmt(Zx);
+    document.getElementById('calc-alum-j').textContent        = fmt(J);
+    document.getElementById('calc-alum-rx').textContent       = fmt(rx, 2);
+    document.getElementById('calc-alum-ry').textContent       = fmt(ry, 2);
+    document.getElementById('calc-alum-mn-yield').textContent = fmt(mnYield, 3);
+    document.getElementById('calc-alum-mn-lb').textContent    = fmt(mnLb, 3);
+    document.getElementById('calc-alum-mn-des').textContent   = fmt(mnDes, 3);
+}
+
+function applyAlumSecVisibility(profileType) {
+    const form = document.getElementById('alum-section-form');
+    if (!form) return;
+    form.querySelectorAll('[data-alum-group]').forEach(el => {
+        const groups = el.getAttribute('data-alum-group').split(' ');
+        el.classList.toggle('hidden', !groups.includes(profileType));
+    });
+    const calcPane = document.getElementById('alum-calc-pane');
+    if (calcPane) calcPane.hidden = false;
+    updateAlumCalcPanel();
 }
 
 function autoNameAlumSection() {
@@ -133,29 +187,43 @@ function renderAlumSectionList() {
 function showAlumSectionForm() {
     const form = document.getElementById('alum-section-form');
     if (!form) return;
+    const calcPane = document.getElementById('alum-calc-pane');
     if (_selectedAlumSecIdx < 0 || _selectedAlumSecIdx >= _alumSections.length) {
         form.hidden = true;
+        if (calcPane) calcPane.hidden = true;
         return;
     }
     form.hidden = false;
     const sec         = _alumSections[_selectedAlumSecIdx];
     const profileType = sec.profileType || 'predefined';
 
-    document.getElementById('alum-sec-name').value         = sec.name || '';
     document.getElementById('alum-sec-profile-type').value = profileType;
-
     populateSecGradeOptions('Aluminum', sec.grade, 'alum-sec-grade');
     populateAlumSecShapeOptions(profileType === 'predefined' ? sec.shape : null);
 
+    // Fields present in all modes
+    const nameEl = document.getElementById('alum-sec-name');
+    if (nameEl) nameEl.value = sec.name || '';
+
+    // stick + manual fields
     document.getElementById('alum-sec-b').value  = sec.b  || '';
     document.getElementById('alum-sec-d').value  = sec.d  || '';
     document.getElementById('alum-sec-tf').value = sec.tf || '';
     document.getElementById('alum-sec-tw').value = sec.tw || '';
-    document.getElementById('alum-sec-a').value  = sec.a  || '';
-    document.getElementById('alum-sec-ix').value = sec.ix || '';
-    document.getElementById('alum-sec-sx').value = sec.sx || '';
 
-    applyAlumSecEditability(profileType);
+    // manual-only fields
+    document.getElementById('alum-sec-j').value          = sec.j        || '';
+    document.getElementById('alum-sec-a').value          = sec.a        || '';
+    document.getElementById('alum-sec-ix').value         = sec.ix       || '';
+    document.getElementById('alum-sec-iy').value         = sec.iy       || '';
+    document.getElementById('alum-sec-y').value          = sec.y        || '';
+    document.getElementById('alum-sec-x').value          = sec.x        || '';
+    document.getElementById('alum-sec-plastic-x').value  = sec.plasticX || '';
+    document.getElementById('alum-sec-plastic-y').value  = sec.plasticY || '';
+    document.getElementById('alum-sec-mn-yield').value   = sec.mnYield  || '';
+    document.getElementById('alum-sec-mn-lb').value      = sec.mnLb     || '';
+
+    applyAlumSecVisibility(profileType);
 }
 
 function syncAlumSectionFromForm() {
@@ -170,14 +238,22 @@ function syncAlumSectionFromForm() {
     sec.tf          = document.getElementById('alum-sec-tf')?.value           || '';
     sec.tw          = document.getElementById('alum-sec-tw')?.value           || '';
     sec.a           = document.getElementById('alum-sec-a')?.value            || '';
-    sec.ix          = document.getElementById('alum-sec-ix')?.value           || '';
-    sec.sx          = document.getElementById('alum-sec-sx')?.value           || '';
+    sec.ix       = document.getElementById('alum-sec-ix')?.value        || '';
+    sec.iy       = document.getElementById('alum-sec-iy')?.value        || '';
+    sec.j        = document.getElementById('alum-sec-j')?.value         || '';
+    sec.y        = document.getElementById('alum-sec-y')?.value         || '';
+    sec.x        = document.getElementById('alum-sec-x')?.value         || '';
+    sec.plasticX = document.getElementById('alum-sec-plastic-x')?.value || '';
+    sec.plasticY = document.getElementById('alum-sec-plastic-y')?.value || '';
+    sec.mnYield  = document.getElementById('alum-sec-mn-yield')?.value  || '';
+    sec.mnLb     = document.getElementById('alum-sec-mn-lb')?.value     || '';
 }
 
 function initAlumSectionFormEvents() {
     const nameInput      = document.getElementById('alum-sec-name');
     const profileTypeSel = document.getElementById('alum-sec-profile-type');
     const shapeSel       = document.getElementById('alum-sec-shape');
+    const form           = document.getElementById('alum-section-form');
     if (!nameInput) return;
 
     nameInput.addEventListener('input', () => {
@@ -196,15 +272,30 @@ function initAlumSectionFormEvents() {
         } else {
             if (shapeSel) shapeSel.value = '';
         }
-        applyAlumSecEditability(profileType);
+        applyAlumSecVisibility(profileType);
         autoNameAlumSection();
         syncAlumSectionFromForm();
     });
 
     shapeSel?.addEventListener('change', () => {
-        if (shapeSel.value) fillPredefinedShape(shapeSel.value);
-        autoNameAlumSection();
+        if (shapeSel.value) {
+            fillPredefinedShape(shapeSel.value);
+            // auto-name from shape for predefined
+            if (!(_alumSections[_selectedAlumSecIdx]?._nameEdited)) {
+                const nameEl = document.getElementById('alum-sec-name');
+                if (nameEl) nameEl.value = shapeSel.value;
+                if (_alumSections[_selectedAlumSecIdx]) _alumSections[_selectedAlumSecIdx].name = shapeSel.value;
+                const item = document.querySelector(`#alum-section-list [data-idx="${_selectedAlumSecIdx}"] .define-modal__item-name`);
+                if (item) item.textContent = shapeSel.value;
+            }
+        }
         syncAlumSectionFromForm();
+        updateAlumCalcPanel();
+    });
+
+    // Live recalc on any input change
+    form.querySelectorAll('input[type="number"]').forEach(inp => {
+        inp.addEventListener('input', updateAlumCalcPanel);
     });
 }
 
@@ -264,11 +355,10 @@ function openAlumSectionModal() {
 
     addBtn.onclick = () => {
         syncAlumSectionFromForm();
-        _alumSections.push({ name: '', material: 'Aluminum', profileType: 'predefined', shape: '', grade: '', b: '', d: '', tf: '', tw: '', a: '', ix: '', sx: '' });
+        _alumSections.push({ name: '', material: 'Aluminum', profileType: 'predefined', shape: '', grade: '', b: '', d: '', tf: '', tw: '', j: '', a: '', ix: '', iy: '', y: '', x: '', plasticX: '', plasticY: '', mnYield: '', mnLb: '' });
         _selectedAlumSecIdx = _alumSections.length - 1;
         renderAlumSectionList();
         showAlumSectionForm();
-        document.getElementById('alum-sec-name')?.focus();
     };
     const dispatchChange = () => document.dispatchEvent(new CustomEvent('frame-sections-changed'));
     closeBtn.onclick = () => { syncAlumSectionFromForm(); closeModal('alum-section-modal'); dispatchChange(); };

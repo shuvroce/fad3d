@@ -330,7 +330,7 @@
 
 <!-- Aluminum Section Definition Modal -->
 <div id="alum-section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="alum-section-modal-title">
-    <div class="modal__dialog modal__dialog-large">
+    <div class="modal__dialog modal__dialog-xlarge">
         <div class="modal__header">
             <h2 class="modal__title" id="alum-section-modal-title">Aluminum Section Properties</h2>
             <button type="button" class="modal__close" id="close-alum-section-modal" aria-label="Close modal">
@@ -341,22 +341,16 @@
             </button>
         </div>
         <div class="modal__content define-modal__layout">
+            <!-- List pane -->
             <div class="define-modal__list-pane">
                 <div class="define-modal__toolbar">
                     <button type="button" class="modal__btn modal__btn-secondary" id="add-alum-sec-btn">+ Add</button>
                 </div>
                 <ul class="define-modal__list" id="alum-section-list" aria-label="Aluminum Sections"></ul>
             </div>
+            <!-- Input pane -->
             <div class="define-modal__form-pane">
                 <div class="define-modal__form" id="alum-section-form" hidden>
-                    <div class="input__field">
-                        <label for="alum-sec-name">Name</label>
-                        <input type="text" id="alum-sec-name" placeholder="Section name">
-                    </div>
-                    <div class="input__field">
-                        <label for="alum-sec-grade">Grade</label>
-                        <select id="alum-sec-grade"><!-- populated from _materials --></select>
-                    </div>
                     <div class="input__field">
                         <label for="alum-sec-profile-type">Profile Type</label>
                         <select id="alum-sec-profile-type">
@@ -366,57 +360,183 @@
                         </select>
                     </div>
                     <div class="input__field">
-                        <label for="alum-sec-shape">Shape</label>
+                        <label for="alum-sec-grade">Grade</label>
+                        <select id="alum-sec-grade"><!-- populated from _materials --></select>
+                    </div>
+                    <!-- predefined only -->
+                    <div class="input__field" data-alum-group="predefined">
+                        <label for="alum-sec-shape">Section Name</label>
                         <select id="alum-sec-shape"><!-- populated by JS --></select>
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-b">Width (B)</label>
-                        <div class="input__group">
-                            <input type="number" id="alum-sec-b" placeholder="—" min="0" step="any">
-                            <span class="input__unit">mm</span>
-                        </div>
+                    <!-- stick + manual -->
+                    <div class="input__field" data-alum-group="stick manual">
+                        <label for="alum-sec-name">Name</label>
+                        <input type="text" id="alum-sec-name" placeholder="Section name">
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-d">Depth (d)</label>
+                    <div class="input__field" data-alum-group="stick manual">
+                        <label for="alum-sec-d">Web Length (depth), d</label>
                         <div class="input__group">
                             <input type="number" id="alum-sec-d" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-tf">Flange Thickness (tf)</label>
+                    <div class="input__field" data-alum-group="stick manual">
+                        <label for="alum-sec-b">Flange Length (width), b</label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-b" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="stick manual">
+                        <label for="alum-sec-tf">Flange Thickness, t<sub>f</sub></label>
                         <div class="input__group">
                             <input type="number" id="alum-sec-tf" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-tw">Web Thickness (tw)</label>
+                    <div class="input__field" data-alum-group="stick manual">
+                        <label for="alum-sec-tw">Web Thickness, t<sub>w</sub></label>
                         <div class="input__group">
                             <input type="number" id="alum-sec-tw" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-a">Area (A)</label>
+                    <!-- manual only -->
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-j">Torsional Constant, J</label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-j" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm⁴</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-a">Area, A</label>
                         <div class="input__group">
                             <input type="number" id="alum-sec-a" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm²</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-ix">Moment of Inertia (Ix)</label>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-ix">Moment of Inertia, I<sub>x</sub></label>
                         <div class="input__group">
                             <input type="number" id="alum-sec-ix" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm⁴</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="alum-sec-sx">Section Modulus (Sx)</label>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-iy">Moment of Inertia, I<sub>y</sub></label>
                         <div class="input__group">
-                            <input type="number" id="alum-sec-sx" placeholder="—" min="0" step="any">
-                            <span class="input__unit">mm³</span>
+                            <input type="number" id="alum-sec-iy" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm⁴</span>
                         </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-y">Extreme Fiber Distance, Y</label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-y" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-x">Extreme Fiber Distance, X</label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-x" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-plastic-x">Upper Region Centroid, ȳ<sub>top</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-plastic-x" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-plastic-y">Lower Region Centroid, ȳ<sub>bot</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-plastic-y" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-mn-yield">Moment Capacity (Yielding), M<sub>n</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-mn-yield" placeholder="—" min="0" step="any">
+                            <span class="input__unit">kNm</span>
+                        </div>
+                    </div>
+                    <div class="input__field" data-alum-group="manual">
+                        <label for="alum-sec-mn-lb">Moment Capacity (Local Buckling), M<sub>nb</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="alum-sec-mn-lb" placeholder="—" min="0" step="any">
+                            <span class="input__unit">kNm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Calculated values pane -->
+            <div class="define-modal__calc-pane" id="alum-calc-pane" hidden>
+                <div class="define-modal__calc-header">Calculated Properties</div>
+                <div class="define-modal__calc-body">
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">Area, A</span>
+                        <span class="define-modal__calc-value" id="calc-alum-a">—</span>
+                        <span class="define-modal__calc-unit">mm²</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">I<sub>x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-ix">—</span>
+                        <span class="define-modal__calc-unit">mm⁴</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">I<sub>y</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-iy">—</span>
+                        <span class="define-modal__calc-unit">mm⁴</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">S<sub>x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-sx">—</span>
+                        <span class="define-modal__calc-unit">mm³</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">S<sub>y</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-sy">—</span>
+                        <span class="define-modal__calc-unit">mm³</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">Z<sub>x</sub> (plastic)</span>
+                        <span class="define-modal__calc-value" id="calc-alum-zx">—</span>
+                        <span class="define-modal__calc-unit">mm³</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">J (torsional)</span>
+                        <span class="define-modal__calc-value" id="calc-alum-j">—</span>
+                        <span class="define-modal__calc-unit">mm⁴</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">r<sub>x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-rx">—</span>
+                        <span class="define-modal__calc-unit">mm</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">r<sub>y</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-ry">—</span>
+                        <span class="define-modal__calc-unit">mm</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">M<sub>n</sub> (yield)</span>
+                        <span class="define-modal__calc-value" id="calc-alum-mn-yield">—</span>
+                        <span class="define-modal__calc-unit">kNm</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">M<sub>nb</sub> (loc. buckling)</span>
+                        <span class="define-modal__calc-value" id="calc-alum-mn-lb">—</span>
+                        <span class="define-modal__calc-unit">kNm</span>
+                    </div>
+                    <div class="define-modal__calc-row define-modal__calc-row--highlight">
+                        <span class="define-modal__calc-label">M<sub>n,des</sub></span>
+                        <span class="define-modal__calc-value" id="calc-alum-mn-des">—</span>
+                        <span class="define-modal__calc-unit">kNm</span>
                     </div>
                 </div>
             </div>
@@ -429,7 +549,7 @@
 
 <!-- Steel Section Definition Modal -->
 <div id="steel-section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="steel-section-modal-title">
-    <div class="modal__dialog modal__dialog-large">
+    <div class="modal__dialog modal__dialog-xlarge">
         <div class="modal__header">
             <h2 class="modal__title" id="steel-section-modal-title">Steel Section Properties</h2>
             <button type="button" class="modal__close" id="close-steel-section-modal" aria-label="Close modal">
@@ -440,70 +560,123 @@
             </button>
         </div>
         <div class="modal__content define-modal__layout">
+            <!-- List pane -->
             <div class="define-modal__list-pane">
                 <div class="define-modal__toolbar">
                     <button type="button" class="modal__btn modal__btn-secondary" id="add-steel-sec-btn">+ Add</button>
                 </div>
                 <ul class="define-modal__list" id="steel-section-list" aria-label="Steel Sections"></ul>
             </div>
+            <!-- Input pane -->
             <div class="define-modal__form-pane">
                 <div class="define-modal__form" id="steel-section-form" hidden>
                     <div class="input__field">
-                        <label for="steel-sec-name">Name</label>
-                        <input type="text" id="steel-sec-name" placeholder="Section name">
+                        <label for="steel-sec-profile-type">Profile Type</label>
+                        <select id="steel-sec-profile-type">
+                            <option value="steel-rhs">RHS / SHS Box</option>
+                            <option value="steel-w">I / W Section</option>
+                        </select>
                     </div>
                     <div class="input__field">
                         <label for="steel-sec-grade">Grade</label>
                         <select id="steel-sec-grade"><!-- populated from _materials --></select>
                     </div>
                     <div class="input__field">
-                        <label for="steel-sec-b">Width (B)</label>
-                        <div class="input__group">
-                            <input type="number" id="steel-sec-b" placeholder="—" min="0" step="any">
-                            <span class="input__unit">mm</span>
-                        </div>
+                        <label for="steel-sec-name">Name</label>
+                        <input type="text" id="steel-sec-name" placeholder="Section name">
                     </div>
                     <div class="input__field">
-                        <label for="steel-sec-d">Depth (d)</label>
+                        <label for="steel-sec-d">Depth, d</label>
                         <div class="input__group">
                             <input type="number" id="steel-sec-d" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="steel-sec-tf">Flange Thickness (tf)</label>
+                        <label for="steel-sec-b">Width, b</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-b" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <!-- RHS only: uniform thickness -->
+                    <div class="input__field" data-steel-group="steel-rhs">
+                        <label for="steel-sec-t">Wall Thickness, t</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-t" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <!-- I/W only: flange + web thickness -->
+                    <div class="input__field" data-steel-group="steel-w">
+                        <label for="steel-sec-tf">Flange Thickness, t<sub>f</sub></label>
                         <div class="input__group">
                             <input type="number" id="steel-sec-tf" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="steel-sec-tw">Web Thickness (tw)</label>
+                    <div class="input__field" data-steel-group="steel-w">
+                        <label for="steel-sec-tw">Web Thickness, t<sub>w</sub></label>
                         <div class="input__group">
                             <input type="number" id="steel-sec-tw" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="steel-sec-a">Area (A)</label>
-                        <div class="input__group">
-                            <input type="number" id="steel-sec-a" placeholder="—" min="0" step="any">
-                            <span class="input__unit">mm²</span>
-                        </div>
+                </div>
+            </div>
+            <!-- Calculated values pane -->
+            <div class="define-modal__calc-pane" id="steel-calc-pane" hidden>
+                <div class="define-modal__calc-header">Calculated Properties</div>
+                <div class="define-modal__calc-body">
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">Area, A</span>
+                        <span class="define-modal__calc-value" id="calc-steel-a">—</span>
+                        <span class="define-modal__calc-unit">mm²</span>
                     </div>
-                    <div class="input__field">
-                        <label for="steel-sec-ix">Moment of Inertia (Ix)</label>
-                        <div class="input__group">
-                            <input type="number" id="steel-sec-ix" placeholder="—" min="0" step="any">
-                            <span class="input__unit">mm⁴</span>
-                        </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">I<sub>x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-ix">—</span>
+                        <span class="define-modal__calc-unit">mm⁴</span>
                     </div>
-                    <div class="input__field">
-                        <label for="steel-sec-sx">Section Modulus (Sx)</label>
-                        <div class="input__group">
-                            <input type="number" id="steel-sec-sx" placeholder="—" min="0" step="any">
-                            <span class="input__unit">mm³</span>
-                        </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">I<sub>y</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-iy">—</span>
+                        <span class="define-modal__calc-unit">mm⁴</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">S<sub>x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-sx">—</span>
+                        <span class="define-modal__calc-unit">mm³</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">S<sub>y</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-sy">—</span>
+                        <span class="define-modal__calc-unit">mm³</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">Z<sub>x</sub> (plastic)</span>
+                        <span class="define-modal__calc-value" id="calc-steel-zx">—</span>
+                        <span class="define-modal__calc-unit">mm³</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">J (torsional)</span>
+                        <span class="define-modal__calc-value" id="calc-steel-j">—</span>
+                        <span class="define-modal__calc-unit">mm⁴</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">r<sub>x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-rx">—</span>
+                        <span class="define-modal__calc-unit">mm</span>
+                    </div>
+                    <div class="define-modal__calc-row">
+                        <span class="define-modal__calc-label">r<sub>y</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-ry">—</span>
+                        <span class="define-modal__calc-unit">mm</span>
+                    </div>
+                    <div class="define-modal__calc-row define-modal__calc-row--highlight">
+                        <span class="define-modal__calc-label">M<sub>p,x</sub></span>
+                        <span class="define-modal__calc-value" id="calc-steel-mpx">—</span>
+                        <span class="define-modal__calc-unit">kNm</span>
                     </div>
                 </div>
             </div>

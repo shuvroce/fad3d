@@ -217,6 +217,9 @@ body.theme__dark {
 }
 
 /* ================ 3. GLOBAL RESETS & BASE STYLES ================ */
+/* Ensure [hidden] always wins over author display rules */
+[hidden] { display: none !important; }
+
 @font-face {
     font-family: "Inter";
     src: url("../static/Inter-Variable.woff2") format("woff2");
@@ -599,6 +602,10 @@ body.theme__dark select {
 
 .modal__dialog-large {
     max-width: 750px;
+}
+
+.modal__dialog-xlarge {
+    max-width: 980px;
 }
 
 .modal__form-grid {
@@ -1528,6 +1535,74 @@ body.theme__dark select {
     min-width: unset;
     flex: unset;
     width: 100%;
+}
+
+/* Calculated properties pane */
+.define-modal__calc-pane {
+    width: 210px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(var(--modal-height) - 16rem);
+    background: var(--bg-secondary);
+}
+
+.define-modal__calc-header {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border-primary);
+    flex-shrink: 0;
+}
+
+.define-modal__calc-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0.4rem 0;
+}
+
+.define-modal__calc-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    padding: 0.32rem 0.9rem;
+    border-bottom: 1px solid var(--border-primary);
+    transition: background 0.1s;
+}
+
+.define-modal__calc-row:last-child { border-bottom: none; }
+
+.define-modal__calc-row--highlight {
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+.define-modal__calc-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.define-modal__calc-value {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.define-modal__calc-row--highlight .define-modal__calc-value {
+    color: var(--color-primary);
+}
+
+.define-modal__calc-unit {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 /* leftbar */
