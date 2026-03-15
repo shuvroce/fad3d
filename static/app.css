@@ -97,7 +97,7 @@
 /* Dark Theme Colors */
 body.theme__dark {
     /* Dark Theme - Background Colors */
-    --bg-body: #0d1117;
+    --bg-body: #010409;
     --bg-primary: #161b22;
     --bg-secondary: #1c2128;
     --bg-hover: #21262d;
@@ -1476,7 +1476,7 @@ body.theme__dark select {
 }
 
 .define-modal__list-item.active .define-modal__item-name {
-    color: var(--color-primary);
+    /* color: var(--color-primary); */
     font-weight: 500;
 }
 
