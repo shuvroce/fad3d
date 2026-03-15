@@ -97,64 +97,63 @@
 /* Dark Theme Colors */
 body.theme__dark {
     /* Dark Theme - Background Colors */
-    --bg-body: #0a0a0a;
-    --bg-primary: #1c1c1c;
-    --bg-secondary: #222;
-    --bg-hover: #2a2a2a;
-    --bg-preview: #282607;
-    --bg-input: #2d2d2d;
-    --bg-select: #1f1c1c;
-    --bg-code: #141414;
-    --bg-category: #1a2617;
+    --bg-body: #0d1117;
+    --bg-primary: #161b22;
+    --bg-secondary: #1c2128;
+    --bg-hover: #21262d;
+    --bg-preview: #1c2010;
+    --bg-input: #1c2128;
+    --bg-select: #161b22;
+    --bg-code: #0d1117;
+    --bg-category: #121c1f;
 
-    --bg-bullet: #2d2d2d;
+    --bg-bullet: #21262d;
 
     /* Dark Theme - Text Colors */
-    --text-primary: #e0e0e0;
-    --text-secondary: #c5c5c5;
-    --text-heading: #e0e0e0;
-    --text-link: #accdeb;
-    --text-code: #e0e0e0;
-    --text-active: #4db8ff;
-    --line-active: #4db8ff;
-    --text-value: #76b1a7;
-    --text-label: #959595;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-heading: #e6edf3;
+    --text-link: #58a6ff;
+    --text-code: #e6edf3;
+    --text-active: #58a6ff;
+    --line-active: #58a6ff;
+    --text-value: #3fb950;
+    --text-label: #6e7681;
 
     /* Dark Theme - Border Colors */
-    --border-primary: #363636;
-    --border-secondary: #323232;
-    --border-tertiary: #3a3a3a;
-    --border-input: #404040;
-    --border-code: #2d2d2d;
-    --border-header: #363636;
+    --border-primary: #30363d;
+    --border-secondary: #21262d;
+    --border-tertiary: #30363d;
+    --border-input: #30363d;
+    --border-code: #21262d;
+    --border-header: #30363d;
 
     /* Dark Theme - Shadow Colors */
-    --shadow-nav: rgba(0, 0, 0, 0.3);
-    --shadow-container: rgba(0, 0, 0, 0.2);
+    --shadow-nav: rgba(0, 0, 0, 0.4);
+    --shadow-container: rgba(0, 0, 0, 0.25);
 
     /* Dark Theme - Scrollbar Colors */
-    --scrollbar-track: #131313;
-    --scrollbar-thumb: #3f3f3f;
-    --scrollbar-thumb-hover: #565656;
+    --scrollbar-track: #0d1117;
+    --scrollbar-thumb: #30363d;
+    --scrollbar-thumb-hover: #484f58;
 
     /* Dark Theme - Accent Colors */
-    /* --color-primary: #344454; */
-    --color-primary: #405469;
-    --color-primary-hover: #516377;
+    --color-primary: #1f3a5f;
+    --color-primary-hover: #2d5280;
     --color-secondary: #9b6b04;
-    --color-success: #22c55e;
-    --color-danger: #ef4444;
+    --color-success: #3fb950;
+    --color-danger: #f85149;
 
-    --btn-primary: #4071aa;
-    --btn-primary-hover: #77afef;
+    --btn-primary: #1f6feb;
+    --btn-primary-hover: #388bfd;
 
     --btn-accent: #9b6b04;
     --btn-accent-hover: #8f6305;
 
-    --btn-danger: #eb3f50;
-    --btn-danger-hover: #c04c58;
+    --btn-danger: #da3633;
+    --btn-danger-hover: #b62824;
 
-    --btn-selected: #757063;
+    --btn-selected: #1f3a5f;
 
     --logo-image: var(--logo-image-dark);
     --logo-filter: brightness(0) invert(1);
