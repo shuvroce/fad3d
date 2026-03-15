@@ -25,6 +25,12 @@ function initDefineSubmenu() {
         const opening = menu.hidden;
         menu.hidden = !opening;
         wrap.classList.toggle('open', opening);
+        if (!opening) {
+            const secSubmenu = document.getElementById('section-submenu');
+            const secWrap    = document.getElementById('section-submenu-wrap');
+            if (secSubmenu) secSubmenu.hidden = true;
+            secWrap?.classList.remove('open');
+        }
     });
 
     document.addEventListener('click', () => {
@@ -57,7 +63,7 @@ function initDefineSubmenu() {
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        ['general-modal', 'material-modal', 'section-modal'].forEach(closeModal);
+        ['general-modal', 'material-modal', 'alum-section-modal', 'steel-section-modal'].forEach(closeModal);
         const menu = document.getElementById('define-submenu');
         if (menu) menu.hidden = true;
         const nestedMenu = document.getElementById('section-submenu');

@@ -1,7 +1,14 @@
 <!-- Error msg modal dialog -->
 <dialog id="error-dialog" class="modal__warning">
     <div class="modal__content">
-        <div class="modal__warning-icon">⚠️</div>
+        <div class="modal__warning-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </div>
         <p id="modal__warning-message"></p>
         <button onclick="document.getElementById('error-dialog').close()">
             OK
@@ -321,12 +328,12 @@
     </div>
 </div>
 
-<!-- Section Definition Modal -->
-<div id="section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="section-modal-title">
+<!-- Aluminum Section Definition Modal -->
+<div id="alum-section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="alum-section-modal-title">
     <div class="modal__dialog modal__dialog-large">
         <div class="modal__header">
-            <h2 class="modal__title" id="section-modal-title">Section Properties</h2>
-            <button type="button" class="modal__close" id="close-section-modal" aria-label="Close modal">
+            <h2 class="modal__title" id="alum-section-modal-title">Aluminum Section Properties</h2>
+            <button type="button" class="modal__close" id="close-alum-section-modal" aria-label="Close modal">
                 <svg viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
@@ -336,79 +343,78 @@
         <div class="modal__content define-modal__layout">
             <div class="define-modal__list-pane">
                 <div class="define-modal__toolbar">
-                    <button type="button" class="modal__btn modal__btn-secondary" id="add-section-btn">+ Add</button>
+                    <button type="button" class="modal__btn modal__btn-secondary" id="add-alum-sec-btn">+ Add</button>
                 </div>
-                <ul class="define-modal__list" id="section-list" aria-label="Sections"></ul>
+                <ul class="define-modal__list" id="alum-section-list" aria-label="Aluminum Sections"></ul>
             </div>
             <div class="define-modal__form-pane">
-
-                <div class="define-modal__form" id="section-form" hidden>
+                <div class="define-modal__form" id="alum-section-form" hidden>
                     <div class="input__field">
-                        <label for="sec-name">Name</label>
-                        <input type="text" id="sec-name" placeholder="Section name">
+                        <label for="alum-sec-name">Name</label>
+                        <input type="text" id="alum-sec-name" placeholder="Section name">
                     </div>
                     <div class="input__field">
-                        <label for="sec-grade">Grade</label>
-                        <select id="sec-grade"><!-- populated from _materials --></select>
+                        <label for="alum-sec-grade">Grade</label>
+                        <select id="alum-sec-grade"><!-- populated from _materials --></select>
                     </div>
-                    <div class="input__field" id="sec-profile-type-row">
-                        <label for="sec-profile-type">Profile Type</label>
-                        <select id="sec-profile-type">
+                    <div class="input__field">
+                        <label for="alum-sec-profile-type">Profile Type</label>
+                        <select id="alum-sec-profile-type">
                             <option value="predefined">Pre-defined</option>
                             <option value="stick">Stick</option>
                             <option value="manual">Manual</option>
                         </select>
                     </div>
-                    <div class="input__field" id="sec-shape-row">
-                        <label for="sec-shape">Shape</label>
-                        <select id="sec-shape"><!-- populated by JS --></select>
+                    <div class="input__field">
+                        <label for="alum-sec-shape">Shape</label>
+                        <select id="alum-sec-shape"><!-- populated by JS --></select>
                     </div>
                     <div class="input__field">
-                        <label for="sec-b">Width (B)</label>
+                        <label for="alum-sec-b">Width (B)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-b" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-b" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="sec-d">Depth (d)</label>
+                        <label for="alum-sec-d">Depth (d)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-d" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-d" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="sec-tf">Flange Thickness (tf)</label>
+                        <label for="alum-sec-tf">Flange Thickness (tf)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-tf" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-tf" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="sec-tw">Web Thickness (tw)</label>
+                        <label for="alum-sec-tw">Web Thickness (tw)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-tw" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-tw" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="sec-a">Area (A)</label>
+                        <label for="alum-sec-a">Area (A)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-a" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-a" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm²</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="sec-ix">Moment of Inertia (Ix)</label>
+                        <label for="alum-sec-ix">Moment of Inertia (Ix)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-ix" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-ix" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm⁴</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="sec-sx">Section Modulus (Sx)</label>
+                        <label for="alum-sec-sx">Section Modulus (Sx)</label>
                         <div class="input__group">
-                            <input type="number" id="sec-sx" placeholder="—" min="0" step="any">
+                            <input type="number" id="alum-sec-sx" placeholder="—" min="0" step="any">
                             <span class="input__unit">mm³</span>
                         </div>
                     </div>
@@ -416,7 +422,94 @@
             </div>
         </div>
         <div class="modal__footer">
-            <button type="button" class="modal__btn modal__btn-primary" id="apply-section-modal">Apply</button>
+            <button type="button" class="modal__btn modal__btn-primary" id="apply-alum-section-modal">Apply</button>
+        </div>
+    </div>
+</div>
+
+<!-- Steel Section Definition Modal -->
+<div id="steel-section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="steel-section-modal-title">
+    <div class="modal__dialog modal__dialog-large">
+        <div class="modal__header">
+            <h2 class="modal__title" id="steel-section-modal-title">Steel Section Properties</h2>
+            <button type="button" class="modal__close" id="close-steel-section-modal" aria-label="Close modal">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal__content define-modal__layout">
+            <div class="define-modal__list-pane">
+                <div class="define-modal__toolbar">
+                    <button type="button" class="modal__btn modal__btn-secondary" id="add-steel-sec-btn">+ Add</button>
+                </div>
+                <ul class="define-modal__list" id="steel-section-list" aria-label="Steel Sections"></ul>
+            </div>
+            <div class="define-modal__form-pane">
+                <div class="define-modal__form" id="steel-section-form" hidden>
+                    <div class="input__field">
+                        <label for="steel-sec-name">Name</label>
+                        <input type="text" id="steel-sec-name" placeholder="Section name">
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-grade">Grade</label>
+                        <select id="steel-sec-grade"><!-- populated from _materials --></select>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-b">Width (B)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-b" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-d">Depth (d)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-d" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-tf">Flange Thickness (tf)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-tf" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-tw">Web Thickness (tw)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-tw" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-a">Area (A)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-a" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm²</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-ix">Moment of Inertia (Ix)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-ix" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm⁴</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="steel-sec-sx">Section Modulus (Sx)</label>
+                        <div class="input__group">
+                            <input type="number" id="steel-sec-sx" placeholder="—" min="0" step="any">
+                            <span class="input__unit">mm³</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button type="button" class="modal__btn modal__btn-primary" id="apply-steel-section-modal">Apply</button>
         </div>
     </div>
 </div>

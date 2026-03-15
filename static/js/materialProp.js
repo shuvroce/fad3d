@@ -18,8 +18,8 @@ const MATERIAL_DATA = {
 };
 
 const DEFAULT_MATERIALS = [
-    { name: 'Aluminum 6063-T5',  type: 'Aluminum', grade: '6063-T5',     e: '69.6', fy: '145' },
-    { name: 'Aluminum 6061-T6',  type: 'Aluminum', grade: '6061-T6',     e: '68.9', fy: '276' },
+    { name: 'Alum 6063-T5',      type: 'Aluminum', grade: '6063-T5',     e: '69.6', fy: '145' },
+    { name: 'Alum 6061-T6',      type: 'Aluminum', grade: '6061-T6',     e: '68.9', fy: '276' },
     { name: 'Steel A572 Gr. 50', type: 'Steel',    grade: 'A572 Gr. 50', e: '200',  fy: '345' },
 ];
 
@@ -28,8 +28,8 @@ let _selectedMatIdx = -1;
 
 // --- Shared utility used by section modules ---
 
-function populateSecGradeOptions(material, selectedGrade = null) {
-    const sel = document.getElementById('sec-grade');
+function populateSecGradeOptions(material, selectedGrade = null, elementId = 'sec-grade') {
+    const sel = document.getElementById(elementId);
     if (!sel) return;
     sel.innerHTML = '';
     const filtered = _materials.filter(m => m.type === material);
