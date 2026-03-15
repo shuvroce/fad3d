@@ -49,75 +49,67 @@ function fillPredefinedShape(shape) {
     updateAlumCalcPanel();
 }
 
+let _alumCalcDebounce = null;
+
 function updateAlumCalcPanel() {
-    const profileType = document.getElementById('alum-sec-profile-type')?.value || 'predefined';
-    const v = id => parseFloat(document.getElementById(id)?.value) || 0;
-
-    const b  = v('alum-sec-b');
-    const d  = v('alum-sec-d');
-    const tf = v('alum-sec-tf');
-    const tw = v('alum-sec-tw');
-
-    let A = 0, Ix = 0, Iy = 0, Sx = 0, Sy = 0, Zx = 0, J = 0;
-
-    if (profileType === 'predefined' || profileType === 'stick') {
-        // RHS/SHS box section formulas
-        if (b > 0 && d > 0 && tf > 0 && tw > 0) {
-            A  = 2 * b * tf + 2 * (d - 2 * tf) * tw;
-            Ix = (b * d ** 3 - (b - 2 * tw) * (d - 2 * tf) ** 3) / 12;
-            Iy = (d * b ** 3 - (d - 2 * tf) * (b - 2 * tw) ** 3) / 12;
-            Sx = d > 0 ? Ix / (d / 2) : 0;
-            Sy = b > 0 ? Iy / (b / 2) : 0;
-            // Plastic section modulus Zx
-            const di = d - 2 * tf;
-            const bi = b - 2 * tw;
-            Zx = (b * d ** 2 / 4) - (bi * di ** 2 / 4);
-            // Torsional constant J for thin-walled closed section
-            const Am        = (d - tf) * (b - tw);
-            const perimeter = 2 * ((d - tf) / tw + (b - tw) / tf);
-            J = perimeter > 0 ? 4 * Am ** 2 / perimeter : 0;
-        }
-    } else {
-        // manual: read stored/manual values directly
-        A  = v('alum-sec-a');
-        Ix = v('alum-sec-ix');
-        Iy = v('alum-sec-iy');
-        const y  = v('alum-sec-y')  || (d / 2);
-        const x  = v('alum-sec-x')  || (b / 2);
-        Sx = y  > 0 ? Ix / y  : 0;
-        Sy = x  > 0 ? Iy / x  : 0;
-        const py = v('alum-sec-plastic-x');
-        const pb = v('alum-sec-plastic-y');
-        Zx = A > 0 && (py + pb) > 0 ? (A / 2) * (py + pb) : 0;
-        J  = v('alum-sec-j');
-    }
-
-    const rx = A > 0 ? Math.sqrt(Ix / A) : 0;
-    const ry = A > 0 ? Math.sqrt(Iy / A) : 0;
-
-    // Moment capacities
-    const mnYield = v('alum-sec-mn-yield');
-    const mnLb    = v('alum-sec-mn-lb');
-    const mnDes   = mnYield > 0 || mnLb > 0 ? Math.min(
-        mnYield > 0 ? mnYield : Infinity,
-        mnLb    > 0 ? mnLb    : Infinity
-    ) : 0;
-
-    const fmt = (n, dp = 1) => n > 0 ? n.toLocaleString('en', { maximumFractionDigits: dp }) : '—';
-
-    document.getElementById('calc-alum-a').textContent        = fmt(A);
-    document.getElementById('calc-alum-ix').textContent       = fmt(Ix);
-    document.getElementById('calc-alum-iy').textContent       = fmt(Iy);
-    document.getElementById('calc-alum-sx').textContent       = fmt(Sx);
-    document.getElementById('calc-alum-sy').textContent       = fmt(Sy);
-    document.getElementById('calc-alum-zx').textContent       = fmt(Zx);
-    document.getElementById('calc-alum-j').textContent        = fmt(J);
-    document.getElementById('calc-alum-rx').textContent       = fmt(rx, 2);
-    document.getElementById('calc-alum-ry').textContent       = fmt(ry, 2);
-    document.getElementById('calc-alum-mn-yield').textContent = fmt(mnYield, 3);
-    document.getElementById('calc-alum-mn-lb').textContent    = fmt(mnLb, 3);
-    document.getElementById('calc-alum-mn-des').textContent   = fmt(mnDes, 3);
+    clearTimeout(_alumCalcDebounce);
+    _alumCalcDebounce = setTimeout(_fetchAlumCalc, 300);
 }
+
+function _fetchAlumCalc() {
+    const profileType = document.getElementById('alum-sec-profile-type')?.value || 'predefined';
+    const v = id => document.getElementById(id)?.value || null;
+
+    // Resolve F_y from the selected material grade
+    const gradeName = document.getElementById('alum-sec-grade')?.value || '';
+    const mat = _materials.find(m => m.name === gradeName);
+    const fy = mat ? (mat.fy || null) : null;
+
+    const payload = {
+        profile_type: profileType,
+        name:    v('alum-sec-name'),
+        d:       v('alum-sec-d'),
+        b:       v('alum-sec-b'),
+        tf:      v('alum-sec-tf'),
+        tw:      v('alum-sec-tw'),
+        fy,
+        // manual-only
+        j:        v('alum-sec-j'),
+        a:        v('alum-sec-a'),
+        ix:       v('alum-sec-ix'),
+        iy:       v('alum-sec-iy'),
+        y:        v('alum-sec-y'),
+        x:        v('alum-sec-x'),
+        plasticX: v('alum-sec-plastic-x'),
+        plasticY: v('alum-sec-plastic-y'),
+        mnYield:  v('alum-sec-mn-yield'),
+    };
+
+    fetch('/api/section/calc/alum', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(props => {
+        if (!props) return;
+        const fmt = (v, dp = 1) => (v != null && v !== '') ? Number(v).toLocaleString('en', { maximumFractionDigits: dp }) : '—';
+        document.getElementById('calc-alum-a').textContent        = fmt(props.area);
+        document.getElementById('calc-alum-ix').textContent       = fmt(props.I_xx);
+        document.getElementById('calc-alum-iy').textContent       = fmt(props.I_yy);
+        document.getElementById('calc-alum-sx').textContent       = fmt(props.S_x);
+        document.getElementById('calc-alum-sy').textContent       = fmt(props.S_y);
+        document.getElementById('calc-alum-zx').textContent       = fmt(props.Z_x);
+        document.getElementById('calc-alum-j').textContent        = fmt(props.tor_constant);
+        document.getElementById('calc-alum-rx').textContent       = fmt(props.I_xx && props.area ? Math.sqrt(props.I_xx / props.area) : null, 2);
+        document.getElementById('calc-alum-ry').textContent       = fmt(props.I_yy && props.area ? Math.sqrt(props.I_yy / props.area) : null, 2);
+        document.getElementById('calc-alum-mn-yield').textContent = fmt(props.Mn_yield, 3);
+        document.getElementById('calc-alum-mn-lb').textContent    = fmt(props.Mn_lb,    3);
+        document.getElementById('calc-alum-mn-des').textContent   = fmt(props.phi_Mn,   3);
+    })
+    .catch(() => {});
+}
+
 
 function applyAlumSecVisibility(profileType) {
     const form = document.getElementById('alum-section-form');

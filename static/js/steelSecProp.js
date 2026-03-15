@@ -9,62 +9,55 @@ const DEFAULT_STEEL_SECTIONS = [
 let _steelSections = DEFAULT_STEEL_SECTIONS.map(s => ({ ...s }));
 let _selectedSteelSecIdx = -1;
 
+let _steelCalcDebounce = null;
+
 function updateSteelCalcPanel() {
-    const profileType = document.getElementById('steel-sec-profile-type')?.value || 'steel-rhs';
-    const v = id => parseFloat(document.getElementById(id)?.value) || 0;
-
-    const b  = v('steel-sec-b');
-    const d  = v('steel-sec-d');
-    const t  = v('steel-sec-t');
-    const tf = v('steel-sec-tf');
-    const tw = v('steel-sec-tw');
-
-    let A = 0, Ix = 0, Iy = 0, Sx = 0, Sy = 0, Zx = 0, J = 0;
-
-    if (profileType === 'steel-rhs') {
-        // RHS/SHS: uniform wall thickness t
-        if (b > 0 && d > 0 && t > 0) {
-            A  = b * d - (b - 2 * t) * (d - 2 * t);
-            Ix = (b * d ** 3 - (b - 2 * t) * (d - 2 * t) ** 3) / 12;
-            Iy = (d * b ** 3 - (d - 2 * t) * (b - 2 * t) ** 3) / 12;
-            Sx = Ix / (d / 2);
-            Sy = Iy / (b / 2);
-            Zx = (b * d ** 2 / 4) - ((b - 2 * t) * (d - 2 * t) ** 2 / 4);
-            const Am  = (d - t) * (b - t);
-            const per = 2 * ((d - t) + (b - t)) / t;
-            J = per > 0 ? 4 * Am ** 2 / per : 0;
-        }
-    } else {
-        // I/W section
-        if (b > 0 && d > 0 && tf > 0 && tw > 0) {
-            const hw = d - 2 * tf;
-            A  = 2 * b * tf + hw * tw;
-            Ix = (b * d ** 3 - (b - tw) * hw ** 3) / 12;
-            Iy = (2 * tf * b ** 3 + hw * tw ** 3) / 12;
-            Sx = Ix / (d / 2);
-            Sy = Iy / (b / 2);
-            Zx = b * tf * (d / 2 - tf / 2) * 2 + tw * hw ** 2 / 4;
-            J  = 2 * b * tf ** 3 / 3 + hw * tw ** 3 / 3;
-        }
-    }
-
-    const rx = A > 0 ? Math.sqrt(Ix / A) : 0;
-    const ry = A > 0 ? Math.sqrt(Iy / A) : 0;
-    const Mpx = Zx > 0 ? Zx : 0; // placeholder — needs fy from material
-
-    const fmt = (n, dp = 1) => n > 0 ? n.toLocaleString('en', { maximumFractionDigits: dp }) : '—';
-
-    document.getElementById('calc-steel-a').textContent   = fmt(A);
-    document.getElementById('calc-steel-ix').textContent  = fmt(Ix);
-    document.getElementById('calc-steel-iy').textContent  = fmt(Iy);
-    document.getElementById('calc-steel-sx').textContent  = fmt(Sx);
-    document.getElementById('calc-steel-sy').textContent  = fmt(Sy);
-    document.getElementById('calc-steel-zx').textContent  = fmt(Zx);
-    document.getElementById('calc-steel-j').textContent   = fmt(J);
-    document.getElementById('calc-steel-rx').textContent  = fmt(rx, 2);
-    document.getElementById('calc-steel-ry').textContent  = fmt(ry, 2);
-    document.getElementById('calc-steel-mpx').textContent = fmt(Zx); // Zx shown; Mpx = Zx×fy handled later
+    clearTimeout(_steelCalcDebounce);
+    _steelCalcDebounce = setTimeout(_fetchSteelCalc, 300);
 }
+
+function _fetchSteelCalc() {
+    const profileType = document.getElementById('steel-sec-profile-type')?.value || 'steel-rhs';
+    const v = id => document.getElementById(id)?.value || null;
+
+    // Resolve F_y from the selected material grade
+    const gradeName = document.getElementById('steel-sec-grade')?.value || '';
+    const mat = _materials.find(m => m.name === gradeName);
+    const fy = mat ? (mat.fy || null) : null;
+
+    const payload = {
+        profile_type: profileType,
+        d:  v('steel-sec-d'),
+        b:  v('steel-sec-b'),
+        t:  v('steel-sec-t'),
+        tf: v('steel-sec-tf'),
+        tw: v('steel-sec-tw'),
+        fy,
+    };
+
+    fetch('/api/section/calc/steel', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(props => {
+        if (!props) return;
+        const fmt = (v, dp = 1) => (v != null && v !== '') ? Number(v).toLocaleString('en', { maximumFractionDigits: dp }) : '—';
+        document.getElementById('calc-steel-a').textContent   = fmt(props.area);
+        document.getElementById('calc-steel-ix').textContent  = fmt(props.I_xx);
+        document.getElementById('calc-steel-iy').textContent  = fmt(props.I_yy);
+        document.getElementById('calc-steel-sx').textContent  = fmt(props.S_x);
+        document.getElementById('calc-steel-sy').textContent  = fmt(props.S_y);
+        document.getElementById('calc-steel-zx').textContent  = fmt(props.Z_x);
+        document.getElementById('calc-steel-j').textContent   = fmt(props.tor_constant);
+        document.getElementById('calc-steel-rx').textContent  = fmt(props.r_x, 2);
+        document.getElementById('calc-steel-ry').textContent  = fmt(props.r_y, 2);
+        document.getElementById('calc-steel-mpx').textContent = fmt(props.phi_Mn, 3);
+    })
+    .catch(() => {});
+}
+
 
 function applySteelSecVisibility(profileType) {
     const form = document.getElementById('steel-section-form');
