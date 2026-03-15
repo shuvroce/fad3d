@@ -258,7 +258,7 @@
 <div id="material-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="material-modal-title">
     <div class="modal__dialog modal__dialog-large">
         <div class="modal__header">
-            <h2 class="modal__title" id="material-modal-title">Material Definitions</h2>
+            <h2 class="modal__title" id="material-modal-title">Material Properties</h2>
             <button type="button" class="modal__close" id="close-material-modal" aria-label="Close modal">
                 <svg viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18" />
@@ -292,16 +292,23 @@
                         <select id="mat-grade"><!-- populated by JS --></select>
                     </div>
                     <div class="input__field">
-                        <label for="mat-e">Elastic Modulus</label>
+                        <label for="mat-e">Elastic Modulus, Y</label>
                         <div class="input__group">
                             <input type="number" id="mat-e" placeholder="—" min="0" step="any">
-                            <span class="input__unit">GPa</span>
+                            <span class="input__unit">MPa</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="mat-fy">Yield Strength</label>
+                        <label for="mat-fy">Yield Strength, f<sub>y</sub></label>
                         <div class="input__group">
                             <input type="number" id="mat-fy" placeholder="—" min="0" step="any">
+                            <span class="input__unit">MPa</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="mat-fu">Ultimate Strength, f<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="mat-fu" placeholder="—" min="0" step="any">
                             <span class="input__unit">MPa</span>
                         </div>
                     </div>
@@ -318,7 +325,7 @@
 <div id="section-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="section-modal-title">
     <div class="modal__dialog modal__dialog-large">
         <div class="modal__header">
-            <h2 class="modal__title" id="section-modal-title">Section Definitions</h2>
+            <h2 class="modal__title" id="section-modal-title">Section Properties</h2>
             <button type="button" class="modal__close" id="close-section-modal" aria-label="Close modal">
                 <svg viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18" />
