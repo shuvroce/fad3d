@@ -102,22 +102,6 @@
     </div>
 </template>
 
-<!-- Result row: label + value with optional pass/fail status -->
-<template id="result-row-template">
-    <div class="result__item">
-        <span class="result__label"></span>
-        <span class="result__value">
-            <span class="result__value-text"></span>
-            <span class="result__status" hidden></span>
-        </span>
-    </div>
-</template>
-
-<!-- Section divider -->
-<template id="result-divider-template">
-    <div class="result__divider"></div>
-</template>
-
 <!-- Empty / no-data state -->
 <template id="result-empty-template">
     <div class="result__item result__empty"></div>
@@ -177,4 +161,388 @@
         <td class="cladding-pz4neg"></td>
         <td class="cladding-pz5neg"></td>
     </tr>
+</template>
+
+<!-- Wind General rows -->
+<template id="result-wind-general-template">
+    <div class="result__item" data-key="wind_speed">
+        <span class="result__label">Wind Speed</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> m/s</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="gust_factor">
+        <span class="result__label">Gust Factor</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="Imp_factor">
+        <span class="result__label">Imp. Factor</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="K_h">
+        <span class="result__label">K<sub>h</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="K_ht">
+        <span class="result__label">K<sub>ht</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="q_h">
+        <span class="result__label">q<sub>h</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="C_pw">
+        <span class="result__label">C<sub>pw</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="C_pl">
+        <span class="result__label">C<sub>pl</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="C_ps">
+        <span class="result__label">C<sub>ps</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="P_hi">
+        <span class="result__label">P<sub>hi</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="P_hl">
+        <span class="result__label">P<sub>hl</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="P_hs">
+        <span class="result__label">P<sub>hs</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+</template>
+
+<!-- Glass result rows (all possible rows; JS hides unused ones) -->
+<template id="result-glass-template">
+    <div class="result__item" data-key="A_eff">
+        <span class="result__label">Eff. Area</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> m²</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="aspect_ratio">
+        <span class="result__label">Aspect Ratio</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- SGU / LGU branch rows -->
+    <div class="result__item" data-key="gtf" hidden>
+        <span class="result__label">GTF</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="lr" hidden>
+        <span class="result__label">LR</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- DGU / LDGU branch rows -->
+    <div class="result__item" data-key="gtf1" hidden>
+        <span class="result__label">GTF₁</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="gtf2" hidden>
+        <span class="result__label">GTF₂</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="dgu_ls1" hidden>
+        <span class="result__label">LS₁</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="dgu_ls2" hidden>
+        <span class="result__label">LS₂</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="dgu_lr1" hidden>
+        <span class="result__label">LR₁</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="dgu_lr2" hidden>
+        <span class="result__label">LR₂</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- Common tail rows -->
+    <div class="result__item" data-key="stress_ratio" hidden>
+        <span class="result__label">Stress Ratio</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="allow_def" hidden>
+        <span class="result__label">Allow. Defl</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="def_ratio" hidden>
+        <span class="result__label">Defl. Ratio</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="bite_req" hidden>
+        <span class="result__label">Bite Req.</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+</template>
+
+<!-- Frame result rows (all possible rows; JS hides unused ones) -->
+<template id="result-frame-template">
+    <div class="result__item" data-key="eff_area">
+        <span class="result__label">Eff. Area</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> m²</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="glass_sw">
+        <span class="result__label">Glass DL</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kPa</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__divider">Mullion</div>
+    <!-- Aluminum + Steel only -->
+    <div class="result__item" data-key="I_xa" hidden>
+        <span class="result__label">I<sub>xa</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm⁴</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="I_xs" hidden>
+        <span class="result__label">I<sub>xs</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm⁴</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="ls_a" hidden>
+        <span class="result__label">LS<sub>a</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="ls_s" hidden>
+        <span class="result__label">LS<sub>s</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- Common mullion rows -->
+    <div class="result__item" data-key="mul_mu">
+        <span class="result__label">M<sub>u</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kNm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- Aluminum + Steel capacity rows -->
+    <div class="result__item" data-key="mul_phi_Mn_a" hidden>
+        <span class="result__label">Alum. φM<sub>n</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN-m</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="mul_dc_a" hidden>
+        <span class="result__label">Alum. D/C</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="mul_phi_Mn_s" hidden>
+        <span class="result__label">Steel φM<sub>n</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN-m</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="mul_dc_s" hidden>
+        <span class="result__label">Steel D/C</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- Aluminum-only capacity rows -->
+    <div class="result__item" data-key="mul_phi_Mn" hidden>
+        <span class="result__label">φM<sub>n</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN-m</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="mul_dc" hidden>
+        <span class="result__label">D/C</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- Mullion deflection rows -->
+    <div class="result__item" data-key="mul_def" hidden>
+        <span class="result__label">Deflection</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="mul_allow_def">
+        <span class="result__label">Allow. Defl</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__divider">Transom</div>
+    <div class="result__item" data-key="tran_mu">
+        <span class="result__label">M<sub>u</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kNm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="tran_phi_Mn">
+        <span class="result__label">φM<sub>n</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN-m</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="tran_dc">
+        <span class="result__label">D/C</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="tran_def_wind" hidden>
+        <span class="result__label">Wind Defl</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="tran_def_dead" hidden>
+        <span class="result__label">Dead Defl</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="tran_allow_def">
+        <span class="result__label">Allow. Defl</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+</template>
+
+<!-- Connection result rows -->
+<template id="result-connection-template">
+    <div class="result__item" data-key="joint_fy">
+        <span class="result__label">Joint f<sub>y</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="joint_fz">
+        <span class="result__label">Joint f<sub>z</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="R_yA">
+        <span class="result__label">Shear R<sub>yA</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="R_zA">
+        <span class="result__label">Tension R<sub>zA</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="Vu">
+        <span class="result__label">Resultant V<sub>u</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Pnv">
+        <span class="result__label">φP<sub>nv</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Pnot">
+        <span class="result__label">φP<sub>not</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Pnov">
+        <span class="result__label">φP<sub>nov</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="beta_pullover">
+        <span class="result__label">β<sub>pullover</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="beta_pullout">
+        <span class="result__label">β<sub>pullout</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
+</template>
+
+<!-- Anchorage result rows (all possible; JS hides unused branch rows) -->
+<template id="result-anchorage-template">
+    <div class="result__item" data-key="reaction_Ry">
+        <span class="result__label">Reaction R<sub>y</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="reaction_Rz">
+        <span class="result__label">Reaction R<sub>z</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__divider" data-section="anchor" hidden>Anchor</div>
+    <!-- Box Clump rows -->
+    <div class="result__item" data-key="V_ua" hidden>
+        <span class="result__label">V<sub>ua</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Vsa" hidden>
+        <span class="result__label">φV<sub>sa</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Vcbg" hidden>
+        <span class="result__label">φV<sub>cbg</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Vcp" hidden>
+        <span class="result__label">φV<sub>cp</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__divider" data-section="baseplate" hidden>Base Plate</div>
+    <div class="result__item" data-key="bp_Pu" hidden>
+        <span class="result__label">P<sub>u</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="bp_t_req_bear" hidden>
+        <span class="result__label">t<sub>req</sub> (Bear.)</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> mm</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <!-- U Clump rows -->
+    <div class="result__item" data-key="N_ua" hidden>
+        <span class="result__label">N<sub>ua</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Nsa" hidden>
+        <span class="result__label">φN<sub>sa</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Ncbg" hidden>
+        <span class="result__label">φN<sub>cbg</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="phi_Npn" hidden>
+        <span class="result__label">φN<sub>pn</sub></span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"> kN</span><span
+                class="result__status" hidden></span></span>
+    </div>
+    <div class="result__item" data-key="interaction" hidden>
+        <span class="result__label">Interaction β</span>
+        <span class="result__value"><span class="result__value-text"></span><span class="result__unit"></span><span
+                class="result__status" hidden></span></span>
+    </div>
 </template>

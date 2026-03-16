@@ -14,28 +14,6 @@ function _clone(id) {
     return document.getElementById(id).content.cloneNode(true);
 }
 
-function _row(label, value, pass = null) {
-    const frag = _clone('result-row-template');
-    const item = frag.querySelector('.result__item');
-    if (pass === true) item.classList.add('result__item-pass');
-    else if (pass === false) item.classList.add('result__item-fail');
-    frag.querySelector('.result__label').innerHTML = label;
-    frag.querySelector('.result__value-text').innerHTML = value;
-    if (pass !== null) {
-        const status = frag.querySelector('.result__status');
-        status.removeAttribute('hidden');
-        status.classList.add(pass ? 'result__status-pass' : 'result__status-fail');
-        status.textContent = pass ? '✔' : '✗';
-    }
-    return frag;
-}
-
-function _divider(label) {
-    const frag = _clone('result-divider-template');
-    frag.querySelector('.result__divider').textContent = label;
-    return frag;
-}
-
 function _empty(msg = 'No data') {
     const frag = _clone('result-empty-template');
     frag.querySelector('.result__empty').textContent = msg;
@@ -47,140 +25,210 @@ function _setBody(selector, frag) {
     if (el) el.replaceChildren(frag);
 }
 
+// Fill a cloned section template with data values and pass/fail states.
+// `data` is a flat object of { key: value }.
+// `passMap` is an optional object of { key: boolean } for pass/fail styling.
+// `showKeys` is an optional array of data-key values to unhide.
+// `showSections` is an optional array of data-section values to unhide.
+function _fillTemplate(templateId, data, passMap = {}, showKeys = [], showSections = []) {
+    const frag = _clone(templateId);
+    for (const key of showKeys) {
+        const el = frag.querySelector(`[data-key="${key}"]`);
+        if (el) el.removeAttribute('hidden');
+    }
+    for (const sec of showSections) {
+        const el = frag.querySelector(`[data-section="${sec}"]`);
+        if (el) el.removeAttribute('hidden');
+    }
+    for (const [key, value] of Object.entries(data)) {
+        const el = frag.querySelector(`[data-key="${key}"]`);
+        if (!el) continue;
+        const valueEl = el.querySelector('.result__value-text');
+        if (valueEl) valueEl.textContent = _fmt(value);
+        if (key in passMap && passMap[key] !== null) {
+            const pass = passMap[key];
+            el.classList.add(pass ? 'result__item-pass' : 'result__item-fail');
+            const status = el.querySelector('.result__status');
+            if (status) {
+                status.removeAttribute('hidden');
+                status.classList.add(pass ? 'result__status-pass' : 'result__status-fail');
+                status.textContent = pass ? '✔' : '✗';
+            }
+        }
+    }
+    return frag;
+}
+
 // ---- Glass Results ----
 
 function _renderGlass(calc) {
     if (!calc || calc.error) return _empty('—');
-    const frag = document.createDocumentFragment();
-    frag.appendChild(_row('Eff. Area', `${_fmt(calc.A_eff)} m²`));
-    frag.appendChild(_row('Aspect Ratio', _fmt(calc.aspect_ratio)));
-    if (calc.branch === 'sgu' || calc.branch === 'lgu') {
-        frag.appendChild(_row('GTF', _fmt(calc.gtf)));
-        frag.appendChild(_row('LR', `${_fmt(calc.sgu_lr ?? calc.lgu_lr)} kPa`));
-    } else if (calc.branch === 'dgu' || calc.branch === 'ldgu') {
-        frag.appendChild(_row('GTF₁', _fmt(calc.gtf1)));
-        frag.appendChild(_row('GTF₂', _fmt(calc.gtf2)));
-        frag.appendChild(_row('LS₁', _fmt(calc.dgu_ls1 ?? calc.ldgu_ls1)));
-        frag.appendChild(_row('LS₂', _fmt(calc.dgu_ls2 ?? calc.ldgu_ls2)));
-        frag.appendChild(_row('LR₁', `${_fmt(calc.dgu_lr1 ?? calc.ldgu_lr1)} kPa`));
-        frag.appendChild(_row('LR₂', `${_fmt(calc.dgu_lr2 ?? calc.ldgu_lr2)} kPa`));
-    }
-    if (calc.stress_ratio != null)
-        frag.appendChild(_row('Stress Ratio', _fmt(calc.stress_ratio), calc.stress_ratio <= 1));
-    if (calc.allow_def != null)
-        frag.appendChild(_row('Allow. Defl', `${_fmt(calc.allow_def)} mm`));
-    if (calc.def_ratio != null)
-        frag.appendChild(_row('Defl. Ratio', _fmt(calc.def_ratio), calc.def_ratio <= 1));
-    if (calc.bite_req != null)
-        frag.appendChild(_row('Bite Req.', `${_fmt(calc.bite_req)} mm`));
-    return frag;
+    const isSingle = calc.branch === 'sgu' || calc.branch === 'lgu';
+    const isDouble = calc.branch === 'dgu' || calc.branch === 'ldgu';
+    const showKeys = [];
+    if (isSingle) showKeys.push('gtf', 'lr');
+    if (isDouble) showKeys.push('gtf1', 'gtf2', 'dgu_ls1', 'dgu_ls2', 'dgu_lr1', 'dgu_lr2');
+    if (calc.stress_ratio != null) showKeys.push('stress_ratio');
+    if (calc.allow_def != null) showKeys.push('allow_def');
+    if (calc.def_ratio != null) showKeys.push('def_ratio');
+    if (calc.bite_req != null) showKeys.push('bite_req');
+
+    const data = {
+        A_eff: calc.A_eff,
+        aspect_ratio: calc.aspect_ratio,
+        gtf: calc.gtf,
+        lr: calc.sgu_lr ?? calc.lgu_lr,
+        gtf1: calc.gtf1,
+        gtf2: calc.gtf2,
+        dgu_ls1: calc.dgu_ls1 ?? calc.ldgu_ls1,
+        dgu_ls2: calc.dgu_ls2 ?? calc.ldgu_ls2,
+        dgu_lr1: calc.dgu_lr1 ?? calc.ldgu_lr1,
+        dgu_lr2: calc.dgu_lr2 ?? calc.ldgu_lr2,
+        stress_ratio: calc.stress_ratio,
+        allow_def: calc.allow_def,
+        def_ratio: calc.def_ratio,
+        bite_req: calc.bite_req,
+    };
+    const passMap = {
+        stress_ratio: calc.stress_ratio != null ? calc.stress_ratio <= 1 : null,
+        def_ratio: calc.def_ratio != null ? calc.def_ratio <= 1 : null,
+    };
+    return _fillTemplate('result-glass-template', data, passMap, showKeys);
 }
 
 // ---- Frame Results ----
 
 function _renderFrame(calc) {
     if (!calc || calc.error) return _empty('—');
-    const frag = document.createDocumentFragment();
-    frag.appendChild(_row('Eff. Area', `${_fmt(calc.eff_area)} m²`));
-    frag.appendChild(_row('Glass DL', `${_fmt(calc.glass_sw)} kPa`));
-    frag.appendChild(_divider('Mullion'));
-    if (calc.mullion_type === 'Aluminum + Steel') {
-        frag.appendChild(_row('I<sub>xa</sub>', `${_fmt(calc.I_xa, 0)} mm⁴`));
-        frag.appendChild(_row('I<sub>xs</sub>', `${_fmt(calc.I_xs, 0)} mm⁴`));
-        frag.appendChild(_row('LS<sub>a</sub>', _fmt(calc.ls_a)));
-        frag.appendChild(_row('LS<sub>s</sub>', _fmt(calc.ls_s)));
-    }
-    frag.appendChild(_row('M<sub>u</sub>', `${_fmt(calc.mul_mu)} kNm`));
-    if (calc.mullion_type === 'Aluminum + Steel') {
-        frag.appendChild(_row('Alum. φM<sub>n</sub>', `${_fmt(calc.mul_phi_Mn_a)} kN-m`));
-        frag.appendChild(_row('Alum. D/C', _fmt(calc.mul_dc_a), calc.mul_dc_a != null ? calc.mul_dc_a <= 1 : null));
-        frag.appendChild(_row('Steel φM<sub>n</sub>', `${_fmt(calc.mul_phi_Mn_s)} kN-m`));
-        frag.appendChild(_row('Steel D/C', _fmt(calc.mul_dc_s), calc.mul_dc_s != null ? calc.mul_dc_s <= 1 : null));
-    } else {
-        frag.appendChild(_row('φM<sub>n</sub>', `${_fmt(calc.mul_phi_Mn)} kN-m`));
-        frag.appendChild(_row('D/C', _fmt(calc.mul_dc), calc.mul_dc != null ? calc.mul_dc <= 1 : null));
-    }
-    if (calc.mul_def != null)
-        frag.appendChild(_row('Deflection', `${_fmt(calc.mul_def)} mm`, calc.mul_def <= (calc.mul_allow_def ?? Infinity)));
-    frag.appendChild(_row('Allow. Defl', `${_fmt(calc.mul_allow_def)} mm`));
-    frag.appendChild(_divider('Transom'));
-    frag.appendChild(_row('M<sub>u</sub>', `${_fmt(calc.tran_mu)} kNm`));
-    frag.appendChild(_row('φM<sub>n</sub>', `${_fmt(calc.tran_phi_Mn)} kN-m`));
-    frag.appendChild(_row('D/C', _fmt(calc.tran_dc), calc.tran_dc != null ? calc.tran_dc <= 1 : null));
-    if (calc.tran_def_wind != null)
-        frag.appendChild(_row('Wind Defl', `${_fmt(calc.tran_def_wind)} mm`, calc.tran_def_wind <= (calc.tran_allow_def ?? Infinity)));
-    if (calc.tran_def_dead != null)
-        frag.appendChild(_row('Dead Defl', `${_fmt(calc.tran_def_dead)} mm`, calc.tran_def_dead <= 3.0));
-    frag.appendChild(_row('Allow. Defl', `${_fmt(calc.tran_allow_def)} mm`));
-    return frag;
+    const isComposite = calc.mullion_type === 'Aluminum + Steel';
+    const showKeys = [];
+    if (isComposite) showKeys.push('I_xa', 'I_xs', 'ls_a', 'ls_s', 'mul_phi_Mn_a', 'mul_dc_a', 'mul_phi_Mn_s', 'mul_dc_s');
+    else showKeys.push('mul_phi_Mn', 'mul_dc');
+    if (calc.mul_def != null) showKeys.push('mul_def');
+    if (calc.tran_def_wind != null) showKeys.push('tran_def_wind');
+    if (calc.tran_def_dead != null) showKeys.push('tran_def_dead');
+
+    const data = {
+        eff_area: calc.eff_area,
+        glass_sw: calc.glass_sw,
+        I_xa: calc.I_xa,
+        I_xs: calc.I_xs,
+        ls_a: calc.ls_a,
+        ls_s: calc.ls_s,
+        mul_mu: calc.mul_mu,
+        mul_phi_Mn_a: calc.mul_phi_Mn_a,
+        mul_dc_a: calc.mul_dc_a,
+        mul_phi_Mn_s: calc.mul_phi_Mn_s,
+        mul_dc_s: calc.mul_dc_s,
+        mul_phi_Mn: calc.mul_phi_Mn,
+        mul_dc: calc.mul_dc,
+        mul_def: calc.mul_def,
+        mul_allow_def: calc.mul_allow_def,
+        tran_mu: calc.tran_mu,
+        tran_phi_Mn: calc.tran_phi_Mn,
+        tran_dc: calc.tran_dc,
+        tran_def_wind: calc.tran_def_wind,
+        tran_def_dead: calc.tran_def_dead,
+        tran_allow_def: calc.tran_allow_def,
+    };
+    const passMap = {
+        mul_dc_a: calc.mul_dc_a != null ? calc.mul_dc_a <= 1 : null,
+        mul_dc_s: calc.mul_dc_s != null ? calc.mul_dc_s <= 1 : null,
+        mul_dc: calc.mul_dc != null ? calc.mul_dc <= 1 : null,
+        mul_def: calc.mul_def != null ? calc.mul_def <= (calc.mul_allow_def ?? Infinity) : null,
+        tran_dc: calc.tran_dc != null ? calc.tran_dc <= 1 : null,
+        tran_def_wind: calc.tran_def_wind != null ? calc.tran_def_wind <= (calc.tran_allow_def ?? Infinity) : null,
+        tran_def_dead: calc.tran_def_dead != null ? calc.tran_def_dead <= 3.0 : null,
+    };
+    return _fillTemplate('result-frame-template', data, passMap, showKeys);
 }
 
 // ---- Connection Results ----
 
 function _renderConnection(calc) {
     if (!calc || calc.error) return _empty('—');
-    const frag = document.createDocumentFragment();
-    frag.appendChild(_row('Joint f<sub>y</sub>', `${_fmt(calc.joint_fy)} kN`));
-    frag.appendChild(_row('Joint f<sub>z</sub>', `${_fmt(calc.joint_fz)} kN`));
-    frag.appendChild(_row('Shear R<sub>yA</sub>', `${_fmt(calc.R_yA)} kN`));
-    frag.appendChild(_row('Tension R<sub>zA</sub>', `${_fmt(calc.R_zA)} kN`));
-    frag.appendChild(_row('Resultant V<sub>u</sub>', `${_fmt(calc.Vu)} kN`));
-    frag.appendChild(_row('φP<sub>nv</sub>', `${_fmt(calc.phi_Pnv)} kN`, calc.phi_Pnv > calc.Vu));
-    frag.appendChild(_row('φP<sub>not</sub>', `${_fmt(calc.phi_Pnot)} kN`, calc.phi_Pnot > calc.R_zA));
-    frag.appendChild(_row('φP<sub>nov</sub>', `${_fmt(calc.phi_Pnov)} kN`, calc.phi_Pnov > calc.R_zA));
-    frag.appendChild(_row('β<sub>pullover</sub>', _fmt(calc.beta_pullover), calc.beta_pullover <= 0.715));
-    frag.appendChild(_row('β<sub>pullout</sub>', _fmt(calc.beta_pullout), calc.beta_pullout <= 0.69));
-    return frag;
+    const data = {
+        joint_fy: calc.joint_fy,
+        joint_fz: calc.joint_fz,
+        R_yA: calc.R_yA,
+        R_zA: calc.R_zA,
+        Vu: calc.Vu,
+        phi_Pnv: calc.phi_Pnv,
+        phi_Pnot: calc.phi_Pnot,
+        phi_Pnov: calc.phi_Pnov,
+        beta_pullover: calc.beta_pullover,
+        beta_pullout: calc.beta_pullout,
+    };
+    const passMap = {
+        phi_Pnv: calc.phi_Pnv > calc.Vu,
+        phi_Pnot: calc.phi_Pnot > calc.R_zA,
+        phi_Pnov: calc.phi_Pnov > calc.R_zA,
+        beta_pullover: calc.beta_pullover <= 0.715,
+        beta_pullout: calc.beta_pullout <= 0.69,
+    };
+    return _fillTemplate('result-connection-template', data, passMap);
 }
 
 // ---- Anchorage Results ----
 
 function _renderAnchorage(calc) {
     if (!calc || calc.error) return _empty('—');
-    const frag = document.createDocumentFragment();
-    frag.appendChild(_row('Reaction R<sub>y</sub>', `${_fmt(calc.reaction_Ry)} kN`));
-    frag.appendChild(_row('Reaction R<sub>z</sub>', `${_fmt(calc.reaction_Rz)} kN`));
+    const showKeys = [];
+    const showSections = [];
     if (calc.clump_type === 'Box Clump') {
-        frag.appendChild(_divider('Anchor'));
-        frag.appendChild(_row('V<sub>ua</sub>', `${_fmt(calc.V_ua)} kN`));
-        frag.appendChild(_row('φV<sub>sa</sub>', `${_fmt(calc.phi_Vsa)} kN`, calc.phi_Vsa > calc.V_ua));
-        frag.appendChild(_row('φV<sub>cbg</sub>', `${_fmt(calc.phi_Vcbg)} kN`, calc.phi_Vcbg > calc.V_ug));
-        frag.appendChild(_row('φV<sub>cp</sub>', `${_fmt(calc.phi_Vcp)} kN`, calc.phi_Vcp > calc.V_ug));
-        frag.appendChild(_divider('Base Plate'));
-        frag.appendChild(_row('P<sub>u</sub>', `${_fmt(calc.bp_Pu)} kN`));
-        frag.appendChild(_row('t<sub>req</sub> (Bear.)', `${_fmt(calc.bp_t_req_bear)} mm`, calc.bp_t_req_bear < calc.bp_thk));
+        showSections.push('anchor', 'baseplate');
+        showKeys.push('V_ua', 'phi_Vsa', 'phi_Vcbg', 'phi_Vcp', 'bp_Pu', 'bp_t_req_bear');
     } else if (calc.clump_type === 'U Clump') {
-        frag.appendChild(_divider('Anchor'));
-        frag.appendChild(_row('N<sub>ua</sub>', `${_fmt(calc.N_ua)} kN`));
-        frag.appendChild(_row('φN<sub>sa</sub>', `${_fmt(calc.phi_Nsa)} kN`, calc.phi_Nsa > calc.N_ua));
-        frag.appendChild(_row('φN<sub>cbg</sub>', `${_fmt(calc.phi_Ncbg)} kN`, calc.phi_Ncbg > calc.N_ug));
-        frag.appendChild(_row('φN<sub>pn</sub>', `${_fmt(calc.phi_Npn)} kN`, calc.phi_Npn > calc.N_ua));
-        frag.appendChild(_row('V<sub>ua</sub>', `${_fmt(calc.V_ua)} kN`));
-        frag.appendChild(_row('φV<sub>sa</sub>', `${_fmt(calc.phi_Vsa)} kN`, calc.phi_Vsa > calc.V_ua));
-        frag.appendChild(_row('φV<sub>cbg</sub>', `${_fmt(calc.phi_Vcbg)} kN`, calc.phi_Vcbg > calc.V_ug));
-        frag.appendChild(_row('Interaction β', _fmt(calc.interaction), calc.interaction <= 1));
+        showSections.push('anchor');
+        showKeys.push('N_ua', 'phi_Nsa', 'phi_Ncbg', 'phi_Npn', 'V_ua', 'phi_Vsa', 'phi_Vcbg', 'interaction');
     }
-    return frag;
+    const data = {
+        reaction_Ry: calc.reaction_Ry,
+        reaction_Rz: calc.reaction_Rz,
+        V_ua: calc.V_ua,
+        phi_Vsa: calc.phi_Vsa,
+        phi_Vcbg: calc.phi_Vcbg,
+        phi_Vcp: calc.phi_Vcp,
+        bp_Pu: calc.bp_Pu,
+        bp_t_req_bear: calc.bp_t_req_bear,
+        N_ua: calc.N_ua,
+        phi_Nsa: calc.phi_Nsa,
+        phi_Ncbg: calc.phi_Ncbg,
+        phi_Npn: calc.phi_Npn,
+        interaction: calc.interaction,
+    };
+    const passMap = {
+        phi_Vsa: calc.phi_Vsa > calc.V_ua,
+        phi_Vcbg: calc.phi_Vcbg > calc.V_ug,
+        phi_Vcp: calc.phi_Vcp > calc.V_ug,
+        bp_t_req_bear: calc.bp_t_req_bear < calc.bp_thk,
+        phi_Nsa: calc.phi_Nsa > calc.N_ua,
+        phi_Ncbg: calc.phi_Ncbg > calc.N_ug,
+        phi_Npn: calc.phi_Npn > calc.N_ua,
+        interaction: calc.interaction <= 1,
+    };
+    return _fillTemplate('result-anchorage-template', data, passMap, showKeys, showSections);
 }
 
 // ---- Wind Results ----
 
 function _renderWindGeneral(summary) {
     if (!summary) return _empty('—');
-    const frag = document.createDocumentFragment();
-    frag.appendChild(_row('Wind Speed', `${_fmt(summary.wind_speed)} m/s`));
-    frag.appendChild(_row('Gust Factor', _fmt(summary.gust_factor)));
-    frag.appendChild(_row('Imp. Factor', _fmt(summary.Imp_factor)));
-    frag.appendChild(_row('K<sub>h</sub>', _fmt(summary.K_h)));
-    frag.appendChild(_row('K<sub>ht</sub>', _fmt(summary.K_ht)));
-    frag.appendChild(_row('q<sub>h</sub>', `${_fmt(summary.q_h)} kPa`));
-    frag.appendChild(_row('C<sub>pw</sub>', _fmt(summary.C_pw)));
-    frag.appendChild(_row('C<sub>pl</sub>', _fmt(summary.C_pl)));
-    frag.appendChild(_row('C<sub>ps</sub>', _fmt(summary.C_ps)));
-    frag.appendChild(_row('P<sub>hi</sub>', `${_fmt(summary.P_hi)} kPa`));
-    frag.appendChild(_row('P<sub>hl</sub>', `${_fmt(summary.P_hl)} kPa`));
-    frag.appendChild(_row('P<sub>hs</sub>', `${_fmt(summary.P_hs)} kPa`));
-    return frag;
+    const data = {
+        wind_speed: summary.wind_speed,
+        gust_factor: summary.gust_factor,
+        Imp_factor: summary.Imp_factor,
+        K_h: summary.K_h,
+        K_ht: summary.K_ht,
+        q_h: summary.q_h,
+        C_pw: summary.C_pw,
+        C_pl: summary.C_pl,
+        C_ps: summary.C_ps,
+        P_hi: summary.P_hi,
+        P_hl: summary.P_hl,
+        P_hs: summary.P_hs,
+    };
+    return _fillTemplate('result-wind-general-template', data);
 }
 
 function _renderMWFRS(levels) {
