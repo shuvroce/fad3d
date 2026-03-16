@@ -150,28 +150,40 @@ function createWindPanel() {
 
 // Function to initialize wind panel event listeners
 function initializeWindPanel() {
-    // Add event listener for calculate button
-    const calculateBtn = document.querySelector(".wind__btn-calculate");
+    // Populate location dropdown from server
+    const locationSel = document.getElementById('location');
+    if (locationSel && locationSel.options.length <= 1) {
+        fetch('/api/wind/locations')
+            .then(r => r.ok ? r.json() : null)
+            .then(locations => {
+                if (!locations) return;
+                locations.forEach(loc => {
+                    const opt = document.createElement('option');
+                    opt.value = loc;
+                    opt.textContent = loc;
+                    locationSel.appendChild(opt);
+                });
+            })
+            .catch(() => {});
+    }
+
+    // Wire calculate button to the calc engine
+    const calculateBtn = document.querySelector('.wind__btn-calculate');
     if (calculateBtn) {
-        calculateBtn.addEventListener("click", () => {
-            console.log("Calculate wind loads");
-            // TODO: Implement wind load calculation
-            alert("Wind load calculation will be implemented here");
+        calculateBtn.addEventListener('click', () => {
+            if (typeof scheduleWindCalc === 'function') scheduleWindCalc();
         });
     }
 
-    // Add event listener for reset button
-    const resetBtn = document.querySelector(".wind__btn-reset");
+    // Reset button clears all wind inputs
+    const resetBtn = document.querySelector('.wind__btn-reset');
     if (resetBtn) {
-        resetBtn.addEventListener("click", () => {
-            const windInputs = document.querySelectorAll(
-                ".wind__panel input, .wind__panel select",
-            );
-            windInputs.forEach((input) => {
-                if (input.tagName === "SELECT") {
+        resetBtn.addEventListener('click', () => {
+            document.querySelectorAll('.wind__panel input, .wind__panel select').forEach(input => {
+                if (input.tagName === 'SELECT') {
                     input.selectedIndex = 0;
                 } else {
-                    input.value = "";
+                    input.value = '';
                 }
             });
         });

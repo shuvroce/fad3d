@@ -4,27 +4,54 @@
 
 const MATERIAL_DATA = {
     'Aluminum': {
-        '6063-T5': { e: '69.6', fy: '145' },
-        '6063-T6': { e: '69.6', fy: '214' },
-        '6061-T6': { e: '68.9', fy: '276' },
-        'Manual':  { e: '',     fy: ''    },
+        '6063-T5': { e: '70000', fy: '110', fu: '150' },
+        '6063-T6': { e: '70000', fy: '172', fu: '207' },
+        '6061-T6': { e: '70000', fy: '241', fu: '262' },
+        'Manual':  { e: '',      fy: '',    fu: ''    },
     },
     'Steel': {
-        'A500 Gr. B':  { e: '200', fy: '317' },
-        'A572 Gr. 50': { e: '200', fy: '345' },
-        'A992 Gr. 50': { e: '200', fy: '345' },
-        'Manual':      { e: '',    fy: ''    },
+        'A36':         { e: '200000', fy: '250', fu: '400' },
+        'A500 Gr. B':  { e: '200000', fy: '317', fu: '400' },
+        'A572 Gr. 50': { e: '200000', fy: '345', fu: '450' },
+        'A992 Gr. 50': { e: '200000', fy: '345', fu: '450' },
+        'Manual':      { e: '',       fy: '',    fu: '' },
     },
 };
 
 const DEFAULT_MATERIALS = [
-    { name: 'Alum 6063-T5',      type: 'Aluminum', grade: '6063-T5',     e: '69.6', fy: '145' },
-    { name: 'Alum 6061-T6',      type: 'Aluminum', grade: '6061-T6',     e: '68.9', fy: '276' },
-    { name: 'Steel A572 Gr. 50', type: 'Steel',    grade: 'A572 Gr. 50', e: '200',  fy: '345' },
+    { name: '6063-T5',      type: 'Aluminum', grade: '6063-T5',     e: '70000',  fy: '110', fu: '150' },
+    { name: '6063-T6',      type: 'Aluminum', grade: '6063-T5',     e: '70000',  fy: '172', fu: '207' },
+    { name: '6061-T6',      type: 'Aluminum', grade: '6061-T6',     e: '70000',  fy: '241', fu: '262' },
+    { name: 'A500 Gr. B',   type: 'Steel',    grade: 'A500 Gr. B',  e: '200000', fy: '317', fu: '400' },
+    { name: 'A572 Gr. 50',  type: 'Steel',    grade: 'A572 Gr. 50', e: '200000', fy: '345', fu: '450' },
 ];
 
 let _materials = [];
 let _selectedMatIdx = -1;
+let _materialSnapshot = null;
+let _selectedMatIdxSnapshot = -1;
+
+function cloneMaterialList(materials) {
+    return materials.map(m => ({ ...m }));
+}
+
+function startMaterialEditSession() {
+    _materialSnapshot = cloneMaterialList(_materials);
+    _selectedMatIdxSnapshot = _selectedMatIdx;
+}
+
+function rollbackMaterialEditSession() {
+    if (!_materialSnapshot) return;
+    _materials = cloneMaterialList(_materialSnapshot);
+    _selectedMatIdx = Math.min(Math.max(_selectedMatIdxSnapshot, -1), _materials.length - 1);
+    _materialSnapshot = null;
+    _selectedMatIdxSnapshot = -1;
+}
+
+function commitMaterialEditSession() {
+    _materialSnapshot = null;
+    _selectedMatIdxSnapshot = -1;
+}
 
 // --- Shared utility used by section modules ---
 
@@ -108,20 +135,24 @@ function showMaterialForm() {
     document.getElementById('mat-name').value = mat.name  || '';
     document.getElementById('mat-type').value = mat.type  || 'Aluminum';
     populateGradeOptions(document.getElementById('mat-grade'), mat.type || 'Aluminum', mat.grade);
-    setMatProps(mat.type || 'Aluminum', mat.grade, mat.e, mat.fy);
+    setMatProps(mat.type || 'Aluminum', mat.grade, mat.e, mat.fy, mat.fu);
 }
 
-function setMatProps(type, grade, eOverride, fyOverride) {
-    const props    = MATERIAL_DATA[type]?.[grade] || { e: '', fy: '' };
+function setMatProps(type, grade, eOverride, fyOverride, fuOverride) {
+    const props    = MATERIAL_DATA[type]?.[grade] || { e: '', fy: '', fu: '' };
     const isManual = grade === 'Manual';
     const eInput   = document.getElementById('mat-e');
     const fyInput  = document.getElementById('mat-fy');
+    const fuInput  = document.getElementById('mat-fu');
     eInput.value   = eOverride !== undefined ? eOverride : props.e;
     fyInput.value  = fyOverride !== undefined ? fyOverride : props.fy;
+    fuInput.value  = fuOverride !== undefined ? fuOverride : props.fu;
     eInput.disabled  = !isManual;
     fyInput.disabled = !isManual;
+    fuInput.disabled = !isManual;
     eInput.classList.toggle('define-list__input--readonly', !isManual);
     fyInput.classList.toggle('define-list__input--readonly', !isManual);
+    fuInput.classList.toggle('define-list__input--readonly', !isManual);
 }
 
 function syncMaterialFromForm() {
@@ -132,6 +163,7 @@ function syncMaterialFromForm() {
     mat.grade = document.getElementById('mat-grade')?.value || '6063-T5';
     mat.e     = document.getElementById('mat-e')?.value     || '';
     mat.fy    = document.getElementById('mat-fy')?.value    || '';
+    mat.fu    = document.getElementById('mat-fu')?.value    || '';
 }
 
 function initMaterialFormEvents() {
@@ -153,7 +185,7 @@ function initMaterialFormEvents() {
         const grade = gradeSelect.value;
         setMatProps(typeSelect.value, grade);
         if (_selectedMatIdx >= 0 && !_materials[_selectedMatIdx]._nameEdited) {
-            const autoName = `${typeSelect.value} ${grade}`;
+            const autoName = grade;
             nameInput.value = autoName;
             _materials[_selectedMatIdx].name = autoName;
             const item = document.querySelector(`#material-list [data-idx="${_selectedMatIdx}"] .define-modal__item-name`);
@@ -166,7 +198,7 @@ function initMaterialFormEvents() {
         const grade = gradeSelect.value;
         setMatProps(typeSelect.value, grade);
         if (_selectedMatIdx >= 0 && !_materials[_selectedMatIdx]._nameEdited) {
-            const autoName = `${typeSelect.value} ${grade}`;
+            const autoName = grade;
             nameInput.value = autoName;
             _materials[_selectedMatIdx].name = autoName;
             const item = document.querySelector(`#material-list [data-idx="${_selectedMatIdx}"] .define-modal__item-name`);
@@ -221,6 +253,7 @@ function initMaterialModal() {
     document.getElementById('material-modal-btn')?.addEventListener('click', () => {
         document.getElementById('define-submenu').hidden = true;
         document.getElementById('define-wrap')?.classList.remove('open');
+        startMaterialEditSession();
         if (_selectedMatIdx < 0 && _materials.length) _selectedMatIdx = 0;
         renderMaterialList();
         showMaterialForm();
@@ -229,16 +262,22 @@ function initMaterialModal() {
 
     addBtn?.addEventListener('click', () => {
         syncMaterialFromForm();
-        _materials.push({ name: '', type: 'Aluminum', grade: '6063-T5', e: '69.6', fy: '145' });
+        _materials.push({ name: '', type: 'Aluminum', grade: '6063-T5', e: '70000', fy: '110', fu: '150' });
         _selectedMatIdx = _materials.length - 1;
         renderMaterialList();
         showMaterialForm();
         document.getElementById('mat-name')?.focus();
     });
 
-    closeBtn?.addEventListener('click', () => { syncMaterialFromForm(); closeModal('material-modal'); });
-    applyBtn?.addEventListener('click', () => { syncMaterialFromForm(); closeModal('material-modal'); });
-    modal.addEventListener('click', (e) => { if (e.target === modal) { syncMaterialFromForm(); closeModal('material-modal'); } });
+    closeBtn?.addEventListener('click', () => { rollbackMaterialEditSession(); closeModal('material-modal'); });
+    applyBtn?.addEventListener('click', () => { syncMaterialFromForm(); commitMaterialEditSession(); closeModal('material-modal'); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) { rollbackMaterialEditSession(); closeModal('material-modal'); } });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (modal.style.display !== 'block') return;
+        rollbackMaterialEditSession();
+    });
 
     initMaterialFormEvents();
 }

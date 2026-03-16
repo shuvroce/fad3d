@@ -234,173 +234,11 @@
 
 
 
-            <!-- this content will be dynamically generated based on the results -->
-            <!-- Wind Tab Content -->
-            <div class="result__tab-content hidden" data-result-tab="wind">
-                <!-- General Wind Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">General Wind</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item">
-                            <span class="result__label">Design Pressure:</span>
-                            <span class="result__value">1.25 kPa</span>
-                        </div>
-                        <div class="result__item">
-                            <span class="result__label">Velocity Pressure:</span>
-                            <span class="result__value">0.95 kPa</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- Wind Tab Content (cards injected from result-wind-tab-template) -->
+            <div class="result__tab-content hidden" data-result-tab="wind"></div>
 
-                <!-- MWFRS Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">MWFRS</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item">
-                            <span class="result__label">Base Shear:</span>
-                            <span class="result__value">850 kN</span>
-                        </div>
-                        <div class="result__item">
-                            <span class="result__label">Overturning Moment:</span>
-                            <span class="result__value">12500 kN·m</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- C&C Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">C&C</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item">
-                            <span class="result__label">Positive Pressure:</span>
-                            <span class="result__value">1.85 kPa</span>
-                        </div>
-                        <div class="result__item">
-                            <span class="result__label">Negative Pressure:</span>
-                            <span class="result__value">-2.45 kPa</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Facade Tab Content -->
-            <div class="result__tab-content" data-result-tab="facade">
-                <div class="result__category-label">
-                    <span>Category 1</span>
-                </div>
-
-                <!-- Glass Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">Glass</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item result__item-pass">
-                            <span class="result__label">Stress Ratio:</span>
-                            <span class="result__value">0.17
-                                <span class="result__status">✔</span></span>
-                        </div>
-                        <div class="result__item result__item-pass">
-                            <span class="result__label">Deflection:</span>
-                            <span class="result__value">L/250
-                                <span class="result__status">✔</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Frame Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">Frame</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item result__item-pass">
-                            <span class="result__label">Stress Ratio:</span>
-                            <span class="result__value">0.68
-                                <span class="result__status">✔</span></span>
-                        </div>
-                        <div class="result__item result__item-fail">
-                            <span class="result__label">Buckling Ratio:</span>
-                            <span class="result__value">1.12
-                                <span class="result__status">✗</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Connection Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">Connection</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item result__item-pass">
-                            <span class="result__label">Strength Ratio:</span>
-                            <span class="result__value">0.85
-                                <span class="result__status">✔</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anchor Results -->
-                <div class="result__card">
-                    <div class="result__card-header">
-                        <h3 class="result__card-title">Anchor</h3>
-                        <button class="result__card-toggle" aria-label="Toggle section">
-                            <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6 9l6 6 6-6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="result__card-body">
-                        <div class="result__item result__item-pass">
-                            <span class="result__label">Pullout Ratio:</span>
-                            <span class="result__value">0.42
-                                <span class="result__status">✔</span></span>
-                        </div>
-                        <div class="result__item result__item-pass">
-                            <span class="result__label">Shear Ratio:</span>
-                            <span class="result__value">0.35
-                                <span class="result__status">✔</span></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Facade Tab Content (cards injected from result-facade-tab-template) -->
+            <div class="result__tab-content" data-result-tab="facade"></div>
         </div>
     </section>
     <button class="right__panel-toggle-right" type="button" aria-label="Collapse right panel"
@@ -412,6 +250,7 @@
 
     {% include "modals.html" %}
     {% include "input-temp.html" %}
+    {% include "result-temp.html" %}
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
@@ -423,7 +262,9 @@
     <script src="{{ url_for('static', filename='js/glassInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/frameInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/anchorInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/resultPanel.js') }}"></script>
     <script src="{{ url_for('static', filename='js/results.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/calcEngine.js') }}"></script>
     <script src="{{ url_for('static', filename='js/report.js') }}"></script>
     <script src="{{ url_for('static', filename='js/viewControls.js') }}"></script>
     <script src="{{ url_for('static', filename='js/categoryIcons.js') }}"></script>

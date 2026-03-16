@@ -98,7 +98,7 @@
 body.theme__dark {
     /* Dark Theme - Background Colors */
     --bg-body: #010409;
-    --bg-primary: #161b22;
+    --bg-primary: #13171d;
     --bg-secondary: #1c2128;
     --bg-hover: #21262d;
     --bg-preview: #1c2010;
@@ -587,24 +587,32 @@ body.theme__dark select {
 .modal__dialog {
     background: var(--bg-primary);
     border-radius: var(--radius-3);
-    max-width: 600px;
-    width: 90%;
+    /* min-width: 40rem; */
+    width: fit-content;
     max-height: var(--modal-height);
     overflow: hidden;
     margin: 5% auto;
     animation: modalSlideDown 0.2s ease;
 }
 
+.modal__dialog-xsmall {
+    min-width: 300px;
+}
+
 .modal__dialog-small {
-    max-width: 400px;
+    min-width: 400px;
+}
+
+.modal__dialog-medium {
+    min-width: 500px;
 }
 
 .modal__dialog-large {
-    max-width: 750px;
+    min-width: 700px;
 }
 
 .modal__dialog-xlarge {
-    max-width: 980px;
+    min-width: 980px;
 }
 
 .modal__form-grid {
@@ -2310,6 +2318,62 @@ body.theme__dark select {
 
 .result__item-fail .result__status {
     color: var(--color-danger);
+}
+
+/* Pass/fail icons injected by resultsRenderer */
+.result__status-pass {
+    color: var(--color-success);
+    font-weight: bold;
+}
+
+.result__status-fail {
+    color: var(--color-danger);
+    font-weight: bold;
+}
+
+.result__divider {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    padding: 0.4rem 0.5rem 0.2rem;
+    margin-top: 0.25rem;
+    border-top: 1px solid var(--border-primary);
+}
+
+.result__empty {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    font-style: italic;
+}
+
+.result__table-wrap {
+    overflow-x: auto;
+    padding: 0.25rem 0.5rem;
+}
+
+.result__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.result__table th {
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 0.25rem 0.4rem;
+    border-bottom: 1px solid var(--border-primary);
+    white-space: nowrap;
+}
+
+.result__table td {
+    padding: 0.25rem 0.4rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-primary);
+    white-space: nowrap;
 }
 
 /* ================ WIND PANEL STYLES ================ */

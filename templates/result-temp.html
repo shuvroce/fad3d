@@ -1,1180 +1,180 @@
-{# ======= RESULT PREVIEW TEMPLATES ======= #}
+<!-- ======= RESULT TEMPLATES ======= -->
 
-{# Steel Profile Preview #}
-{% macro steel_preview(calc) %}
-<div class="profile-properties">
-    <div class="property-item">
-        <span class="property-label">Flange:</span>
-        <span class="property-value">
-            {% if calc.lambda_f < calc.lambda_p_f %}Compact <span class="status-icon pass">✓</span>
-        {% elif calc.lambda_f > calc.lambda_p_f and calc.lambda_f < calc.lambda_r_f %}Non-compact <span
-            class="status-icon fail">✕</span>
-            {% else %}Slender <span class="status-icon fail">✕</span>
-            {% endif %}
-            </span>
+<!-- Wind tab content shell -->
+<template id="result-wind-tab-template">
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">General Wind</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="wind-general-body">
+            <div class="result__item result__empty">Enter wind inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">Web:</span>
-        <span class="property-value">
-            {% if calc.lambda_w < calc.lambda_p_w %}Compact <span class="status-icon pass">✓</span>
-        {% elif calc.lambda_w > calc.lambda_p_w and calc.lambda_w < calc.lambda_r_w %}Non-compact <span
-            class="status-icon fail">✕</span>
-            {% else %}Slender <span class="status-icon fail">✕</span>
-            {% endif %}
-            </span>
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">MWFRS</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="wind-mwfrs-body">
+            <div class="result__item result__empty">Enter wind inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">Area:</span>
-        <span class="property-value">{{ calc.area }} mm²</span>
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">C&amp;C</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="wind-cladding-body">
+            <div class="result__item result__empty">Enter wind inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">I<sub>xx</sub>:</span>
-        <span class="property-value">{{ calc.I_xx }} mm⁴</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">I<sub>yy</sub>:</span>
-        <span class="property-value">{{ calc.I_yy }} mm⁴</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">Z<sub>x</sub>:</span>
-        <span class="property-value">{{ calc.Z_x }} mm³</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">M<sub>n</sub>:</span>
-        <span class="property-value">{{ calc.Mn }} kN-m</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">φM<sub>n</sub>:</span>
-        <span class="property-value">{{ calc.phi_Mn }} kN-m</span>
-    </div>
-</div>
-{% endmacro %}
+</template>
 
-{# Aluminum Profile Preview #}
-{% macro alum_preview(calc) %}
-<div class="profile-properties">
-    <div class="property-item">
-        <span class="property-label">Area:</span>
-        <span class="property-value">{{ calc.area }} mm²</span>
+<!-- Facade tab content shell -->
+<template id="result-facade-tab-template">
+    <div class="result__category-label">
+        <span>Category 1</span>
     </div>
-    <div class="property-item">
-        <span class="property-label">I<sub>xx</sub>:</span>
-        <span class="property-value">{{ calc.I_xx }} mm⁴</span>
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">Glass</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="facade-glass-body">
+            <div class="result__item result__empty">Enter glass inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">I<sub>yy</sub>:</span>
-        <span class="property-value">{{ calc.I_yy }} mm⁴</span>
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">Frame</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="facade-frame-body">
+            <div class="result__item result__empty">Enter frame inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">S<sub>x</sub>:</span>
-        <span class="property-value">{{ calc.S_x }} mm³</span>
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">Connection</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="facade-conn-body">
+            <div class="result__item result__empty">Enter connection inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">Z<sub>x</sub>:</span>
-        <span class="property-value">{{ calc.Z_x }} mm³</span>
+    <div class="result__card">
+        <div class="result__card-header">
+            <h3 class="result__card-title">Anchor</h3>
+            <button class="result__card-toggle" aria-label="Toggle section">
+                <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="result__card-body" id="facade-anchor-body">
+            <div class="result__item result__empty">Enter anchor inputs to calculate</div>
+        </div>
     </div>
-    <div class="property-item">
-        <span class="property-label">φM<sub>n</sub>:</span>
-        <span class="property-value">{{ calc.phi_Mn or '—' }} kN-m</span>
-    </div>
-</div>
-{% endmacro %}
+</template>
 
-{# Glass Unit Preview #}
-{% macro glass_preview(calc, glass_type) %}
-{% if glass_type == "sgu" or glass_type == "lgu" and calc.length < 5000 and calc.support_type !="Point Fixed" %} <div
-    class="profile-properties">
-    <div class="property-item">
-        <span class="property-label">Eff. Area:</span>
-        <span class="property-value">{{ calc.A_eff or '—' }} mm²</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">Aspect Ratio:</span>
-        <span class="property-value">{{ calc.aspect_ratio or '—' }}</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">GTF:</span>
-        <span class="property-value">{{ calc.gtf or '—' }}</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">LR:</span>
-        <span class="property-value">
-            {% if glass_type == "sgu" %}
-            {{ calc.sgu_lr or '—' }} kPa
-            {% elif glass_type == "lgu" %}
-            {{ calc.lgu_lr or '—' }} kPa
-            {% endif %}
+<!-- Result row: label + value with optional pass/fail status -->
+<template id="result-row-template">
+    <div class="result__item">
+        <span class="result__label"></span>
+        <span class="result__value">
+            <span class="result__value-text"></span>
+            <span class="result__status" hidden></span>
         </span>
     </div>
-    <div class="property-item">
-        <span class="property-label">Stress Ratio:</span>
-        <span class="property-value">{{ calc.stress_ratio or '—' }}
-            {% if calc.stress_ratio and calc.stress_ratio <= 1 %}<span class="status-icon pass">✓</span>
-        {% elif calc.stress_ratio %}<span class="status-icon fail">✕</span>
-        {% endif %}
-        </span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">Allow. Def:</span>
-        <span class="property-value">{{ calc.allow_def or '—' }} mm</span>
-    </div>
-    <div class="property-item">
-        <span class="property-label">Defl. Ratio:</span>
-        <span class="property-value">{{ calc.def_ratio or '—' }}
-            {% if calc.def_ratio and calc.def_ratio <= 1 %}<span class="status-icon pass">✓</span>
-        {% elif calc.def_ratio %}<span class="status-icon fail">✕</span>
-        {% endif %}
-        </span>
-    </div>
-    </div>
+</template>
 
-    {% elif glass_type == "dgu" or glass_type == "ldgu" and calc.length < 5000 and calc.support_type !="Point Fixed" %}
-        <div class="profile-properties">
-        <div class="property-item">
-            <span class="property-label">Eff. Area:</span>
-            <span class="property-value">{{ calc.A_eff or '—' }} mm²</span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">Aspect Ratio:</span>
-            <span class="property-value">{{ calc.aspect_ratio or '—' }}</span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">GTF<sub>1</sub>:</span>
-            <span class="property-value">{{ calc.gtf1 or '—' }}</span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">GTF<sub>2</sub>:</span>
-            <span class="property-value">{{ calc.gtf2 or '—' }}</span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">LS<sub>1</sub>:</span>
-            <span class="property-value">
-                {% if glass_type == "dgu" %}
-                {{ calc.dgu_ls1 or '—' }}
-                {% elif glass_type == "ldgu" %}
-                {{ calc.ldgu_ls1 or '—' }}
-                {% endif %}
-            </span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">LS<sub>2</sub>:</span>
-            <span class="property-value">
-                {% if glass_type == "dgu" %}
-                {{ calc.dgu_ls2 or '—' }}
-                {% elif glass_type == "ldgu" %}
-                {{ calc.ldgu_ls2 or '—' }}
-                {% endif %}
-            </span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">LR<sub>1</sub>:</span>
-            <span class="property-value">
-                {% if glass_type == "dgu" %}
-                {{ calc.dgu_lr1 or '—' }} kPa
-                {% elif glass_type == "ldgu" %}
-                {{ calc.ldgu_lr1 or '—' }} kPa
-                {% endif %}
-            </span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">LR<sub>2</sub>:</span>
-            <span class="property-value">
-                {% if glass_type == "dgu" %}
-                {{ calc.dgu_lr2 or '—' }} kPa
-                {% elif glass_type == "ldgu" %}
-                {{ calc.ldgu_lr2 or '—' }} kPa
-                {% endif %}
-            </span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">Stress Ratio:</span>
-            <span class="property-value">{{ calc.stress_ratio or '—' }}
-                {% if calc.stress_ratio and calc.stress_ratio <= 1 %}<span class="status-icon pass">✓</span>
-            {% elif calc.stress_ratio %}<span class="status-icon fail">✕</span>
-            {% endif %}
-            </span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">Allow. Def:</span>
-            <span class="property-value">{{ calc.allow_def or '—' }} mm</span>
-        </div>
-        <div class="property-item">
-            <span class="property-label">Defl. Ratio:</span>
-            <span class="property-value">{{ calc.def_ratio or '—' }}
-                {% if calc.def_ratio and calc.def_ratio <= 1 %}<span class="status-icon pass">✓</span>
-            {% elif calc.def_ratio %}<span class="status-icon fail">✕</span>
-            {% endif %}
-            </span>
-        </div>
-        </div>
+<!-- Section divider -->
+<template id="result-divider-template">
+    <div class="result__divider"></div>
+</template>
 
-        {% elif calc.length >= 5000 or calc.support_type == "Point Fixed" %}
-        <div class="profile-properties">
-            <div class="property-item">
-                <span class="property-label">Eff. Area:</span>
-                <span class="property-value">{{ calc.A_eff or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Aspect Ratio:</span>
-                <span class="property-value">{{ calc.aspect_ratio or '—' }}</span>
-            </div>
-        </div>
-        {% endif %}
-        {% endmacro %}
+<!-- Empty / no-data state -->
+<template id="result-empty-template">
+    <div class="result__item result__empty"></div>
+</template>
 
-        {# Frame Preview #}
-        {% macro frame_preview(calc) %}
-        <div class="profile-properties">
-            <div class="property-item">
-                <span class="property-label">Eff. Area:</span>
-                <span class="property-value">{{ calc.eff_area or '—' }} m²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Glass DL:</span>
-                <span class="property-value">{{ calc.glass_sw or '—' }} kPa</span>
-            </div>
-
-            <div class="property-break">Mullion</div>
-            {% if calc.mullion_type == "Aluminum + Steel" %}
-            <div class="property-item">
-                <span class="property-label">I<sub>xa</sub>:</span>
-                <span class="property-value">{{ calc.I_xa or '—' }} mm⁴</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">I<sub>xs</sub>:</span>
-                <span class="property-value">{{ calc.I_xs or '—' }} mm⁴</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">LS<sub>a</sub>:</span>
-                <span class="property-value">{{ calc.ls_a or '—' }}</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">LS<sub>s</sub>:</span>
-                <span class="property-value">{{ calc.ls_s or '—' }}</span>
-            </div>
-            {% endif %}
-
-            <div class="property-item">
-                <span class="property-label">Mullion M<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.mul_mu or '—' }} kNm</span>
-            </div>
-
-            {% if calc.mullion_type == "Aluminum + Steel" %}
-            <div class="property-item">
-                <span class="property-label">Alum. φM<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.mul_phi_Mn_a or '—' }} kN-m</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Alum. D/C:</span>
-                <span class="property-value">{{ calc.mul_dc_a or '—' }}
-                    {% if calc.mul_dc_a and calc.mul_dc_a <= 1 %}<span class="status-icon pass">✓</span>
-                {% elif calc.mul_dc_a %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Steel φM<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.mul_phi_Mn_s or '—' }} kN-m</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Steel D/C:</span>
-                <span class="property-value">{{ calc.mul_dc_s or '—' }}
-                    {% if calc.mul_dc_s and calc.mul_dc_s <= 1 %}<span class="status-icon pass">✓</span>
-                {% elif calc.mul_dc_s %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            {% else %}
-            <div class="property-item">
-                <span class="property-label">Mullion φM<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.mul_phi_Mn or '—' }} kN-m</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Mullion D/C:</span>
-                <span class="property-value">{{ calc.mul_dc or '—' }}
-                    {% if calc.mul_dc and calc.mul_dc <= 1 %}<span class="status-icon pass">✓</span>
-                {% elif calc.mul_dc %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            {% endif %}
-
-            <div class="property-item">
-                <span class="property-label">Mullion Defl:</span>
-                <span class="property-value">{{ calc.mul_def or '—' }} mm
-                    {% if calc.mul_def and calc.mul_def <= calc.mul_allow_def %}<span class="status-icon pass">✓</span>
-                {% elif calc.mul_def %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Mul. Allow. Defl:</span>
-                <span class="property-value">{{ calc.mul_allow_def or '—' }} mm</span>
-            </div>
-
-            <div class="property-break">Transom</div>
-            <div class="property-item">
-                <span class="property-label">Transom M<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.tran_mu or '—' }} kNm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Transom φM<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.tran_phi_Mn or '—' }} kN-m</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Transom D/C:</span>
-                <span class="property-value">{{ calc.tran_dc or '—' }}
-                    {% if calc.tran_dc and calc.tran_dc <= 1 %}<span class="status-icon pass">✓</span>
-                {% elif calc.tran_dc %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Tran. Wind Defl:</span>
-                <span class="property-value">{{ calc.tran_def_wind or '—' }} mm
-                    {% if calc.tran_def_wind and calc.tran_def_wind <= calc.tran_allow_def %}<span
-                        class="status-icon pass">✓</span>
-                {% elif calc.tran_def_wind %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Tran. Dead Defl:</span>
-                <span class="property-value">{{ calc.tran_def_dead or '—' }} mm
-                    {% if calc.tran_def_dead and calc.tran_def_dead <= 3.0 %}<span class="status-icon pass">✓</span>
-                {% elif calc.tran_def_dead %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Tran. Allow. Defl:</span>
-                <span class="property-value">{{ calc.tran_allow_def or '—' }} mm</span>
-            </div>
-        </div>
-        {% endmacro %}
-
-        {# Connection Preview #}
-        {% macro connection_preview(calc) %}
-        <div class="profile-properties">
-            <div class="property-item">
-                <span class="property-label">Joint f<sub>y</sub>:</span>
-                <span class="property-value">{{ calc.joint_fy or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Joint f<sub>z</sub>:</span>
-                <span class="property-value">{{ calc.joint_fz or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Shear, R<sub>yA</sub>:</span>
-                <span class="property-value">{{ calc.R_yA or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Tension, R<sub>zA</sub>:</span>
-                <span class="property-value">{{ calc.R_zA or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Resultant, V<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.Vu or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Shear, φP<sub>nv</sub>:</span>
-                <span class="property-value">{{ calc.phi_Pnv or '—' }} kN
-                    {% if calc.phi_Pnv and calc.phi_Pnv > calc.Vu %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Pnv %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Pullout, φP<sub>not</sub>:</span>
-                <span class="property-value">{{ calc.phi_Pnot or '—' }} kN
-                    {% if calc.phi_Pnot and calc.phi_Pnot > calc.R_zA %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Pnot %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Pullover, φP<sub>nov</sub>:</span>
-                <span class="property-value">{{ calc.phi_Pnov or '—' }} kN
-                    {% if calc.phi_Pnov and calc.phi_Pnov > calc.R_zA %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Pnov %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">β<sub>pullover</sub>:</span>
-                <span class="property-value">{{ calc.beta_pullover or '—' }}
-                    {% if calc.beta_pullover and calc.beta_pullover <= 0.715 %}<span class="status-icon pass">✓</span>
-                {% elif calc.beta_pullover %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">β<sub>pullout</sub>:</span>
-                <span class="property-value">{{ calc.beta_pullout or '—' }}
-                    {% if calc.beta_pullout and calc.beta_pullout <= 0.69 %}<span class="status-icon pass">✓</span>
-                {% elif calc.beta_pullout %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-        </div>
-        {% endmacro %}
-
-        {# Anchorage Preview #}
-        {% macro anchorage_preview(calc) %}
-        <div class="profile-properties">
-            <div class="property-item">
-                <span class="property-label">Reaction R<sub>y</sub>:</span>
-                <span class="property-value">{{ calc.reaction_Ry or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Reaction R<sub>z</sub>:</span>
-                <span class="property-value">{{ calc.reaction_Rz or '—' }} kN</span>
-            </div>
-
-            {% if calc.clump_type == "Box Clump" %}
-            <div class="property-break">Anchor</div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ua</sub>:</span>
-                <span class="property-value">{{ calc.V_ua or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ug</sub>:</span>
-                <span class="property-value">{{ calc.V_ug or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>sa</sub>:</span>
-                <span class="property-value">{{ calc.phi_Vsa or '—' }} kN
-                    {% if calc.phi_Vsa and calc.phi_Vsa > calc.V_ua %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Vsa %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">A<sub>VC</sub>:</span>
-                <span class="property-value">{{ calc.A_VC or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">A<sub>VCO</sub>:</span>
-                <span class="property-value">{{ calc.A_VCO or '—' }} mm²</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">φV<sub>cbg</sub>:</span>
-                <span class="property-value">{{ calc.phi_Vcbg or '—' }} kN
-                    {% if calc.phi_Vcbg and calc.phi_Vcbg > calc.V_ug %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Vcbg %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>cp</sub>:</span>
-                <span class="property-value">{{ calc.phi_Vcp or '—' }} kN
-                    {% if calc.phi_Vcp and calc.phi_Vcp > calc.V_ug %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Vcp %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Base plate</div>
-            <div class="property-item">
-                <span class="property-label">Length:</span>
-                <span class="property-value">{{ calc.bp_length or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Width:</span>
-                <span class="property-value">{{ calc.bp_width or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">P<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bp_Pu or '—' }} kN</span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">d:</span>
-                <span class="property-value">{{ calc.bp_d or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">b:</span>
-                <span class="property-value">{{ calc.bp_b or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">m:</span>
-                <span class="property-value">{{ calc.bp_m or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">n:</span>
-                <span class="property-value">{{ calc.bp_n or '—' }} mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub> (Bearing):</span>
-                <span class="property-value">{{ calc.bp_t_req_bear or '—' }} mm
-                    {% if calc.bp_t_req_bear and calc.bp_t_req_bear < calc.bp_thk %}<span class="status-icon pass">
-                        ✓</span>
-                {% elif calc.bp_t_req_bear %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-
-            {% elif calc.clump_type == "U Clump" %}
-            <div class="property-break">Anchor</div>
-            <div class="property-item">
-                <span class="property-label">N<sub>ua</sub>:</span>
-                <span class="property-value">{{ calc.N_ua or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">N<sub>ug</sub>:</span>
-                <span class="property-value">{{ calc.N_ug or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ua</sub>:</span>
-                <span class="property-value">{{ calc.V_ua or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ug</sub>:</span>
-                <span class="property-value">{{ calc.V_ug or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φN<sub>sa</sub>:</span>
-                <span class="property-value">{{ calc.phi_Nsa or '—' }} kN
-                    {% if calc.phi_Nsa and calc.phi_Nsa > calc.N_ua %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Nsa %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">A<sub>NC</sub>:</span>
-                <span class="property-value">{{ calc.A_NC or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">A<sub>NCO</sub>:</span>
-                <span class="property-value">{{ calc.A_NCO or '—' }} mm²</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">φN<sub>cbg</sub>:</span>
-                <span class="property-value">{{ calc.phi_Ncbg or '—' }} kN
-                    {% if calc.phi_Ncbg and calc.phi_Ncbg > calc.N_ug %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Ncbg %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φN<sub>pn</sub>:</span>
-                <span class="property-value">{{ calc.phi_Npn or '—' }} kN
-                    {% if calc.phi_Npn and calc.phi_Npn > calc.N_ua %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Npn %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>sa</sub>:</span>
-                <span class="property-value">{{ calc.phi_Vsa or '—' }} kN
-                    {% if calc.phi_Vsa and calc.phi_Vsa > calc.V_ua %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Vsa %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">A<sub>VC</sub>:</span>
-                <span class="property-value">{{ calc.A_VC or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">A<sub>VCO</sub>:</span>
-                <span class="property-value">{{ calc.A_VCO or '—' }} mm²</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">φV<sub>cbg</sub>:</span>
-                <span class="property-value">{{ calc.phi_Vcbg or '—' }} kN
-                    {% if calc.phi_Vcbg and calc.phi_Vcbg > calc.V_ug %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Vcbg %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>cp</sub>:</span>
-                <span class="property-value">{{ calc.phi_Vcp or '—' }} kN
-                    {% if calc.phi_Vcp and calc.phi_Vcp > calc.V_ug %}<span class="status-icon pass">✓</span>
-                    {% elif calc.phi_Vcp %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Interaction:</span>
-                <span class="property-value">{{ calc.interaction or '—' }}
-                    {% if calc.beta_N < 0.2 or calc.beta_V < 0.2 %} {% if calc.interaction and calc.interaction < 1.0
-                        %}<span class="status-icon pass">✓</span>
-                {% elif calc.interaction %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                {% else %}
-                {% if calc.interaction and calc.interaction < 1.2 %}<span class="status-icon pass">✓</span>
-                    {% elif calc.interaction %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                    {% endif %}
-                    </span>
-            </div>
-
-            <div class="property-break">Through bolt</div>
-            <div class="property-item">
-                <span class="property-label">V<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bolt_Vu or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Shear):</span>
-                <span class="property-value">{{ calc.bolt_phi_Rn_shear or '—' }} kN
-                    {% if calc.bolt_phi_Rn_shear and calc.bolt_phi_Rn_shear > calc.bolt_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.bolt_phi_Rn_shear %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Bearing):</span>
-                <span class="property-value">{{ calc.bolt_phi_Rn_bear or '—' }} kN
-                    {% if calc.bolt_phi_Rn_bear and calc.bolt_phi_Rn_bear > calc.bolt_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.bolt_phi_Rn_bear %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Fin plate</div>
-            <div class="property-item">
-                <span class="property-label">V<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.fin_Vu or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub>:</span>
-                <span class="property-value">{{ calc.fin_t_req or '—' }} mm
-                    {% if calc.fin_t_req and calc.fin_t_req < calc.fin_thk %}<span class="status-icon pass">✓</span>
-                {% elif calc.fin_t_req %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Shear yield):</span>
-                <span class="property-value">{{ calc.fin_phi_Rn_yield or '—' }} kN
-                    {% if calc.fin_phi_Rn_yield and calc.fin_phi_Rn_yield > calc.fin_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.fin_phi_Rn_yield %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Shear rupture):</span>
-                <span class="property-value">{{ calc.fin_phi_Rn_rupture or '—' }} kN
-                    {% if calc.fin_phi_Rn_rupture and calc.fin_phi_Rn_rupture > calc.fin_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.fin_phi_Rn_rupture %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Block shear):</span>
-                <span class="property-value">{{ calc.fin_phi_Rn_block or '—' }} kN
-                    {% if calc.fin_phi_Rn_block and calc.fin_phi_Rn_block > calc.fin_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.fin_phi_Rn_block %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Weld</div>
-
-            {# <div class="property-item">
-                <span class="property-label">Tensile f<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.weld_fn or '—' }} N/mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Shear f<sub>v</sub>:</span>
-                <span class="property-value">{{ calc.weld_fv or '—' }} N/mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Bending f<sub>b</sub>:</span>
-                <span class="property-value">{{ calc.weld_fb or '—' }} N/mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">Resultant, f<sub>R</sub>:</span>
-                <span class="property-value">{{ calc.weld_fR or '—' }} N/mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.weld_phi_Rn or '—' }} N/mm
-                    {% if calc.weld_phi_Rn and calc.weld_phi_Rn > calc.weld_fR %}<span class="status-icon pass">✓</span>
-                    {% elif calc.weld_phi_Rn %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Base plate</div>
-            <div class="property-item">
-                <span class="property-label">Length:</span>
-                <span class="property-value">{{ calc.bp_length or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Width:</span>
-                <span class="property-value">{{ calc.bp_width or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">P<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bp_Pu or '—' }} kN</span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">d:</span>
-                <span class="property-value">{{ calc.bp_d or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">b:</span>
-                <span class="property-value">{{ calc.bp_b or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">m:</span>
-                <span class="property-value">{{ calc.bp_m or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">n:</span>
-                <span class="property-value">{{ calc.bp_n or '—' }} mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub> (Bearing):</span>
-                <span class="property-value">{{ calc.bp_t_req_bear or '—' }} mm
-                    {% if calc.bp_t_req_bear and calc.bp_t_req_bear < calc.bp_thk %}<span class="status-icon pass">
-                        ✓</span>
-                {% elif calc.bp_t_req_bear %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">T<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bp_Tu or '—' }} kN</span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">x:</span>
-                <span class="property-value">{{ calc.bp_x or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">B<sub>eff</sub>:</span>
-                <span class="property-value">{{ calc.bp_Beff or '—' }} mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub> (Tension):</span>
-                <span class="property-value">{{ calc.bp_t_req_tension or '—' }} mm
-                    {% if calc.bp_t_req_tension and calc.bp_t_req_tension < calc.bp_thk %}<span
-                        class="status-icon pass">✓</span>
-                {% elif calc.bp_t_req_tension %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-
-            {% elif calc.clump_type == "L Clump" %}
-            <div class="property-break">Top anchor</div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ua</sub>:</span>
-                <span class="property-value">{{ calc.top_V_ua or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ug</sub>:</span>
-                <span class="property-value">{{ calc.top_V_ug or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>sa</sub>:</span>
-                <span class="property-value">{{ calc.top_phi_Vsa or '—' }} kN
-                    {% if calc.top_phi_Vsa and calc.top_phi_Vsa > calc.top_V_ua %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.top_phi_Vsa %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">A<sub>VC</sub>:</span>
-                <span class="property-value">{{ calc.top_A_VC or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">A<sub>VCO</sub>:</span>
-                <span class="property-value">{{ calc.top_A_VCO or '—' }} mm²</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">φV<sub>cbg</sub>:</span>
-                <span class="property-value">{{ calc.top_phi_Vcbg or '—' }} kN
-                    {% if calc.top_phi_Vcbg and calc.top_phi_Vcbg > calc.top_V_ug %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.top_phi_Vcbg %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>cp</sub>:</span>
-                <span class="property-value">{{ calc.top_phi_Vcp or '—' }} kN
-                    {% if calc.top_phi_Vcp and calc.top_phi_Vcp > calc.top_V_ug %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.top_phi_Vcp %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Front anchor</div>
-            <div class="property-item">
-                <span class="property-label">N<sub>ua</sub>:</span>
-                <span class="property-value">{{ calc.front_N_ua or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">N<sub>ug</sub>:</span>
-                <span class="property-value">{{ calc.front_N_ug or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ua</sub>:</span>
-                <span class="property-value">{{ calc.front_V_ua or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">V<sub>ug</sub>:</span>
-                <span class="property-value">{{ calc.front_V_ug or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φN<sub>sa</sub>:</span>
-                <span class="property-value">{{ calc.front_phi_Nsa or '—' }} kN
-                    {% if calc.front_phi_Nsa and calc.front_phi_Nsa > calc.front_N_ua %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.front_phi_Nsa %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">A<sub>NC</sub>:</span>
-                <span class="property-value">{{ calc.front_A_NC or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">A<sub>NCO</sub>:</span>
-                <span class="property-value">{{ calc.A_NCO or '—' }} mm²</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">φN<sub>cbg</sub>:</span>
-                <span class="property-value">{{ calc.front_phi_Ncbg or '—' }} kN
-                    {% if calc.front_phi_Ncbg and calc.front_phi_Ncbg > calc.front_N_ug %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.front_phi_Ncbg %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φN<sub>pn</sub>:</span>
-                <span class="property-value">{{ calc.front_phi_Npn or '—' }} kN
-                    {% if calc.front_phi_Npn and calc.front_phi_Npn > calc.front_N_ua %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.front_phi_Npn %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>sa</sub>:</span>
-                <span class="property-value">{{ calc.front_phi_Vsa or '—' }} kN
-                    {% if calc.front_phi_Vsa and calc.front_phi_Vsa > calc.front_V_ua %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.front_phi_Vsa %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">A<sub>VC</sub>:</span>
-                <span class="property-value">{{ calc.front_A_VC or '—' }} mm²</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">A<sub>VCO</sub>:</span>
-                <span class="property-value">{{ calc.front_A_VCO or '—' }} mm²</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">φV<sub>cbg</sub>:</span>
-                <span class="property-value">{{ calc.front_phi_Vcbg or '—' }} kN
-                    {% if calc.front_phi_Vcbg and calc.front_phi_Vcbg > calc.front_V_ug %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.front_phi_Vcbg %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φV<sub>cp</sub>:</span>
-                <span class="property-value">{{ calc.front_phi_Vcp or '—' }} kN
-                    {% if calc.front_phi_Vcp and calc.front_phi_Vcp > calc.front_V_ug %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.front_phi_Vcp %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Interaction:</span>
-                <span class="property-value">{{ calc.front_interaction or '—' }}
-                    {% if calc.front_beta_N < 0.2 or calc.front_beta_V < 0.2 %} {% if calc.front_interaction and
-                        calc.front_interaction < 1.0 %}<span class="status-icon pass">✓</span>
-                {% elif calc.front_interaction %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                {% else %}
-                {% if calc.front_interaction and calc.front_interaction < 1.2 %}<span class="status-icon pass">✓</span>
-                    {% elif calc.front_interaction %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                    {% endif %}
-                    </span>
-            </div>
-
-            <div class="property-break">Through bolt</div>
-            <div class="property-item">
-                <span class="property-label">V<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bolt_Vu or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Shear):</span>
-                <span class="property-value">{{ calc.bolt_phi_Rn_shear or '—' }} kN
-                    {% if calc.bolt_phi_Rn_shear and calc.bolt_phi_Rn_shear > calc.bolt_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.bolt_phi_Rn_shear %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Bearing):</span>
-                <span class="property-value">{{ calc.bolt_phi_Rn_bear or '—' }} kN
-                    {% if calc.bolt_phi_Rn_bear and calc.bolt_phi_Rn_bear > calc.bolt_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.bolt_phi_Rn_bear %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Fin plate</div>
-            <div class="property-item">
-                <span class="property-label">V<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.fin_Vu or '—' }} kN</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub>:</span>
-                <span class="property-value">{{ calc.fin_t_req or '—' }} mm
-                    {% if calc.fin_t_req and calc.fin_t_req < calc.fin_thk %}<span class="status-icon pass">✓</span>
-                {% elif calc.fin_t_req %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Shear yield):</span>
-                <span class="property-value">{{ calc.fin_phi_Rn_yield or '—' }} kN
-                    {% if calc.fin_phi_Rn_yield and calc.fin_phi_Rn_yield > calc.fin_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.fin_phi_Rn_yield %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Shear rupture):</span>
-                <span class="property-value">{{ calc.fin_phi_Rn_rupture or '—' }} kN
-                    {% if calc.fin_phi_Rn_rupture and calc.fin_phi_Rn_rupture > calc.fin_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.fin_phi_Rn_rupture %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub> (Block shear):</span>
-                <span class="property-value">{{ calc.fin_phi_Rn_block or '—' }} kN
-                    {% if calc.fin_phi_Rn_block and calc.fin_phi_Rn_block > calc.fin_Vu %}<span
-                        class="status-icon pass">✓</span>
-                    {% elif calc.fin_phi_Rn_block %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Weld</div>
-
-            {# <div class="property-item">
-                <span class="property-label">Tensile f<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.weld_fn or '—' }} N/mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Shear f<sub>v</sub>:</span>
-                <span class="property-value">{{ calc.weld_fv or '—' }} N/mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Bending f<sub>b</sub>:</span>
-                <span class="property-value">{{ calc.weld_fb or '—' }} N/mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">Resultant, f<sub>R</sub>:</span>
-                <span class="property-value">{{ calc.weld_fR or '—' }} N/mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">φR<sub>n</sub>:</span>
-                <span class="property-value">{{ calc.weld_phi_Rn or '—' }} N/mm
-                    {% if calc.weld_phi_Rn and calc.weld_phi_Rn > calc.weld_fR %}<span class="status-icon pass">✓</span>
-                    {% elif calc.weld_phi_Rn %}<span class="status-icon fail">✕</span>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="property-break">Base plate</div>
-
-            {# <div class="property-item">
-                <span class="property-label">Top Length:</span>
-                <span class="property-value">{{ calc.top_bp_length or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Top Width:</span>
-                <span class="property-value">{{ calc.top_bp_width or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Front Length:</span>
-                <span class="property-value">{{ calc.front_bp_length or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">Front Width:</span>
-                <span class="property-value">{{ calc.front_bp_width or '—' }} mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">P<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bp_Pu or '—' }} kN</span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">d:</span>
-                <span class="property-value">{{ calc.bp_d or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">b:</span>
-                <span class="property-value">{{ calc.bp_b or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">m:</span>
-                <span class="property-value">{{ calc.bp_m or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">n:</span>
-                <span class="property-value">{{ calc.bp_n or '—' }} mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub> (Bearing):</span>
-                <span class="property-value">{{ calc.bp_t_req_bear or '—' }} mm
-                    {% if calc.bp_t_req_bear and calc.bp_t_req_bear < calc.bp_thk %}<span class="status-icon pass">
-                        ✓</span>
-                {% elif calc.bp_t_req_bear %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">T<sub>u</sub>:</span>
-                <span class="property-value">{{ calc.bp_Tu or '—' }} kN</span>
-            </div>
-
-            {# <div class="property-item">
-                <span class="property-label">x:</span>
-                <span class="property-value">{{ calc.bp_x or '—' }} mm</span>
-            </div>
-            <div class="property-item">
-                <span class="property-label">B<sub>eff</sub>:</span>
-                <span class="property-value">{{ calc.bp_Beff or '—' }} mm</span>
-            </div> #}
-
-            <div class="property-item">
-                <span class="property-label">t<sub>req</sub> (Tension):</span>
-                <span class="property-value">{{ calc.bp_t_req_tension or '—' }} mm
-                    {% if calc.bp_t_req_tension and calc.bp_t_req_tension < calc.bp_thk %}<span
-                        class="status-icon pass">✓</span>
-                {% elif calc.bp_t_req_tension %}<span class="status-icon fail">✕</span>
-                {% endif %}
-                </span>
-            </div>
-            {% endif %}
-        </div>
-        {% endmacro %}
-
-        {# Wind Preview #}
-        {% macro wind_table(headers, rows) %}
-        <table class="mini-table">
+<!-- MWFRS table wrapper with header -->
+<template id="result-mwfrs-table-template">
+    <div class="result__table-wrap">
+        <table class="result__table">
             <thead>
                 <tr>
-                    {% for h in headers %}<th>{{ h.label|safe }}</th>{% endfor %}
+                    <th>Lvl</th>
+                    <th>H (m)</th>
+                    <th>K<sub>z</sub></th>
+                    <th>q<sub>z</sub></th>
+                    <th>P<sub>zw</sub></th>
                 </tr>
             </thead>
-            <tbody>
-                {% if rows and rows|length > 0 %}
-                {% for row in rows %}
-                <tr>
-                    {% for h in headers %}
-                    <td>{{ row.get(h.key, '') }}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="{{ headers|length }}" class="wind-empty">No data</td>
-                </tr>
-                {% endif %}
-            </tbody>
+            <tbody></tbody>
         </table>
-        {% endmacro %}
+    </div>
+</template>
 
-        {% macro wind_preview(summary, mwfrs_rows, wall_rows_fmt, roof_rows_fmt) %}
-        {% set mwfrs_headers = [
-        {"key": "Lvl", "label": "Lvl"},
-        {"key": "z", "label": "Cumu. (m)"},
-        {"key": "Kz", "label": "K<sub>z</sub>"},
-        {"key": "Kzt", "label": "K<sub>zt</sub>"},
-        {"key": "qz", "label": "q<sub>z</sub> (kPa)"},
-        {"key": "P_wind", "label": "P<sub>z</sub> (kPa)"}
-        ] %}
+<!-- Single MWFRS table row -->
+<template id="result-mwfrs-row-template">
+    <tr>
+        <td class="mwfrs-level"></td>
+        <td class="mwfrs-height"></td>
+        <td class="mwfrs-kz"></td>
+        <td class="mwfrs-qz"></td>
+        <td class="mwfrs-pzw"></td>
+    </tr>
+</template>
 
-        {% set cnc_headers_wall = [
-        {"key": "A_eff", "label": "A<sub>eff</sub> (m²)"},
-        {"key": "P_z4_pos", "label": "P<sub>z4+</sub> (kPa)"},
-        {"key": "P_z4_neg", "label": "P<sub>z4−</sub> (kPa)"},
-        {"key": "P_z5_pos", "label": "P<sub>z5+</sub> (kPa)"},
-        {"key": "P_z5_neg", "label": "P<sub>z5−</sub> (kPa)"}
-        ] %}
+<!-- C&C cladding table wrapper with header -->
+<template id="result-cladding-table-template">
+    <div class="result__table-wrap">
+        <table class="result__table">
+            <thead>
+                <tr>
+                    <th>Area (m²)</th>
+                    <th>P<sub>z4+</sub></th>
+                    <th>P<sub>z4-</sub></th>
+                    <th>P<sub>z5-</sub></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</template>
 
-        {% set cnc_headers_roof = [
-        {"key": "A_eff", "label": "A<sub>eff</sub> (m²)"},
-        {"key": "P_z1_neg", "label": "P<sub>z1−</sub> (kPa)"},
-        {"key": "P_z2_neg", "label": "P<sub>z2−</sub> (kPa)"},
-        {"key": "P_z3_neg", "label": "P<sub>z3−</sub> (kPa)"}
-        ] %}
-
-        <div class="wind-calc-summary">
-            <h4>At height h,</h4>
-            <ul>
-                <li><span class="label">Importance Factor: </span><span class="value">{{ summary.Imp_factor }}</span>
-                </li>
-                <li><span class="label">Leeward Ext. Coeffi: </span><span class="value">{{ summary.C_pl }}</span></li>
-                <li><span class="label">Gust Factor: </span><span class="value">{{ summary.gust_factor }}</span></li>
-                <li><span class="label">Int. Pressure: </span><span class="value">{{ summary.P_hi }} kPa</span></li>
-                <li><span class="label">Leeward Pressure: </span><span class="value">{{ summary.P_hl }} kPa</span></li>
-                <li><span class="label">Sidewall Pressure: </span><span class="value">{{ summary.P_hs }} kPa</span></li>
-            </ul>
-        </div>
-
-        <div class="wind-calc">
-            <h4>MWFRS Pressures at height z</h4>
-            {{ wind_table(mwfrs_headers, mwfrs_rows) }}
-        </div>
-
-        <div class="wind-calc">
-            <h4>C&amp;C Pressure for Walls at height h</h4>
-            {{ wind_table(cnc_headers_wall, wall_rows_fmt) }}
-        </div>
-
-        <div class="wind-calc">
-            <h4>C&amp;C Pressure for Roof at height h</h4>
-            {{ wind_table(cnc_headers_roof, roof_rows_fmt) }}
-        </div>
-        {% endmacro %}
+<!-- Single C&C cladding table row -->
+<template id="result-cladding-row-template">
+    <tr>
+        <td class="cladding-area"></td>
+        <td class="cladding-pz4pos"></td>
+        <td class="cladding-pz4neg"></td>
+        <td class="cladding-pz5neg"></td>
+    </tr>
+</template>

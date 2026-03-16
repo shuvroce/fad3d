@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML, CSS
 import pikepdf
-from calc_helpers import precompute_data
+from calculations.calc_helpers import precompute_data
 
 BASE_DIR = os.path.dirname(__file__)
 INPUT_YAML = os.path.join(BASE_DIR, "input.yaml")

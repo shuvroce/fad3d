@@ -32,6 +32,13 @@ function switchCategory(categoryNum) {
     if (activeButton) {
         activeButton.classList.add("active");
     }
+
+    // Notify dependent UI (Design Summary, viewport, etc.) about active category changes
+    window.dispatchEvent(
+        new CustomEvent("category-switched", {
+            detail: { categoryNum: Number(categoryNum) },
+        }),
+    );
 }
 
 // Function to switch tabs within a category
@@ -383,6 +390,18 @@ function createCategory(categoryNum) {
                 categoryNames.delete(currentCatNum);
                 heading.textContent = defaultName;
                 updateCategoryButtonTooltip(currentCatNum, defaultName);
+            }
+
+            // Keep Design Summary title in sync if this is the active category
+            const activeBtn = document.querySelector(".category__btn.active");
+            const activeCatNum = activeBtn
+                ? Number(activeBtn.getAttribute("data-category"))
+                : null;
+            if (
+                activeCatNum === currentCatNum &&
+                typeof updateFacadeResultCategory === "function"
+            ) {
+                updateFacadeResultCategory(currentCatNum);
             }
         });
 

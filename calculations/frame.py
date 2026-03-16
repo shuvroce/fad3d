@@ -4,45 +4,25 @@ from calculations.alum_profile import calc_alum_profile
 from calculations.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
 from calculations.loading import frame_loads, joint_forces, reaction_forces
 
-def calc_frame(frame: Dict[str, Any], alum_profiles_data: list = None, steel_profiles: list = None) -> Optional[Dict[str, Any]]:
-    if not frame or alum_profiles_data is None:
+def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles: list = None) -> Optional[Dict[str, Any]]:
+    if not frame or alum_profiles is None:
         return None
 
-    alum_profiles_data = alum_profiles_data or []
+    alum_profiles = alum_profiles or []
     steel_profiles = steel_profiles or []
-
-    # Resolve profile references
-    def find_profile(name: str, data_list: list) -> Optional[Dict]:
-        if not name:
-            return None
-        for p in data_list:
-            if p.get("profile_name") == name or p.get("profile_name", "").strip() == name.strip():
-                return p
-        return None
 
     mullion = frame.get("mullion")
     transom = frame.get("transom")
-    steel_ref = frame.get("steel")
+    steel = frame.get("steel") or {}
 
-    # Get mullion profile data (either from list by name or as direct dictionary)
-    if isinstance(mullion, dict):
-        mullion_profile_data = mullion
-    elif isinstance(mullion, str):
-        mullion_profile_data = find_profile(mullion, alum_profiles_data)
-    else:
-        mullion_profile_data = None
-    
-    # Get transom profile data (either from list by name or as direct dictionary)
-    if isinstance(transom, dict):
-        transom_profile_data = transom
-    elif isinstance(transom, str):
-        transom_profile_data = find_profile(transom, alum_profiles_data)
-    else:
-        transom_profile_data = None
+    steel_profile_type = steel.get("profile_type")
 
-    mullion_profile = calc_alum_profile(mullion_profile_data) if mullion_profile_data else None
-    transom_profile = calc_alum_profile(transom_profile_data) if transom_profile_data else None
-    steel_calc = calc_steel_rhs_profile(steel_ref) if steel_ref else None
+    mullion_profile = calc_alum_profile(mullion) if mullion else None
+    transom_profile = calc_alum_profile(transom) if transom else None
+    if steel_profile_type == "rhs":
+        steel_profile = calc_steel_rhs_profile(steel) if steel else None
+    else:
+        steel_profile = calc_steel_iw_profile(steel) if steel else None
 
     # Extract dimensions
     frame_width = _to_float(frame.get("width"))
@@ -81,13 +61,11 @@ def calc_frame(frame: Dict[str, Any], alum_profiles_data: list = None, steel_pro
         mul_allow_def = (frame_length / 240) + 6.35
     tran_allow_def = frame_width / 175
     
-    # Calculate steel profile properties from profile name
-    # steel_calc = calc_steel_profile(steel_ref) if steel_ref else None
-    
     if not all([frame_width, frame_length]):
         return None
 
     mul_w_dead, mul_w_wind, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
+
 
     # Mullion
     mul_mu = round(1.6 * mul_w_wind * (frame_length / 1000) ** 2 / 8, 2) if geometry == "regular" else mul_mu
@@ -105,9 +83,9 @@ def calc_frame(frame: Dict[str, Any], alum_profiles_data: list = None, steel_pro
         mul_phi_Mn_a = mullion_profile.get("phi_Mn", 0.001) if mullion_profile else 0.001
 
         # Steel moment of inertia from calculated steel profile
-        if steel_calc:
-            sp_I_xx = steel_calc.get("I_xx", 0.001)
-            mul_phi_Mn_s = steel_calc.get("phi_Mn", 0.001)
+        if steel_profile:
+            sp_I_xx = steel_profile.get("I_xx", 0.001)
+            mul_phi_Mn_s = steel_profile.get("phi_Mn", 0.001)
         else:
             sp_I_xx = 0.001
             mul_phi_Mn_s = 0.001
@@ -157,7 +135,7 @@ def calc_frame(frame: Dict[str, Any], alum_profiles_data: list = None, steel_pro
         "frame_type": frame_type,
         "mullion_type": mullion_type,
         "mullion": mullion,
-        "steel_ref": steel_ref,
+        "steel": steel,
         "glass_thk": round(glass_thk, 1),
         "glass_sw": round(glass_sw, 2),
         "acc_sw": round(acc_sw, 2),

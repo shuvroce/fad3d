@@ -45,6 +45,7 @@ Positioned beneath the navbar. A semi-transparent or low-profile bar overlaying 
 - **Far Left:** Toggle group, a pill-shaped container for **Wind** and **Facade**. Two primary buttons—**Wind** and **Facade**—to switch the context of the input fields.
 
 - **Center (Data Definition):** A pill-shaped container holding **General**, **Define** button. **General:** Opens a modal for Project Info and Report configuration. **Define (Dropdown/Group):** Material and Section buttons that open modals to define structural properties.
+    - the aluminum and steel profile calculated preview value will come from python file location in /calculations dir. using jinja template as a calculation preview template.
 
 - **Right (View Controls):** A pill-shaped container holding Buttons to toggle the 3D viewport between **Model**, **DC Ratio**, and **Deflection** views.
 
@@ -92,6 +93,8 @@ A nested, collapsible navigation system for facade management. Overlaying the to
 - **Navigation Tabs:** **Facade** tab that update dynamically based on the selected category and input data. **Wind** tab dynamicallly updated from input data, category independent.
 
 - **Result Cards:** Collapsible sections for Glass, Frame, Conn., and Anchor results in the facade tab. And collapsible sections for General, MWFRS, C&C results in the Wind tab.
+
+- **Calculation Sources:** the calculation results will come from python file from the /calculations dir as a single source of truth. use jinja template (result-temp.html) to preview the design summary/results.
 
 - **Visual Cues:** Use green checkmarks next to passed ratios (e.g., "Stress Ratio: 0.17 ✔") and red x (e.g., "Stress Ratio: 1.2 X") for a professional engineering look.
 

@@ -6,34 +6,13 @@ STEEL_E = 210000  # MPa
 STEEL_FY = 318    # MPa
 
 def calc_steel_rhs_profile(profile_data: Any) -> Optional[Dict[str, float]]:
-    web_length = None
-    flange_length = None
-    thk = None
-    
-    # Handle dictionary input (from preview API)
-    if isinstance(profile_data, dict):
-        web_length = _to_float(profile_data.get("web_length"), None)
-        flange_length = _to_float(profile_data.get("flange_length"), None)
-        thk = _to_float(profile_data.get("thk"), None)
-    # Handle string input (profile name)
-    elif isinstance(profile_data, str):
-        if not profile_data:
-            return None
-        try:
-            parts = profile_data.strip().split()
-            dimension_part = parts[-1] if parts else ""
-            
-            dimensions = dimension_part.split('x')
-            if len(dimensions) != 3:
-                return None
-            
-            web_length = _to_float(dimensions[0])
-            flange_length = _to_float(dimensions[1])
-            thk = _to_float(dimensions[2])
-        except (IndexError, ValueError, AttributeError):
-            return None
-    else:
+    if not profile_data:
         return None
+    
+    web_length = _to_float(profile_data.get("web_length"))
+    flange_length = _to_float(profile_data.get("flange_length"))
+    thk = _to_float(profile_data.get("thk"))
+    F_y = _to_float(profile_data.get("F_y")) or STEEL_FY
     
     if not all([web_length, flange_length, thk]):
         return None
@@ -53,13 +32,13 @@ def calc_steel_rhs_profile(profile_data: Any) -> Optional[Dict[str, float]]:
     b = flange_length - 2 * thk
     h = web_length - 2 * thk
     lambda_f = b / thk
-    lambda_p_f = 1.12 * math.sqrt(STEEL_E / STEEL_FY)
-    lambda_r_f = 1.4 * math.sqrt(STEEL_E / STEEL_FY)
+    lambda_p_f = 1.12 * math.sqrt(STEEL_E / F_y)
+    lambda_r_f = 1.4 * math.sqrt(STEEL_E / F_y)
     lambda_w = h / thk
-    lambda_p_w = 2.42 * math.sqrt(STEEL_E / STEEL_FY)
-    lambda_r_w = 5.7 * math.sqrt(STEEL_E / STEEL_FY)
+    lambda_p_w = 2.42 * math.sqrt(STEEL_E / F_y)
+    lambda_r_w = 5.7 * math.sqrt(STEEL_E / F_y)
 
-    Mn = (Z_x * STEEL_FY / 1_000_000)
+    Mn = (Z_x * F_y / 1_000_000)
     phi_Mn = 0.9 * Mn
 
     return {
@@ -86,7 +65,6 @@ def calc_steel_rhs_profile(profile_data: Any) -> Optional[Dict[str, float]]:
 
 
 def calc_steel_iw_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, float]]:
-    """Calculate section properties for a hot-rolled I / W section."""
     if not profile_data:
         return None
 
