@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from typing import Any, Dict, Tuple
 
 location_wind_speeds = {
         "Angarpota": 47.8, "Bagerhat": 77.5, "Bandarban": 62.5, "Barguna": 80.0,
@@ -29,14 +30,9 @@ def location_wind_load_bd(location):
 
 
 def parse_floor_heights(floor_heights):
-    """Parse a space/comma separated string or iterable into a clean list of floats.
-
-    Returns (floors, cumulative_heights).
-    """
     if floor_heights is None:
         raise ValueError("floor_heights is required")
 
-    # Accept list/tuple of numbers directly
     if isinstance(floor_heights, (list, tuple, np.ndarray)):
         heights = [float(h) for h in floor_heights if float(h) > 0]
     else:
@@ -59,17 +55,16 @@ def parse_floor_heights(floor_heights):
     return heights, cumu
 
 def importance_factor(occupancy_cat):
-    """Return ASCE-style importance factor from occupancy category."""
     mapping = {"I": 0.77, "II": 1.0, "III": 1.15, "IV": 1.15}
     return mapping.get(str(occupancy_cat), 1.0)
 
 def base_velocity_pressure(wind_speed, K_d, occupancy_cat):
-    """Return q_z at z=10m without Kz/Kzt (0.000613 * Kd * V^2 * I)."""
     Imp_factor = importance_factor(occupancy_cat)
     return 0.000613 * K_d * (wind_speed ** 2) * Imp_factor
 
-def topographic_factor(topography_type, topo_height, topo_length, topo_distance, z, exposure_cat, topo_crest_side):
-    # clean and normalize inputs
+def topographic_factor(topography_type, topo_height, topo_length, topo_distance,
+                        z, exposure_cat, topo_crest_side):
+    
     exposure_cat = str(exposure_cat).strip().upper()
     topography_type = str(topography_type).strip().capitalize()
     topo_crest_side = str(topo_crest_side).strip().capitalize()
@@ -77,14 +72,12 @@ def topographic_factor(topography_type, topo_height, topo_length, topo_distance,
     if topography_type == 'Homogeneous':
         return 1.0
     
-    # K1 Table
     K1_table = {
         'Ridge': {'A': 1.30, 'B': 1.45, 'C': 1.55},
         'Escarpment': {'A': 0.75, 'B': 0.85, 'C': 0.95},
         'Hill': {'A': 0.95, 'B': 1.05, 'C': 1.15}
     }
 
-    # γ and μ values
     gamma_values = {'Ridge': 3.0, 'Escarpment': 2.5, 'Hill': 4.0}
     mu_values = {
         'Ridge': {'Upwind': 1.5, 'Downwind': 1.5},
@@ -99,11 +92,9 @@ def topographic_factor(topography_type, topo_height, topo_length, topo_distance,
         gamma = gamma_values[topography_type]
         mu = mu_values[topography_type][topo_crest_side]
 
-        # Compute K2 and K3
         K2 = max(0, 1 - abs(topo_distance) / (mu * topo_length))  # Ensure K2 ≥ 0
         K3 = math.exp(-gamma * z / topo_length)
 
-        # Final Kzt
         Kzt = (1 + K1 * K2 * K3) ** 2
         return round(Kzt, 3)
 
@@ -111,14 +102,12 @@ def topographic_factor(topography_type, topo_height, topo_length, topo_distance,
         raise ValueError(f"Invalid input: {e}")
 
 def gust_factor(b_height, b_length, b_width, wind_speed, b_freq, damping, exposure_cat):
-    # Exposure-dependent values
     exposure_data = {
         "A": {"alpha": 0.25, "b": 0.45, "c": 0.30},
         "B": {"alpha": 0.20, "b": 0.35, "c": 0.25},
         "C": {"alpha": 0.15, "b": 0.25, "c": 0.20}
     }
 
-    # Constants
     alpha = exposure_data[exposure_cat]["alpha"]
     b = exposure_data[exposure_cat]["b"]
     c = exposure_data[exposure_cat]["c"]
@@ -163,7 +152,6 @@ def gust_factor(b_height, b_length, b_width, wind_speed, b_freq, damping, exposu
     return G_f
 
 def velocity_pressure_coeff(exposure_cat, b_height, WFRS):
-    # WFRS = Wind Force Resisting System (MWFRS or C&C)
     heights = [
         4.6, 6.1, 7.6, 9.1, 12.2, 15.2, 18.0, 21.3, 24.4, 27.41, 30.5,
         36.6, 42.7, 48.8, 54.9, 61.0, 76.2, 91.4, 106.7, 121.9, 137.2, 152.4
@@ -185,7 +173,6 @@ def velocity_pressure_coeff(exposure_cat, b_height, WFRS):
     else:
         key = (exposure_cat, "")
 
-    # Interpolate to get Kz
     kz_values = data[key]
     K_z = float(np.interp(b_height, heights, kz_values))
     return K_z
@@ -252,35 +239,18 @@ def ext_pressure_coeff_roof_cladd(eff_area):
     return -GCp_z1_n, -GCp_z2_n, -GCp_z3_n
 
 def compute_mwfrs_pressures(
-    exposure_cat,
-    b_length,
-    b_width,
-    K_d,
-    wind_speed,
-    occupancy_cat,
-    GC_pi,
-    topography_type,
-    topo_height,
-    topo_length,
-    topo_distance,
-    topo_crest_side,
-    floor_heights,
-    b_rigidity,
-    b_freq,
-    damping,
-):
-    """Compute MWFRS pressures floor-by-floor.
-
-    `floor_heights` can be a list/tuple/ndarray of numbers or a space-separated string
-    such as "3.5 3.2 3.2". Returns (summary, per_level).
-    """
+        exposure_cat, b_length, b_width, K_d, wind_speed, occupancy_cat, GC_pi,
+        topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+        floor_heights, b_rigidity, b_freq, damping
+    ):
 
     floors, cumu_heights = parse_floor_heights(floor_heights)
     b_height = cumu_heights[-1]
 
     K_h = velocity_pressure_coeff(exposure_cat, b_height, WFRS="MWFRS")
     K_ht = topographic_factor(
-        topography_type, topo_height, topo_length, topo_distance, b_height, exposure_cat, topo_crest_side
+        topography_type, topo_height, topo_length, topo_distance,
+        b_height, exposure_cat, topo_crest_side
     ) or 1.0
     C_pw, C_pl, C_ps = external_pressure_coeff(b_length, b_width)
     gust_factor_value = gust_factor(b_height, b_length, b_width, wind_speed, b_freq, damping, exposure_cat) if b_rigidity != "Rigid" else 0.85
@@ -333,29 +303,18 @@ def compute_mwfrs_pressures(
     )
 
 def compute_cladding_pressures(
-    GC_pi,
-    exposure_cat,
-    topography_type,
-    topo_height,
-    topo_length,
-    topo_distance,
-    topo_crest_side,
-    floor_heights,
-    wind_speed,
-    K_d,
-    occupancy_cat
-):
-    """Compute C&C pressures for each level and effective area."""
+        GC_pi, exposure_cat,
+        topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+        floor_heights, wind_speed, K_d, occupancy_cat
+    ):
 
     floors, cumu_heights = parse_floor_heights(floor_heights)
-    # Per requirement: evaluate only at the top floor (building height)
     top_level = len(floors)
     levels_to_use = [top_level]
     q_zk = base_velocity_pressure(wind_speed, K_d, occupancy_cat)
 
     wall_results, roof_results = {}, {}
 
-    # Choose area list
     area_list = [5.0, 10.0, 20.0, 30.0, 40.0, 46.5]
 
     for A_eff in area_list:
@@ -365,13 +324,13 @@ def compute_cladding_pressures(
         wall_rows = []
         roof_rows = []
 
-        # Single level: top of building
         level = levels_to_use[0]
         height = cumu_heights[level - 1]
         K_z = velocity_pressure_coeff(exposure_cat, height, WFRS="C&C")
         K_zt = topographic_factor(
-            topography_type, topo_height, topo_length, topo_distance, height, exposure_cat, topo_crest_side
-        )
+                topography_type, topo_height, topo_length, topo_distance,
+                height, exposure_cat, topo_crest_side
+            )
         q_z = q_zk * K_z * K_zt
         P_zi = q_z * GC_pi
 
@@ -410,3 +369,73 @@ def compute_cladding_pressures(
         roof_results[A_eff] = roof_rows
 
     return wall_results, roof_results
+
+
+def _extract_wind_inputs(wind_dict: Dict[str, Any], _to_float) -> Tuple[str, float, list, str, float, float, str, float, float, float, str, str, float, float]:
+    exposure_cat = str(wind_dict.get("exposure_cat", "A")).upper()
+    floors, _ = parse_floor_heights(wind_dict.get("b_floor_heights"))
+    
+    wind_speed = _to_float(wind_dict.get("wind_speed"))
+    if not wind_speed or wind_speed == 0:
+        location = wind_dict.get("location", "")
+        wind_speed = location_wind_speeds.get(location, 0)
+        if not wind_speed:
+            raise ValueError("Wind speed must be provided or location must be selected")
+    
+    b_length = _to_float(wind_dict.get("b_length"))
+    b_width = _to_float(wind_dict.get("b_width"))
+    K_d = _to_float(wind_dict.get("K_d"), 0.85)
+    occupancy_cat = wind_dict.get("occupancy_cat")
+    GC_pi = _to_float(wind_dict.get("GC_pi"), 0.18)
+    topography_type = wind_dict.get("topography_type", "Homogeneous")
+    topo_height = _to_float(wind_dict.get("topo_height"), 0.0)
+    topo_length = _to_float(wind_dict.get("topo_length"), 1.0)
+    topo_distance = _to_float(wind_dict.get("topo_distance"), 0.0)
+    topo_crest_side = wind_dict.get("topo_crest_side", "Upwind")
+    b_rigidity = wind_dict.get("b_rigidity", "Rigid")
+    b_freq = _to_float(wind_dict.get("b_freq"), 1.2)
+    damping = _to_float(wind_dict.get("damping"), 0.02)
+    
+    return (
+        exposure_cat, wind_speed, floors, b_length, b_width, K_d, occupancy_cat, GC_pi,
+        topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+        b_rigidity, b_freq, damping
+    )
+
+
+def compute_wind_loads(wind_dict: Dict[str, Any], _to_float) -> Dict[str, Any]:
+    wind = wind_dict.copy() if wind_dict else {}
+    
+    def _as_bool(value):
+        if isinstance(value, str):
+            return value.strip().lower() in {"yes", "true", "1", "on", "y"}
+        return bool(value)
+    
+    if _as_bool(wind.get("auto_load")):
+        try:
+            (exposure_cat, wind_speed, floors, b_length, b_width, K_d, occupancy_cat, GC_pi,
+            topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+            b_rigidity, b_freq, damping) = _extract_wind_inputs(wind, _to_float)
+            
+            summary, mwfrs_levels = compute_mwfrs_pressures(
+                exposure_cat, b_length, b_width, K_d, wind_speed, occupancy_cat, GC_pi,
+                topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+                floors, b_rigidity, b_freq, damping
+            )
+            
+            wall_results, roof_results = compute_cladding_pressures(
+                GC_pi, exposure_cat,
+                topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+                floors, wind_speed, K_d, occupancy_cat
+            )
+            
+            wind["auto_calc"] = {
+                "summary": summary,
+                "mwfrs_levels": mwfrs_levels,
+                "wall_results": wall_results,
+                "roof_results": roof_results,
+            }
+        except Exception as exc:
+            wind["auto_calc_error"] = str(exc)
+    
+    return wind

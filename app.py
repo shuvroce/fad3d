@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
-from calculations.calc_helpers import calc_alum_profile, calc_steel_profile, calc_steel_iw_profile
+from calculations.alum_profile import calc_alum_profile
+from calculations.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
 
 app = Flask(__name__)
 
@@ -53,7 +54,7 @@ def api_calc_steel():
         "F_y":           data.get("fy"),
     }
     if profile_type == "steel-rhs":
-        result = calc_steel_profile(payload)
+        result = calc_steel_rhs_profile(payload)
     else:
         result = calc_steel_iw_profile(payload)
     if result is None:
