@@ -9,18 +9,65 @@
 
 console.log("FAD-3D Application Initialized");
 
-function initializePanelToggle() {
+function initTooltips() {
+    const tooltip = document.createElement("div");
+    tooltip.id = "global-tooltip";
+    document.body.appendChild(tooltip);
+
+    let showTimer = null;
+    let currentTarget = null;
+
+    document.addEventListener("mouseover", (e) => {
+        const target = e.target.closest("[data-title]");
+        if (!target || target === currentTarget) return;
+
+        currentTarget = target;
+        clearTimeout(showTimer);
+
+        showTimer = setTimeout(() => {
+            const text = target.getAttribute("data-title");
+            if (!text) return;
+
+            tooltip.textContent = text;
+            tooltip.classList.add("visible");
+            positionTooltip(target);
+        }, 300);
+    });
+
+    document.addEventListener("mouseout", (e) => {
+        if (!e.target.closest("[data-title]")) return;
+        clearTimeout(showTimer);
+        tooltip.classList.remove("visible");
+        currentTarget = null;
+    });
+
+    function positionTooltip(target) {
+        const rect = target.getBoundingClientRect();
+        tooltip.style.left = "0";
+        tooltip.style.top = "0";
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        let left = rect.left + rect.width / 2 - tw / 2;
+        let top = rect.bottom + 8;
+        left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+        if (top + th > window.innerHeight - 8) top = rect.top - th - 8;
+        tooltip.style.left = left + "px";
+        tooltip.style.top = top + "px";
+    }
+}
+
+function initializeLeftPanelToggle() {
     const leftPanelToggleButton = document.querySelector(
         ".left__panel-toggle-left",
     );
-    const inputContainer = document.getElementById("input-container");
+    const inputSlideUnit = document.querySelector(".input__slide-unit");
 
-    if (!leftPanelToggleButton || !inputContainer) {
+    if (!leftPanelToggleButton || !inputSlideUnit) {
         return;
     }
 
     const syncToggleLabel = () => {
-        const isCollapsed = inputContainer.classList.contains("collapsed");
+        const isCollapsed = inputSlideUnit.classList.contains("collapsed");
         const label = isCollapsed ? "Expand left panel" : "Collapse left panel";
         leftPanelToggleButton.setAttribute("aria-label", label);
         leftPanelToggleButton.setAttribute("data-title", label);
@@ -28,7 +75,7 @@ function initializePanelToggle() {
     };
 
     leftPanelToggleButton.addEventListener("click", () => {
-        inputContainer.classList.toggle("collapsed");
+        inputSlideUnit.classList.toggle("collapsed");
         syncToggleLabel();
     });
 
@@ -40,29 +87,23 @@ function initializeRightPanelToggle() {
         ".right__panel-toggle-right",
     );
     const rightPanel = document.querySelector(".right__panel");
-    const resultBox = document.querySelector(".result__box");
-    const floatingBarRight = document.querySelector(".floating__bar-right");
 
-    if (!rightPanelToggleButton || !rightPanel || !resultBox) {
+    if (!rightPanelToggleButton || !rightPanel) {
         return;
     }
 
     const syncToggleLabel = () => {
-        const isCollapsed = resultBox.classList.contains("collapsed");
+        const isCollapsed = rightPanel.classList.contains("collapsed");
         const label = isCollapsed
             ? "Expand right panel"
             : "Collapse right panel";
         rightPanelToggleButton.setAttribute("aria-label", label);
         rightPanelToggleButton.setAttribute("data-title", label);
         rightPanelToggleButton.classList.toggle("collapsed", isCollapsed);
-        rightPanel.classList.toggle("collapsed", isCollapsed);
-        if (floatingBarRight) {
-            floatingBarRight.classList.toggle("collapsed", isCollapsed);
-        }
     };
 
     rightPanelToggleButton.addEventListener("click", () => {
-        resultBox.classList.toggle("collapsed");
+        rightPanel.classList.toggle("collapsed");
         syncToggleLabel();
     });
 
@@ -71,10 +112,12 @@ function initializeRightPanelToggle() {
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
-        initializePanelToggle();
+        initTooltips();
+        initializeLeftPanelToggle();
         initializeRightPanelToggle();
     });
 } else {
-    initializePanelToggle();
+    initTooltips();
+    initializeLeftPanelToggle();
     initializeRightPanelToggle();
 }

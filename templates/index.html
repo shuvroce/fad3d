@@ -207,20 +207,28 @@
             </button>
         </div>
 
-        <div class="input__box" id="input-container">
-            <!-- Categories will be dynamically created here -->
+        <div class="input__slide-unit">
+            <div class="input__box" id="input-container">
+                <!-- Categories will be dynamically created here -->
+            </div>
+            <button class="left__panel-toggle-left" type="button" aria-label="Collapse left panel"
+                data-title="Collapse left panel">
+                <svg class="panel__toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M14.5 6.5L9 12l5.5 5.5"></path>
+                </svg>
+            </button>
         </div>
     </section>
-    <button class="left__panel-toggle-left" type="button" aria-label="Collapse left panel"
-        data-title="Collapse left panel">
-        <svg class="panel__toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M14.5 6.5L9 12l5.5 5.5"></path>
-        </svg>
-    </button>
 
     <section class="viewport__container"></section>
 
     <section class="right__panel">
+        <button class="right__panel-toggle-right" type="button" aria-label="Collapse right panel"
+            data-title="Collapse right panel">
+            <svg class="panel__toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9.5 6.5L15 12l-5.5 5.5"></path>
+            </svg>
+        </button>
         <div class="result__box">
             <h2 class="result__heading">Design Summary</h2>
 
@@ -241,12 +249,6 @@
             <div class="result__tab-content" data-result-tab="facade"></div>
         </div>
     </section>
-    <button class="right__panel-toggle-right" type="button" aria-label="Collapse right panel"
-        data-title="Collapse right panel">
-        <svg class="panel__toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9.5 6.5L15 12l-5.5 5.5"></path>
-        </svg>
-    </button>
 
     {% include "modals.html" %}
     {% include "input-temp.html" %}
