@@ -184,12 +184,21 @@
 
         <div class="floating__bar-right">
             <div class="floating__bar-right-view">
-                <button class="floating__bar-btn">Figures</button>
-            </div>
-            <div class="floating__bar-right-view">
                 <button class="floating__bar-btn active">Model</button>
                 <button class="floating__bar-btn">DC Ratio</button>
                 <button class="floating__bar-btn">Deflection</button>
+            </div>
+            <div class="floating__bar-right-view">
+                <button class="floating__bar-btn floating__bar-btn--figures" id="figures-btn">
+                    <span class="figures__indicator" id="figures-indicator"></span>
+                    Figures
+                    <svg class="floating__bar-chevron figures__chevron" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="figure__panel" id="figure-panel">
+                <!-- figure status dynamically load here -->
             </div>
         </div>
     </section>
@@ -272,6 +281,7 @@
     <script src="{{ url_for('static', filename='js/categoryIcons.js') }}"></script>
     <script src="{{ url_for('static', filename='js/generalInfo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/floatingBar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 </body>
 
 </html>

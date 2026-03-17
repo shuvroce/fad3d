@@ -123,6 +123,12 @@ function renderMaterialList() {
     initMaterialDrag();
 }
 
+function animateDefineForm(form) {
+    form.classList.remove('animate-in');
+    void form.offsetWidth;
+    form.classList.add('animate-in');
+}
+
 function showMaterialForm() {
     const form  = document.getElementById('material-form');
     if (!form) return;
@@ -136,6 +142,7 @@ function showMaterialForm() {
     document.getElementById('mat-type').value = mat.type  || 'Aluminum';
     populateGradeOptions(document.getElementById('mat-grade'), mat.type || 'Aluminum', mat.grade);
     setMatProps(mat.type || 'Aluminum', mat.grade, mat.e, mat.fy, mat.fu);
+    animateDefineForm(form);
 }
 
 function setMatProps(type, grade, eOverride, fyOverride, fuOverride) {
@@ -271,7 +278,7 @@ function initMaterialModal() {
 
     closeBtn?.addEventListener('click', () => { rollbackMaterialEditSession(); closeModal('material-modal'); });
     applyBtn?.addEventListener('click', () => { syncMaterialFromForm(); commitMaterialEditSession(); closeModal('material-modal'); });
-    modal.addEventListener('click', (e) => { if (e.target === modal) { rollbackMaterialEditSession(); closeModal('material-modal'); } });
+    modal.addEventListener('click', (e) => { if (e.target === modal) applyBtn?.click(); });
 
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;

@@ -207,6 +207,7 @@ function showAlumSectionForm() {
     document.getElementById('alum-sec-mn-lb').value      = sec.mnLb     || '';
 
     applyAlumSecVisibility(profileType);
+    animateDefineForm(form);
 }
 
 function syncAlumSectionFromForm() {

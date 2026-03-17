@@ -7,70 +7,76 @@ const categoryNames = new Map(); // Store custom category names
 
 // Function to switch categories
 function switchCategory(categoryNum) {
-    // Hide all category contents
-    document.querySelectorAll(".input__category-content").forEach((content) => {
-        content.classList.add("hidden");
-    });
+    const current = document.querySelector(".input__category-content:not(.hidden)");
 
-    // Remove active class from all category buttons
+    // Immediately update button states
     document.querySelectorAll(".category__btn").forEach((btn) => {
         btn.classList.remove("active");
     });
-
-    // Show selected category content
-    const selectedCategory = document.querySelector(
-        `.input__category-content[data-category="${categoryNum}"]`,
-    );
-    if (selectedCategory) {
-        selectedCategory.classList.remove("hidden");
-    }
-
-    // Add active class to clicked category button
     const activeButton = document.querySelector(
         `.category__btn[data-category="${categoryNum}"]`,
     );
-    if (activeButton) {
-        activeButton.classList.add("active");
-    }
+    if (activeButton) activeButton.classList.add("active");
 
-    // Notify dependent UI (Design Summary, viewport, etc.) about active category changes
+    // Notify dependents immediately
     window.dispatchEvent(
         new CustomEvent("category-switched", {
             detail: { categoryNum: Number(categoryNum) },
         }),
     );
+
+    const showNew = () => {
+        document.querySelectorAll(".input__category-content").forEach((c) => {
+            c.classList.add("hidden");
+            c.classList.remove("is-exiting");
+        });
+        const target = document.querySelector(
+            `.input__category-content[data-category="${categoryNum}"]`,
+        );
+        if (target) target.classList.remove("hidden");
+    };
+
+    if (current) {
+        current.classList.add("is-exiting");
+        setTimeout(showNew, 100);
+    } else {
+        showNew();
+    }
 }
 
 // Function to switch tabs within a category
 function switchTab(categoryNum, tabName) {
-    // Hide all tab contents for this category
-    document
-        .querySelectorAll(`.input__tab-content[data-category="${categoryNum}"]`)
-        .forEach((content) => {
-            content.classList.add("hidden");
-        });
+    const current = document.querySelector(
+        `.input__tab-content[data-category="${categoryNum}"]:not(.hidden)`,
+    );
 
-    // Remove active class from all tab buttons for this category
+    // Immediately update button states
     document
         .querySelectorAll(`.input__box-nav-btn[data-category="${categoryNum}"]`)
-        .forEach((button) => {
-            button.classList.remove("active");
-        });
-
-    // Show selected tab content
-    const selectedTab = document.querySelector(
-        `.input__tab-content[data-category="${categoryNum}"][data-tab="${tabName}"]`,
-    );
-    if (selectedTab) {
-        selectedTab.classList.remove("hidden");
-    }
-
-    // Add active class to clicked tab button
+        .forEach((button) => button.classList.remove("active"));
     const activeButton = document.querySelector(
         `.input__box-nav-btn[data-category="${categoryNum}"][data-tab="${tabName}"]`,
     );
-    if (activeButton) {
-        activeButton.classList.add("active");
+    if (activeButton) activeButton.classList.add("active");
+
+    const showNew = () => {
+        document
+            .querySelectorAll(`.input__tab-content[data-category="${categoryNum}"]`)
+            .forEach((c) => {
+                c.classList.add("hidden");
+                c.classList.remove("is-exiting");
+            });
+        const target = document.querySelector(
+            `.input__tab-content[data-category="${categoryNum}"][data-tab="${tabName}"]`,
+        );
+        if (target) target.classList.remove("hidden");
+    };
+
+    if (current) {
+        current.classList.add("is-exiting");
+        setTimeout(showNew, 100);
+    } else {
+        showNew();
     }
 }
 

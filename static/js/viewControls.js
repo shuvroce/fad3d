@@ -99,9 +99,46 @@ function initializeViewControls() {
     switchViewMode("model");
 }
 
+// ============================
+// Figures Panel Toggle
+// ============================
+
+function initFiguresPanel() {
+    const btn   = document.getElementById('figures-btn');
+    const panel = document.getElementById('figure-panel');
+    if (!btn || !panel) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = !btn.classList.contains('open');
+        btn.classList.toggle('open', opening);
+        panel.classList.toggle('open', opening);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!btn.contains(e.target) && !panel.contains(e.target)) {
+            btn.classList.remove('open');
+            panel.classList.remove('open');
+        }
+    });
+}
+
+/**
+ * Update the figures status indicator dot.
+ * @param {'all'|'some'|'none'} status
+ */
+function updateFiguresIndicator(status) {
+    const dot = document.getElementById('figures-indicator');
+    if (dot) dot.dataset.status = status;
+}
+
 // Initialize when DOM is ready
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeViewControls);
+    document.addEventListener("DOMContentLoaded", () => {
+        initializeViewControls();
+        initFiguresPanel();
+    });
 } else {
     initializeViewControls();
+    initFiguresPanel();
 }

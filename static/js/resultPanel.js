@@ -4,30 +4,33 @@
 
 // Function to switch between Wind and Facade tabs
 function switchResultTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll(".result__tab-content").forEach((content) => {
-        content.classList.add("hidden");
-    });
+    const current = document.querySelector(".result__tab-content:not(.hidden)");
 
-    // Remove active class from all tab buttons
+    // Immediately update button states
     document.querySelectorAll(".result__tab-btn").forEach((btn) => {
         btn.classList.remove("active");
     });
-
-    // Show selected tab content
-    const selectedTab = document.querySelector(
-        `.result__tab-content[data-result-tab="${tabName}"]`,
-    );
-    if (selectedTab) {
-        selectedTab.classList.remove("hidden");
-    }
-
-    // Add active class to clicked tab button
     const activeButton = document.querySelector(
         `.result__tab-btn[data-result-tab="${tabName}"]`,
     );
-    if (activeButton) {
-        activeButton.classList.add("active");
+    if (activeButton) activeButton.classList.add("active");
+
+    const showNew = () => {
+        document.querySelectorAll(".result__tab-content").forEach((c) => {
+            c.classList.add("hidden");
+            c.classList.remove("is-exiting");
+        });
+        const target = document.querySelector(
+            `.result__tab-content[data-result-tab="${tabName}"]`,
+        );
+        if (target) target.classList.remove("hidden");
+    };
+
+    if (current) {
+        current.classList.add("is-exiting");
+        setTimeout(showNew, 100);
+    } else {
+        showNew();
     }
 }
 

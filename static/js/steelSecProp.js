@@ -137,6 +137,7 @@ function showSteelSectionForm() {
     document.getElementById('steel-sec-tw').value = sec.tw || '';
 
     applySteelSecVisibility(sec.profileType || '');
+    animateDefineForm(form);
 }
 
 function syncSteelSectionFromForm() {

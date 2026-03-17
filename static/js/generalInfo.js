@@ -20,5 +20,5 @@ function initGeneralModal() {
         }
         closeModal('general-modal');
     });
-    modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal('general-modal'); });
+    modal?.addEventListener('click', (e) => { if (e.target === modal) applyBtn?.click(); });
 }
