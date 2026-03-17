@@ -2222,6 +2222,24 @@ summary {
     display: none;
 }
 
+/* Smooth field visibility toggling inside modal dialogs */
+.modal__dialog .input__field[data-alum-group],
+.modal__dialog .input__field[data-steel-group] {
+    overflow: hidden;
+    max-height: 8rem;
+    opacity: 1;
+    transition: max-height 0.25s ease, opacity 0.2s ease, margin-bottom 0.25s ease;
+}
+
+.modal__dialog .input__field[data-alum-group].hidden,
+.modal__dialog .input__field[data-steel-group].hidden {
+    display: flex !important;
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    margin-bottom: 0;
+}
+
 .input__section {
     display: flex;
     flex-direction: column;
