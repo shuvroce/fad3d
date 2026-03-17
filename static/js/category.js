@@ -474,6 +474,9 @@ async function initializeCategories() {
         // Add fresh listener
         newAddBtn.addEventListener("click", () => {
             categoryCount++;
+            if (typeof availableIcons !== "undefined" && typeof categoryIcons !== "undefined") {
+                categoryIcons.set(categoryCount, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
+            }
             createCategory(categoryCount);
             switchCategory(categoryCount);
             populateFrameSectionDropdowns?.();
@@ -573,6 +576,9 @@ async function initializeCategoryManagement() {
     // Add category button click handler
     document.getElementById("cat-add").addEventListener("click", () => {
         categoryCount++;
+        if (typeof availableIcons !== "undefined" && typeof categoryIcons !== "undefined") {
+            categoryIcons.set(categoryCount, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
+        }
         createCategory(categoryCount);
         switchCategory(categoryCount);
         populateFrameSectionDropdowns?.();

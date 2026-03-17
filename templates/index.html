@@ -146,25 +146,67 @@
     <section class="floating__bar">
         <div class="floating__bar-left">
             <div class="floating__bar-left-button">
-                <button class="floating__bar-btn">Wind</button>
-                <button class="floating__bar-btn active">Facade</button>
+                <button class="floating__bar-btn">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
+                    </svg>
+                    Wind
+                </button>
+                <button class="floating__bar-btn active">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="1" />
+                        <path d="M9 22V12h6v10" />
+                        <path d="M3 9h18" />
+                    </svg>
+                    Facade
+                </button>
             </div>
 
             <div class="floating__bar-left-button">
-                <button class="floating__bar-btn" id="general-modal-btn">General</button>
+                <button class="floating__bar-btn" id="general-modal-btn">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <line x1="4" y1="21" x2="4" y2="14" />
+                        <line x1="4" y1="10" x2="4" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12" y2="3" />
+                        <line x1="20" y1="21" x2="20" y2="16" />
+                        <line x1="20" y1="12" x2="20" y2="3" />
+                        <line x1="1" y1="14" x2="7" y2="14" />
+                        <line x1="9" y1="8" x2="15" y2="8" />
+                        <line x1="17" y1="16" x2="23" y2="16" />
+                    </svg>
+                    General
+                </button>
                 <div class="floating__bar-define-wrap" id="define-wrap">
                     <button class="floating__bar-btn" id="define-modal-btn">
+                        <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
                         Define
                         <svg class="floating__bar-chevron" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M6 9l6 6 6-6"></path>
                         </svg>
                     </button>
                     <div class="floating__bar-submenu" id="define-submenu" hidden>
-                        <button class="floating__bar-submenu-btn" id="material-modal-btn">Material</button>
+                        <button class="floating__bar-submenu-btn" id="material-modal-btn">
+                            <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                                <polyline points="2 17 12 22 22 17" />
+                                <polyline points="2 12 12 17 22 12" />
+                            </svg>
+                            Material
+                        </button>
                         <div class="floating__bar-submenu-item floating__bar-submenu-item--nested"
                             id="section-submenu-wrap">
                             <button class="floating__bar-submenu-btn floating__bar-submenu-btn--nested"
                                 id="section-submenu-trigger">
+                                <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="2" y="2" width="4" height="20" rx="1" />
+                                    <rect x="10" y="2" width="4" height="20" rx="1" />
+                                    <rect x="18" y="2" width="4" height="20" rx="1" />
+                                </svg>
                                 Section
                                 <svg class="floating__bar-chevron floating__bar-chevron--right" viewBox="0 0 24 24"
                                     aria-hidden="true">
@@ -173,8 +215,22 @@
                             </button>
                             <div class="floating__bar-submenu floating__bar-submenu--nested" id="section-submenu"
                                 hidden>
-                                <button class="floating__bar-submenu-btn" id="section-alum-btn">Aluminum</button>
-                                <button class="floating__bar-submenu-btn" id="section-steel-btn">Steel</button>
+                                <button class="floating__bar-submenu-btn" id="section-alum-btn">
+                                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="2" y="3" width="20" height="18" rx="1" />
+                                        <line x1="2" y1="9" x2="22" y2="9" />
+                                        <line x1="12" y1="9" x2="12" y2="21" />
+                                    </svg>
+                                    Aluminum
+                                </button>
+                                <button class="floating__bar-submenu-btn" id="section-steel-btn">
+                                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <line x1="3" y1="5" x2="21" y2="5" />
+                                        <line x1="3" y1="19" x2="21" y2="19" />
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                    </svg>
+                                    Steel
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -184,9 +240,33 @@
 
         <div class="floating__bar-right">
             <div class="floating__bar-right-view">
-                <button class="floating__bar-btn active">Model</button>
-                <button class="floating__bar-btn">DC Ratio</button>
-                <button class="floating__bar-btn">Deflection</button>
+                <button class="floating__bar-btn active">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg>
+                    Model
+                </button>
+                <button class="floating__bar-btn">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                        <line x1="2" y1="20" x2="22" y2="20" />
+                    </svg>
+                    DC Ratio
+                </button>
+                <button class="floating__bar-btn">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <line x1="3" y1="8" x2="21" y2="8" />
+                        <path d="M3 8 Q12 20 21 8" />
+                        <line x1="3" y1="6" x2="3" y2="10" />
+                        <line x1="21" y1="6" x2="21" y2="10" />
+                    </svg>
+                    Deflection
+                </button>
             </div>
             <div class="floating__bar-right-view">
                 <button class="floating__bar-btn floating__bar-btn--figures" id="figures-btn">

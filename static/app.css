@@ -99,11 +99,11 @@
 body.theme__dark {
     /* Dark Theme - Background Colors */
     --bg-body: #010409;
-    --bg-primary: #13171d;
-    --bg-secondary: #1c2128;
+    --bg-primary: #161616;
+    --bg-secondary: #141414;
     --bg-hover: #21262d;
     --bg-preview: #1c2010;
-    --bg-input: #1c2128;
+    --bg-input: #2d2d2d;
     --bg-select: #161b22;
     --bg-code: #0d1117;
     --bg-category: #121c1f;
@@ -802,6 +802,21 @@ summary {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.modal__title-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    opacity: 0.75;
 }
 
 .modal__close {
@@ -1292,6 +1307,9 @@ summary {
     font-size: 0.8rem;
     transition: color 0.3s;
     border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* .floating__bar-btn:not(:last-child) {
@@ -1330,6 +1348,17 @@ summary {
     transition: transform 0.3s ease;
 }
 
+.floating__bar-icon {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
 .floating__bar-define-wrap.open > .floating__bar-btn > .floating__bar-chevron {
     transform: rotate(180deg);
 }
@@ -1358,9 +1387,12 @@ summary {
 }
 
 .floating__bar-submenu-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     width: 100%;
     padding: 0.45rem 1rem;
+    justify-content: left;
     background: transparent;
     border: none;
     text-align: left;
@@ -1381,8 +1413,7 @@ summary {
 .floating__bar-submenu-btn--nested {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .floating__bar-chevron--right {
@@ -1394,6 +1425,7 @@ summary {
     stroke-linecap: round;
     stroke-linejoin: round;
     flex-shrink: 0;
+    margin-left: auto;
     transition: transform 0.15s ease;
 }
 
@@ -1846,6 +1878,7 @@ summary {
     display: flex;
     transform: translateX(0);
     transition: transform 0.3s ease;
+    border-left: 1px solid var(--border-primary);;
 }
 
 .input__slide-unit.collapsed {
@@ -1888,7 +1921,7 @@ summary {
     width: var(--catbar-width);
     padding: 0.6rem 0.6rem;
     background: var(--bg-primary);
-    border-right: 1px solid var(--border-primary);
+    /* border-right: 1px solid var(--border-primary); */
     display: flex;
     flex-direction: column;
     align-items: center;
