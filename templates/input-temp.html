@@ -164,10 +164,37 @@
         <h2 class="input__category-heading" contenteditable="true" data-category="0" spellcheck="false">Category 0</h2>
     </div>
     <div class="input__box-nav">
-        <button class="input__box-nav-btn active" data-category="0" data-tab="glass">Glass</button>
-        <button class="input__box-nav-btn" data-category="0" data-tab="frame">Frame</button>
-        <button class="input__box-nav-btn" data-category="0" data-tab="conn">Conn.</button>
-        <button class="input__box-nav-btn" data-category="0" data-tab="anchor">Anchor.</button>
+        <button class="input__box-nav-btn active" data-category="0" data-tab="glass">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="12" y1="3" x2="12" y2="21" />
+            </svg>
+            Glass
+        </button>
+        <button class="input__box-nav-btn" data-category="0" data-tab="frame">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <rect x="7" y="7" width="10" height="10" rx="1" />
+            </svg>
+            Frame
+        </button>
+        <button class="input__box-nav-btn" data-category="0" data-tab="conn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="7" cy="17" r="3" />
+                <circle cx="17" cy="7" r="3" />
+                <line x1="9.5" y1="14.5" x2="14.5" y2="9.5" />
+            </svg>
+            Conn.
+        </button>
+        <button class="input__box-nav-btn" data-category="0" data-tab="anchor">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="6" r="2" />
+                <line x1="12" y1="8" x2="12" y2="20" />
+                <path d="M6 12h12M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+            </svg>
+            Anchor
+        </button>
     </div>
 
     <!-- Glass Tab Content -->
@@ -1168,7 +1195,7 @@
                 <div class="input__field">
                     <label for="cat0-anchor-box-clump-anchor_nos">No. of Anchor bolt, n</label>
                     <div class="input__group">
-                        <input type="number" id="cat0-anchor-box-clump-anchor_nos" placeholder="0">
+                        <input type="number" id="cat0-anchor-box-clump-anchor_nos">
                     </div>
                 </div>
                 <div class="input__field">
@@ -1229,7 +1256,7 @@
                 <div class="input__field">
                     <label for="cat0-anchor-u-clump-anchor_nos">No. of Anchor bolt, n</label>
                     <div class="input__group">
-                        <input type="number" id="cat0-anchor-u-clump-anchor_nos" placeholder="0">
+                        <input type="number" id="cat0-anchor-u-clump-anchor_nos">
                     </div>
                 </div>
                 <div class="input__field">
@@ -1311,7 +1338,7 @@
                 <div class="input__field">
                     <label for="cat0-anchor-l-clump-top_anchor_nos">No. of Top Anchor bolt, n</label>
                     <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-top_anchor_nos" placeholder="0">
+                        <input type="number" id="cat0-anchor-l-clump-top_anchor_nos">
                     </div>
                 </div>
                 <div class="input__field">
