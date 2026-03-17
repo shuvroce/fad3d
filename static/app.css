@@ -234,6 +234,42 @@ body.theme__dark {
     }
 }
 
+@keyframes panelSlideFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes panelSlideFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes panelSlideOutLeft {
+    to {
+        opacity: 0;
+        transform: translateX(-18px);
+    }
+}
+
+@keyframes panelSlideOutRight {
+    to {
+        opacity: 0;
+        transform: translateX(18px);
+    }
+}
+
 /* ================ 3. GLOBAL RESETS & BASE STYLES ================ */
 /* Ensure [hidden] always wins over author display rules */
 [hidden] { display: none !important; }
@@ -2501,6 +2537,24 @@ summary {
 .result__tab-content.is-exiting {
     animation: contentFadeOut 0.1s ease forwards;
     pointer-events: none;
+}
+
+.panel-mode-exiting-left {
+    animation: panelSlideOutLeft 0.15s ease forwards;
+    pointer-events: none;
+}
+
+.panel-mode-exiting-right {
+    animation: panelSlideOutRight 0.15s ease forwards;
+    pointer-events: none;
+}
+
+.panel-mode-entering-left {
+    animation: panelSlideFromLeft 0.22s ease;
+}
+
+.panel-mode-entering-right {
+    animation: panelSlideFromRight 0.22s ease;
 }
 
 .result__category-label {

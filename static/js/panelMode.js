@@ -15,46 +15,64 @@ function switchPanelMode(mode) {
     const inputContainer = document.getElementById("input-container");
     const catbar = document.querySelector(".catbar");
     const leftPanel = document.querySelector(".left__panel");
+    const toggleBtn = document.querySelector(".left__panel-toggle-left");
 
-    if (mode === "wind") {
-        // Save current facade content before switching
-        savedFacadeContent = inputContainer.innerHTML;
-        savedCatbarContent = catbar.innerHTML;
+    // Wind is left button → exiting to right, entering from left
+    // Facade is right button → exiting to left, entering from right
+    const exitClass   = mode === "wind" ? "panel-mode-exiting-right"  : "panel-mode-exiting-left";
+    const enterClass  = mode === "wind" ? "panel-mode-entering-left"  : "panel-mode-entering-right";
 
-        // Hide catbar
-        catbar.style.display = "none";
+    // Fade out catbar, input, and toggle together
+    inputContainer.classList.add(exitClass);
+    catbar.classList.add(exitClass);
+    if (toggleBtn) toggleBtn.classList.add(exitClass);
 
-        // Add wind-mode class to left panel
-        if (leftPanel) {
-            leftPanel.classList.add("wind-mode");
+    setTimeout(() => {
+        inputContainer.classList.remove(exitClass);
+        catbar.classList.remove(exitClass);
+        if (toggleBtn) toggleBtn.classList.remove(exitClass);
+
+        if (mode === "wind") {
+            // Save current facade content before switching
+            savedFacadeContent = inputContainer.innerHTML;
+            savedCatbarContent = catbar.innerHTML;
+
+            // Swap content before showing
+            inputContainer.innerHTML = createWindPanel();
+
+            // Apply width change and hide catbar after content is ready
+            catbar.style.display = "none";
+            if (leftPanel) leftPanel.classList.add("wind-mode");
+
+            initializeWindPanel();
+        } else {
+            // Restore saved facade categories
+            if (savedFacadeContent) {
+                inputContainer.innerHTML = savedFacadeContent;
+                catbar.innerHTML = savedCatbarContent;
+                reattachCategoryEventListeners();
+            }
+
+            // Show catbar and restore width after content is ready
+            catbar.style.display = "flex";
+            if (leftPanel) leftPanel.classList.remove("wind-mode");
         }
 
-        // Show wind panel
-        inputContainer.innerHTML = createWindPanel();
+        // Fade in new content
+        inputContainer.classList.add(enterClass);
+        catbar.classList.add(enterClass);
+        if (toggleBtn) toggleBtn.classList.add(enterClass);
 
-        // Initialize any event listeners for wind panel
-        initializeWindPanel();
-    } else {
-        // Show catbar
-        catbar.style.display = "flex";
+        const cleanup = () => {
+            inputContainer.classList.remove(enterClass);
+            catbar.classList.remove(enterClass);
+            if (toggleBtn) toggleBtn.classList.remove(enterClass);
+        };
+        inputContainer.addEventListener("animationend", cleanup, { once: true });
 
-        // Remove wind-mode class from left panel
-        if (leftPanel) {
-            leftPanel.classList.remove("wind-mode");
-        }
-
-        // Restore saved facade categories
-        if (savedFacadeContent) {
-            inputContainer.innerHTML = savedFacadeContent;
-            catbar.innerHTML = savedCatbarContent;
-
-            // Reattach event listeners to restored elements
-            reattachCategoryEventListeners();
-        }
-    }
-
-    // Update floating bar button states
-    updateFloatingBarButtons(mode);
+        // Update floating bar button states
+        updateFloatingBarButtons(mode);
+    }, 150);
 }
 
 // Function to reattach event listeners after restoring facade content
@@ -90,10 +108,19 @@ function reattachCategoryEventListeners() {
                 typeof switchCategory === "function"
             ) {
                 categoryCount++;
+                if (typeof availableIcons !== "undefined" && typeof categoryIcons !== "undefined") {
+                    categoryIcons.set(categoryCount, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
+                }
                 createCategory(categoryCount);
                 switchCategory(categoryCount);
+                populateFrameSectionDropdowns?.();
             }
         });
+    }
+
+    // Restore icon SVGs and context menu listeners on catbar buttons
+    if (typeof reattachCategoryIcons === "function") {
+        reattachCategoryIcons();
     }
 
     // Reattach tab switching handlers
