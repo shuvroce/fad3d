@@ -307,10 +307,9 @@ function createCategory(categoryNum) {
 
     btnWrapper.appendChild(categoryBtn);
 
-    // Insert before the add button
-    const catbar = document.querySelector(".catbar");
-    const addBtn = document.querySelector("#cat-add");
-    catbar.insertBefore(btnWrapper, addBtn);
+    // Insert into the scrollable category list
+    const catbarScroll = document.querySelector(".catbar__scroll");
+    catbarScroll.appendChild(btnWrapper);
 
     // Create category content
     const categoryContent = document.createElement("div");
@@ -488,7 +487,7 @@ async function ensureTemplatesLoaded() {
 
 // Drag-and-drop reordering of category buttons
 function initializeCategoryDragDrop() {
-    const catbar = document.querySelector(".catbar");
+    const catbar = document.querySelector(".catbar__scroll");
     let dragSrc = null;
 
     catbar.addEventListener("dragstart", (e) => {

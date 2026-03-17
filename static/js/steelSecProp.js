@@ -3,7 +3,8 @@
 // ============================
 
 const DEFAULT_STEEL_SECTIONS = [
-    { name: 'Steel Section', material: 'Steel', profileType: 'steel-rhs', shape: '', grade: '', b: '100', d: '200', t: '', tf: '8', tw: '6' },
+    { name: 'RHS 85x50x2.5', profileType: 'steel-rhs', grade: '', d: '85', b: '50',  t: '2.5', tf: '',  tw: '' },
+    { name: 'W 85x50x4-3',   profileType: 'steel-w',   grade: '', d: '85', b: '50',  t: '',    tf: '4', tw: '3' },
 ];
 
 let _steelSections = DEFAULT_STEEL_SECTIONS.map(s => ({ ...s }));
@@ -17,7 +18,7 @@ function updateSteelCalcPanel() {
 }
 
 function _fetchSteelCalc() {
-    const profileType = document.getElementById('steel-sec-profile-type')?.value || 'steel-rhs';
+    const profileType = document.getElementById('steel-sec-profile-type')?.value || '';
     const v = id => document.getElementById(id)?.value || null;
 
     // Resolve F_y from the selected material grade
@@ -44,16 +45,14 @@ function _fetchSteelCalc() {
     .then(props => {
         if (!props) return;
         const fmt = (v, dp = 1) => (v != null && v !== '') ? Number(v).toLocaleString('en', { maximumFractionDigits: dp }) : '—';
-        document.getElementById('calc-steel-a').textContent   = fmt(props.area);
-        document.getElementById('calc-steel-ix').textContent  = fmt(props.I_xx);
-        document.getElementById('calc-steel-iy').textContent  = fmt(props.I_yy);
-        document.getElementById('calc-steel-sx').textContent  = fmt(props.S_x);
-        document.getElementById('calc-steel-sy').textContent  = fmt(props.S_y);
-        document.getElementById('calc-steel-zx').textContent  = fmt(props.Z_x);
-        document.getElementById('calc-steel-j').textContent   = fmt(props.tor_constant);
-        document.getElementById('calc-steel-rx').textContent  = fmt(props.r_x, 2);
-        document.getElementById('calc-steel-ry').textContent  = fmt(props.r_y, 2);
-        document.getElementById('calc-steel-mpx').textContent = fmt(props.phi_Mn, 3);
+        document.getElementById('calc-steel-a').textContent      = fmt(props.area);
+        document.getElementById('calc-steel-ix').textContent     = fmt(props.I_xx);
+        document.getElementById('calc-steel-iy').textContent     = fmt(props.I_yy);
+        document.getElementById('calc-steel-sx').textContent     = fmt(props.S_x);
+        document.getElementById('calc-steel-sy').textContent     = fmt(props.S_y);
+        document.getElementById('calc-steel-zx').textContent     = fmt(props.Z_x);
+        document.getElementById('calc-steel-j').textContent      = fmt(props.tor_constant);
+        document.getElementById('calc-steel-phi-mn').textContent = fmt(props.phi_Mn);
     })
     .catch(() => {});
 }
@@ -129,25 +128,25 @@ function showSteelSectionForm() {
     populateSecGradeOptions('Steel', sec.grade, 'steel-sec-grade');
 
     const profileTypeSel = document.getElementById('steel-sec-profile-type');
-    if (profileTypeSel) profileTypeSel.value = sec.profileType || 'steel-rhs';
+    if (profileTypeSel) profileTypeSel.value = sec.profileType || '';
 
-    document.getElementById('steel-sec-b').value  = sec.b  || '';
     document.getElementById('steel-sec-d').value  = sec.d  || '';
+    document.getElementById('steel-sec-b').value  = sec.b  || '';
     document.getElementById('steel-sec-t').value  = sec.t  || '';
     document.getElementById('steel-sec-tf').value = sec.tf || '';
     document.getElementById('steel-sec-tw').value = sec.tw || '';
 
-    applySteelSecVisibility(sec.profileType || 'steel-rhs');
+    applySteelSecVisibility(sec.profileType || '');
 }
 
 function syncSteelSectionFromForm() {
     if (_selectedSteelSecIdx < 0 || _selectedSteelSecIdx >= _steelSections.length) return;
-    const sec   = _steelSections[_selectedSteelSecIdx];
-    sec.name    = document.getElementById('steel-sec-name')?.value  || '';
-    sec.grade   = document.getElementById('steel-sec-grade')?.value || '';
-    sec.profileType = document.getElementById('steel-sec-profile-type')?.value || 'steel-rhs';
-    sec.b           = document.getElementById('steel-sec-b')?.value            || '';
+    const sec       = _steelSections[_selectedSteelSecIdx];
+    sec.profileType = document.getElementById('steel-sec-profile-type')?.value || '';
+    sec.name        = document.getElementById('steel-sec-name')?.value         || '';
+    sec.grade       = document.getElementById('steel-sec-grade')?.value        || '';
     sec.d           = document.getElementById('steel-sec-d')?.value            || '';
+    sec.b           = document.getElementById('steel-sec-b')?.value            || '';
     sec.t           = document.getElementById('steel-sec-t')?.value            || '';
     sec.tf          = document.getElementById('steel-sec-tf')?.value           || '';
     sec.tw          = document.getElementById('steel-sec-tw')?.value           || '';
@@ -171,6 +170,7 @@ function initSteelSectionFormEvents() {
         syncSteelSectionFromForm();
     });
 
+    document.getElementById('steel-sec-grade')?.addEventListener('change', updateSteelCalcPanel);
     const form = document.getElementById('steel-section-form');
     form?.querySelectorAll('input[type="number"]').forEach(inp => {
         inp.addEventListener('input', updateSteelCalcPanel);
@@ -233,7 +233,7 @@ function openSteelSectionModal() {
 
     addBtn.onclick = () => {
         syncSteelSectionFromForm();
-        _steelSections.push({ name: '', material: 'Steel', profileType: 'steel-rhs', shape: '', grade: '', b: '', d: '', t: '', tf: '', tw: '' });
+        _steelSections.push({ name: '', profileType: '', grade: '', d: '', b: '', t: '', tf: '', tw: '' });
         _selectedSteelSecIdx = _steelSections.length - 1;
         renderSteelSectionList();
         showSteelSectionForm();

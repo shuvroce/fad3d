@@ -604,7 +604,7 @@ body.theme__dark select {
 }
 
 .modal__dialog-medium {
-    min-width: 500px;
+    min-width: 600px;
 }
 
 .modal__dialog-large {
@@ -1404,11 +1404,11 @@ body.theme__dark select {
     flex-direction: row;
     min-height: 360px;
     overflow: hidden;
-    padding: 0;
+    padding: 0 1rem;
 }
 
 .define-modal__list-pane {
-    width: 185px;
+    width: 160px;
     flex-shrink: 0;
     border-right: 1px solid var(--border-primary);
     display: flex;
@@ -1546,21 +1546,21 @@ body.theme__dark select {
 
 /* Calculated properties pane */
 .define-modal__calc-pane {
-    width: 210px;
+    width: 160px;
     flex-shrink: 0;
     border-left: 1px solid var(--border-primary);
     display: flex;
     flex-direction: column;
     max-height: calc(var(--modal-height) - 16rem);
-    background: var(--bg-secondary);
+    /* background: var(--bg-secondary); */
 }
 
 .define-modal__calc-header {
     padding: 0.6rem 0.9rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-secondary);
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     letter-spacing: 0.04em;
     border-bottom: 1px solid var(--border-primary);
     flex-shrink: 0;
@@ -1668,17 +1668,32 @@ body.theme__dark select {
 
 .catbar {
     width: var(--catbar-width);
-    padding: 1rem 0.6rem;
+    padding: 0.6rem 0.6rem;
     background: var(--bg-primary);
     border-right: 1px solid var(--border-primary);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+    overflow: hidden;
     transition:
         var(--transition-bg),
         var(--transition-border),
         box-shadow 0.2s ease;
+}
+
+.catbar__scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-primary) transparent;
+    padding: 0.4rem 0 0.4rem;
 }
 
 .catbar__btn {

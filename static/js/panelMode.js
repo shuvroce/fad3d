@@ -152,7 +152,7 @@ function createWindPanel() {
 function initializeWindPanel() {
     // Populate location dropdown from server
     const locationSel = document.getElementById('location');
-    if (locationSel && locationSel.options.length <= 1) {
+    if (locationSel && locationSel.options.length === 0) {
         fetch('/api/wind/locations')
             .then(r => r.ok ? r.json() : null)
             .then(locations => {
@@ -163,6 +163,8 @@ function initializeWindPanel() {
                     opt.textContent = loc;
                     locationSel.appendChild(opt);
                 });
+                const dhaka = Array.from(locationSel.options).find(o => o.value === 'Dhaka');
+                if (dhaka) locationSel.value = 'Dhaka';
             })
             .catch(() => {});
     }
