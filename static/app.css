@@ -359,13 +359,122 @@ textarea {
     font-family: monospace;
 }
 
+/* native select is hidden — custom-select widget takes over */
 select {
-    /* background-color: var(--bg-select); */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpolyline points='2,4 6,8 10,4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    padding-right: 30px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Custom Select Widget */
+.custom-select {
+    position: relative;
+    flex: 1 1 calc(50% - 15px);
+    min-width: 200px;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.custom-select__selected {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border-radius: var(--radius-1);
     cursor: pointer;
+    transition: var(--transition-bg), var(--transition-border);
+}
+
+.custom-select__selected-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.custom-select__arrow {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    transition: transform 0.2s ease;
+}
+
+.custom-select.open .custom-select__arrow {
+    transform: rotate(180deg);
+}
+
+.custom-select__selected:hover {
+    border-color: var(--border-secondary);
+}
+
+.custom-select.open .custom-select__selected,
+.custom-select__selected:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.custom-select__list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-1);
+    margin-top: 2px;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    /* closed state */
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.96);
+    transform-origin: top;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s 0.15s;
+}
+
+.custom-select__list.open-up {
+    transform: translateY(6px) scaleY(0.96);
+    transform-origin: bottom;
+}
+
+.custom-select.open .custom-select__list {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.custom-select__option {
+    padding: 6px 10px;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: background-color 0.12s;
+}
+
+.custom-select__option:hover {
+    background-color: var(--bg-hover);
+}
+
+.custom-select__option.active {
+    background-color: var(--btn-selected);
+    color: var(--text-link);
+}
+
+.custom-select__option.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 input[type="checkbox"] {
@@ -425,9 +534,7 @@ summary {
 }
 
 /* Dark theme dropdown arrow */
-body.theme__dark select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpolyline points='2,4 6,8 10,4' stroke='%23c5c5c5' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
+
 
 /* --- tooltips --- */
 #global-tooltip {
