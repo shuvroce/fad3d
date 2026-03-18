@@ -983,6 +983,83 @@ summary {
     margin-left: 1rem;
 }
 
+/* --- Settings Modal --- */
+.settings-modal__layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 340px;
+    overflow: hidden;
+}
+
+.settings-modal__nav {
+    width: 140px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
+    gap: 0.1rem;
+    background-color: var(--bg-secondary);
+    transition: var(--transition-bg), var(--transition-border);
+}
+
+.settings-modal__nav-btn {
+    text-align: left;
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+
+.settings-modal__nav-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.settings-modal__nav-btn.active {
+    background: var(--bg-input);
+    color: var(--text-active);
+    border-left: 2px solid var(--text-active);
+    padding-left: calc(1rem - 2px);
+}
+
+.settings-modal__pane {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(var(--modal-height) - 8rem);
+}
+
+.settings-modal__tab {
+    padding: 0 0 1rem;
+}
+
+.settings__radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.settings__radio-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+}
+
+.settings__radio-option input[type="radio"] {
+    appearance: auto;
+    width: auto;
+    flex: none;
+    min-width: unset;
+    cursor: pointer;
+}
+
 /* ================ 5. LAYOUT COMPONENTS ================ */
 
 /* --- Top Bar --- */

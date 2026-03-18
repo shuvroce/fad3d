@@ -684,3 +684,152 @@
         </div>
     </div>
 </div>
+
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+    <div class="modal__dialog modal__dialog-medium">
+        <div class="modal__header">
+            <h2 class="modal__title" id="settings-modal-title">
+                <svg class="modal__title-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19 12a7 7 0 0 0-.09-1.11l2.03-1.58-2-3.46-2.44.86a7.1 7.1 0 0 0-1.92-1.11L14.2 3h-4.4l-.38 2.6a7.1 7.1 0 0 0-1.92 1.11l-2.44-.86-2 3.46 2.03 1.58A7 7 0 0 0 5 12c0 .38.03.75.09 1.11l-2.03 1.58 2 3.46 2.44-.86c.58.47 1.22.84 1.92 1.11l.38 2.6h4.4l.38-2.6c.7-.27 1.34-.64 1.92-1.11l2.44.86 2-3.46-2.03-1.58c.06-.36.09-.73.09-1.11Z">
+                    </path>
+                </svg>
+                Settings
+            </h2>
+            <button type="button" class="modal__close" id="close-settings-modal" aria-label="Close modal">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="settings-modal__layout">
+            <!-- Sidebar nav -->
+            <nav class="settings-modal__nav" aria-label="Settings sections">
+                <button class="settings-modal__nav-btn active" data-settings-tab="design">Design Codes</button>
+                <button class="settings-modal__nav-btn" data-settings-tab="units">Units</button>
+                <button class="settings-modal__nav-btn" data-settings-tab="deflection">Deflection</button>
+            </nav>
+
+            <!-- Content pane -->
+            <div class="settings-modal__pane">
+
+                <!-- Design Codes -->
+                <div class="settings-modal__tab" data-settings-tab="design">
+                    <p class="modal__form-section-title">Design Codes</p>
+                    <div class="modal__form-grid">
+                        <div class="input__field modal__form-full">
+                            <label for="setting-wind-code">Wind Load Standard</label>
+                            <select id="setting-wind-code">
+                                <option value="ASCE7-05">ASCE 7-05</option>
+                                <option value="EN1991">EN 1991-1-4</option>
+                                <option value="ASNZS">AS/NZS 1170.2</option>
+                                <option value="BNBC2020">BNBC 2020</option>
+                            </select>
+                        </div>
+                        <div class="input__field modal__form-full">
+                            <label for="setting-glass-code">Glass Design Standard</label>
+                            <select id="setting-glass-code">
+                                <option value="ASTME1300">ASTM E1300</option>
+                                <option value="EN12600">EN 12600</option>
+                                <option value="AS1288">AS 1288</option>
+                            </select>
+                        </div>
+                        <div class="input__field modal__form-full">
+                            <label for="setting-alum-code">Aluminum Structural Standard</label>
+                            <select id="setting-alum-code">
+                                <option value="ADM2015">ADM 2015</option>
+                                <option value="EN1999">EN 1999-1-1</option>
+                                <option value="AS1664">AS 1664</option>
+                            </select>
+                        </div>
+                        <div class="input__field modal__form-full">
+                            <label for="setting-steel-code">Steel Structural Standard</label>
+                            <select id="setting-steel-code">
+                                <option value="AISC360">AISC 360-05</option>
+                                <option value="EN1993">EN 1993-1-1</option>
+                                <option value="AS4100">AS 4100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Units -->
+                <div class="settings-modal__tab hidden" data-settings-tab="units">
+                    <p class="modal__form-section-title">Unit System</p>
+                    <div class="modal__form-grid">
+                        <div class="input__field modal__form-full">
+                            <label>Primary Unit System</label>
+                            <div class="settings__radio-group">
+                                <label class="settings__radio-option">
+                                    <input type="radio" name="setting-unit-system" value="metric" checked>
+                                    <span>SI Metric (mm, kN, MPa)</span>
+                                </label>
+                                <label class="settings__radio-option">
+                                    <input type="radio" name="setting-unit-system" value="imperial">
+                                    <span>Imperial US (in, kip, ksi)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deflection Criteria -->
+                <div class="settings-modal__tab hidden" data-settings-tab="deflection">
+                    <p class="modal__form-section-title">Glass Deflection Criteria</p>
+                    <div class="modal__form-grid">
+                        <div class="input__field">
+                            <label for="setting-glass-defl-type">Criteria Type</label>
+                            <select id="setting-glass-defl-type">
+                                <option value="span_ratio">Span Ratio (L / n)</option>
+                                <option value="absolute">Absolute</option>
+                            </select>
+                        </div>
+                        <div class="input__field" id="setting-glass-defl-ratio-wrap">
+                            <label for="setting-glass-defl-ratio">Span Divisor, n</label>
+                            <input type="number" id="setting-glass-defl-ratio" value="175" min="50" max="1000" step="1">
+                        </div>
+                        <div class="input__field hidden" id="setting-glass-defl-abs-wrap">
+                            <label for="setting-glass-defl-abs">Max. Deflection</label>
+                            <div class="input__group">
+                                <input type="number" id="setting-glass-defl-abs" value="25" min="1" step="0.1">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="modal__form-section-title">Frame Deflection Criteria</p>
+                    <div class="modal__form-grid">
+                        <div class="input__field">
+                            <label for="setting-frame-defl-type">Criteria Type</label>
+                            <select id="setting-frame-defl-type">
+                                <option value="span_ratio">Span Ratio (L / n)</option>
+                                <option value="absolute">Absolute</option>
+                            </select>
+                        </div>
+                        <div class="input__field" id="setting-frame-defl-ratio-wrap">
+                            <label for="setting-frame-defl-ratio">Span Divisor, n</label>
+                            <input type="number" id="setting-frame-defl-ratio" value="200" min="50" max="1000" step="1">
+                        </div>
+                        <div class="input__field hidden" id="setting-frame-defl-abs-wrap">
+                            <label for="setting-frame-defl-abs">Max. Deflection</label>
+                            <div class="input__group">
+                                <input type="number" id="setting-frame-defl-abs" value="20" min="1" step="0.1">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal__footer">
+            <button type="button" class="modal__btn modal__btn-secondary" id="cancel-settings-modal">Cancel</button>
+            <button type="button" class="modal__btn modal__btn-primary" id="apply-settings-modal">Apply</button>
+        </div>
+    </div>
+</div>
