@@ -52,7 +52,7 @@ function _fillTemplate(templateId, data, passMap = {}, showKeys = [], showSectio
             if (status) {
                 status.removeAttribute('hidden');
                 status.classList.add(pass ? 'result__status-pass' : 'result__status-fail');
-                status.textContent = pass ? '✔' : '✗';
+                status.textContent = pass ? '✓' : '✕';
             }
         }
     }

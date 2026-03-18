@@ -30,7 +30,7 @@ const SVG_ICONS = {
 };
 
 // Default icon key
-const DEFAULT_CATEGORY_ICON = "building";
+const DEFAULT_CATEGORY_ICON = "window";
 
 // Available icon keys (order shown in grid)
 const availableIcons = Object.keys(SVG_ICONS);
