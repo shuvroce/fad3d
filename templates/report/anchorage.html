@@ -1,0 +1,13 @@
+{% if cat.anchorage %}
+{% for anchor in cat.anchorage %}
+{% set calc = anchor.calc %}
+    {% if anchor.clump_type == "Box Clump" %}
+        {% include "partials/box-clump.html" %}
+    {% elif anchor.clump_type == "U Clump" %}
+        {% include "partials/u-clump.html" %}
+    {% elif anchor.clump_type == "L Clump" %}
+        {% include "partials/l-clump.html" %}
+    {% endif %}
+{% endfor %}
+{% endif %}
+

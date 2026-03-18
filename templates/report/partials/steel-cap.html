@@ -1,0 +1,200 @@
+{% set target_name = profile.profile_name %}
+{% set ns = namespace(found_data=none) %}
+{% for data_row in steel_profiles_data %}
+    {% if data_row.profile_name | trim == target_name | trim %}
+        {% set ns.found_data = data_row %}
+    {% endif %}
+{% endfor %}
+
+{% if ns.found_data is not none %}
+{% set calc = ns.found_data.calc %}
+{% endif %}
+
+
+<div class="page__break"></div>
+<h2>{{ profile.profile_name }}</h2>
+<div>
+    <!-- <div>
+        <img src="{{ inputs_dir }}/{{ profile.profile_name }}.png" class="fig__45">
+    </div> -->
+    
+    <table class="width__90">
+        <caption>Section Properties</caption>
+        <tbody>
+            <tr>
+                <td>Length of web</td>
+                <td>a</td>
+                <td>{{ profile.web_length }}</td>
+                <td><i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Length of flange</td>
+                <td>b</td>
+                <td>{{ profile.flange_length }}</td>
+                <td><i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Thickness</td>
+                <td>t</td>
+                <td>{{ profile.thk }}</td>
+                <td><i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Torsional Constant</td>
+                <td><i>J<sub>y</sub></i></td>
+                <td>{{ calc.tor_constant }}</td>
+                <td><i>mm<sup>4</sup></i></td>
+            </tr>
+            <tr>
+                <td>Area of cross-section</td>
+                <td>A</td>
+                <td>{{ calc.area }}</td>
+                <td><i>mm<sup>2</sup></i></td>
+            </tr>
+            <tr>
+                <td>Moment of inertia about major axis</td>
+                <td>I<sub>x</sub></td>
+                <td>{{ calc.I_xx }}</td>
+                <td><i>mm<sup>4</sup></i></td>
+            </tr>
+            <tr>
+                <td>Moment of inertia about minor axis</td>
+                <td>I<sub>y</sub></td>
+                <td>{{ calc.I_yy }}</td>
+                <td><i>mm<sup>4</sup></i></td>
+            </tr>
+            <tr>
+                <td>Extreme fiber Distance from N.A (minor axis)</td>
+                <td>Y</td>
+                <td>{{ calc.Y }}</td>
+                <td><i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Extreme fiber Distance from N.A (major axis)</td>
+                <td>X</td>
+                <td>{{ calc.X }}</td>
+                <td><i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Elastic section modulus about major axis</td>
+                <td><i>S<sub>x</sub> = I<sub>x</sub> / Y</i></td>
+                <td>{{ calc.S_x }}</td>
+                <td><i>mm<sup>3</sup></i></td>
+            </tr>
+            <tr>
+                <td>Elastic section modulus about minor axis</td>
+                <td><i>S<sub>y</sub> = I<sub>y</sub> / X</i></td>
+                <td>{{ calc.S_y }}</td>
+                <td><i>mm<sup>3</sup></i></td>
+            </tr>
+            <tr>
+                <td>Plastic section modulus about major axis</td>
+                <td><i>Z<sub>x</sub></i></td>
+                <td>{{ calc.Z_x }}</td>
+                <td><i>mm<sup>3</sup></i></td>
+            </tr>
+            <tr>
+                <td>Yield strength of Steel</td>
+                <td>F<sub>y</sub></td>
+                <td>318</td>
+                <td><i>MPa</i></td>
+            </tr>
+            <tr>
+                <td>Modulus of elasticity of steel</td>
+                <td>E<sub>s</sub></td>
+                <td>210000</td>
+                <td><i>MPa</i></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p class="mt-1">Slenderness check for box section,</p>
+    <table class="width__100 align__center">
+        <thead>
+            <tr>
+                <th>Element</th>
+                <th>b</th>
+                <th>t</th>
+                <th>λ = b/t</th>
+                <th>λ<sub>p</sub> = 1.12 √(E/Fy)</th>
+                <th>λ<sub>r</sub> = 1.4 √(E/Fy)</th>
+                <th>Slenderness</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Flange</td>
+                <td>{{ calc.b }}</td>
+                <td>{{ profile.thk }}</td>
+                <td>{{ calc.lambda_f }}</td>
+                <td>{{ calc.lambda_p_f }}</td>
+                <td>{{ calc.lambda_r_f }}</td>
+                <td>
+                    {% if calc.lambda_f < calc.lambda_p_f %}
+                        Compact
+                    {% elif calc.lambda_f > calc.lambda_r_f %}
+                        Slender
+                    {% else %}
+                        Non-compact
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__100 align__center mt-1">
+        <thead>
+            <tr>
+                <th>Element</th>
+                <th>h</th>
+                <th>t</th>
+                <th>λ = h/t</th>
+                <th>λ<sub>p</sub> = 2.42 √(E/Fy)</th>
+                <th>λ<sub>r</sub> = 5.7 √(E/Fy)</th>
+                <th>Slenderness</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Web</td>
+                <td>{{ calc.h }}</td>
+                <td>{{ profile.thk }}</td>
+                <td>{{ calc.lambda_w }}</td>
+                <td>{{ calc.lambda_p_w }}</td>
+                <td>{{ calc.lambda_r_w }}</td>
+                <td>
+                    {% if calc.lambda_w < calc.lambda_p_w %}
+                        Compact
+                    {% elif calc.lambda_w > calc.lambda_r_w %}
+                        Slender
+                    {% else %}
+                        Non-compact
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>As the flange and web both are compact, the whole section is compact. Hence, only failure by yielding governs.</p>
+    <p><u>Therefore,</u></p>
+
+    <table class="borderless ml-2">
+        <tbody>
+            <tr>
+                <td>Nominal Moment Capacity, <i>M<sub>n</sub> = M<sub>p</sub> = Z F<sub>y</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.Mn }} <i>kN-m</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>So, the design moment capacity, <i>φM<sub>n</sub> (; φ = 0.9)</i></td>
+                <td>=</td>
+                <td>{{ calc.phi_Mn }} <i>kN-m</i></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+

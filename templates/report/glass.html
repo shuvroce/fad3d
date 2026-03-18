@@ -1,0 +1,26 @@
+{% if cat.glass_units %}
+{% for gu in cat.glass_units %}
+
+    {% set glass_index = loop.index %}
+
+    {% set calc = gu.calc %}
+
+    {% if gu.glass_type == "sgu" and gu.length < 5000 and gu.support_type != "Point Fixed" %}
+        {% include "partials/sgu.html" %}
+
+    {% elif gu.glass_type == "dgu" and gu.length < 5000 and gu.support_type != "Point Fixed" %}
+        {% include "partials/dgu.html" %}
+
+    {% elif gu.glass_type == "lgu" and gu.length < 5000 and gu.support_type != "Point Fixed" %}
+        {% include "partials/lgu.html" %}
+
+    {% elif gu.glass_type == "ldgu" and gu.length < 5000 and gu.support_type != "Point Fixed" %}
+        {% include "partials/ldgu.html" %}
+
+    {% else %}
+        {% include "partials/glass-rfem.html" %}
+
+    {% endif %}
+
+{% endfor %}
+{% endif %}

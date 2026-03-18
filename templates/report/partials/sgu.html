@@ -1,0 +1,253 @@
+<div class="page__break"></div>
+<h2>Verification of Glass Panel {{ glass_index }}</h2>
+<div>
+    <h3>Panel Info</h3>
+    <table class="width__50">
+        <tbody>
+            <tr>
+                <td>Glass Size</td>
+                <td>{{ gu.length }} x {{ gu.width }} <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Glass Thickness</td>
+                <td>{{ gu.thickness }} <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Glass Type</td>
+                <td>SGU, {{ gu.grade }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Data Analysis</h3>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Glass length, a</td>
+                <td>=</td>
+                <td>{{ gu.length }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Glass width, b</td>
+                <td>=</td>
+                <td>{{ gu.width }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Effective wind area for glass, <i>A<sub>eff</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.A_eff }} <i>m<sup>2</sup></i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Therefore, Max. wind suction/pressure, <i>P<sub>z</sub></i></td>
+                <td>=</td>
+                <td>{{ gu.wind_load }} <i>kPa</i></td>
+                <td><i>; from wind load table</i></td>
+            </tr>
+            <tr>
+                <td>Glass thickness, <i>t<sub>g</sub></i></td>
+                <td>=</td>
+                <td>{{ gu.thickness }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Modulus of Elasticity, <i>E</i></td>
+                <td>=</td>
+                <td>71700 <i>MPa</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Support Type</td>
+                <td>=</td>
+                <td>{{ gu.support_type }}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Check for Strength</h3>
+    <div class="calc__fig">
+        {% if gu.support_type == "Four Edges" %}
+            <img src="assets/images/glass-load-charts/monolithic/four-edge/{{ gu.thickness }}mm.png" alt="Non-factored Load Chart">
+        {% elif gu.support_type == "Three Edges" %}
+            <img src="assets/images/glass-load-charts/monolithic/three-edge/{{ gu.thickness }}mm.png" alt="Non-factored Load Chart">
+        {% elif gu.support_type == "Two Edges" %}
+            <img src="assets/images/glass-load-charts/monolithic/two-edge/all-thk.png" alt="Non-factored Load Chart">
+        {% else %}
+            <img src="assets/images/glass-load-charts/monolithic/one-edge/all-thk.png" alt="Non-factored Load Chart">
+        {% endif %}
+        <figcaption>Non-factored Load Chart</figcaption>
+    </div>
+
+    <div>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Max non factored load, <i>NFL</i></td>
+                    <td>=</td>
+                    <td>{{ gu.nfl }} <i>kPa</i></td>
+                    <td><i>; from above chart</i></td>
+                </tr>
+                <tr>
+                    <td>Type of glass</td>
+                    <td>=</td>
+                    <td>{{ gu.grade }}</td>
+                    <td><i>
+                        {% if gu.grade == "FT" %}
+                            ; FT = Full Tempered
+                        {% elif gu.grade == "HS" %}
+                            ; HS = Heat Strengthened
+                        {% else %}
+                            ; AN = Annealed
+                        {% endif %} </i>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Glass type factor, <i>calc.gtf</i></td>
+                    <td>=</td>
+                    <td>{{ calc.gtf }}</td>
+                    <td><i>; ASTM E1300, Table 2</i></td>
+                </tr>
+                <tr>
+                    <td>Load resisting capacity, <i>LR = NFL x calc.gtf</i></td>
+                    <td>=</td>
+                    <td>{{ calc.sgu_lr }} <i>kPa</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Load resistance ratio = <i>P<sub>z</sub>/LR</i></td>
+                    <td>=</td>
+                    <td>{{ calc.stress_ratio | round(2) }}</td>
+                    <td class="{% if calc.stress_ratio < 1 %}ok{% else %}not-ok{% endif %}">
+                        {% if calc.stress_ratio < 1 %} OK {% else %} NOT OK {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div>
+    <h3>Check for Deflection</h3>
+    <div class="calc__fig">
+        {% if gu.support_type == "Four Edges" %}
+            <img src="assets/images/glass-deflection-charts/monolithic/four-edge/{{ gu.thickness }}mm.png" alt="Deflection Chart">
+        {% elif gu.support_type == "Three Edges" %}
+            <img src="assets/images/glass-deflection-charts/monolithic/three-edge/{{ gu.thickness }}mm.png" alt="Deflection Chart">
+        {% elif gu.support_type == "Two Edges" %}
+            <img src="assets/images/glass-deflection-charts/monolithic/two-edge/all-thk.png" alt="Deflection Chart">
+        {% else %}
+            <img src="assets/images/glass-deflection-charts/monolithic/one-edge/all-thk.png" alt="Deflection Chart">
+        {% endif %}
+        <figcaption>Deflection Chart</figcaption>
+    </div>
+
+    <div>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Service wind load for deflection, q = 0.7 P<sub>z</sub></td>
+                    <td>=</td>
+                    <td>{{ (0.7 * gu.wind_load) | round(2) }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Load × Area<sup>2</sup> **</td>
+                    <td>=</td>
+                    <td>{{ gu.load_x_area2 }} <i>kN-m<sup>2</sup></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Aspect Ratio, <i>AR = a/b</i></td>
+                    <td>=</td>
+                    <td>{{ calc.aspect_ratio }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Deflection, <i>δ</i></td>
+                    <td>=</td>
+                    <td>{{ gu.def }} <i>mm</i></td>
+                    <td><i>; from above chart</i></td>
+                </tr>
+                <tr>
+                    <td>Allowable deflection, <i>δ<sub>a</sub> = b/{{ calc.def_criteria }}</i></td>
+                    <td>=</td>
+                    <td>{{ calc.allow_def }} <i>mm</i></td>
+                    <td><i>; AS 1288:2006</i></td>
+                </tr>
+                <tr>
+                    <td>Deflection ratio</td>
+                    <td>=</td>
+                    <td>{{ calc.def_ratio }} <i>mm</i></td>
+                    <td class="{% if calc.def_ratio < 1 %}ok{% else %}not-ok{% endif %}">
+                        {% if calc.def_ratio < 1 %} OK {% else %} NOT OK {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="footnote__content">** (Load × Free-Length<sup>4</sup> for three, two and one edge supported glass)</p>
+    </div>
+</div>
+
+<div>
+    <h3>Verification of Silicone Bite</h3>
+    <div class="calc__fig2">
+        <img src="assets/images/silicone.png" alt="Silicone Bite">
+    </div>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. Design Wind/suction pressure, <i>P<sub>z</sub></i></td>
+                <td>=</td>
+                <td>{{ gu.wind_load }} <i>kN/m<sup>2</sup></i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Effective load width, <i>B</i></td>
+                <td>=</td>
+                <td>{{ gu.width }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Design strength of Sealant, <i>F<sub>s</sub></i></td>
+                <td>=</td>
+                <td>140 <i>N/mm<sup>2</sup></i></td>
+                <td><i>; ASTM C1401 – 02</i></td>
+            </tr>
+            <tr>
+                <td>Bite size/width required, <i>t<sub>r</sub> = (P<sub>z</sub> × B) / (2 F<sub>s</sub>)</i></td>
+                <td>=</td>
+                <td>{{ calc.bite_req }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Bite size/width provided, <i>t<sub>p</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.bite_pro }} <i>mm</i></td>
+                <td><i>; ≥ t<sub>r</sub></i></td>
+                <td class="ok">OK</td>
+            </tr>
+            <tr>
+                <td>Glue line thickness required, <i>e<sub>r</sub> = t<sub>r</sub> / 3</i></td>
+                <td>=</td>
+                <td>{{ calc.glue_req }} <i>mm</i></td>
+                <td>; ≥ 6 <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Glue line thickness provided, <i>e<sub>p</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.glue_pro }} <i>mm</i></td>
+                <td><i>; ≥ e<sub>r</sub></i></td>
+                <td class="ok">OK</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+

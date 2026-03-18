@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+import os
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from calculations.alum_profile import calc_alum_profile
 from calculations.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
 from calculations.glass import calc_glass_unit
@@ -132,6 +133,12 @@ def api_calc_anchorage():
     if result is None:
         return jsonify({"error": "Insufficient data"}), 400
     return jsonify(result)
+
+
+@app.route("/report/assets/images/profiles/<path:filename>")
+def serve_profile_image(filename):
+    profiles_dir = os.path.join(app.root_path, 'templates', 'report', 'assets', 'images', 'profiles')
+    return send_from_directory(profiles_dir, filename)
 
 
 if __name__ == "__main__":

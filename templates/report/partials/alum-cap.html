@@ -1,0 +1,848 @@
+{% set target_name = profile.profile_name %}
+{% set ns = namespace(found_data=none) %}
+{% for data_row in alum_profiles_data %}
+    {% if data_row.profile_name | trim == target_name | trim %}
+        {% set ns.found_data = data_row %}
+    {% endif %}
+{% endfor %}
+
+{% if ns.found_data is not none %}
+{% set calc = ns.found_data.calc %}
+{% endif %}
+
+{% if profile.profile_type == "Pre-defined" %}
+    <div class="page__break"></div>
+    <h2>{{ ns.found_data.profile_name }}</h2>
+    <div>
+        <div>
+            <img src="assets/images/profiles/{{ ns.found_data.profile_name }}-wp.png" style="width: 50mm;">
+        </div>
+        
+        <table class="width__90">
+            <caption>Section Properties</caption>
+            <tbody>
+                <tr>
+                    <td>Length of web</td>
+                    <td>a</td>
+                    <td>{{ ns.found_data.web_length }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Length of flange</td>
+                    <td>b</td>
+                    <td>{{ ns.found_data.flange_length }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of web</td>
+                    <td>t<sub>1</sub></td>
+                    <td>{{ ns.found_data.web_thk }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of flange (avg.)</td>
+                    <td>t<sub>2</sub></td>
+                    <td>{{ ns.found_data.flange_thk }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Torsional Constant</td>
+                    <td><i>J<sub>y</sub></i></td>
+                    <td>{{ ns.found_data.tor_constant }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+
+                <tr>
+                    <td>Area of cross-section</td>
+                    <td>A</td>
+                    <td>{{ ns.found_data.area }}</td>
+                    <td><i>mm<sup>2</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia about major axis</td>
+                    <td>I<sub>x</sub></td>
+                    <td>{{ ns.found_data.I_xx }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia about minor axis</td>
+                    <td>I<sub>y</sub></td>
+                    <td>{{ ns.found_data.I_yy }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Extreme fiber Distance from N.A (minor axis)</td>
+                    <td>Y</td>
+                    <td>{{ ns.found_data.Y }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Extreme fiber Distance from N.A (major axis)</td>
+                    <td>X</td>
+                    <td>{{ ns.found_data.X }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Elastic section modulus about major axis</td>
+                    <td><i>S<sub>x</sub> = I<sub>x</sub> / Y</i></td>
+                    <td>{{ calc.S_x }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Elastic section modulus about minor axis</td>
+                    <td><i>S<sub>y</sub> = I<sub>y</sub> / X</i></td>
+                    <td>{{ calc.S_y }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="borderless width__100">
+            <tbody>
+                <tr>
+                    <td><img src="assets/images/profiles/{{ ns.found_data.profile_name }}p.png" class="fig__130"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__90">
+            <tbody>
+                <tr>
+                    <td>Lower region centroid distance from PNA</td>
+                    <td>x</td>
+                    <td>{{ ns.found_data.plastic_x }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Upper region centroid distance from PNA</td>
+                    <td>y</td>
+                    <td>{{ ns.found_data.plastic_y }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Plastic section modulus about major axis</td>
+                    <td><i>Z<sub>x</sub> = 0.5 A(x + y)</i></td>
+                    <td>{{ calc.Z_x }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+
+                <tr>
+                    <td>Yield strength of Aluminum</td>
+                    <td>F<sub>y</sub></td>
+                    <td>{{ ns.found_data.F_y }}</td>
+                    <td><i>MPa</i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of elasticity of aluminum</td>
+                    <td>E<sub>a</sub></td>
+                    <td>70000</td>
+                    <td><i>MPa</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if "M" in ns.found_data.profile_name %}
+        <h3>Moment Capacity by Yielding</h3>
+        <div>
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Moment capacity, <i>M<sub>np</sub></i></td>
+                        <td>=</td>
+                        <td><i>min( ZF<sub>y</sub> , 1.5 F<sub>y</sub>S<sub>x</sub> )</i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>=</td>
+                        <td>{{ (calc.Mn_yield) }} <i>kN-m</i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Moment Capacity by Local Buckling</h3>
+        <div>
+            <table class="borderless width__100 fig__table align__center">
+                <tbody>
+                    <tr>
+                        <td><img style="width: 40mm;" src="assets/images/profiles/{{ ns.found_data.profile_name }}-lb-web.png"></td>
+                        <td><img style="width: 40mm;" src="assets/images/profiles/{{ ns.found_data.profile_name }}-lb-flange.png"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table class="width__100 align__center">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Type</th>
+                        <th>Supports</th>
+                        <th><i>c<sub>c</sub></i></th>
+                        <th><i>c<sub>o</sub></i></th>
+                        <th><i>(c<sub>o</sub> / c<sub>c</sub>)</i></th>
+                        <th>m</th>
+                        <th>b</th>
+                        <th>t</th>
+                        <th>λ <br>= b/t</th>
+                        <th>λ<sub>1</sub></th>
+                        <th>λ<sub>2</sub></th>
+                        <th>F<sub>c</sub> <br>(or F<sub>b</sub>)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>FC</td>
+                        <td>Both Edges</td>
+                        <td>- {{ calc.c_c }}</td>
+                        <td>{{ calc.c_o }}</td>
+                        <td>- {{ (calc.c_o / calc.c_c) | round(2) }}</td>
+                        <td>{{ calc.m }}</td>
+                        <td>{{ calc.web_b }}</td>
+                        <td>{{ ns.found_data.web_thk }}</td>
+                        <td>{{ (calc.web_b / ns.found_data.web_thk) | round(2) }}</td>
+                        <td>{{ calc.web_lambda1 }}</td>
+                        <td>{{ calc.web_lambda2 }}</td>
+                        <td>{{ calc.F_b }}</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>UC</td>
+                        <td>Both Edges</td>
+                        <td>–</td>
+                        <td>–</td>
+                        <td>–</td>
+                        <td>–</td>
+                        <td>{{ calc.flange_b }}</td>
+                        <td>{{ ns.found_data.flange_thk }}</td>
+                        <td>{{ (calc.flange_b / ns.found_data.flange_thk) | round(2) }}</td>
+                        <td>{{ calc.flange_lambda1 }}</td>
+                        <td>{{ calc.flange_lambda2 }}</td>
+                        <td>{{ calc.F_c }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>The weighted average method is utilized to compute the nominal flexure strength due to the limit state of local buckling –</p>
+            <p>For web elements under flexural compression –</p>
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td colspan="3"><u>Element identifier: (1)</u></td>
+                    </tr>
+                    <tr>
+                        <td>No. of element</td>
+                        <td>=</td>
+                        <td>2 <i>Nos.</i></td>
+                    </tr>
+                    <tr>
+                        <td>Centroidal distance of element, d</td>
+                        <td>=</td>
+                        <td>{{ calc.web_d }} <i>mm</i></td>
+                    </tr>
+                    <tr>
+                        <td>Moment of Inertia about NA, I<sub>w</sub></td>
+                        <td>=</td>
+                        <td>{{ calc.I_w }} <i>mm<sup>4</sup></i></td>
+                    </tr>
+                    <tr>
+                        <td>Extreme fiber distance of element, C<sub>w</sub></td>
+                        <td>=</td>
+                        <td>{{ calc.c_c }} <i>mm</i></td>
+                    </tr>
+                    <tr>
+                        <td>Moment capacity, M<sub>nlb,w</sub></td>
+                        <td>=</td>
+                        <td>{{ calc.Mn_lbw }} <i>kNm</i></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>For flange elements under uniform compression –</p>
+            <table class="borderless mt-1 ml-2">
+                <tbody>
+                    <tr>
+                        <td>Moment of Inertia about NA, I<sub>f</sub></td>
+                        <td>=</td>
+                        <td>{{ calc.I_f }} <i>mm<sup>4</sup></i></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>NA's distance to element's thickness center, c<sub>f</sub></td>
+                        <td>=</td>
+                        <td>{{ calc.c_f }} <i>mm</i></td>
+                        <td><i>; avg.</i></td>
+                    </tr>
+                    <tr>
+                        <td>Moment capacity, M<sub>nlb,f</sub></td>
+                        <td>=</td>
+                        <td>{{ calc.Mn_lbf }} <i>kNm</i></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="borderless ml-2 mt-1">
+                <tbody>
+                    <tr>
+                        <td>Total moment capacity, <i>M<sub>nlb</sub></i></td>
+                        <td>=</td>
+                        <td><i>M<sub>nlb,w</sub> + M<sub>nlb,f</sub></i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>=</td>
+                        <td>{{ calc.Mn_lb }} <i>kN-m</i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Moment Capacity by Lateral Torsional Buckling</h3>
+        <div>
+            <p>The member is considered to be continuously braced by the glass panel. Therefore, lateral torsional buckling (LTB) not governs.</p>
+        </div>
+
+        <div>
+            <p>The nominal bending strength is the minimum value obtained considering the limit states of yielding, local buckling and lateral-torsional buckling. Therefore –</p>
+
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Nominal Moment Capacity, <i>M<sub>n</sub> = min( M<sub>np</sub> , M<sub>nlb</sub> , M<sub>nmb</sub> )</i></td>
+                        <td>=</td>
+                        <td>{{ (calc.phi_Mn / 0.9) | round(1) }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>So, the design moment capacity, <i>φM<sub>n</sub> (; φ = 0.9)</i></td>
+                        <td>=</td>
+                        <td>{{ calc.phi_Mn }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        {% elif "T" in ns.found_data.profile_name %}
+        <h3>Moment Capacity</h3>
+        <p>Moment capacity of the profile is calculated following the same procedure of mullion
+            design above as per AA ADM 2015. Results are summarized below –</p>
+        <table class="width__80">
+            <tbody>
+                <tr>
+                    <td>Moment capacity by yielding</td>
+                    <td><i>M<sub>np</sub></i></td>
+                    <td>{{ ns.found_data.Mn_yield }}</td>
+                    <td><i>kNm</i></td>
+                </tr>
+                <tr>
+                    <td>Moment capacity by local buckling</td>
+                    <td><i>M<sub>nlb</sub></i></td>
+                    <td>{{ ns.found_data.Mn_lb }}</td>
+                    <td><i>kNm</i></td>
+                </tr>
+                <tr>
+                    <td>Moment capacity by Lateral torsional buckling</td>
+                    <td><i>M<sub>nmb</sub></i></td>
+                    <td>–</td>
+                    <td><i>kNm</i></td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <p>The nominal bending strength is the minimum value obtained considering the limit states of yielding, local buckling and lateral-torsional buckling. Therefore –</p>
+
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Nominal Moment Capacity, <i>M<sub>n</sub> = min( M<sub>np</sub> , M<sub>nlb</sub> , M<sub>nmb</sub> )</i></td>
+                        <td>=</td>
+                        <td>{{ [ns.found_data.Mn_yield, ns.found_data.Mn_lb] | min }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>So, the design moment capacity, <i>φM<sub>n</sub> (; φ = 0.9)</i></td>
+                        <td>=</td>
+                        <td>{{ (([ns.found_data.Mn_yield, ns.found_data.Mn_lb] | min) * 0.9) | round(2) }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+{% elif profile.profile_type == "Stick" %}
+    <div class="page__break"></div>
+    <h2>{{ ns.found_data.profile_name }}</h2>
+    <div>
+        <div>
+            <img src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}.png" style="width: 45mm;">
+        </div>
+        
+        <table class="width__90">
+            <caption>Section Properties</caption>
+            <tbody>
+                <tr>
+                    <td>Length of web</td>
+                    <td>a</td>
+                    <td>{{ ns.found_data.web_length }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Length of flange</td>
+                    <td>b</td>
+                    <td>{{ ns.found_data.flange_length }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of web</td>
+                    <td>t<sub>1</sub></td>
+                    <td>{{ ns.found_data.web_thk }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of flange (avg.)</td>
+                    <td>t<sub>2</sub></td>
+                    <td>{{ ns.found_data.flange_thk }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Torsional Constant</td>
+                    <td><i>J<sub>y</sub></i></td>
+                    <td>{{ calc.tor_constant }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Area of cross-section</td>
+                    <td>A</td>
+                    <td>{{ calc.area }}</td>
+                    <td><i>mm<sup>2</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia about major axis</td>
+                    <td>I<sub>x</sub></td>
+                    <td>{{ calc.I_xx }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia about minor axis</td>
+                    <td>I<sub>y</sub></td>
+                    <td>{{ calc.I_yy }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Extreme fiber Distance from N.A (minor axis)</td>
+                    <td>Y</td>
+                    <td>{{ ns.found_data.web_length / 2 }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Extreme fiber Distance from N.A (major axis)</td>
+                    <td>X</td>
+                    <td>{{ ns.found_data.flange_length / 2 }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Elastic section modulus about major axis</td>
+                    <td><i>S<sub>x</sub> = I<sub>x</sub> / Y</i></td>
+                    <td>{{ calc.S_x }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Elastic section modulus about minor axis</td>
+                    <td><i>S<sub>y</sub> = I<sub>y</sub> / X</i></td>
+                    <td>{{ calc.S_y }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Plastic section modulus about major axis</td>
+                    <td><i>Z<sub>x</sub></i></td>
+                    <td>{{ calc.Z_x }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Yield strength</td>
+                    <td>F<sub>y</sub></td>
+                    <td>{{ ns.found_data.F_y }}</td>
+                    <td><i>MPa</i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of elasticity</td>
+                    <td>E<sub>a</sub></td>
+                    <td>70000</td>
+                    <td><i>MPa</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Moment Capacity by Yielding</h3>
+        <div>
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Moment capacity, <i>M<sub>np</sub></i></td>
+                        <td>=</td>
+                        <td><i>min( ZF<sub>y</sub> , 1.5 F<sub>y</sub>S<sub>x</sub> )</i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>=</td>
+                        <td>{{ calc.Mn_yield }} <i>kN-m</i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Moment Capacity by Local Buckling</h3>
+        <div>
+            <p>The weighted average method is utilized to compute the nominal flexure strength due to the limit state of local buckling –</p>
+            <p>For box section (symmetric about both axis, m = 0.65),</p>
+            <table class="width__100 align__center">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Supports</th>
+                        <th>b</th>
+                        <th>t</th>
+                        <th>λ <br>= b/t</th>
+                        <th>λ<sub>1</sub></th>
+                        <th>λ<sub>2</sub></th>
+                        <th>F<sub>c</sub> <br>(or F<sub>b</sub>)</th>
+                        <th>I<sub>w</sub> <br>(or I<sub>f</sub>)</th>
+                        <th>c<sub>w</sub> <br>(or c<sub>f</sub>)</th>
+                        <th>M<sub>nlb</sub></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FC (Web)</td>
+                        <td>Both Edges</td>
+                        <td>{{ calc.web_b }}</td>
+                        <td>{{ ns.found_data.web_thk }}</td>
+                        <td>{{ (calc.web_b / ns.found_data.web_thk) | round(2) }}</td>
+                        <td>{{ calc.web_lambda1 }}</td>
+                        <td>{{ calc.web_lambda2 }}</td>
+                        <td>{{ calc.F_b }}</td>
+                        <td>{{ calc.I_w }}</td>
+                        <td>{{ calc.c_w }}</td>
+                        <td>{{ calc.Mn_lbw }}</td>
+                    </tr>
+                    <tr>
+                        <td>UC (Flange)</td>
+                        <td>Both Edges</td>
+                        <td>{{ calc.flange_b }}</td>
+                        <td>{{ ns.found_data.flange_thk }}</td>
+                        <td>{{ (calc.flange_b / ns.found_data.flange_thk) | round(2) }}</td>
+                        <td>{{ calc.flange_lambda1 }}</td>
+                        <td>{{ calc.flange_lambda2 }}</td>
+                        <td>{{ calc.F_c }}</td>
+                        <td>{{ calc.I_f }}</td>
+                        <td>{{ calc.c_f }}</td>
+                        <td>{{ calc.Mn_lbf }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="borderless ml-3">
+                <tbody>
+                    <tr>
+                        <td>Therefore, Total Moment Capacity, M<sub>nlb</sub></td>
+                        <td>=</td>
+                        <td>({{ calc.Mn_lbw }} + {{ calc.Mn_lbf }})</td>
+                        <td>=</td>
+                        <td>{{ calc.Mn_lb }} <i>kNm</i></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="page__break"></div>
+            <p><u>Where,</u></p>
+            <table class="borderless ml-1">
+                <tbody>
+                    <tr>
+                        <td><i>I</i></td>
+                        <td>–</td>
+                        <td>Moment of inertia (mm<sup>4</sup>)</td>
+                    </tr>
+                    <tr>
+                        <td>c<sub>w</sub></td>
+                        <td>–</td>
+                        <td>Extreme fibre distance (mm)</td>
+                    </tr>
+                    <tr>
+                        <td>c<sub>f</sub></td>
+                        <td>–</td>
+                        <td>NA's distance to element's thickness center (mm)</td>
+                    </tr>
+                    <tr>
+                        <td>M<sub>nlb</sub></td>
+                        <td>–</td>
+                        <td>Moment capacity (kNm)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Moment Capacity by Lateral Torsional Buckling</h3>
+        <div>
+            <p>The member is considered to be continuously braced by the glass panel. Therefore, lateral torsional buckling (LTB) not governs.</p>
+        </div>
+
+        <div>
+            <p>The nominal bending strength is the minimum value obtained considering the limit states of yielding, local buckling and lateral-torsional buckling. Therefore –</p>
+
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Nominal Moment Capacity, <i>M<sub>n</sub> = min( M<sub>np</sub> , M<sub>nlb</sub> , M<sub>nmb</sub> )</i></td>
+                        <td>=</td>
+                        <td>{{ (calc.phi_Mn / 0.9) | round(2) }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>So, the design moment capacity, <i>φM<sub>n</sub> (; φ = 0.9)</i></td>
+                        <td>=</td>
+                        <td>{{ calc.phi_Mn }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% else %}
+    <div class="page__break"></div>
+    <h2>{{ ns.found_data.profile_name }}</h2>
+    <div>
+        <div>
+            <img src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}.png" class="fig__120">
+        </div>
+        
+        <table class="width__90">
+            <caption>Section Properties</caption>
+            <tbody>
+                <tr>
+                    <td>Length of web</td>
+                    <td>a</td>
+                    <td>{{ ns.found_data.web_length }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Length of flange</td>
+                    <td>b</td>
+                    <td>{{ ns.found_data.flange_length }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of web</td>
+                    <td>t<sub>1</sub></td>
+                    <td>{{ ns.found_data.web_thk }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of flange (avg.)</td>
+                    <td>t<sub>2</sub></td>
+                    <td>{{ ns.found_data.flange_thk }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Torsional Constant</td>
+                    <td>a</td>
+                    <td>{{ ns.found_data.tor_constant }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+
+                <tr>
+                    <td>Area of cross-section</td>
+                    <td>A</td>
+                    <td>{{ ns.found_data.area }}</td>
+                    <td><i>mm<sup>2</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia about major axis</td>
+                    <td>I<sub>x</sub></td>
+                    <td>{{ ns.found_data.I_xx }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia about minor axis</td>
+                    <td>I<sub>y</sub></td>
+                    <td>{{ ns.found_data.I_yy }}</td>
+                    <td><i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Extreme fiber Distance from N.A (minor axis)</td>
+                    <td>Y</td>
+                    <td>{{ ns.found_data.Y }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Extreme fiber Distance from N.A (major axis)</td>
+                    <td>X</td>
+                    <td>{{ ns.found_data.X }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Elastic section modulus about major axis</td>
+                    <td><i>S<sub>x</sub> = I<sub>x</sub> / Y</i></td>
+                    <td>{{ (ns.found_data.I_xx / ns.found_data.Y) | round(1) }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Elastic section modulus about minor axis</td>
+                    <td><i>S<sub>y</sub> = I<sub>y</sub> / X</i></td>
+                    <td>{{ (ns.found_data.I_yy / ns.found_data.X) | round(1) }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="borderless width__100">
+            <tbody>
+                <tr>
+                    <td><img src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}p.png" class="fig__130"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__90">
+            <tbody>
+                <tr>
+                    <td>Lower region centroid distance from PNA</td>
+                    <td>x</td>
+                    <td>{{ ns.found_data.plastic_x }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Upper region centroid distance from PNA</td>
+                    <td>y</td>
+                    <td>{{ ns.found_data.plastic_y }}</td>
+                    <td><i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Plastic section modulus about major axis</td>
+                    <td><i>Z<sub>x</sub> = 0.5 A(x + y)</i></td>
+                    <td>{{ (0.5 * ns.found_data.area * (ns.found_data.plastic_x + ns.found_data.plastic_y)) | round(1) }}</td>
+                    <td><i>mm<sup>3</sup></i></td>
+                </tr>
+
+                <tr>
+                    <td>Yield strength of Aluminum</td>
+                    <td>F<sub>y</sub></td>
+                    <td>{{ ns.found_data.F_y }}</td>
+                    <td><i>MPa</i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of elasticity of aluminum</td>
+                    <td>E<sub>a</sub></td>
+                    <td>70000</td>
+                    <td><i>MPa</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <h3>Moment Capacity by Yielding</h3>
+        <div>
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Moment capacity, <i>M<sub>np</sub></i></td>
+                        <td>=</td>
+                        <td><i>min( ZF<sub>y</sub> , 1.5 F<sub>y</sub>S<sub>x</sub> )</i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>=</td>
+                        <td>{{ ns.found_data.Mn_yield }} <i>kN-m</i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Moment Capacity by Local Buckling</h3>
+        <div>
+            <table class="borderless width__100 fig__table align__center">
+                <tbody>
+                    <tr>
+                        <td><img style="width: 40mm;" src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}-lb-web.png"></td>
+                        <td><img style="width: 40mm;" src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}-lb-flange.png"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="borderless width__100 fig__table">
+                <tbody>
+                    <tr>
+                        <td><img src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}-lb-table.png"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>The weighted average method is utilized to compute the nominal flexure strength due to the limit state of local buckling –</p>
+            <p>For web elements under flexural compression –</p>
+            <table class="borderless width__70 fig__table">
+                <tbody>
+                    <tr>
+                        <td><img src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}-lb-web-cap.png"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>For flange elements under uniform compression –</p>
+            <table class="borderless width__100 fig__table">
+                <tbody>
+                    <tr>
+                        <td><img src="{{ inputs_dir }}/{{ ns.found_data.profile_name }}-lb-flange-cap.png" class="fig__100"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Total moment capacity, <i>M<sub>nlb</sub></i></td>
+                        <td>=</td>
+                        <td><i>M<sub>nlb,w</sub> + M<sub>nlb,f</sub></i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>=</td>
+                        <td>{{ ns.found_data.Mn_lb }} <i>kN-m</i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Moment Capacity by Lateral Torsional Buckling</h3>
+        <div>
+            <p>The member is considered to be continuously braced by the glass panel. Therefore, lateral torsional buckling (LTB) not governs.</p>
+        </div>
+
+        <div>
+            <p>The nominal bending strength is the minimum value obtained considering the limit states of yielding, local buckling and lateral-torsional buckling. Therefore –</p>
+
+            <table class="borderless ml-2">
+                <tbody>
+                    <tr>
+                        <td>Nominal Moment Capacity, <i>M<sub>n</sub> = min( M<sub>np</sub> , M<sub>nlb</sub> , M<sub>nmb</sub> )</i></td>
+                        <td>=</td>
+                        <td>{{ [calc.Mn_yield, calc.Mn_lb] | min }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>So, the design moment capacity, <i>φM<sub>n</sub> (; φ = 0.9)</i></td>
+                        <td>=</td>
+                        <td>{{ (([calc.Mn_yield, calc.Mn_lb] | min) * 0.9) | round(2) }} <i>kN-m</i></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+
+
+

@@ -43,6 +43,19 @@ function fillPredefinedShape(shape) {
     updateAlumCalcPanel();
 }
 
+function updateAlumProfileFigure(shape) {
+    const wrap = document.getElementById('alum-profile-fig-wrap');
+    const img  = document.getElementById('alum-profile-fig');
+    if (!wrap || !img) return;
+    if (!shape) {
+        wrap.hidden = true;
+        img.src = '';
+        return;
+    }
+    img.src = `/report/assets/images/profiles/${encodeURIComponent(shape)}.png`;
+    wrap.hidden = false;
+}
+
 let _alumCalcDebounce = null;
 
 function updateAlumCalcPanel() {
@@ -111,6 +124,10 @@ function applyAlumSecVisibility(profileType) {
     });
     const calcPane = document.getElementById('alum-calc-pane');
     if (calcPane) calcPane.hidden = false;
+    const shape = profileType === 'predefined'
+        ? (document.getElementById('alum-sec-shape')?.value || null)
+        : profileType === 'stick' ? 'stick-profile' : null;
+    updateAlumProfileFigure(shape);
     updateAlumCalcPanel();
 }
 
@@ -273,9 +290,13 @@ function initAlumSectionFormEvents() {
                 if (item) item.textContent = shapeSel.value;
             }
         }
+        updateAlumProfileFigure(shapeSel.value || null);
         syncAlumSectionFromForm();
         updateAlumCalcPanel();
     });
+
+    const figImg = document.getElementById('alum-profile-fig');
+    if (figImg) figImg.onerror = () => { figImg.closest('#alum-profile-fig-wrap').hidden = true; };
 
     // Live recalc on grade or any input change
     document.getElementById('alum-sec-grade')?.addEventListener('change', updateAlumCalcPanel);

@@ -1,0 +1,757 @@
+<div class="page__break"></div>
+<h2>Design of Framing Members</h2>
+
+{% set calc = calc or frame.calc %}
+
+<div>
+    <h3>Basic Model Data</h3>
+    <table class="width__70">
+        <caption>Structural model information</caption>
+        <tbody>
+            <tr>
+                <td>Span of mullion (Support to Support), L</td>
+                <td>{{ frame.length }} <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Max. Effective Span of transom, B</td>
+                <td>{{ frame.width }} <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Max. transom spacing, L <sub>b</sub></td>
+                <td>{{ frame.tran_spacing }} <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Façade zone</td>
+                <td>{{ frame.zone }}</td>
+            </tr>
+            <tr>
+                <td>Façade system type</td>
+                <td>{{ frame.system_type }}</td>
+            </tr>
+            <tr>
+                <td>Frame continuity type</td>
+                <td>{{ frame.frame_type }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Loadings</h3>
+    <table class="width__100">
+        <caption>Loads on mullion and transom</caption>
+        <tbody>
+            <tr>
+                <td>Effective Glass thickness</td>
+                <td><i>t<sub>g</sub></i></td>
+                <td>{{ frame.glass_thk }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Density of glass</td>
+                <td><i>ρ<sub>g</sub></i></td>
+                <td>25 <i>kN/m<sup>3</sup></i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Self-weight of glass</td>
+                <td><i>DL<sub>g</sub> = t<sub>g</sub> × ρ<sub>g</sub></i></td>
+                <td>{{ calc.glass_sw }} <i>kN/m<sup>2</sup></i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Dead load from other accessories</td>
+                <td><i>DL<sub>o</sub> = 0.3 DL<sub>g</sub></i></td>
+                <td>{{ calc.acc_sw }} <i>kN/m<sup>2</sup></i></td>
+                <td><i>; 30% of glass self-weight</i></td>
+            </tr>
+            <tr>
+                <td>Effective wind area for vertical frame</td>
+                <td><i>A<sub>eff</sub></i></td>
+                <td>{{ calc.eff_area }} <i>m<sup>2</sup></i></td>
+                <td>
+                    {% if frame.frame_type == "Continuous" %}
+                        <i>; two span considered</i>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Therefore, Max. +Ve Wind Pressure</td>
+                <td><i>P<sub>z(+ve)</sub></i></td>
+                <td>{{ frame.wind_pos }} <i>kN/m<sup>2</sup></i></td>
+                <td rowspan="2"><i>; from wind load table</i></td>
+            </tr>
+            <tr>
+                <td style="padding-left: 4rem;">Max. -Ve Wind Pressure</td>
+                <td><i>P<sub>z(-ve)</sub></i></td>
+                <td>{{ frame.wind_neg }} <i>kN/m<sup>2</sup></i></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Profile Specification</h3>
+    <table class="borderless width__100 fig__table align__center">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        {% if frame.mullion_type == "Aluminum Only" %}
+                            {% if frame.system_type == "Semi-unitized" %}
+                                <img style="width: 50mm;" src="assets/images/profiles/{{ frame.mullion }}.png" class="fig__50">
+                            {% else %}
+                                <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.mullion }}.png" class="fig__50">
+                            {% endif %}
+                        {% else %}
+                        <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.mullion }}+RHS {{ frame.steel.split('x')[-1] }}.png" class="fig__50">
+                        {% endif %}
+                        <figcaption>Mullion</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        {% if frame.system_type == "Semi-unitized" %}
+                            <img style="width: 50mm;" src="assets/images/profiles/{{ frame.transom }}.png" class="fig__50">
+                        {% else %}
+                            <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.transom }}.png" class="fig__50">
+                        {% endif %}
+                        <figcaption>Transom</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    {% if frame.mullion_type == "Aluminum + Steel" %}
+        <p class="page__break">For aluminum-steel combined mullion profile,</p>
+
+        <table class="width__80">
+            <tbody>
+                <tr>
+                    <td>Modular ratio</td>
+                    <td><i>n = E<sub>s</sub> / E<sub>a</sub></i></td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia of aluminum</td>
+                    <td><i>I<sub>xa</sub></i></td>
+                    <td>{{ calc.I_xa }} <i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Moment of inertia of steel</td>
+                    <td><i>I<sub>xs</sub></i></td>
+                    <td>{{ calc.I_xs }} <i>mm<sup>4</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Load share factor for aluminum</td>
+                    <td><i>LS<sub>a</sub> = I<sub>xa</sub> / ( I<sub>xa</sub> + nI<sub>xs</sub> )</i></td>
+                    <td>{{ calc.ls_a }}</td>
+                </tr>
+                <tr>
+                    <td>Load share factor for Steel</td>
+                    <td><i>LS<sub>s</sub> = nI<sub>xs</sub> / ( I<sub>xa</sub> + nI<sub>xs</sub> )</i></td>
+                    <td>{{ calc.ls_s }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+
+{% if frame.geometry != "regular" %}
+<div>
+    <h3>Software Input</h3>
+    <div style="text-align: center;">
+        <figure>
+            <img src="{{ inputs_dir }}/{{ loop_index }}-sap-model.png" style="width: 100mm;">
+            <figcaption>Model view</figcaption>
+        </figure>
+    </div>
+
+    <table class="borderless width__100 fig__table">
+        <tbody>
+            <tr>
+                <td rowspan="2">
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-release.png">
+                        <figcaption>Frame releases and restraints</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img src="assets/images/sap-support1.png">
+                    </figure>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <figure>
+                        <img src="assets/images/sap-support2.png">
+                        <figcaption>Support restraint condition</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="borderless width__100 fig__table">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-dead-load.png">
+                        <figcaption>Dead load</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-wind-load.png">
+                        <figcaption>Wind load</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="calc__fig2">
+        <figure>
+            <img src="assets/images/sap-load-combo.png">
+            <figcaption>Load combinations</figcaption>
+        </figure>
+    </div>
+</div>
+
+<div>
+    <h3>Analysis & Result</h3>
+    <table class="borderless width__100 fig__table align__center">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-bmd.png">
+                        <figcaption>BMD about major axis (0.9D – 1.6W)</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-sfd.png">
+                        <figcaption>SFD about major axis (0.9D – 1.6W)</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="borderless width__100 fig__table align__center">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 80mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-mul-max-moment.png">
+                        <figcaption>Max. Moment on mullion (0.9D – 1.6W)</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 80mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-tran-max-moment.png">
+                        <figcaption>Max. Moment on transom (0.9D – 1.6W)</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="borderless width__100 fig__table align__center">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-deformed-shape.png">
+                        <figcaption>Deformed shape (D – 0.7W, contour)</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 80mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-mul-def.png">
+                        <figcaption>Mullion deflection (D – 0.7W)</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <table class="borderless width__100 fig__table align__center">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 80mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-tran-def-wind.png">
+                        <figcaption>Transom deflection (D – 0.7W)</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 80mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-tran-def-dead.png">
+                        <figcaption>Transom deflection (under dead load)</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="borderless width__100 fig__table align__center mt-2">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-joint-force-dead.png">
+                        <figcaption>Max. joint force under dead load (about minor axis)</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-joint-force-wind.png">
+                        <figcaption>Max. joint force under wind load (about major axis)</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="borderless width__100 fig__table">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-reaction-force-dead.png">
+                        <figcaption>Support reactions (Dead)</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 75mm;" src="{{ inputs_dir }}/{{ loop_index }}-sap-reaction-force-wind.png">
+                        <figcaption>Support reactions (Wind)</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<div>
+    <h3>Analysis</h3>
+    <div style="text-align: center;">
+        <figure>
+            {% if frame.frame_type == "Continuous" %}
+                {% if frame.tran_spacing < frame.length and frame.tran_spacing == (frame.length / 2) %}
+                <img src="assets/images/reg-model-cont1.png" style="width: 145mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) == frame.width %}
+                <img src="assets/images/reg-model-cont2.png" style="width: 145mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) < frame.width %}
+                <img src="assets/images/reg-model-cont3.png" style="width: 145mm;">
+                {% elif frame.tran_spacing < (frame.length / 2) %}
+                <img src="assets/images/reg-model-cont4.png" style="width: 145mm;">
+                {% else %}
+                <img src="assets/images/reg-model-cont5.png" style="width: 145mm;">
+                {% endif %}
+            {% else %}
+                {% if frame.tran_spacing < frame.length and frame.tran_spacing == (frame.length / 2) %}
+                <img src="assets/images/reg-model-sfgp1.png" style="width: 155mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) == frame.width %}
+                <img src="assets/images/reg-model-sfgp2.png" style="width: 155mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) < frame.width %}
+                <img src="assets/images/reg-model-sfgp3.png" style="width: 155mm;">
+                {% elif frame.tran_spacing < (frame.length / 2) %}
+                <img src="assets/images/reg-model-sfgp4.png" style="width: 155mm;">
+                {% else %}
+                <img src="assets/images/reg-model-sfgp5.png" style="width: 155mm;">
+                {% endif %}
+            {% endif %}
+            <figcaption>Model view</figcaption>
+        </figure>
+    </div>
+    
+    <div style="text-align: center;">
+        <figure>
+            {% if frame.frame_type == "Continuous" %}
+                {% if frame.tran_spacing < frame.length and frame.tran_spacing == (frame.length / 2) %}
+                <img src="assets/images/reg-load-dist-cont1.png" style="width: 145mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) == frame.width %}
+                <img src="assets/images/reg-load-dist-cont2.png" style="width: 145mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) < frame.width %}
+                <img src="assets/images/reg-load-dist-cont3.png" style="width: 145mm;">
+                {% elif frame.tran_spacing < (frame.length / 2) %}
+                <img src="assets/images/reg-load-dist-cont4.png" style="width: 145mm;">
+                {% else %}
+                <img src="assets/images/reg-load-dist-cont5.png" style="width: 145mm;">
+                {% endif %}
+            {% else %}
+                {% if frame.tran_spacing < frame.length and frame.tran_spacing == (frame.length / 2) %}
+                <img src="assets/images/reg-load-dist-sfgp1.png" style="width: 155mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) == frame.width %}
+                <img src="assets/images/reg-load-dist-sfgp2.png" style="width: 155mm;">
+                {% elif frame.tran_spacing < frame.length and (frame.length - frame.tran_spacing) < frame.width %}
+                <img src="assets/images/reg-load-dist-sfgp3.png" style="width: 155mm;">
+                {% elif frame.tran_spacing < (frame.length / 2) %}
+                <img src="assets/images/reg-load-dist-sfgp4.png" style="width: 155mm;">
+                {% else %}
+                <img src="assets/images/reg-load-dist-sfgp5.png" style="width: 155mm;">
+                {% endif %}
+            {% endif %}
+            <figcaption>Load distribution</figcaption>
+        </figure>
+    </div>
+    
+    <div style="text-align: center;">
+        <figure>
+            {% if frame.frame_type == "Continuous" %}
+            <img src="assets/images/reg-mul-int-force-cont1.png" style="width: 155mm;">
+            {% else %}
+            <img src="assets/images/reg-mul-int-force-sfgp1.png" style="width: 155mm;">
+            {% endif %}
+            <figcaption>FBD of mullion with Load, SFD and BMD about major axis</figcaption>
+        </figure>
+    </div>
+    
+    <div style="text-align: center;">
+        <figure>
+            {% if frame.frame_type == "Continuous" %}
+            <img src="assets/images/reg-mul-int-force-cont2.png" style="width: 155mm;">
+            {% else %}
+            <img src="assets/images/reg-mul-int-force-sfgp2.png" style="width: 155mm;">
+            {% endif %}
+            <figcaption>Deflection and reaction forces of mullion</figcaption>
+        </figure>
+    </div>
+
+    <table class="borderless fig__table width__100">
+        <tbody>
+            <tr>
+                <td>
+                    <figure>
+                        <img src="assets/images/reg-tran-int-force1.png" style="width: 85mm;">
+                        <figcaption>FBD of transom with Load, SFD and BMD about major axis</figcaption>
+                    </figure>
+                </td>
+                <td>
+                    <figure>
+                        <img src="assets/images/reg-tran-int-force2.png" style="width: 85mm;">
+                        <figcaption>Deflection and reaction forces of transom</figcaption>
+                    </figure>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="page__break">
+    <h3>Analysis Summary</h3>
+    <table class="width__90 align__center">
+        <caption>Internal forces</caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    <p>Bending Moment,</p>
+                    <p><i>M<sub>u</sub> (kN-m)</i></p>
+                </th>
+                <th>
+                    <p>Shear Force,</p>
+                    <p><i>V<sub>u</sub> (kN)</i></p>
+                </th>
+                <th colspan="2">
+                    <p>Max. Deflection,</p>
+                    <p><i>δ (mm)</i></p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td><i>(0.9D – 1.6W)</i></td>
+                <td><i>(0.9D – 1.6W)</i></td>
+                <td><i>(D – 0.7W)</i></td>
+                <td><i>Dead</i></td>
+            </tr>
+            <tr>
+                <td>Mullion</td>
+                <td>{{ calc.mul_mu }}</td>
+                <td>{{ calc.mul_vu }}</td>
+                <td>{{ calc.mul_def }}</td>
+                <td>–</td>
+            </tr>
+            <tr>
+                <td>Transom</td>
+                <td>{{ calc.tran_mu }}</td>
+                <td>{{ calc.tran_vu }}</td>
+                <td>{{ calc.tran_def_wind }}</td>
+                <td>{{ calc.tran_def_dead }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__80 align__center">
+        <caption>Joint forces</caption>
+        <thead>
+            <tr>
+                <th colspan="6">
+                    <p>Max. Mullion-Transom Joint forces <i>(kN)</i></p>
+                    <p>(SLS)</p>
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><i>F<sub>x</sub></i></td>
+                <td><i>F<sub>y</sub></i></td>
+                <td><i>F<sub>z</sub></i></td>
+                <td><i>M<sub>x</sub></i></td>
+                <td><i>M<sub>y</sub></i></td>
+                <td><i>M<sub>z</sub></i></td>
+            </tr>
+            <tr>
+                <td>–</td>
+                <td>{{ calc.joint_fy }}</td>
+                <td>{{ calc.joint_fz }}</td>
+                <td>–</td>
+                <td>–</td>
+                <td>–</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__80 align__center">
+        <caption>Support reaction forces</caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th colspan="6">
+                    <p>Max. Support Reaction forces <i>(kN)</i></p>
+                    <p>(SLS)</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td><i>R<sub>x</sub></i></td>
+                <td><i>R<sub>y</sub></i></td>
+                <td><i>R<sub>z</sub></i></td>
+                <td><i>M<sub>x</sub></i></td>
+                <td><i>M<sub>y</sub></i></td>
+                <td><i>M<sub>z</sub></i></td>
+            </tr>
+            {% if frame.frame_type == "Floor-to-floor" %}
+                <tr>
+                    <td>End Node</td>
+                    <td>–</td>
+                    <td>{{ calc.reaction_Ry }}</td>
+                    <td>{{ calc.reaction_Rz }}</td>
+                    <td>–</td>
+                    <td>–</td>
+                    <td>–</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>Middle Node</td>
+                    <td>–</td>
+                    <td>{{ calc.reaction_Ry }}</td>
+                    <td>{{ calc.reaction_Rz }}</td>
+                    <td>–</td>
+                    <td>–</td>
+                    <td>–</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="page__break">
+    <h3>Design of Mullion</h3>
+
+    {% if frame.mullion_type == "Aluminum + Steel" %}
+        <h4>Design of Aluminum Part</h4>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Max. bending moment, <i>M<sub>u</sub></i> (under ULS)</td>
+                    <td>=</td>
+                    <td>{{ calc.mul_mu }} <i>kN-m</i></td>
+                    <td><i>; from 'Internal forces' table</i></td>
+                </tr>
+                <tr>
+                    <td>Moment shared by alum. profile, <i>M<sub>ua</sub> = LS<sub>a</sub> × M<sub>u</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.mul_mu_a }} <i>kN-m</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>The design moment capacity,  <i>φM<sub>n</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.mul_phi_Mn_a }} <i>kN-m</i></td>
+                    <td><i>; from Chapter 4</i></td>
+                </tr>
+                <tr>
+                    <td>P-M-M (D/C) ratio</td>
+                    <td>=</td>
+                    <td>{{ calc.mul_dc_a }} &nbsp;&nbsp;&nbsp; <1 </td>
+                    <td class="{% if calc.mul_dc_a < 1 %}ok{% else %}not-ok{% endif %}">
+                        {% if calc.mul_dc_a < 1 %} OK {% else %} NOT OK {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Design of Embedded Steel Tube Part</h4>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Max. bending moment, <i>M<sub>u</sub></i> (under ULS)</td>
+                    <td>=</td>
+                    <td>{{ calc.mul_mu }} <i>kN-m</i></td>
+                    <td><i>; from 'Internal forces' table</i></td>
+                </tr>
+                <tr>
+                    <td>Moment shared by steel tube, <i>M<sub>us</sub> = LS<sub>s</sub> × M<sub>u</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.mul_mu_s }} <i>kN-m</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>The design moment capacity,  <i>φM<sub>n</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.mul_phi_Mn_s }} <i>kN-m</i></td>
+                    <td><i>; from Chapter 4</i></td>
+                </tr>
+                <tr>
+                    <td>P-M-M (D/C) ratio</td>
+                    <td>=</td>
+                    <td>{{ calc.mul_dc_s }} &nbsp;&nbsp;&nbsp; <1 </td>
+                    <td class="{% if calc.mul_dc_s < 1 %}ok{% else %}not-ok{% endif %}">
+                        {% if calc.mul_dc_s < 1 %} OK {% else %} NOT OK {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    
+    {% else %}
+    <h4>Design for Moment</h4>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. bending moment, <i>M<sub>u</sub></i> (under ULS)</td>
+                <td>=</td>
+                <td>{{ calc.mul_mu }} <i>kN-m</i></td>
+                <td><i>; from 'Internal forces' table</i></td>
+            </tr>
+            <tr>
+                <td>The design moment capacity,  <i>φM<sub>n</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.mul_phi_Mn }} <i>kN-m</i></td>
+                <td><i>; from Chapter 4</i></td>
+            </tr>
+            <tr>
+                <td>P-M-M (D/C) ratio</td>
+                <td>=</td>
+                <td>{{ calc.mul_dc }} &nbsp;&nbsp;&nbsp; <1 </td>
+                <td class="{% if calc.mul_dc < 1 %}ok{% else %}not-ok{% endif %}">
+                    {% if calc.mul_dc < 1 %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h4>Check for Deflection</h4>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. deflection (under SLS), δ</td>
+                <td>=</td>
+                <td>{{ calc.mul_def }} <i>mm</i></td>
+                <td><i>; from 'Internal forces table'</i></td>
+            </tr>
+            <tr>
+                <td>Max. allowable deflection, δ<sub>a</sub></td>
+                <td>=</td>
+                <td>{{ calc.mul_allow_def }} <i>mm</i> &nbsp;&nbsp;&nbsp; > δ </td>
+                <td class="{% if calc.mul_allow_def > calc.mul_def %}ok{% else %}not-ok{% endif %}">
+                    {% if calc.mul_allow_def > calc.mul_def %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Design of Transom</h3>
+
+    <h4>Design for Moment</h4>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. bending moment, <i>M<sub>u</sub></i> (under ULS)</td>
+                <td>=</td>
+                <td>{{ calc.tran_mu }} <i>kN-m</i></td>
+                <td><i>; from 'Internal forces' table</i></td>
+            </tr>
+            <tr>
+                <td>The design moment capacity,  <i>φM<sub>n</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.tran_phi_Mn }} <i>kN-m</i></td>
+                <td><i>; from Chapter 4</i></td>
+            </tr>
+            <tr>
+                <td>P-M-M (D/C) ratio</td>
+                <td>=</td>
+                <td>{{ calc.tran_dc }} &nbsp;&nbsp;&nbsp; <1 </td>
+                <td class="{% if (calc.tran_dc) < 1 %}ok{% else %}not-ok{% endif %}">
+                    {% if (calc.tran_dc) < 1 %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Check for Deflection</h4>
+    <p><u>For wind load –</u></p>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. deflection (under SLS), δ</td>
+                <td>=</td>
+                <td>{{ calc.tran_def_wind }} <i>mm</i></td>
+                <td><i>; from 'Internal forces table'</i></td>
+            </tr>
+            <tr>
+                <td>Max. allowable deflection, δ<sub>a</sub></td>
+                <td>=</td>
+                <td>{{ calc.tran_allow_def }} <i>mm</i> &nbsp;&nbsp;&nbsp; > δ </td>
+                <td class="{% if (calc.tran_allow_def) > (calc.tran_def_wind) %}ok{% else %}not-ok{% endif %}">
+                    {% if (calc.tran_allow_def) > (calc.tran_def_wind) %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p><u>For dead load –</u></p>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. deflection (under SLS), δ</td>
+                <td>=</td>
+                <td>{{ calc.tran_def_dead }} <i>mm</i></td>
+                <td><i>; from 'Internal forces table'</i></td>
+            </tr>
+            <tr>
+                <td>Max. allowable deflection, δ<sub>a</sub></td>
+                <td>=</td>
+                <td>3.0 <i>mm</i> &nbsp;&nbsp;&nbsp; > δ </td>
+                <td class="{% if 3.0 > (calc.tran_def_dead) %}ok{% else %}not-ok{% endif %}">
+                    {% if 3.0 > (calc.tran_def_dead) %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

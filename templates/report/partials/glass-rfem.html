@@ -1,0 +1,496 @@
+<div class="page__break"></div>
+<h2>Verification of Glass Panel {{ glass_index }}</h2>
+
+{% if gu.glass_type == "sgu" %}
+    <div>
+        <h3>Panel Info</h3>
+        <table class="width__50">
+            <tbody>
+                <tr>
+                    <td>Glass Size</td>
+                    <td>{{ gu.length }} x {{ gu.width }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Thickness</td>
+                    <td>{{ gu.thickness }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Type</td>
+                    <td>SGU, {{ gu.grade }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3>Data Analysis</h3>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Glass length, a</td>
+                    <td>=</td>
+                    <td>{{ gu.length }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Glass width, b</td>
+                    <td>=</td>
+                    <td>{{ gu.width }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Effective wind area for glass, <i>A<sub>eff</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.A_eff }} <i>m<sup>2</sup></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Therefore, Max. wind suction/pressure, <i>P<sub>z</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.wind_load }} <i>kPa</i></td>
+                    <td><i>; from wind load table</i></td>
+                </tr>
+                <tr>
+                    <td>Glass thickness, <i>t<sub>g</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Modulus of Elasticity, <i>E</i></td>
+                    <td>=</td>
+                    <td>71700 <i>MPa</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Support Type</td>
+                    <td>=</td>
+                    <td>{{ gu.support_type }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% elif gu.glass_type == "dgu" %}
+    <div class="calc__fig2">
+        <img src="assets/images/fig_dgu.png" alt="DGU Diagram">
+        <figcaption>DGU Glass (Section & Plan)</figcaption>
+    </div>
+
+    <div>
+        <h3>Panel Info</h3>
+        <table class="width__50">
+            <tbody>
+                <tr>
+                    <td>Glass Size</td>
+                    <td>{{ gu.length }} x {{ gu.width }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Thickness</td>
+                    <td>{{ gu.thickness1 }} + {{ gu.gap }} + {{ gu.thickness2 }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Type</td>
+                    <td>DGU, {{ gu.grade1 }} + {{ gu.grade2 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3>Data Analysis</h3>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Glass length, a</td>
+                    <td>=</td>
+                    <td>{{ gu.length }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Glass width, b</td>
+                    <td>=</td>
+                    <td>{{ gu.width }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Effective wind area for glass, <i>A<sub>eff</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.A_eff }} <i>m<sup>2</sup></i></td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>Therefore, Max. wind suction/pressure, <i>P<sub>z</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.wind_load }} <i>kPa</i></td>
+                    <td><i>; from wind load table</i></td>
+                </tr>
+                <tr>
+                    <td>Thickness of outer panel, <i>t<sub>1</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Thickness of air/gas gap, <i>t<sub>a</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.gap }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Thickness of inner panel, <i>t<sub>2</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness2 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Total glass thickness, <i>t<sub>g</sub> = t<sub>1</sub> + t<sub>2</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1 + gu.thickness2 }} <i>mm</i></td>
+                    <td><i>; without air/gas gap</i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of Elasticity, <i>E</i></td>
+                    <td>=</td>
+                    <td>71700 <i>MPa</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Support Type</td>
+                    <td>=</td>
+                    <td>{{ gu.support_type }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% elif gu.glass_type == "lgu" %}
+    <div class="calc__fig2">
+        <img src="assets/images/fig_lgu.png" alt="LGU Diagram">
+        <figcaption>LGU Glass (Section & Plan)</figcaption>
+    </div>
+
+    <div>
+        <h3>Panel Info</h3>
+        <table class="width__50">
+            <tbody>
+                <tr>
+                    <td>Glass Size</td>
+                    <td>{{ gu.length }} x {{ gu.width }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Thickness</td>
+                    <td>{{ gu.thickness1 }} + {{ gu.thickness_inner }} + {{ gu.thickness2 }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Type</td>
+                    <td>LGU, {{ gu.grade }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3>Data Analysis</h3>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Glass length, a</td>
+                    <td>=</td>
+                    <td>{{ gu.length }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Glass width, b</td>
+                    <td>=</td>
+                    <td>{{ gu.width }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Effective wind area for glass, <i>A<sub>eff</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.A_eff }} <i>m<sup>2</sup></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Therefore, Max. wind suction/pressure, <i>P<sub>z</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.wind_load }} <i>kPa</i></td>
+                    <td><i>; from wind load table</i></td>
+                </tr>
+                <tr>
+                    <td>First Glass thickness, <i>t<sub>1</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Interlayer thickness, <i>t<sub>i</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness_inner }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Second Glass thickness, <i>t<sub>2</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness2 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Total glass thickness, <i>t<sub>g</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1 + gu.thickness2 }} <i>mm</i></td>
+                    <td><i>; without interlayer</i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of Elasticity, <i>E</i></td>
+                    <td>=</td>
+                    <td>71700 <i>MPa</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Support Type</td>
+                    <td>=</td>
+                    <td>{{ gu.support_type }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% else %}
+    <div class="calc__fig2">
+        <img src="assets/images/fig_ldgu.png" alt="LDGU Diagram">
+        <figcaption>LDGU Glass (Section & Plan)</figcaption>
+    </div>
+
+    <div>
+        <h3>Panel Info</h3>
+        <table class="width__60">
+            <tbody>
+                <tr>
+                    <td>Glass Size</td>
+                    <td>{{ gu.length }} x {{ gu.width }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Thickness</td>
+                    <td>({{ gu.thickness1_1 }} + {{ gu.thickness_inner }} + {{ gu.thickness1_2 }}) + {{ gu.gap }} + {{ gu.thickness2 }} <i>mm</i></td>
+                </tr>
+                <tr>
+                    <td>Glass Type</td>
+                    <td>LDGU, {{ gu.grade1 }} + {{ gu.grade2 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3>Data Analysis</h3>
+        <table class="borderless">
+            <tbody>
+                <tr>
+                    <td>Glass length, a</td>
+                    <td>=</td>
+                    <td>{{ gu.length }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Glass width, b</td>
+                    <td>=</td>
+                    <td>{{ gu.width }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Effective wind area for glass, <i>A<sub>eff</sub></i></td>
+                    <td>=</td>
+                    <td>{{ calc.A_eff }} <i>m<sup>2</sup></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Therefore, Max. wind suction/pressure, <i>P<sub>z</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.wind_load }} <i>kPa</i></td>
+                    <td><i>; from wind load table</i></td>
+                </tr>
+                <tr>
+                    <td>First thickness of outer panel, <i>t<sub>1-1</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1_1 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Interlayer thickness, <i>t<sub>i</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness_inner }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Second thickness of outer panel, <i>t<sub>1-2</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1_2 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Thickness of air/gas gap, <i>t<sub>a</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.gap }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>So, Thickness of outer panel, <i>t<sub>1</sub> = t<sub>1-1</sub> + t<sub>1-2</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1_1 + gu.thickness1_2 }} <i>mm</i></td>
+                    <td><i>; without interlayer</i></td>
+                </tr>
+                    <td>Thickness of inner panel, <i>t<sub>2</sub></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness2 }} <i>mm</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Total glass thickness, <i>t<sub>g</sub> = t<sub>1</sub> + t<sub>2</sub></i></td>
+                    <td>=</td>
+                    <td>{{ gu.thickness1_1 + gu.thickness1_2 + gu.thickness2 }} <i>mm</i></td>
+                    <td><i>; without air/gas gap</i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of Elasticity, <i>E</i></td>
+                    <td>=</td>
+                    <td>71700 <i>MPa</i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Support Type</td>
+                    <td>=</td>
+                    <td>{{ gu.support_type }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endif %}
+
+<div>
+    {% if gu.length > 5000 %}
+        <p>As the glass length is more than 5000 mm, the glass cannot be designed using ASTM chart. Therefore, software analysis is required. In that case, RFEM with RF-Glass module is utilized to design this glass.</p>
+
+    {% elif gu.support_type == "Point Fixed" %}
+        <p>As the point supported glass is out of scope of ASTM chart. Therefore, software analysis is required. In that case, RFEM with RF-Glass module is utilized to design this glass.</p>
+    
+    {% else %}
+        <p>This glass is out of scope of ASTM chart. Therefore, software analysis is required. In that case, RFEM with RF-Glass module is utilized to design this glass.</p>
+
+    {% endif %}
+</div>
+
+<div>
+    <h3>Model Data</h3>
+    <div class="calc_fig">
+        <figure>
+            <img style="width: 170mm;" src="{{ inputs_dir }}/{{ loop_index }}.{{ glass_index }}-rfem-model-3d.png">
+            <figcaption>3d Model</figcaption>
+        </figure>
+    </div>
+
+    <div class="calc_fig">
+        <figure>
+            <img style="width: 170mm;" src="{{ inputs_dir }}/{{ loop_index }}.{{ glass_index }}-rfem-model-data.png">
+            <figcaption>RFEM Model Data</figcaption>
+        </figure>
+    </div>
+</div>
+
+<div>
+    <h3>Check for Strength</h3>
+    <div>
+        <figure>
+            <img style="width: 170mm;" src="{{ inputs_dir }}/{{ loop_index }}.{{ glass_index }}-rfem-stress.png">
+            <figcaption>Stresses in glass</figcaption>
+        </figure>
+    </div>
+    
+    <div>
+        <figure>
+            <img style="width: 170mm;" src="{{ inputs_dir }}/{{ loop_index }}.{{ glass_index }}-rfem-stress-ratio.png">
+            <figcaption>Stress ratio</figcaption>
+        </figure>
+    </div>
+</div>
+
+<div>
+    <h3>Check for Deflection</h3>
+    <div>
+        <figure>
+            <img style="width: 170mm;" src="{{ inputs_dir }}/{{ loop_index }}.{{ glass_index }}-rfem-def.png">
+            <figcaption>Deflection in glass</figcaption>
+        </figure>
+    </div>
+    
+    <div>
+        <figure>
+            <img style="width: 170mm;" src="{{ inputs_dir }}/{{ loop_index }}.{{ glass_index }}-rfem-def-ratio.png">
+            <figcaption>Deflection ratio</figcaption>
+        </figure>
+    </div>
+</div>
+
+{% if gu.support_type != "Point Fixed" %}
+<div>
+    <h3>Verification of Silicone Bite</h3>
+    <div class="calc__fig2">
+        <img src="assets/images/silicone.png" alt="Silicone Bite">
+    </div>
+    <table class="borderless">
+        <tbody>
+            <tr>
+                <td>Max. Design Wind/suction pressure, <i>P<sub>z</sub></i></td>
+                <td>=</td>
+                <td>{{ gu.wind_load }} <i>kN/m<sup>2</sup></i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Effective load width, <i>B</i></td>
+                <td>=</td>
+                <td>{{ gu.width }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Design strength of Sealant, <i>F<sub>s</sub></i></td>
+                <td>=</td>
+                <td>140 <i>N/mm<sup>2</sup></i></td>
+                <td><i>; ASTM C1401 – 02</i></td>
+            </tr>
+            <tr>
+                <td>Bite size/width required, <i>t<sub>r</sub> = (P<sub>z</sub> × B) / (2 F<sub>s</sub>)</i></td>
+                <td>=</td>
+                <td>{{ calc.bite_req }} <i>mm</i></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Bite size/width provided, <i>t<sub>p</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.bite_pro }} <i>mm</i></td>
+                <td><i>; ≥ t<sub>r</sub></i></td>
+                <td class="ok">OK</td>
+            </tr>
+            <tr>
+                <td>Glue line thickness required, <i>e<sub>r</sub> = t<sub>r</sub> / 3</i></td>
+                <td>=</td>
+                <td>{{ calc.glue_req }} <i>mm</i></td>
+                <td>; ≥ 6 <i>mm</i></td>
+            </tr>
+            <tr>
+                <td>Glue line thickness provided, <i>e<sub>p</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.glue_pro }} <i>mm</i></td>
+                <td><i>; ≥ e<sub>r</sub></i></td>
+                <td class="ok">OK</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}

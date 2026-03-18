@@ -1,0 +1,25 @@
+<!-- ====== Cover Header ======== -->
+<section class="cover__header">
+    <div>
+        <p>Structural Design Report</p>
+    </div>
+    <div>
+        <p>{{ project_info.ref_no }}</p>
+    </div>
+</section>
+
+<!-- ====== Page Header ======== -->
+<section class="page__header">
+    <div class="page__header_left">
+        <p class="page__header_title">Structural Design Report</p>
+        <div class="page__header_logo">
+            <img src="assets/images/logo.png">
+        </div>
+        <p class="page__header_web"><a>www.armanengineering.com</a></p>
+    </div>
+    <div class="page__header_right">
+        <p class="page__header_ref">{{ project_info.ref_no }}</p>
+        <p class="page__header_project">Project: {{ project_info.project_name }}</p>
+        <p class="page__header_date">Date: {{ project_info.date }}</p>
+    </div>
+</section>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Design Report</title>
+
+    <link rel="stylesheet" href="/css/katex.min.css">
+    <link rel="stylesheet" href="/css/report.css">
+</head>
+
+<body>
+    {% include "common/header.html" %}
+    {% include "common/cover.html" %}
+
+    {% if include.toc|default(false) %}
+        {% include "common/toc.html" %}
+    {% endif%}
+
+    {% include "common/intro.html" %}
+
+    {% if include.moment_capacity|default(false) %}
+        {% include "profile.html" %}
+    {% endif%}
+
+    {% if include.wind_pressure|default(false) %}
+        {% include "wind.html" %}
+    {% endif%}
+
+    {% if include.categories|default(false) and categories %}
+        {% for cat in categories %}
+            {% set loop_index = loop.index %}
+            {% include "category.html" %}
+        {% endfor %}
+    {% endif%}
+
+    {% if include.reference|default(false) %}
+        {% include "common/reference.html" %}
+    {% endif%}
+</body>
+
+</html>

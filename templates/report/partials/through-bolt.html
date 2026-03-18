@@ -1,0 +1,214 @@
+<h3>Design of Through Bolt</h3>
+<table class="borderless">
+    <tbody>
+        <tr>
+            <td>Max. horizontal reaction force, F<sub>y</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Ry }} <i>kN</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>No. of bolt, n</td>
+            <td>=</td>
+            <td>{{ calc.thr_bolt_nos }} <i>Nos.</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Shear force on each bolt, V<sub>h</sub></td>
+            <td>=</td>
+            <td>{{ calc.thr_Vh }} <i>kN</i></td>
+            <td><i>; bolt in double shear</i></td>
+        </tr>
+        <tr>
+            <td>Max. vertical reaction force, F<sub>z</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Rz }} <i>kN</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Shear force on each bolt, V<sub>v</sub></td>
+            <td>=</td>
+            <td>{{ calc.thr_Vv }} <i>kN</i></td>
+            <td><i>; bolt in double shear</i></td>
+        </tr>
+        <tr>
+            <td>Resultant shear force, V<sub>u</sub>=√(V<sub>h</sub><sup>2</sup> + V<sub>v</sub><sup>2</sup>)</td>
+            <td>=</td>
+            <td>{{ calc.bolt_Vu }} <i>kN</i></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<h4>Check for Shear Resistance</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><i>φR<sub>n</sub> = φ F<sub>nv</sub> A<sub>b</sub> &nbsp;&nbsp;&nbsp; (kN)</i></td>
+            <td style="text-align: right;">(AISC 360-05, J3-1)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Resistance factor</td>
+        </tr>
+        <tr>
+            <td><i>F<sub>nv</sub> = 0.4 F<sub>u</sub></i></td>
+            <td>–</td>
+            <td>Nominal shear stress (MPa) <i>(Table J3.2, AISC 360-05)</i></td>
+        </tr>
+        <tr>
+            <td><i>F<sub>u</sub></i></td>
+            <td>–</td>
+            <td>Ultimate strength of bolt (MPa)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>b</sub> = (πd<sup>2</sup>) / 4</i></td>
+            <td>–</td>
+            <td>Gross cross-section area of bolt (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td>d</td>
+            <td>–</td>
+            <td>Diameter of bolt (mm)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th>F<sub>u</sub> *</th>
+            <th>F<sub>nv</sub></th>
+            <th>d</th>
+            <th>A<sub>b</sub></th>
+            <th>φR<sub>n</sub></th>
+            <th>V<sub>u</sub></th>
+            <th>β<sub>N</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.75</td>
+            <td>700</td>
+            <td>280</td>
+            <td>{{ anchor.thr_bolt_dia }}</td>
+            <td>{{ calc.thr_Ab }}</td>
+            <td>{{ calc.bolt_phi_Rn_shear }}</td>
+            <td>{{ calc.bolt_Vu }}</td>
+            <td>{{ (calc.bolt_Vu / calc.bolt_phi_Rn_shear) | round(2) }}</td>
+            <td class="{% if (calc.bolt_Vu / calc.bolt_phi_Rn_shear) < 1 %}ok{% else %}not-ok{% endif %}">
+                {% if (calc.bolt_Vu / calc.bolt_phi_Rn_shear) < 1 %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p class="footnote__content ml-2">* SS Grade A4-70</p>
+
+<h4>Check for Bearing Resistance</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/images/eqn-bolt-bearing-resistance.png" class="fig__85"></td>
+            <td style="text-align: right;">(AISC 360-05, J3-6)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>l<sub>c</sub></td>
+            <td>–</td>
+            <td>Clear distance, in the direction of the force, between the edge of the hole and the edge of the adjacent hole or edge of the material (mm)</td>
+        </tr>
+        <tr>
+            <td><i>t</i></td>
+            <td>–</td>
+            <td>Thickness of the plate (mm)</td>
+        </tr>
+        <tr>
+            <td><i>F<sub>u</sub></i></td>
+            <td>–</td>
+            <td>Tensile strength of connected material (MPa)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th><i>l<sub>c</sub></i></th>
+            <th><i>t</i></th>
+            <th>d</th>
+            <th>F<sub>u</sub> *</th>
+            <th>φR<sub>n1</sub></th>
+            <th>φR<sub>n2</sub></th>
+            <th>φR<sub>n</sub></th>
+            <th>V<sub>u</sub></th>
+            <th>β<sub>N</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.75</td>
+            <td>{{ calc.thr_bearing_lc }}</td>
+            <td>{{ anchor.fin_thk }}</td>
+            <td>{{ anchor.thr_bolt_dia }}</td>
+            <td>450</td>
+            <td>{{ calc.thr_bearing_phi_Rn1 }}</td>
+            <td>{{ calc.thr_bearing_phi_Rn2 }}</td>
+            <td>{{ calc.bolt_phi_Rn_bear }}</td>
+            <td>{{ calc.bolt_Vu }}</td>
+            <td>{{ (calc.bolt_Vu / calc.bolt_phi_Rn_bear) | round(2) }}</td>
+            <td class="{% if (calc.bolt_Vu / calc.bolt_phi_Rn_bear) < 1 %}ok{% else %}not-ok{% endif %}">
+                {% if (calc.bolt_Vu / calc.bolt_phi_Rn_bear) < 1 %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p class="footnote__content ml-2">* 50 gr.</p>
+
+<h4>Tightening Torque Requirement</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><i>T = KDF &nbsp;&nbsp;&nbsp; (Nm)</i></td>
+            <td style="text-align: right;"></td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>K</th>
+            <th>D</th>
+            <th><i>f<sub>yp</sub></i></th>
+            <th><i>A<sub>se</sub></i></th>
+            <th>F</th>
+            <th>T</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.2</td>
+            <td>{{ anchor.thr_bolt_dia }}</td>
+            <td>450</td>
+            <td>{{ calc.thr_bolt_AseN }}</td>
+            <td>{{ (0.75 * 450 * calc.thr_bolt_AseN / 1000) | round(2) }}</td>
+            <td>{{ (0.2 * anchor.thr_bolt_dia * (0.75 * 450 * calc.thr_bolt_AseN / 1000)) | round(2) }}</td>
+        </tr>
+    </tbody>
+</table>

@@ -2031,7 +2031,7 @@ summary {
 }
 
 .define-modal__calc-value {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--text-primary);
     text-align: right;
@@ -2046,6 +2046,22 @@ summary {
     font-size: 0.68rem;
     color: var(--text-secondary);
     white-space: nowrap;
+}
+
+.define-modal__profile-fig {
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-primary);
+    flex-shrink: 0;
+}
+
+.define-modal__profile-fig img {
+    max-width: 100%;
+    max-height: 12rem;
+    object-fit: contain;
+    transition: opacity 0.2s;
 }
 
 /* leftbar */

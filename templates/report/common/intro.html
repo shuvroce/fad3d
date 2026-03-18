@@ -1,0 +1,1026 @@
+{% if include.intro|default(false) %}
+<section class="chapter__front">
+    <h1>Introduction</h1>
+</section>
+<section>
+    <h2>Project Information</h2>
+    <div>
+        <table class="width__100">
+            <caption>Project Information</caption>
+            <tbody>
+                <tr>
+                    <td>Project:</td>
+                    <td>{{ project_info.project_name }}</td>
+                </tr>
+                <tr>
+                    <td>Client:</td>
+                    <td>{{ project_info.project_client }}</td>
+                </tr>
+                <tr>
+                    <td>Contractor:</td>
+                    <td>Arman Engineering Ltd.</td>
+                </tr>
+                <tr>
+                    <td>Report for:</td>
+                    <td>Structural Calculation Report for {{ project_info.project_name }}</td>
+                </tr>
+                <tr>
+                    <td>Design Method:</td>
+                    <td>Design and Analysis using FEM Based Computer Software and Manual Calculations using Static Principles and Design Codes</td>
+                </tr>
+                <tr>
+                    <td>Items Included:</td>
+                    <td>
+                        <ol>
+                            <li>Glass</li>
+                            <li>Structural Silicone</li>
+                            <li>Structural Members</li>
+                            <li>Connections & Anchorage</li>
+                            <li>Brackets and Bolts</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td>References:</td>
+                    <td>Attached Drawing and standards</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Objectives</h2>
+    <div>
+        <p>The aim of this report is to analyze the façade structure whether this is structurally safe and thereby –</p>
+        <ol>
+            <li>To calculate the wind load for component and cladding using BNBC 2020.</li>
+            <li>To calculate the load acting on the façade structure.</li>
+            <li>To verify the glass whether it is safe against wind load, i.e., bending stress and deflection.</li>
+            <li>To evaluate the framing members (mullion and transom) is structurally sound and safe.</li>
+            <li>To analyze and design the support, i.e., Bracket, Anchor bolt etc. for the frame.</li>
+        </ol>
+    </div>
+
+    <h2>Scope</h2>
+    <div>
+        <p>The main goal of structural report is to evaluate the façade structure whether it’s structurally safe against the load acting on the structure such as dead load and wind load. Therefore, only structural calculation is provided for various element, i.e., glass, vertical & horizontal members, bracket, bolts etc. related to the fabrication of façade.</p>
+        <p><u>Note:</u> This document should be read in conjunction with the provided tender/shop drawing.</p>
+    </div>
+</section>
+{% endif%}
+
+
+<section class="chapter__front">
+    <h1>Design Criteria</h1>
+</section>
+<section>
+    <h2>Codes and Standards</h2>
+    <div>
+        <table class="width__100">
+            <caption>Building Codes</caption>
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Code / Standard Name</th>
+                    <th>For</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>01.</td>
+                    <td>BNBC 2020</td>
+                    <td>General</td>
+                    <td>Bangladesh National Building Code 2020</td>
+                </tr>
+                <tr>
+                    <td>02.</td>
+                    <td>AA ADM – 2015</td>
+                    <td>Aluminum</td>
+                    <td>Aluminum Design Manual 2015</td>
+                </tr>
+                <tr>
+                    <td>03.</td>
+                    <td>AISC 360 – 05</td>
+                    <td>Steel</td>
+                    <td>Specification for Structural Steel Buildings</td>
+                </tr>
+                <tr>
+                    <td>04.</td>
+                    <td>ASTM E 1300 – 04</td>
+                    <td>Glass</td>
+                    <td>Standard Practice for Determining Load Resistance of Glass in Buildings</td>
+                </tr>
+                <tr>
+                    <td>05.</td>
+                    <td>AS 1288 – 2006</td>
+                    <td>Glass</td>
+                    <td>Australian Standard® Glass in buildings —Selection and installation</td>
+                </tr>
+                <tr>
+                    <td>06.</td>
+                    <td>ASTM C1401 – 02</td>
+                    <td>Silicone</td>
+                    <td>Standard Guide for Structural Sealant Glazing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% if include.material_specs|default(false) %}
+    <h2>Materials Specification</h2>
+    <div>
+        <table class="width__100">
+            <caption>Properties of Glass</caption>
+            <thead>
+                <tr>
+                    <th colspan="2">Properties</th>
+                    <th>Values</th>
+                    <th>Units</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">Modulus of Elasticity, E</td>
+                    <td>71700</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Density, ρ</td>
+                    <td>2500</td>
+                    <td><i>KG/m<sup>3</sup></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Poisson’s Ratio, U</td>
+                    <td>0.25</td>
+                    <td>-</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="3">Allowable surface stress</td>
+                    <td>Fully Tempered</td>
+                    <td>93.1</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                    <td rowspan="3"><i>; ASTM E1300, X8.2</i></td>
+                </tr>
+                <tr>
+                    <td>Heat Strengthened</td>
+                    <td>46.6</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Annealed</td>
+                    <td>23.3</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                </tr>
+                <tr>
+                    <td rowspan="3">Allowable edge stress</td>
+                    <td>Fully Tempered</td>
+                    <td>73.0</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                    <td rowspan="3"><i>; ASTM E1300, X9.1</i></td>
+                </tr>
+                <tr>
+                    <td>Heat Strengthened</td>
+                    <td>36.5</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Annealed</td>
+                    <td>20.0</td>
+                    <td><i>N/mm<sup>2</sup></i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ref__fig">
+            <img src="assets/images/glass1.png">
+        </div>
+        <div class="ref__fig">
+            <img src="assets/images/glass2.png">
+        </div>
+
+        <table class="width__100 page__break">
+            <caption>Properties of Aluminum (Alloy 6063 T5)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>70000 <i>N/mm<sup>2</sup></i></td>
+                    <td>10100 <i>ksi</i></td>
+                    <td rowspan="6"><i>; Table A.3.3M, ADM 2015</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>2710 <i>KG/m<sup>3</sup></i></td>
+                    <td>169 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of rigidity, G</td>
+                    <td>26600 <i>N/mm<sup>2</sup></i></td>
+                    <td>3800 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.33</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>110 <i>N/mm<sup>2</sup></i></td>
+                    <td>16 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>150 <i>N/mm<sup>2</sup></i></td>
+                    <td>22 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Aluminum (Alloy 6063 T6)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>70000 <i>N/mm<sup>2</sup></i></td>
+                    <td>10100 <i>ksi</i></td>
+                    <td rowspan="6"><i>
+                        <p>; Table 2, ASTM B429 – 02</p>
+                        <p>; Table A.3.3M, ADM 2015</p> </i>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>2710 <i>KG/m<sup>3</sup></i></td>
+                    <td>169 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of rigidity, G</td>
+                    <td>26600 <i>N/mm<sup>2</sup></i></td>
+                    <td>3800 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.33</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>172 <i>N/mm<sup>2</sup></i></td>
+                    <td>25 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>207 <i>N/mm<sup>2</sup></i></td>
+                    <td>30 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Aluminum (Alloy 6061 T6)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>70000 <i>N/mm<sup>2</sup></i></td>
+                    <td>10100 <i>ksi</i></td>
+                    <td rowspan="6"><i>
+                        <p>; Table 2, ASTM B429 – 02</p>
+                        <p>; Table A.3.3M, ADM 2015</p></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>2710 <i>KG/m<sup>3</sup></i></td>
+                    <td>169 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Modulus of rigidity, G</td>
+                    <td>26600 <i>N/mm<sup>2</sup></i></td>
+                    <td>3800 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.33</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>241 <i>N/mm<sup>2</sup></i></td>
+                    <td>35 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>262 <i>N/mm<sup>2</sup></i></td>
+                    <td>38 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Steel (ASTM A36)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>200000 <i>N/mm<sup>2</sup></i></td>
+                    <td>29000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 3, ASTM A36M</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>250 <i>N/mm<sup>2</sup></i></td>
+                    <td>36 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>400 <i>N/mm<sup>2</sup></i></td>
+                    <td>58 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Steel (ASTM A500 Gr. B)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>200000 <i>N/mm<sup>2</sup></i></td>
+                    <td>29000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 3, ASTM A500M</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>317 <i>N/mm<sup>2</sup></i></td>
+                    <td>46 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>400 <i>N/mm<sup>2</sup></i></td>
+                    <td>58 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Steel (ASTM A572 Gr. 50)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>200000 <i>N/mm<sup>2</sup></i></td>
+                    <td>29000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 3, ASTM A572M</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>345 <i>N/mm<sup>2</sup></i></td>
+                    <td>50 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>450 <i>N/mm<sup>2</sup></i></td>
+                    <td>65 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Stainless Steel (Gr. 304)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>200000 <i>N/mm<sup>2</sup></i></td>
+                    <td>29000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 3, ASTM A240M</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>205 <i>N/mm<sup>2</sup></i></td>
+                    <td>30 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>515 <i>N/mm<sup>2</sup></i></td>
+                    <td>75 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Bolt Grade (Class 5.8)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>200000 <i>N/mm<sup>2</sup></i></td>
+                    <td>29000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 3, ISO 898-1:2013(E)</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>400 <i>N/mm<sup>2</sup></i></td>
+                    <td>58 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>500 <i>N/mm<sup>2</sup></i></td>
+                    <td>72.5 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Bolt Grade (Class 8.8)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>200000 <i>N/mm<sup>2</sup></i></td>
+                    <td>29000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 3, ISO 898-1:2013(E)</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>640 <i>N/mm<sup>2</sup></i></td>
+                    <td>92.8 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>800 <i>N/mm<sup>2</sup></i></td>
+                    <td>116 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Bolt Grade (ASTM A325M)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>210000 <i>N/mm<sup>2</sup></i></td>
+                    <td>30000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 5, ASTM A325M</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>660 <i>N/mm<sup>2</sup></i></td>
+                    <td>95 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>830 <i>N/mm<sup>2</sup></i></td>
+                    <td>120 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Bolt Grade (ASTM A307M)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>210000 <i>N/mm<sup>2</sup></i></td>
+                    <td>30000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 2, ASTM A307M</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>250 <i>N/mm<sup>2</sup></i></td>
+                    <td>36 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>415 <i>N/mm<sup>2</sup></i></td>
+                    <td>60 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100">
+            <caption>Properties of Bolt Grade (Gr. SS A4-70)</caption>
+            <thead>
+                <tr>
+                    <th>Properties</th>
+                    <th colspan="2">Values</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modulus of Elasticity, E</td>
+                    <td>210000 <i>N/mm<sup>2</sup></i></td>
+                    <td>30000 <i>ksi</i></td>
+                    <td rowspan="5"><i>; Table 2, ISO 3506-1:2020(E)</i></td>
+                </tr>
+                <tr>
+                    <td>Density, ρ</td>
+                    <td>7850 <i>KG/m<sup>3</sup></i></td>
+                    <td>490 <i>lb/ft<sup>3</sup></i></td>
+                </tr>
+                <tr>
+                    <td>Poisons ratio, U</td>
+                    <td>0.3</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Yield strength, F<sub>y</sub></td>
+                    <td>450 <i>N/mm<sup>2</sup></i></td>
+                    <td>65 <i>ksi</i></td>
+                </tr>
+                <tr>
+                    <td>Ultimate strength, F<sub>u</sub></td>
+                    <td>700 <i>N/mm<sup>2</sup></i></td>
+                    <td>102 <i>ksi</i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif%}
+
+    {% if include.design_consideration|default(false) %}
+    <div class="page__break"></div>
+    <h2>Design Consideration</h2>
+    <div>
+        <ol>
+            <li>Vertical members (Aluminum mullions, MS tube etc.), which are outside of the slab (spanning multiple floor) are considered as continuous member.</li>
+            <li>Vertical members (Aluminum mullions, MS tube etc.), which are inside of the slab (spanning floor to floor) are considered as discontinuous/single span member.</li>
+            <li>Supports of vertical members at the floor/slab level is considered as pin supported.</li>
+            <li>The connections of Horizontal members (Aluminum transom), are considered as pinned/shear connection. Hence the end moment will be released during analysis.</li>
+            <li>In case of steel insert where required, steel and aluminum are attached using self-drilling screw at transom level to ensure no slip between steel and aluminum. Aluminum and Steel is considered to be subjected to the load respected to their flexural rigidity as they will go through the equal amount of deflection.</li>
+            <li>Loads are applied to vertical and horizontal members using two-way slab theory, i.e., trapezoidal and triangular loads are considered.</li>
+            <li>At the canilever/overhang (if exist), loads are applied by combining both positive and negative wind pressure.</li>
+            <li>The structural components are designed by following Limit State Design method. Therefore, the Strength and bending moment are checked for Ultimate Limit State (ULS) and Deflections are checked for Serviceability Limit State (SLS).</li>
+            <li>For continuous member, at least four spans are modeled in the structural analysis program when analyzing the curtain wall system. From experience, nearly 90% of actual condition result can be obtained from four spans model.</li>
+        </ol>
+        <p class="mt-2">
+            <u><b>NOTE:</b></u> Other design considerations and assumptions (when applicable) will be addressed in the relevant section.
+        </p>
+    </div>
+    {% endif%}
+    
+    {% if include.idealization|default(false) %}
+    <div class="page__break"></div>
+    <h2>Idealization of Cross-section</h2>
+    <div>
+        <p>Most of the aluminum extruded profile are irregular in shape. The analysis software is not currently supported the design of irregular cross-section. Therefore, the cross-section is needed to be idealized for software input and design. The irregular cross-section is idealized as follows –</p>
+        <ul>
+            <li>Closed rectangular liked hollow section is idealized as rectangular hollow section (RHS).</li>
+            <li>The width and the depth of the section kept same.</li>
+            <li>For an irregular element (flange/web), the equivalent thickness is taken as the area of the element divided by the width of section.</li>
+            <li>The moment of inertia of idealized section is adjusted by using the property modifier.</li>
+        </ul>
+        
+        <div class="ideal__profile">
+            <figure>
+                <img src="assets/images/ideal-profile1.png">
+                <figcaption>Irregular section</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/images/ideal-profile2.png">
+                <figcaption>Irregular flange</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/images/ideal-profile3.png">
+                <figcaption>Idealized section</figcaption>
+            </figure>
+        </div>
+
+        <p>For the above profile,</p>
+        <table class="width__80">
+            <tbody>
+                <tr>
+                    <td>Area of irregular flange</td>
+                    <td><i>A<sub>f</sub></i></td>
+                </tr>
+                <tr>
+                    <td>Width of flange</td>
+                    <td><i>b</i></td>
+                </tr>
+                <tr>
+                    <td>Equivalent thickness of irregular flange</td>
+                    <td><i>t<sub>e</sub> = A<sub>f</sub> / b</i></td>
+                </tr>
+                <tr>
+                    <td>Regular (top) flange thickness</td>
+                    <td><i>t<sub>t</sub></i></td>
+                </tr>
+                <tr>
+                    <td>Average flange thickness</td>
+                    <td><i>t<sub>f</sub> = (t<sub>e</sub> + t<sub>t</sub>) / 2</i></td>
+                </tr>
+                <tr>
+                    <td>Property modifier for Moment of inertia</td>
+                    <td><i>I<sub>33</sub> = I<sub>original</sub> / I<sub>idealized</sub></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif%}
+    
+    <h2>Load Combination</h2>
+    <div>
+        <table class="width__100">
+            <caption>Load Combination</caption>
+            <thead>
+                <tr>
+                    <th>Combination</th>
+                    <th>Description</th>
+                    <th>For</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <p class="eqn"><i>1.4D</i></p>
+                        <p class="eqn"><i>1.2D + 1.6L</i></p>
+                        <p class="eqn"><i>1.2D + L ± 1.6W</i></p>
+                        <p class="eqn"><i>0.9D ± 1.6W</i></p>
+                    </td>
+                    <td>
+                        <p>Ultimate Limit State</p>
+                        <p>(ULS)</p>
+                    </td>
+                    <td>Strength checks for structure</td>
+                    <td><i>; Sec 2.7.3, BNBC 2020</i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <p class="eqn"><i>D ± 0.7W</i></p>
+                        <p class="eqn"><i>D + 0.5L ± 0.7W</i></p>
+                    </td>
+                    <td>
+                        <p>Serviceability Limit State</p>
+                        <p>(SLS)</p>
+                    </td>
+                    <td>Deflection check</td>
+                    <td><i>
+                        <p>; Sec 1.2.5, Note – f,</p>
+                        <p>BNBC 2020</p>
+                        <p>; Sec 2.7.5, BNBC 2020</p>
+                    </i></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="ref__fig">
+            <img src="assets/images/load-combo1.png" style="width: 140mm;">
+        </div>
+        <div class="ref__fig">
+            <img src="assets/images/load-combo2.png">
+        </div>
+        <div class="ref__fig">
+            <img src="assets/images/load-combo3.png" style="width: 145mm;">
+        </div>
+    </div>
+    
+    <h2>Deflection Criteria</h2>
+    <div>
+        <table class="width__100">
+            <caption>Deflection Criteria</caption>
+            <thead>
+                <tr>
+                    <th>Element</th>
+                    <th>Loading</th>
+                    <th>Deflection Limit</th>
+                    <th>Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2">Structural members (Mullion & Transom)</td>
+                    <td>Wind Load</td>
+                    <td>
+                        <p>L/175 up to L = 4.1m</p>
+                        <p>(L/240) + 6.35 mm for L > 4.1m</p>
+                        <p class="mt-1">Where, L is the length between support.</p>
+                    </td>
+                    <td><i>
+                        <p>; AAMA TIR-A11-04</p>
+                        <p>; Sec 1.2.5, Note – h, BNBC 2020</p>
+                    </i></td>
+                </tr>
+                <tr>
+                    <td>Dead Load</td>
+                    <td>
+                        <p>L/300 or 3 mm, whichever is less</p>
+                        <p class="mt-1">Where, L is the maximum span length.</p>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Glass</td>
+                    <td>Wind Load</td>
+                    <td>
+                        <p>B/60 at center</p>
+                        <p>Where, B is the shortest length of glass.</p>
+                        <p class="mt-1">L/175 at edge</p>
+                        <p>Where, L is the largest length of glass</p>
+                    </td>
+                    <td>
+                        <p><i>; AS 1288:2006</i></p>
+                        <p><i>; ASTM E1300</i></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Steel Frame</td>
+                    <td>Combined Load</td>
+                    <td>
+                        <p>L/240</p>
+                        <p>Where, L is the length between support</p>
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="ref__fig">
+            <img src="assets/images/def-c1.png">
+        </div>
+        <div class="ref__fig">
+            <img src="assets/images/def-c2.png">
+        </div>
+    </div>
+</section>
+
+
+{% if include.theory|default(false) %}
+<section class="chapter__front">
+    <h1>Theoretical Background</h1>
+</section>
+<section>
+    <h2>Buckling Constants</h2>
+    <div>
+        <p>For the design of <b>Aluminum member,</b></p>
+        <p>The buckling constants B, D, and C are calculated as shown in the following table -</p>
+        
+        <table class="width__100 borderless fig__table">
+            <caption>Buckling Constants</caption>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="assets/images/buckling-constants.png">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="footnote__content"><i>* C<sub>t</sub> in this Table is taken from AA 2020 for the purpose of simplifying the calculation. k = 1.0 ksi (6.895 MPa)</i></p>
+    </div>
+
+    <div class="page__break"></div>
+    <h2>Strength of Elements for Local Buckling</h2>
+    <div>
+        <p>
+            The nominal strengths for compression and flexure of a section are dependent on the slenderness and stress capacity of individual elements of the section. In consideration of local buckling, each element of the section is categorized into loading conditions of Uniform Compression (UC) or Flexural Compression (FC), and its slenderness and stress capacity are calculated correspondingly.
+        </p>
+        <table class="width__100 borderless fig__table">
+            <caption>Limiting Width-Thickness Ratios of Elements for Stress Capacity</caption>
+            <tbody>
+                <tr>
+                    <td><img src="assets/images/bt-ratio.png"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="width__100 borderless fig__table">
+            <caption>Stress Capacity of Individual Elements</caption>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="assets/images/element-capacity.png">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <p><b><u>Note:</u></b></p>
+            <p class="eqn ml-2"><i>
+                m = 1.15 + [c<sub>o</sub> / (2c<sub>c</sub>)] ---- when -1 < c<sub>o</sub> / c<sub>c</sub> < 1 <br>
+                m = 1.3 / [1 - (c<sub>o</sub> / c<sub>c</sub>)] ---- when c<sub>o</sub> / c<sub>c</sub> ≤ -1 <br>
+                m = 0.65 ---- when c<sub>o</sub> = c<sub>c</sub>
+            </i></p>
+            <p>c<sub>c</sub> = distance from elastic neutral axis to the element extreme fiber with the greatest compressive stress and has negative value.</p>
+            <p>c<sub>o</sub> = distance from elastic neutral axis to the other extreme fiber and has positive value.</p>
+            <p>k<sub>1</sub> = 0.35 & k<sub>2</sub> = 2.27 for flat elements in compression with temper designations beginning with T5, T6, T7, T8, or T9</p>
+            <p>k<sub>1</sub> = 0.5 & k<sub>2</sub> = 2.04 for flat elements in flexure.</p>
+        </div>
+    </div>
+
+    <h2>Nominal Flexure Strength</h2>
+    <div>
+        <p>The design flexural strength, <i>φ<sub>b</sub>M<sub>n</sub></i>, is determined using the following resistance factor.</p>
+        <p class="ml-2 eqn"><i>φ<sub>b</sub> = 0.9</i> (LRFD)</p>
+        <p>
+            The nominal bending strength depends on the following criteria: the geometric shape of the cross section; the axis of bending; the slenderness of the section; and a slenderness parameter for lateral-torsional buckling.  The nominal bending strength is the minimum value obtained considering the limit states of yielding, local buckling and lateral-torsional buckling.
+        </p>
+    </div>
+
+    <div>
+        <h3>Yielding</h3>
+        <p>For yielding, the flexural strength is taken as the -</p>
+        <p class="ml-2 eqn"><i>
+            M<sub>np</sub> = min( Z F<sub>cy</sub> , 1.5 S<sub>t</sub> F<sub>ty</sub> , 1.5 S<sub>c</sub> F<sub>ty</sub> )
+        </i></p>
+        <p>where, Z is plastic section modulus, S<sub>t</sub> and S<sub>c</sub> are the elastic section moduli on the tension and compression sides of the neutral axis, respectively.</p>
+    </div>
+    
+    <div>
+        <h3>Local Buckling</h3>
+        <p>
+            The Weighted Average Method described in Section F.3.1 of the AA 2015 is adopted to calculate the flexural strength for the limit state of local buckling. The stress condition and capacity of each element of the section are determined as described in Section 3.2 and Table 3.3 of this report. And the nominal flexural strength is computed as – 
+        </p>
+        <p class="ml-2 eqn"><i>
+            M<sub>lb</sub> = F<sub>c</sub>(I<sub>f</sub> / C<sub>cf</sub>) + F<sub>b</sub>(I<sub>w</sub> / C<sub>cw</sub>)
+        </i></p>
+        <p><u>Where,</u></p>
+        <p class="ml-1">
+            F<sub>c</sub> = uniform compression stress of an element <br>
+            F<sub>b</sub> = flexural compression stress of an element <br>
+            C<sub>cf</sub> = distance from centerline of the element subjected to uniform compression to the section’s elastic neutral axis <br>
+            C<sub>cw</sub> = distance from the extreme compression fiber of an element subjected to flexural compression to the section’s elastic neutral axis <br>
+            I<sub>f</sub> = moment of inertia of the element subjected to uniform compression stress about the section’s elastic neutral axis <br>
+            I<sub>w</sub> = moment of inertia of the element subjected to flexural compression stress about the section’s elastic neutral axis
+        </p>
+    </div>
+
+    <div>
+        <h3>Lateral Torsional Buckling</h3>
+        <p>For the limit state of lateral-torsional buckling, the flexural strength is computed as –</p>
+        <p class="eqn ml-2"><i>
+            M<sub>nm,b</sub> = M<sub>np</sub> (1 - λ/C<sub>c</sub>) + (π<sup>2</sup>EλS<sub>xc</sub>) / (C<sub>c</sub><sup>3</sup>) ---- when λ < C<sub>c</sub> <br>
+            M<sub>nm,b</sub> = (π<sup>2</sup>ES<sub>xc</sub>) / λ<sup>2</sup> ---- when λ ≥ C<sub>c</sub>
+        </i></p>
+        <p>
+            where C<sub>c</sub> is the intercept buckling constant for member buckling. And λ is computed for box section by the following Equation in which <i>C<sub>b</sub></i> is required and defined as the lateral-torsional buckling modification factor for non-uniform moment diagram and conservatively taken as 1.0.
+        </p>
+        <p class="ml-2 eqn"><i>
+            λ = 2.3 √[(L<sub>b</sub> S<sub>xc</sub>) / (C<sub>b</sub> √(I<sub>y</sub> J<sub>y</sub>))]
+        </i></p>
+        <p class="ml-2 eqn"><i>
+            J<sub>y</sub> = [2t<sub>1</sub>t<sub>2</sub> (a - t<sub>2</sub>)<sup>2</sup> (b - t<sub>1</sub>)<sup>2</sup>] / [at<sub>2</sub> + bt<sub>1</sub> - t<sub>2</sub><sup>2</sup> - t<sub>1</sub><sup>2</sup>]
+        </i></p>
+        <p>Where, J<sub>y</sub> is the torsional constant.</p>
+        <p class="ml-2">
+            a = length of flange <br>
+            b = length of web <br>
+            t<sub>1</sub> = thickness of flange <br>
+            t<sub>2</sub> = thickness of web
+        </p>
+    </div>
+</section>
+{% endif%}

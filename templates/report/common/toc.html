@@ -1,0 +1,72 @@
+<section class="frontmatter">
+    <h2>Table of Contents</h2>
+    <table class="width__90">
+        <thead>
+            <tr>
+                <th>Chapter Name</th>
+                <th>Page No.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set base_chapters = [
+                ('Introduction', True),
+                ('Design Criteria', True),
+                ('Theoretical Background', include.theory|default(false)),
+                ('Design Moment Capacity of Profiles', include.moment_capacity|default(false)),
+                ('Wind Pressure Calculation', include.wind_pressure|default(false))
+            ] %}
+            {% set ns = namespace(num=0) %}
+
+            {% for title, show in base_chapters %}
+            {% if show %}
+            {% set ns.num = ns.num + 1 %}
+            <tr>
+                <td>Chapter {{ ns.num }}: {{ title }}</td>
+                <td></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+
+            {% if include.categories|default(false) %}
+            {% for cat in categories %}
+            {% set ns.num = ns.num + 1 %}
+            <tr>
+                <td>Chapter {{ ns.num }}: [{{ loop.index }}] {{ cat.category_name }}</td>
+                <td>{{ cat.page or "" }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+
+            {% if include.reference|default(false) %}
+            {% set ns.num = ns.num + 1 %}
+            <tr>
+                <td>Chapter {{ ns.num }}: Reference</td>
+                <td></td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</section>
+
+
+<section class="frontmatter record">
+    <h2>Document Preparation Records</h2>
+    <table class="width__90">
+        <thead>
+            <tr>
+                <th>Date of Issue</th>
+                <th>Revision</th>
+                <th>Prepared by</th>
+                <th>Checked & verified by</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ project_info.date }}</td>
+                <td>{{ project_info.rev_no }}</td>
+                <td>Md. Akram Hossain <span>Structural Engineer</span> <span>AMIEB A-26033</span></td>
+                <td>Bashir Ahmed Khan <span>Managing Director</span></td>
+            </tr>
+        </tbody>
+    </table>
+</section>

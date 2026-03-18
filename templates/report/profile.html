@@ -1,0 +1,18 @@
+<section class="chapter__front">
+    <h1>Design Moment Capacity of Profiles</h1>
+</section>
+<section>
+    {% if alum_profiles %}
+        {% for profile in alum_profiles %}
+            {% set calc = profile.calc %}
+            {% include "partials/alum-cap.html" %}
+        {% endfor %}
+    {% endif %}
+
+    {% if steel_profiles %}
+        {% for profile in steel_profiles or steel_profiles_data %}
+            {% include "partials/steel-cap.html" %}
+        {% endfor %}
+    {% endif %}
+</section>
+

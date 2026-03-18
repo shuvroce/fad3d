@@ -1,0 +1,13 @@
+{% if cat.frames %}
+{% for frame in cat.frames %}
+    {% if frame.frame_type == "Fin Frame" %}
+        {% include "partials/fin-frame.html" %}
+    
+    {% else %}
+        {% set calc = frame.calc %}
+        {% include "partials/typ-frame.html" %}
+    {% endif %}
+
+{% endfor %}
+{% endif %}
+
