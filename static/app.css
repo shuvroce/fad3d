@@ -707,7 +707,9 @@ summary {
 .modal__content {
     background-color: var(--bg-primary);
     max-width: var(--modal-width-max);
-    max-height: var(--modal-height);
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     transition: var(--transition-bg), var(--transition-border);
@@ -746,9 +748,12 @@ summary {
     border-radius: var(--radius-3);
     /* min-width: 40rem; */
     width: fit-content;
+    min-height: 20rem;
     max-height: var(--modal-height);
     overflow: hidden;
     margin: 0;
+    display: flex;
+    flex-direction: column;
     animation: modalSlideDown 0.3s ease;
     pointer-events: auto;
     box-shadow: 0 8px 20px 5px rgba(0, 0, 0, 0.15), 0 2px 20px 5px rgba(0, 0, 0, 0.15);
@@ -888,6 +893,9 @@ summary {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
+    flex-shrink: 0;
+    background-color: var(--bg-primary);
+    transition: var(--transition-bg), var(--transition-border);
 }
 
 .modal__btn {
@@ -1193,6 +1201,85 @@ summary {
 
 .topbar__header-icon-btn:hover {
     background-color: var(--bg-secondary);
+}
+
+/* --- Support Submenu --- */
+.topbar__support-wrap {
+    position: relative;
+}
+
+.topbar__support-submenu {
+    position: absolute;
+    top: calc(100% - 0.4rem);
+    right: 0;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 155px;
+    z-index: 10001;
+    overflow: hidden;
+    animation: submenu-in 0.15s ease;
+    transition: var(--transition-bg), var(--transition-border);
+}
+
+.topbar__support-submenu-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 0;
+    cursor: pointer;
+    justify-content: left;
+    transition: background-color 0.15s ease;
+}
+
+.topbar__support-submenu-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    opacity: 0.75;
+}
+
+.topbar__support-submenu-btn:hover {
+    background-color: var(--bg-hover);
+}
+
+/* --- Contact Info (modal) --- */
+.modal__contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.25rem 0;
+}
+
+.modal__contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-primary);
+}
+
+.modal__contact-item svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    opacity: 0.7;
 }
 
 .topbar__icon-btn:active {

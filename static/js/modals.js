@@ -59,15 +59,61 @@ function initDraggableModals() {
 }
 
 function initSimpleModalClickOutside() {
-    ['calculator-modal', 'glass-chart-modal'].forEach(id => {
+    ['calculator-modal', 'glass-chart-modal', 'feedback-modal', 'contact-modal'].forEach(id => {
         const modal = document.getElementById(id);
         if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(id); });
     });
 }
 
+// ============================
+// Support Submenu
+// ============================
+
+function initSupportSubmenu() {
+    const btn     = document.getElementById('support-btn');
+    const submenu = document.getElementById('support-submenu');
+    if (!btn || !submenu) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = submenu.hidden;
+        submenu.hidden = !opening;
+        btn.setAttribute('aria-expanded', String(opening));
+    });
+
+    document.addEventListener('click', () => {
+        if (!submenu.hidden) {
+            submenu.hidden = true;
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    submenu.addEventListener('click', (e) => e.stopPropagation());
+
+    document.getElementById('feedback-modal-btn')?.addEventListener('click', () => {
+        submenu.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        openModal('feedback-modal');
+    });
+
+    document.getElementById('contact-modal-btn')?.addEventListener('click', () => {
+        submenu.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        openModal('contact-modal');
+    });
+
+    document.getElementById('close-feedback-modal')?.addEventListener('click', () => closeModal('feedback-modal'));
+    document.getElementById('cancel-feedback-modal')?.addEventListener('click', () => closeModal('feedback-modal'));
+    document.getElementById('submit-feedback-modal')?.addEventListener('click', () => closeModal('feedback-modal'));
+
+    document.getElementById('close-contact-modal')?.addEventListener('click', () => closeModal('contact-modal'));
+    document.getElementById('close-contact-modal-footer')?.addEventListener('click', () => closeModal('contact-modal'));
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { initDraggableModals(); initSimpleModalClickOutside(); });
+    document.addEventListener('DOMContentLoaded', () => { initDraggableModals(); initSimpleModalClickOutside(); initSupportSubmenu(); });
 } else {
     initDraggableModals();
     initSimpleModalClickOutside();
+    initSupportSubmenu();
 }
