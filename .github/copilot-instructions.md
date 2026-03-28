@@ -9,19 +9,30 @@ Single-page web application for facade engineering analysis with dynamic multi-c
 ## Architecture & File Structure
 
 ```
-templates/
-  index.html           # Main SPA layout (3-panel: left/center/right)
-  modals.html          # Modal dialogs (included via Jinja2)
-  ... more files on demand
-  report/
-    ... report.html files on demand. will add later.
-static/
-  app.css              # Monolithic stylesheet
-  js/
-    app.js             # Panel collapse/expand logic
-    category.js        # Dynamic category/tab management system
-    theme.js           # Light/dark theme toggle with localStorage
-    ... other modular js for different functionality to make code cleaner
+backend/
+  app/
+    main.py              # FastAPI entry point, all API routes
+    report.py            # Report generation (WeasyPrint + Jinja2)
+    calculations/        # Python calculation modules (glass, frame, anchorage, etc.)
+    api/                 # Additional API route modules (if any)
+    core/                # Config, security helpers
+    schemas/             # Pydantic schemas
+  .env
+  requirements.txt
+frontend/
+  templates/
+    index.html           # Main SPA layout (3-panel: left/center/right)
+    modals.html          # Modal dialogs (included via Jinja2)
+    ... more files on demand
+    report/
+      ... report.html files on demand.
+  static/
+    app.css              # Monolithic stylesheet
+    js/
+      app.js             # Panel collapse/expand logic
+      category.js        # Dynamic category/tab management system
+      theme.js           # Light/dark theme toggle with localStorage
+      ... other modular js for different functionality to make code cleaner
 ```
 
 ### Three-Panel Layout System
@@ -172,6 +183,6 @@ Edit `:root` for light theme, `.theme__dark` for dark overrides. Variables follo
 5. **Map-based state**: Category custom names stored in Map (not object) for easy migration during renumbering.
 6. **White-space: nowrap**: Required on collapsible panels to prevent text wrapping during width animation.
 
-## Flask/Template Notes
+## FastAPI/Template Notes
 
-HTML has commented Flask routes: `<!-- {{ url_for('static', filename='...') }} -->`. Currently using direct paths (`/static/...`). If integrating with Flask backend, uncomment Jinja2 template tags and update paths.
+Templates are served via FastAPI's `Jinja2Templates` pointing to `frontend/templates/`. Static files are mounted via `StaticFiles` at `/static/` pointing to `frontend/static/`. The backend entry point is `backend/app/main.py`, run from the `backend/` directory.

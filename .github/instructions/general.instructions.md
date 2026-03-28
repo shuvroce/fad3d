@@ -15,6 +15,7 @@ Web application for facade structural analysis and design with dynamic multi-cat
 
 - Use clean, minimal and readable code
 - Use highly modular structure for JS to keep code organized and maintainable.
+- Keep the API's modular too
 - Always avoid redundancy
 - Avoid repeated code
 - Use comments to explain complex logic, but avoid obvious comments

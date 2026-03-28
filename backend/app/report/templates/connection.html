@@ -1,0 +1,381 @@
+{% if cat.connections %}
+{% for conn in cat.connections %}
+{% if conn.screw_dia %}
+
+{% set calc = conn.calc %}
+
+<div class="page__break"></div>
+<h2>Design of Connection</h2>
+
+<div>
+    <h3>Joint Forces</h3>
+    <table class="width__90 align__center">
+        <thead>
+            <tr>
+                <th></th>
+                <th>SLS (D + W)</th>
+                <th>ULS (1.4D + 1.6 W)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Wind load, <i>F<sub>y</sub> (kN)</i></td>
+                <td>{{ calc.joint_fy }}</td>
+                <td>{{ (calc.joint_fy * 1.6) | round(2) }}</td>
+            </tr>
+            <tr>
+                <td>Dead load, <i>F<sub>z</sub> (kN)</i></td>
+                <td>{{ calc.joint_fz }}</td>
+                <td>{{ (calc.joint_fz * 1.4) | round(2) }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Joint Analysis</h3>
+    <ul>
+        <li>{{ conn.cleat_size }} <i>mm</i> – Aluminum (6063-T6) Cleat</li>
+        <li>{{ conn.screw_nos }} – M{{ conn.screw_dia }} x 25 Hex Head Self-drilling Screw</li>
+    </ul>
+
+    <div class="calc__fig3">
+        <img src="assets/conn-{{ conn.screw_nos }}-screw.png">
+    </div>
+
+    <p class="page__break">As the eccentricity is very small, hence ignoring the eccentricity and applying static equilibrium equation, ∑ F<sub>y</sub><sup>→+</sup> = 0 , ∑ F<sub>z</sub><sup>↑+</sup> = 0,</p>
+    
+    <table class="borderless ml-2 mt-1">
+        <tbody>
+            <tr>
+                <td>For screws on transom (A *), <i>R<sub>yA</sub> = F<sub>y</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td>=</td>
+                <td>{{ calc.R_yA }} <i>kN</i></td>
+                <td><i>; shear</i></td>
+            </tr>
+            <tr>
+                <td style="padding-left: 4rem;"><i>R<sub>zA</sub> = F<sub>z</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td>=</td>
+                <td>{{ calc.R_zA }} <i>kN</i></td>
+                <td><i>; tension</i></td>
+            </tr>
+            <tr>
+                <td>For screws on mullion (B *), <i>R<sub>yB</sub> = F<sub>y</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td>=</td>
+                <td>{{ calc.R_yA }} <i>kN</i></td>
+                <td><i>; shear</i></td>
+            </tr>
+            <tr>
+                <td style="padding-left: 4rem;"><i>R<sub>zB</sub> = F<sub>z</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td>=</td>
+                <td>{{ calc.R_zA }} <i>kN</i></td>
+                <td><i>; shear</i></td>
+            </tr>
+            <tr>
+                <td>Resultant shear, <i>V<sub>u</sub> = √( R<sub>yB</sub><sup>2</sup> + R<sub>zB</sub><sup>2</sup> )</i></td>
+                <td>=</td>
+                <td>{{ calc.Vu }} <i>kN</i></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-2">
+    <h3>Design Capacity of Cleat and Screw</h3>
+
+    <h4>Shear Strength Limited by Tilting and Bearing</h4>
+    <p>For t<sub>2</sub> / t<sub>1</sub> ≤ 1.0,</p>
+    <div class="calc__fig4">
+        <img src="assets/conn-eqn1.png">
+    </div>
+    
+    <p><u>Where,</u></p>
+    <table class="borderless ml-1">
+        <tbody>
+            <tr>
+                <td>φ</td>
+                <td>–</td>
+                <td>Resistance factor</td>
+            </tr>
+            <tr>
+                <td><i>t<sub>1</sub></i></td>
+                <td>–</td>
+                <td>Thickness of member contact with screw head (mm)</td>
+            </tr>
+            <tr>
+                <td><i>t<sub>2</sub></i></td>
+                <td>–</td>
+                <td>Thickness of member not contact with screw head (mm)</td>
+            </tr>
+            <tr>
+                <td>d</td>
+                <td>–</td>
+                <td>Nominal diameter of screw (mm)</td>
+            </tr>
+            <tr>
+                <td><i>F<sub>u1</sub></i></td>
+                <td>–</td>
+                <td>Tensile strength of member in contact with screw head (MPa) <span class="footnote">a</span></td>
+            </tr>
+            <tr>
+                <td><i>F<sub>u2</sub></i></td>
+                <td>–</td>
+                <td>Tensile strength of member not in contact with screw head (MPa) <span class="footnote">b</span></td>
+            </tr>
+            <tr>
+                <td>V</td>
+                <td>–</td>
+                <td>Required shear strength (kN)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__100 align__center">
+        <thead>
+            <tr>
+                <th>φ</th>
+                <th><i>t<sub>1</sub></i></th>
+                <th><i>t<sub>2</sub></i></th>
+                <th>d</th>
+                <th><i>F<sub>u1</sub></i></th>
+                <th><i>F<sub>u2</sub></i></th>
+                <th><i>φP<sub>nv</sub></i></th>
+                <th>V</th>
+                <th>Ratio</th>
+                <th>Check</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.5</td>
+                <td>{{ conn.t1 }}</td>
+                <td>{{ conn.t2 }}</td>
+                <td>{{ conn.screw_dia }}</td>
+                <td>207</td>
+                <td>207</td>
+                <td>{{ calc.phi_Pnv }}</td>
+                <td>{{ calc.Vu }}</td>
+                <td>{{ (calc.Vu / calc.phi_Pnv) | round(2) }}</td>
+                <td class="{% if (calc.Vu / calc.phi_Pnv) < 1 %}ok{% else %}not-ok{% endif %}">
+                    {% if (calc.Vu / calc.phi_Pnv) < 1 %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="footnote__content"><span class="footnote">a, b </span>Aluminum Alloy 6063-T6</p>
+
+    <div class="page__break"></div>
+    <h4>Pull-out Strength in Tension</h4>
+    <table class="width__100 borderless">
+        <tbody>
+            <tr>
+                <td><i>φP<sub>not</sub> = φ 0.85 t<sub>c</sub> d F<sub>u2</sub> &nbsp;&nbsp;&nbsp; (kN) </i></td>
+                <td style="text-align: right;">(Sec. J4.4.1, AISI S100-16)</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p><u>Where,</u></p>
+    <table class="borderless ml-1">
+        <tbody>
+            <tr>
+                <td>φ</td>
+                <td>–</td>
+                <td>Resistance factor</td>
+            </tr>
+            <tr>
+                <td><i>t<sub>c</sub></i></td>
+                <td>–</td>
+                <td>Lesser of Depth of penetration and thickness t<sub>2</sub> (mm)</td>
+            </tr>
+            <tr>
+                <td>T</td>
+                <td>–</td>
+                <td>Required tensile strength (kN)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__100 align__center">
+        <thead>
+            <tr>
+                <th>φ</th>
+                <th><i>t<sub>c</sub></i></th>
+                <th>d</th>
+                <th><i>F<sub>u2</sub></i></th>
+                <th><i>φP<sub>not</sub></i></th>
+                <th>T</th>
+                <th>Ratio</th>
+                <th>Check</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.5</td>
+                <td>{{ conn.tc }}</td>
+                <td>{{ conn.screw_dia }}</td>
+                <td>207</td>
+                <td>{{ calc.phi_Pnot }}</td>
+                <td>{{ calc.R_zA }}</td>
+                <td>{{ (calc.R_zA / calc.phi_Pnot) | round(2) }}</td>
+                <td class="{% if (calc.R_zA / calc.phi_Pnot) < 1 %}ok{% else %}not-ok{% endif %}">
+                    {% if (calc.R_zA / calc.phi_Pnot) < 1 %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Pull-over Strength in Tension</h4>
+    <table class="width__100 borderless">
+        <tbody>
+            <tr>
+                <td><i>φP<sub>nov</sub> = φ 1.5 t<sub>1</sub> d<sub>w</sub><sup>'</sup> F<sub>u1</sub> &nbsp;&nbsp;&nbsp; (kN) </i></td>
+                <td style="text-align: right;">(Sec. J4.4.1, AISI S100-16)</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p><u>Where,</u></p>
+    <table class="borderless ml-1">
+        <tbody>
+            <tr>
+                <td>φ</td>
+                <td>–</td>
+                <td>Resistance factor</td>
+            </tr>
+            <tr>
+                <td><i>d<sub>w</sub><sup>'</sup> = min(d<sub>h</sub> , 19.1)</i></td>
+                <td>–</td>
+                <td>Effective pull-over resistance diameter for screw <br> without independent washer (mm)</td>
+            </tr>
+            <tr>
+                <td><i>d<sub>h</sub></i></td>
+                <td>–</td>
+                <td>Screw head or integral hex washer diameter (mm)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__100 align__center">
+        <thead>
+            <tr>
+                <th>φ</th>
+                <th><i>d<sub>h</sub></i></th>
+                <th><i>d<sub>w</sub><sup>'</sup></i></th>
+                <th><i>φP<sub>nov</sub></i></th>
+                <th>T</th>
+                <th>Ratio</th>
+                <th>Check</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.5</td>
+                <td>{{ conn.head_dia }}</td>
+                <td>{{ calc.d_w }}</td>
+                <td>{{ calc.phi_Pnov }}</td>
+                <td>{{ calc.R_zA }}</td>
+                <td>{{ (calc.R_zA / calc.phi_Pnov) | round(2) }}</td>
+                <td class="{% if (calc.R_zA / calc.phi_Pnov) < 1 %}ok{% else %}not-ok{% endif %}">
+                    {% if (calc.R_zA / calc.phi_Pnov) < 1 %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Combined Shear and Pull-over</h4>
+    <div class="calc__fig4">
+        <img src="assets/conn-eqn2.png">
+    </div>
+    
+    <p><u>Where,</u></p>
+    <table class="borderless ml-1">
+        <tbody>
+            <tr>
+                <td>φ</td>
+                <td>–</td>
+                <td>Resistance factor</td>
+            </tr>
+            <tr>
+                <td>V</td>
+                <td>–</td>
+                <td>Required shear strength (kN)</td>
+            </tr>
+            <tr>
+                <td>T</td>
+                <td>–</td>
+                <td>Required tensile strength (kN)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="width__100 align__center">
+        <thead>
+            <tr>
+                <th>φ</th>
+                <th>V</th>
+                <th>T</th>
+                <th>P<sub>nv</sub></th>
+                <th>P<sub>nov</sub></th>
+                <th>β</th>
+                <th>1.1φ</th>
+                <th>Check</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.65</td>
+                <td>{{ calc.Vu }}</td>
+                <td>{{ calc.R_zA }}</td>
+                <td>{{ (calc.phi_Pnv / 0.5) | round(2) }}</td>
+                <td>{{ (calc.phi_Pnov / 0.5) | round(2) }}</td>
+                <td>{{ calc.beta_pullover }}</td>
+                <td>{{ (1.1 * 0.65) | round(2) }}</td>
+                <td class="{% if calc.beta_pullover < (1.1 * 0.65) %}ok{% else %}not-ok{% endif %}">
+                    {% if calc.beta_pullover < (1.1 * 0.65) %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Combined Shear and Pull-out</h4>
+    <div class="calc__fig4">
+        <img src="assets/conn-eqn3.png">
+    </div>
+    
+    <table class="width__100 align__center">
+        <thead>
+            <tr>
+                <th>φ</th>
+                <th>V</th>
+                <th>T</th>
+                <th>P<sub>nv</sub></th>
+                <th>P<sub>not</sub></th>
+                <th>β</th>
+                <th>1.15φ</th>
+                <th>Check</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.6</td>
+                <td>{{ calc.Vu }}</td>
+                <td>{{ calc.R_zA }}</td>
+                <td>{{ (calc.phi_Pnv / 0.5) | round(2) }}</td>
+                <td>{{ (calc.phi_Pnot / 0.5) | round(2) }}</td>
+                <td>{{ calc.beta_pullout }}</td>
+                <td>{{ (1.15 * 0.6) | round(2) }}</td>
+                <td class="{% if calc.beta_pullout < (1.15 * 0.6) %}ok{% else %}not-ok{% endif %}">
+                    {% if calc.beta_pullout < (1.15 * 0.6) %} OK {% else %} NOT OK {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endif %}
+{% endfor %}
+{% endif %}
+
+

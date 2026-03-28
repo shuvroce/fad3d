@@ -1,0 +1,577 @@
+<section class="chapter__front">
+    <h1>Wind Pressure Calculation</h1>
+</section>
+
+{% set calc = wind.calc %}
+<section>
+    <h2>Wind Pressure for 'MWFRS'</h2>
+    <div>
+        <p class="ml-1">
+            <i><b>p = qGC<sub>p</sub> - q<sub>i</sub>(GC<sub>pi</sub>)</b> (kN/m<sup>2</sup>)</i>
+        </p>
+        <p><u>Where,</u><br>
+        <p class="ml-2">
+            q = q<sub>z</sub> for windward walls evaluated at height z above the ground<br>
+            q = q<sub>h</sub> for leeward walls, side walls, and roofs, evaluated at height h<br>
+            q<sub>i</sub> = q<sub>h</sub> for windward walls, side walls, leeward walls, and roofs of enclosed buildings 
+                            and for negative internal pressure evaluation in partially enclosed buildings.<br>
+            G = Gust effect factor from Sec 2.4.8, BNBC 2020<br>
+            C<sub>p</sub> = External pressure coefficient from Figure 6.2.6, BNBC 2020<br>
+            GC<sub>pi</sub> = Internal pressure coefficient from Figure 6.2.5, BNBC 2020
+        </p>
+
+        <p><b>Velocity pressure, q<sub>z</sub> evaluated at height z shall be calculated by the following
+                equations:</b></p>
+        <p class="ml-1">
+            <i><b>q<sub>z</sub> = 0.000613 K<sub>z</sub> K<sub>zt</sub> K<sub>d</sub> V<sup>2</sup> I</b>
+            (kN/m<sup>2</sup>)</i>
+        </p>
+
+        <p class="ml-1">
+            <u>Where,</u><br>
+            <p class="ml-2">
+                K<sub>z</sub> = Velocity pressure exposure coefficient defined in Sec 2.4.6.6, BNBC 2020<br>
+                K<sub>zt</sub> = Topographic factor defined in Sec 2.4.7.2, BNBC 2020<br>
+                K<sub>d</sub> = Wind directionality factor<br>
+                V = Basic wind speed (m/s)<br>
+                I = Importance factor
+            </p>
+        </p>
+    </div>
+
+    <div>
+        <table class="width__100">
+            <caption>Wind load parameters</caption>
+            <thead>
+                <tr>
+                    <th>Parameters</th>
+                    <th>Values</th>
+                    <th>References</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Building type</td>
+                    <td>{% if wind.GC_pi == 0.18 %}Enclosed{% elif wind.GC_pi == 0.55 %}Partially Enclosed{% else %}Open{% endif %}, Flat Roof</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Building height (Above GL), H</td>
+                    <td>{{ wind.b_height }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Width perpendicular to the wind direction, B </td>
+                    <td>{{ wind.b_length }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Width Parallel to the wind direction, L </td>
+                    <td>{{ wind.b_width }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td>{{ wind.location }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Basic Wind Speed, V </td>
+                    <td>{{ calc.summary.wind_speed }}</td>
+                    <td><i>BNBC 2020, Table 6.2.8</i></td>
+                </tr>
+                <tr>
+                    <td>Exposure Category </td>
+                    <td>{{ wind.exposure_cat }}</td>
+                    <td class="footnote">a</td>
+                </tr>
+                <tr>
+                    <td>Occupancy Category</td>
+                    <td>{{ wind.occupancy_cat }}</td>
+                    <td><i>
+                        BNBC 2020, Table 6.1.1
+                        <span class="footnote">b</span></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Importance factor, I</td>
+                    <td>{{ calc.summary.Imp_factor }}</td>
+                    <td><i>BNBC 2020, Table 6.2.9</i></td>
+                </tr>
+                <tr>
+                    <td>Wind Directionality factor, K<sub>d</sub></td>
+                    <td>{{ wind.K_d }}</td>
+                    <td><i>BNBC 2020, Table 6.2.12</i></td>
+                </tr>
+
+                {% if wind.topography_type == "Homogeneous" %}
+                <tr>
+                    <td>Topographic factor, K<sub>zt</sub></td>
+                    <td>1.0</td>
+                    <td class="footnote">c</td>
+                </tr>
+                {% endif %}
+                
+                <tr>
+                    <td>Gust factor, G</td>
+                    <td>{{ calc.summary.gust_factor }}</td>
+                    
+                    {% if wind.b_rigidity == "Flexible" %}
+                        <td class="footnote">d</td>
+                    {% else %}
+                        <td><i>; Rigid structure</i></td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Internal Pressure Cofficient, GC<sub>pi</sub></td>
+                    <td>± {{ wind.GC_pi }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-1">
+        <table class="width__50">
+            <caption>External Wall Pressure Coefficient</caption>
+            <thead>
+                <tr>
+                    <th>Surface</th>
+                    <th>L/B</th>
+                    <th>C<sub>p</sub></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Windward Wall</td>
+                    <td>All</td>
+                    <td>0.8</td>
+                </tr>
+                <tr>
+                    <td>Side Wall</td>
+                    <td>All</td>
+                    <td>- 0.7</td>
+                </tr>
+                <tr>
+                    <td>Leeward Wall</td>
+                    <td>{{ (wind.b_width / wind.b_length) | round(2) }}</td>
+                    <td>{{ calc.summary.C_pl }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page__break_avoid">
+        <p><span class="footnote">a </span><u>Exposure Category:</u></p>
+        <p>
+            <div class="map__fig">
+                <img src="{{ inputs_dir }}/wind-location-map.png">
+            </div>
+            {{ wind.exposure_note }}
+        </p>
+    </div>
+
+    <div>
+        <p><span class="footnote">b </span>{{ wind.occupancy_note }}</p>
+    </div>
+
+    <div>
+        {% if wind.topography_type == "Homogeneous" %}
+            <p><span class="footnote">c </span>Homogeneous topographies, not in hilly region. No significant effect of topography.</p>
+        {% else %}
+            <p><u>Topographic Factor:</u></p>
+            <p>The structure is located in a hilly region. Topograpic factor is calculated as per Fig. 6.2.4, BNBC 2020, using the following information:</p>
+            <table class="borderless width__70 ml-2">
+                <tbody>
+                    <tr>
+                        <td>Topographic feature Type</td>
+                        <td>=</td>
+                        <td>{{ wind.topography_type }}</td>
+                    </tr>
+                    <tr>
+                        <td>Building site direction from crest</td>
+                        <td>=</td>
+                        <td>{{ wind.topo_crest_side }}</td>
+                    </tr>
+                    <tr>
+                        <td>Topographic feature Height, H</td>
+                        <td>=</td>
+                        <td>{{ wind.topo_height }} m</td>
+                    </tr>
+                    <tr>
+                        <td>Distance, L<sub>h</sub></td>
+                        <td>=</td>
+                        <td>{{ wind.topo_length }} m</td>
+                    </tr>
+                    <tr>
+                        <td>Distance from crest to building site, X</td>
+                        <td>=</td>
+                        <td>{{ wind.topo_distance }} m</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+    {% if wind.b_rigidity == "Flexible" %}
+        <div class="page__break_avoid mt-1">
+            <span class="footnote">d </span>
+            <u>Gust effect factor:</u>
+            <table class="borderless width__100 ml-2">
+                <tr>
+                    <td style="width: 13rem;">Approx. Natural frequency, f<sub>n1</sub></td>
+                    <td style="width: 0.5rem;">=</td>
+                    <td style="width: 1.5rem;">{{ wind.b_freq }}</td>
+                    <td style="width: 1.5rem;"><i>Hz</i></td>
+                    <td>< 1 → flexible structure</td>
+                </tr>
+                <tr>
+                    <td>Damping ratio</td>
+                    <td>=</td>
+                    <td>{{ wind.damping }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Therefore, Gust effect factor, G</td>
+                    <td>=</td>
+                    <td>{{ calc.summary.gust_factor }}</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    {% endif %}
+
+
+    <div class="ref__fig">
+        <img src="assets/bnbc-wind-speed.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-occupancy-cat1.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-occupancy-cat2.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-imp-factor.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-kd.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-cpe.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-gcpi.png">
+    </div>
+    <div class="ref__fig">
+        <img src="assets/bnbc-kz.png">
+    </div>
+
+    {% if wind.auto_load|default(false) %}
+        {% set calc = wind.calc %}
+        {% if calc %}
+            <div class="page__break">
+                <table class="width__100 mt-1 align__center">
+                    <caption>Wind pressure at different height z</caption>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Cumu. Height (m)</th>
+                            <th>K<sub>z</sub></th>
+                            <th>Topo. Factor, K<sub>zt</sub></th>
+                            <th>Velocity Pressure, q<sub>z</sub> (kPa)</th>
+                            <th>Int. Pressure, P<sub>i</sub> (kPa)</th>
+                            <th>Windward Pressure, P<sub>z</sub> (kPa)</th>
+                            <th>Leeward Pressure, P<sub>l</sub> (kPa)</th>
+                            <th>Sidewall Pressure, P<sub>s</sub> (kPa)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set row_len = calc.mwfrs_levels | length %}
+                        {% for row in calc.mwfrs_levels %}
+                        <tr>
+                            <td>{{ row.level }}</td>
+                            <td>{{ row.cumu_height }}</td>
+                            <td>{{ row.K_z }}</td>
+                            <td>{{ row.K_zt }}</td>
+                            <td>{{ row.q_z }}</td>
+                            {% if loop.first %}
+                            <td rowspan="{{ row_len }}">{{ calc.summary.P_hi }}</td>
+                            {% endif %}
+                            <td>{{ row.P_zw }}</td>
+                            {% if loop.first %}
+                            <td rowspan="{{ row_len }}">{{ calc.summary.P_hl }}</td>
+                            <td rowspan="{{ row_len }}">{{ calc.summary.P_hs }}</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="footnote__content">Auto wind calculation failed: No data found.</p>
+        {% endif %}
+    {% else %}
+    <div class="page__break">
+        <table class="width__100 borderless fig__table">
+            <caption>Wind pressure at different height z</caption>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="{{ inputs_dir }}/wind-mwfrs.png">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</section>
+
+
+<section class="page__break">
+    <h2>Wind Pressure for Components and Cladding (C&C)</h2>
+
+    <div>
+        <p class="ml-1">
+            <i><b>p = q(GC<sub>p</sub>) - q<sub>i</sub>(GC<sub>pi</sub>)</b> (kN/m<sup>2</sup>)</i>
+        </p>
+        <p><u>Where,</u><br>
+        <p class="ml-2">
+            q = q<sub>z</sub> for windward walls evaluated at height z above the ground</br>
+            q = q<sub>h</sub> leeward walls, side walls, and roofs, evaluated at height h</br>
+            q<sub>i</sub> = q<sub>h</sub> for windward walls, side walls, leeward walls, and roofs
+                        of enclosed buildings and for negative internal pressure evaluation in partially enclosed
+                        buildings. For positive internal pressure evaluation, q<sub>i</sub> may conservatively be
+                        evaluated at height h (q<sub>i</sub> = q<sub>h</sub>)</br>
+            <i>GC<sub>p</sub></i> = External pressure coefficient from Figure 6.2.17, BNBC 2020</br>
+            <i>GC<sub>pi</sub></i> = Internal pressure coefficient from Figure 6.2.5, BNBC 2020
+        </p>
+    </div>
+
+    <div class="table__sidewise width__100 mt-2">
+        <div class="width__100">
+            <table class="align__center width__100">
+                <caption>GC<sub>p</sub> for Wall Componets</caption>
+                <thead>
+                    <tr>
+                        <th rowspan="2">Eff. Area <span class="footnote">1</span></th>
+                        <th>+ GC<sub>p</sub></th>
+                        <th colspan="2">- GC<sub>p</sub></th>
+                    </tr>
+                    <tr>
+                        <th>Zone 4 & 5</th>
+                        <th>Zone 4</th>
+                        <th>Zone 5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>≤ 5</td>
+                        <td>0.81</td>
+                        <td>0.84</td>
+                        <td>1.56</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>0.74</td>
+                        <td>0.80</td>
+                        <td>1.38</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>0.68</td>
+                        <td>0.75</td>
+                        <td>1.21</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td>0.64</td>
+                        <td>0.73</td>
+                        <td>1.11</td>
+                    </tr>
+                    <tr>
+                        <td>40</td>
+                        <td>0.60</td>
+                        <td>0.70</td>
+                        <td>1.00</td>
+                    </tr>
+                    <tr>
+                        <td>≥ 46.5</td>
+                        <td>0.60</td>
+                        <td>0.70</td>
+                        <td>1.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="width__100">
+            <table class="align__center width__100">
+                <caption>GC<sub>p</sub> for Roof Componets</caption>
+                <thead>
+                    <tr>
+                        <th colspan="3">- GC<sub>p</sub></th>
+                    </tr>
+                    <tr>
+                        <th>Zone 1</th>
+                        <th>Zone 2</th>
+                        <th>Zone 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.18</td>
+                        <td>2.00</td>
+                        <td>2.81</td>
+                    </tr>
+                    <tr>
+                        <td>1.09</td>
+                        <td>1.87</td>
+                        <td>2.65</td>
+                    </tr>
+                    <tr>
+                        <td>1.01</td>
+                        <td>1.75</td>
+                        <td>2.49</td>
+                    </tr>
+                    <tr>
+                        <td>0.96</td>
+                        <td>1.68</td>
+                        <td>2.40</td>
+                    </tr>
+                    <tr>
+                        <td>0.92</td>
+                        <td>1.63</td>
+                        <td>2.33</td>
+                    </tr>
+                    <tr>
+                        <td>0.90</td>
+                        <td>1.60</td>
+                        <td>2.30</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <p>
+            <sup>1</sup> Effective wind area as defined in Section 2.1.3, BNBC 2020.
+            For component and cladding elements, the effective wind area is the span length multiplied by
+            an effective width that need not be less than one-third the span length.
+            i.e., A = max(hb, h × h/3)
+        </p>
+    </div>
+
+    <div>
+        <figure class="ref__fig">
+            <img src="assets/cnc.png">
+            <figcaption>External pressure coefficient for C&C</figcaption>
+        </figure>
+    </div>
+    
+    <div>
+        <figure class="ref__fig">
+            <img src="assets/cnc2.png">
+            <figcaption>Roof and Wall Zone demarcation (Non-rectangula plan view)</figcaption>
+        </figure>
+    </div>
+    
+    
+    {% if wind.auto_load|default(false) %}
+        {% set calc = wind.calc %}
+        {% if calc %}
+            <div class="page__break">
+                <div class="page__break_avoid">
+                    <table class="width__100 align__center">
+                        <caption>C&C Wind Pressure for wall component</caption>
+                        <thead>
+                            <tr>
+                                <th>Eff. Area (m²)</th>
+                                <th>Zone 4, P<sub>z+</sub></th>
+                                <th>Zone 4, P<sub>z-</sub></th>
+                                <th>Zone 5, P<sub>z+</sub></th>
+                                <th>Zone 5, P<sub>z-</sub></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for area, rows in calc.wall_results.items() %}
+                                {% for row in rows %}
+                                <tr>
+                                    <td>{{ row.A_eff }}</td>
+                                    <td>{{ row.P_z4_pos }}</td>
+                                    <td>{{ row.P_z4_neg }}</td>
+                                    <td>{{ row.P_z5_pos }}</td>
+                                    <td>{{ row.P_z5_neg }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="page__break_avoid mt-1">
+                    <table class="width__100 align__center">
+                        <caption>C&C Wind Pressure for roof component</caption>
+                        <thead>
+                            <tr>
+                                <th>Eff. Area (m²)</th>
+                                <th>Zone 1, P<sub>z-</sub></th>
+                                <th>Zone 2, P<sub>z-</sub></th>
+                                <th>Zone 3, P<sub>z-</sub></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for area, rows in calc.roof_results.items() %}
+                                {% for row in rows %}
+                                <tr>
+                                    <td>{{ row.A_eff }}</td>
+                                    <td>{{ row.P_z1_neg }}</td>
+                                    <td>{{ row.P_z2_neg }}</td>
+                                    <td>{{ row.P_z3_neg }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <p class="footnote__content">Auto wind calculation failed: No data found.</p>
+        {% endif %}
+    
+    {% else %}
+        <div class="page__break">
+            <div class="page__break_avoid">
+                <table class="width__100 borderless fig__table">
+                    <caption>C&C Wind Pressure for wall component</caption>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="{{ inputs_dir }}/wind-cnc-wall.png">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="footnote__content">
+                    Zone 5 (Edge) width, a = Min<sup>m</sup> of (10% of least horizontal dimension, 0.4h);
+                    but not less than 0.9 m.
+                </p>
+            </div>
+
+            <div class="page__break_avoid">
+                <table class="width__100 borderless fig__table">
+                    <caption>C&C Wind Pressure for roof component</caption>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="{{ inputs_dir }}/wind-cnc-roof.png">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+</section>

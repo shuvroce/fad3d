@@ -1,0 +1,111 @@
+<div class="page__break"></div>
+<h2>Design of Anchorage and Support (U-Clump)</h2>
+
+<div>
+    <h3>Data Analysis</h3>
+    <p>Support reactions of mullion for U clump (end node) (<i>; from 'Support reaction forces' table</i>) –</p>
+    <table class="width__80 align__center">
+        <tbody>
+            <tr>
+                <td></td>
+                <td>SLS</td>
+                <td>1.4D</td>
+                <td>0.9D – 1.6W</td>
+            </tr>
+            <tr>
+                <td>Horizontal reaction, <i>R<sub>y</sub> (kN)</i></td>
+                <td>{{ calc.reaction_Ry }}</td>
+                <td>–</td>
+                <td>{{ calc.design_Ry }}</td>
+            </tr>
+            <tr>
+                <td>Vertical reaction, <i>R<sub>z</sub> (kN)</i></td>
+                <td>{{ calc.reaction_Rz }}</td>
+                <td>{{ (calc.reaction_Rz * 1.4) | round(2) }}</td>
+                <td>{{ (calc.reaction_Rz * 0.9) | round(2) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- <p class="mt-1">Considered Design Load for clump (<i>Higher load for safety</i>) –</p>
+    <ul>
+        <li>Horizontal reaction, <i>R<sub>y</sub></i> = {{ anchor.design_Ry }} <i>kN</i></li>
+        <li>Vertical reaction, <i>R<sub>z</sub></i> = {{ anchor.design_Rz }} <i>kN</i></li>
+    </ul> -->
+
+    <p class="mt-2">Bracket Specification –</p>
+    <table class="borderless width__100 fig__table">
+        <tbody>
+            <tr>
+                <td>
+                    <ul>
+                        <li>1 – {{ calc.bp_length }} x {{ calc.bp_width }} x {{ anchor.bp_thk }} mm – Base plate (50 gr.)</li>
+                        <li>2 – {{ calc.fin_length }} x {{ calc.fin_width }} x {{ anchor.fin_thk }} mm – Fin plate (50 gr.)</li>
+                        <li>{{ anchor.anchor_nos }} – M{{ anchor.anchor_dia }} x {{ anchor.embed_depth }}** Royal Bolt (Grade 5.8 / or Equivalent)</li>
+                        <li>{{ calc.thr_bolt_nos }} – M{{ anchor.thr_bolt_dia }} x {{ calc.thr_bolt_length }} Through Bolt (SS Grade A4-70 / or Equivalent)</li>
+                    </ul>
+                </td>
+                <td>
+                    <figure>
+                        <img style="width: 60mm;" src="assets/u-clump-3d.png">
+                        <figcaption>Typical U-clump</figcaption>
+                    </figure>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="footnote__content">** Embedment depth</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page__break"></div>
+    <h3>Design of Anchor Bolts</h3>
+    <table class="borderless width__100 fig__table">
+        <tbody>
+            <tr>
+                <td><img src="assets/u-clump-plan.png"></td>
+                <td><img src="assets/u-clump-section.png"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Applying static equilibrium equation, ∑ F<sub>y</sub><sup>→+</sup> = 0 , ∑ F<sub>z</sub><sup>↑+</sup> = 0,</p>
+    <table class="borderless ml-2">
+        <tbody>
+            <tr>
+                <td>Horizontal reaction force, <i>R<sub>y</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.design_Ry }} <i>kN</i></td>
+                <td><i>; tension</i></td>
+            </tr>
+            <tr>
+                <td>Horizontal force in single bolt</td>
+                <td>=</td>
+                <td>{{ (calc.design_Ry / anchor.anchor_nos) | round(2) }} <i>kN</i></td>
+                <td><i>; {{ anchor.anchor_nos }} bolts</i></td>
+            </tr>
+            <tr>
+                <td>Vertical reaction force, <i>R<sub>z</sub></i></td>
+                <td>=</td>
+                <td>{{ calc.design_Rz }} <i>kN</i></td>
+                <td><i>; shear</i></td>
+            </tr>
+            <tr>
+                <td>Vertical force in single bolt</td>
+                <td>=</td>
+                <td>{{ (calc.design_Rz / anchor.anchor_nos) | round(2) }} <i>kN</i></td>
+                <td><i>; {{ anchor.anchor_nos }} bolts</i></td>
+            </tr>
+        </tbody>
+    </table>
+
+    {% include "partials/anchor-bolt.html" %}
+
+    <div class="page__break"></div>
+    {% include "partials/through-bolt.html" %}
+
+    {% include "partials/fin-plate.html" %}
+    
+    <div class="page__break"></div>
+    {% include "partials/base-plate.html" %}
+</div>

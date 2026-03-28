@@ -1,0 +1,423 @@
+<h3>Design of Base Plate</h3>
+{% if anchor.clump_type == "L Clump" %}
+<div>
+    <img style="width: 90mm;" src="assets/l-front-bp-plan.png">
+</div>
+{% endif %}
+
+{% set bp_length = calc.bp_length if anchor.clump_type != "L Clump" else calc.front_bp_length %}
+{% set bp_width = calc.bp_width if anchor.clump_type != "L Clump" else calc.front_bp_width %}
+
+<table class="borderless">
+    <tbody>
+        <tr>
+            <td>Max. horizontal reaction force, R<sub>y</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Ry }} <i>kN</i></td>
+            <td><i>
+                {% if anchor.clump_type != "Box Clump" %}
+                    ; P<sub>u</sub>
+                {% endif %}
+            </i></td>
+        </tr>
+        <tr>
+            <td>Max. vertical reaction force, R<sub>z</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Rz }} <i>kN</i></td>
+            <td><i>
+                {% if anchor.clump_type == "Box Clump" %}
+                    ; P<sub>u</sub>
+                {% endif %}
+            </i></td>
+        </tr>
+        <tr>
+            <td>Plate length, N</td>
+            <td>=</td>
+            <td>{{ bp_length }} <i>mm</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Plate width, B</td>
+            <td>=</td>
+            <td>{{ bp_width }} <i>mm</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Compressive strength of concrete, f'<sub>c</sub></td>
+            <td>=</td>
+            <td>27.5 <i>MPa</i></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+{% if anchor.clump_type == "L Clump" %}
+<div class="page__break"></div>
+{% endif %}
+<h4>Plate Thickness for Bearing Interface</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/eqn-bp-thk-bearing.png" style="width: 55mm;"></td>
+            <td style="text-align: right;">(AISC Design Guide 1, 2nd ed.)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Strength reduction factor</td>
+        </tr>
+        <tr>
+            <td>N</td>
+            <td>–</td>
+            <td>Length of plate (mm)</td>
+        </tr>
+        <tr>
+            <td>B</td>
+            <td>–</td>
+            <td>Width of plate (mm)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>p</sub> = B × N</i></td>
+            <td>–</td>
+            <td>Effective plate area (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td><i>
+                {% if anchor.clump_type == "Box Clump" %}
+                    l = max( m , n )
+                {% else %}
+                    l = max( m , n , λn' )
+                {% endif %}
+            </i></td>
+            <td>–</td>
+            <td>Critical cantilever length (mm)</td>
+        </tr>
+        <tr>
+            <td colspan="3" style="padding-left: 3.5rem;"><i>
+                {% if anchor.clump_type == "Box Clump" %}
+                    m = (N - 0.95d) / 2 , n = (B - 0.95b) / 2
+                {% else %}
+                    m = (N - 0.95d) / 2 , n = (B - 0.8b) / 2 , λn' = λ √(db) / 4
+                {% endif %}
+            </i></td>
+        </tr>
+        <tr>
+            <td>d</td>
+            <td>–</td>
+            <td>Depth of profile (mm)</td>
+        </tr>
+        <tr>
+            <td><i>b</i></td>
+            <td>–</td>
+            <td>Width of flange (mm)</td>
+        </tr>
+        <tr>
+            <td><i>q = P<sub>u</sub> / N</i></td>
+            <td>–</td>
+            <td>Line load due to bearing pressure (N/mm)</td>
+        </tr>
+        <tr>
+            <td><i>P<sub>u</sub></i></td>
+            <td>–</td>
+            <td>Compressive load (kN)</td>
+        </tr>
+        <tr>
+            <td><i>M<sub>u</sub> = (ql<sup>2</sup>) / 2</i></td>
+            <td>–</td>
+            <td>Required bending moment (kN-m)</td>
+        </tr>
+        <tr>
+            <td><i>F<sub>y</sub></i></td>
+            <td>–</td>
+            <td>Yield strength of plate (MPa)</td>
+        </tr>
+        <tr>
+            <td>t<sub>p</sub></td>
+            <td>–</td>
+            <td>Provided plate thickness (mm)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th>N</th>
+            <th>B</th>
+            <th><i>A<sub>p</sub></i></th>
+            <th>d</th>
+            <th>b</th>
+            <th>m</th>
+            <th>n</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.9</td>
+            <td>{{ bp_length }}</td>
+            <td>{{ bp_width }}</td>
+            <td>{{ (bp_length * bp_width) | round(2) }}</td>
+            <td>{{ calc.bp_d }}</td>
+            <td>{{ calc.bp_b }}</td>
+            <td>{{ calc.bp_m }}</td>
+            <td>{{ calc.bp_n }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            {% if anchor.clump_type != "Box Clump" %}
+            <th>λn'</th>
+            {% endif %}
+            <th><i>l</i></th>
+            <th>P<sub>u</sub></th>
+            <th>q</th>
+            <th>M<sub>u</sub></th>
+            <th>F<sub>y</sub></th>
+            <th>t</th>
+            <th>t<sub>p</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% if anchor.clump_type != "Box Clump" %}
+            <td>{{ calc.bp_lambda_n }}</td>
+            {% endif %}
+            <td>{{ calc.bp_l }}</td>
+            <td>{{ calc.bp_Pu }}</td>
+            <td>{{ calc.bp_q }}</td>
+            <td>{{ calc.bp_bearing_Mu }}</td>
+            <td>345</td>
+            <td>{{ calc.bp_t_req_bear }}</td>
+            <td>{{ anchor.bp_thk }}</td>
+            <td class="{% if anchor.bp_thk > calc.bp_t_req_bear %}ok{% else %}not-ok{% endif %}">
+                {% if anchor.bp_thk > calc.bp_t_req_bear %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% if anchor.clump_type != "L Clump" %}
+<div class="page__break-after"></div>
+{% endif %}
+
+
+{% if anchor.clump_type != "Box Clump" %}
+<h4>Plate Thickness for Tension Interface</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/eqn-bp-thk-tension.png" class="fig__40"></td>
+            <td style="text-align: right;">(AISC Design Guide 1, 2nd ed.)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Strength reduction factor</td>
+        </tr>
+        <tr>
+            <td><i>M<sub>u</sub> = T<sub>u</sub> x</i></td>
+            <td>–</td>
+            <td>Required bending moment (kN-m)</td>
+        </tr>
+        <tr>
+            <td>T<sub>u</sub></td>
+            <td>–</td>
+            <td>Tension force in single anchor bolt (kN)</td>
+        </tr>
+        <tr>
+            <td><i>x</i></td>
+            <td>–</td>
+            <td>Anchor bolt center to flange edge distance (mm)</td>
+        </tr>
+        <tr>
+            <td>B<sub>eff</sub></td>
+            <td>–</td>
+            <td>Effective plate width (mm)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th><i>T<sub>u</sub></i></th>
+            <th><i>x</i></th>
+            <th><i>M<sub>u</sub></i></th>
+            <th><i>B<sub>eff</sub></i></th>
+            <th>t</th>
+            <th><i>t<sub>p</sub></i></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.9</td>
+            <td>{{ calc.bp_Tu }}</td>
+            <td>{{ calc.bp_x }}</td>
+            <td>{{ calc.bp_tension_Mu }}</td>
+            <td>{{ calc.bp_Beff }}</td>
+            <td>{{ calc.bp_t_req_tension }}</td>
+            <td>{{ anchor.bp_thk }}</td>
+            <td class="{% if anchor.bp_thk > calc.bp_t_req_tension %}ok{% else %}not-ok{% endif %}">
+                {% if anchor.bp_thk > calc.bp_t_req_tension %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+
+<h4>Check for Plate Area</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/eqn-bp-area.png" style="width: 45mm;"></td>
+            <td style="text-align: right;">(AISC Design Guide 1, 2nd ed.)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Concrete resistance factor</td>
+        </tr>
+        <tr>
+            <td><i>P<sub>u</sub></i></td>
+            <td>–</td>
+            <td>Axial compression (kN)</td>
+        </tr>
+        <tr>
+            <td><i>f'<sub>c</sub></i></td>
+            <td>–</td>
+            <td>Compressive strength of concrete (MPa)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>1</sub></i></td>
+            <td>–</td>
+            <td>Required plate area in contact with concrete surface (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>1,p</sub> = BN</i></td>
+            <td>–</td>
+            <td>Provided plate area in contact with concrete surface (mm<sup>2</sup>)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th><i>P<sub>u</sub></i></th>
+            <th><i>f'<sub>c</sub></i></th>
+            <th><i>A<sub>1</sub></i></th>
+            <th>B</th>
+            <th>N</th>
+            <th><i>A<sub>1,p</sub></i></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.65</td>
+            <td>{{ calc.bp_Pu }}</td>
+            <td>27.5</td>
+            <td>{{ calc.bp_A1 }}</td>
+            <td>{{ bp_width }}</td>
+            <td>{{ bp_length }}</td>
+            <td>{{ (bp_length * bp_width) | round(2) }}</td>
+            <td class="{% if (bp_length * bp_width) > calc.bp_A1 %}ok{% else %}not-ok{% endif %}">
+                {% if (bp_length * bp_width) > calc.bp_A1 %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% if anchor.clump_type == "U Clump" %}
+<div class="page__break"></div>
+{% endif %}
+
+<h4>Check for Concrete Bearing Stress</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/eqn-bp-conc-bearing-stress.png" style="width: 100mm;"></td>
+            <td style="text-align: right;">(AISC Design Guide 1, 2nd ed.)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Concrete resistance factor</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>1</sub></i></td>
+            <td>–</td>
+            <td>Base plate area in contact with concrete surface (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>2</sub></i></td>
+            <td>–</td>
+            <td>Concrete supporting surface (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td><i>f'<sub>c</sub></i></td>
+            <td>–</td>
+            <td>Compressive strength of concrete (MPa)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th><i>A<sub>1</sub></i></th>
+            <th><i>A<sub>2</sub></i></th>
+            <th><i>f'<sub>c</sub></i></th>
+            <th><i>f<sub>p,max</sub></i></th>
+            <th><i>P<sub>u</sub> / A<sub>1</sub></i></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.65</td>
+            <td>{{ (bp_length * bp_width) | round(2) }}</td>
+            <td>{{ (bp_length * bp_width) | round(2) }}</td>
+            <td>27.5</td>
+            <td>{{ calc.bp_fp_max }}</td>
+            <td>{{ (calc.bp_Pu * 1000 / (bp_length * bp_width)) | round(2) }}</td>
+            <td class="{% if calc.bp_fp_max > (calc.bp_Pu / (bp_length * bp_width)) %}ok{% else %}not-ok{% endif %}">
+                {% if calc.bp_fp_max > (calc.bp_Pu / (bp_length * bp_width)) %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>

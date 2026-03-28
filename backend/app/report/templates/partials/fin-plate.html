@@ -1,0 +1,534 @@
+<h3>Design of Fin Plate</h3>
+<table class="borderless">
+    <tbody>
+        <tr>
+            <td>Max. horizontal reaction force, R<sub>y</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Ry }} <i>kN</i></td>
+            <td rowspan="6">
+                {% if anchor.clump_type == "U Clump" %}
+                    <img src="assets/u-fin-plate.png" class="fig__70">
+                {% elif anchor.clump_type == "L Clump" %}
+                    <img src="assets/l-fin-plate.png" class="fig__70">
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>No. of plate, n</td>
+            <td>=</td>
+            <td>2 <i>Nos.</i></td>
+        </tr>
+        <tr>
+            <td>Shear force on each plate, V<sub>h</sub></td>
+            <td>=</td>
+            <td>{{ calc.fin_Vh }} <i>kN</i></td>
+        </tr>
+        <tr>
+            <td>Max. vertical reaction force, R<sub>z</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Rz }} <i>kN</i></td>
+        </tr>
+        <tr>
+            <td>Shear force on each plate, V<sub>v</sub></td>
+            <td>=</td>
+            <td>{{ calc.fin_Vv }} <i>kN</i></td>
+        </tr>
+        <tr>
+            <td>Resultant shear force, <i>V<sub>u</sub> = √(V<sub>h</sub><sup>2</sup> + V<sub>v</sub><sup>2</sup>)</i></td>
+            <td>=</td>
+            <td>{{ calc.fin_Vu }} <i>kN</i></td>
+        </tr>
+    </tbody>
+</table>
+
+<h4>Plate Thickness Requirement</h4>
+<p>Plate thickness required for bending moment due to eccentricity,</p>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/eqn-fin-thk.png" class="fig__40"></td>
+            <td style="text-align: right;">(AISC Design Guide 1, 2nd ed.)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Strength reduction factor</td>
+        </tr>
+        <tr>
+            <td>b</td>
+            <td>–</td>
+            <td>Width of plate (mm)</td>
+        </tr>
+        <tr>
+            <td><i>M<sub>u</sub> = P<sub>u</sub>e</i></td>
+            <td>–</td>
+            <td>Required bending moment (kN-m)</td>
+        </tr>
+        <tr>
+            <td>e</td>
+            <td>–</td>
+            <td>Eccentricity (mm)</td>
+        </tr>
+        <tr>
+            <td><i>P<sub>u</sub></i></td>
+            <td>–</td>
+            <td>Load acting on single plate (kN)</td>
+        </tr>
+        <tr>
+            <td>F<sub>y</sub></td>
+            <td>–</td>
+            <td>Yield strength of plate (MPa)</td>
+        </tr>
+        <tr>
+            <td>t<sub>p</sub></td>
+            <td>–</td>
+            <td>Provided plate thickness (mm)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th>b</th>
+            <th>P<sub>u</sub></th>
+            <th>e</th>
+            <th>M<sub>u</sub></th>
+            <th>F<sub>y</sub></th>
+            <th>t</th>
+            <th>t<sub>p</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.9</td>
+            <td>{{ calc.fin_width }}</td>
+            <td>{{ calc.fin_Vv }}</td>
+            <td>{{ anchor.fin_e }}</td>
+            <td>{{ calc.fin_Mu }}</td>
+            <td>345</td>
+            <td>{{ calc.fin_t_req }}</td>
+            <td>{{ anchor.fin_thk }}</td>
+            <td class="{% if anchor.fin_thk > calc.fin_t_req %}ok{% else %}not-ok{% endif %}">
+                {% if anchor.fin_thk > calc.fin_t_req %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page__break"></div>
+<h4>Strength of Plate in Shear</h4>
+<p>For shear yielding,</p>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><i>φR<sub>n</sub> = φ 0.6 F<sub>y</sub> A<sub>gv</sub> &nbsp;&nbsp;&nbsp; (kN) </i></td>
+            <td style="text-align: right;">(Eqn. J4-3, AISC 360-05)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th>F<sub>y</sub></th>
+            <th>b</th>
+            <th>t</th>
+            <th>A<sub>gv</sub></th>
+            <th>φR<sub>n</sub></th>
+            <th>V<sub>u</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1.0</td>
+            <td>345</td>
+            <td>{{ calc.fin_width }}</td>
+            <td>{{ anchor.fin_thk }}</td>
+            <td>{{ (calc.fin_width * anchor.fin_thk) | round(2) }}</td>
+            <td>{{ calc.fin_phi_Rn_yield }}</td>
+            <td>{{ calc.fin_Vu }}</td>
+            <td class="{% if calc.fin_phi_Rn_yield > calc.fin_Vu %}ok{% else %}not-ok{% endif %}">
+                {% if calc.fin_phi_Rn_yield > calc.fin_Vu %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p class="mt-1">For shear rupture,</p>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><i>φR<sub>n</sub> = φ 0.6 F<sub>u</sub> A<sub>nv</sub> &nbsp;&nbsp;&nbsp; (kN) </i></td>
+            <td style="text-align: right;">(Eqn. J4-4, AISC 360-05)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th>F<sub>u</sub></th>
+            <th>b</th>
+            <th>t</th>
+            <th>n</th>
+            <th>d<sub>h</sub></th>
+            <th>A<sub>nv</sub></th>
+            <th>φR<sub>n</sub></th>
+            <th>V<sub>u</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.75</td>
+            <td>450</td>
+            <td>{{ calc.fin_width }}</td>
+            <td>{{ anchor.fin_thk }}</td>
+            <td>{{ calc.thr_bolt_nos }}</td>
+            <td>{{ calc.fin_dh }}</td>
+            <td>{{ calc.fin_rupture_Anv }}</td>
+            <td>{{ calc.fin_phi_Rn_rupture }}</td>
+            <td>{{ calc.fin_Vu }}</td>
+            <td class="{% if calc.fin_phi_Rn_rupture > calc.fin_Vu %}ok{% else %}not-ok{% endif %}">
+                {% if calc.fin_phi_Rn_rupture > calc.fin_Vu %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Resistance factor</td>
+        </tr>
+        <tr>
+            <td>b</td>
+            <td>–</td>
+            <td>Width of plate (mm)</td>
+        </tr>
+        <tr>
+            <td>t</td>
+            <td>–</td>
+            <td>Thickness of plate (mm)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>gv</sub> = bt</i></td>
+            <td>–</td>
+            <td>Gross shear area of plate (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td><i>A<sub>nv</sub> = (b - nd<sub>h</sub>)t</i></td>
+            <td>–</td>
+            <td>Net shear area of plate (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td>n</td>
+            <td>–</td>
+            <td>No. of bolt hole</td>
+        </tr>
+        <tr>
+            <td>d<sub>h</sub></td>
+            <td>–</td>
+            <td>Diameter of bolt hole (mm)</td>
+        </tr>
+        <tr>
+            <td>F<sub>y</sub></td>
+            <td>–</td>
+            <td>Yield strength of plate (MPa)</td>
+        </tr>
+        <tr>
+            <td>F<sub>u</sub></td>
+            <td>–</td>
+            <td>Ultimate strength of plate (MPa)</td>
+        </tr>
+        <tr>
+            <td>V<sub>u</sub></td>
+            <td>–</td>
+            <td>Load acting on single plate (kN)</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page__break"></div>
+<h4>Block Shear Strength</h4>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><img src="assets/eqn-fin-block-shear.png" class="fig__95"></td>
+            <td style="text-align: right;">(Eqn. J4-5, AISC 360-05)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Resistance factor</td>
+            <td rowspan="9"><img src="assets/fin-block-shear.png" class="fig__55"></td>
+        </tr>
+        <tr>
+            <td>b</td>
+            <td>–</td>
+            <td>Width of plate (mm)</td>
+        </tr>
+        <tr>
+            <td>t</td>
+            <td>–</td>
+            <td>Thickness of plate (mm)</td>
+        </tr>
+        <tr>
+            <td>A<sub>gv</sub> = b<sub>gv</sub> × t</td>
+            <td>–</td>
+            <td>Gross shear area (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td><img src="assets/eqn-fin-block-shear2.png" class="fig__50"></td>
+            <td>–</td>
+            <td>Net shear area (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td>n</td>
+            <td>–</td>
+            <td>No. of bolt hole</td>
+        </tr>
+        <tr>
+            <td>d<sub>h</sub></td>
+            <td>–</td>
+            <td>Diameter of bolt hole (mm)</td>
+        </tr>
+        <tr>
+            <td><img src="assets/eqn-fin-block-shear3.png" class="fig__35"></td>
+            <td>–</td>
+            <td>Net tension area (mm<sup>2</sup>)</td>
+        </tr>
+        <tr>
+            <td>U<sub>bs</sub></td>
+            <td>–</td>
+            <td>Reduction coefficient</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th>F<sub>y</sub></th>
+            <th>F<sub>u</sub></th>
+            <th>b<sub>gv</sub></th>
+            <th>b<sub>nt</sub></th>
+            <th>t</th>
+            <th>n</th>
+            <th>d<sub>h</sub></th>
+            <th>A<sub>gv</sub></th>
+            <th>A<sub>nv</sub></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.75</td>
+            <td>345</td>
+            <td>450</td>
+            <td>{{ calc.fin_bgv }}</td>
+            <td>{{ calc.fin_bnt }}</td>
+            <td>{{ anchor.fin_thk }}</td>
+            <td>{{ calc.thr_bolt_nos }}</td>
+            <td>{{ calc.fin_dh }}</td>
+            <td>{{ (calc.fin_bgv * anchor.fin_thk) | round(2) }}</td>
+            <td>{{ calc.fin_block_Anv }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center mt-1">
+    <thead>
+        <tr>
+            <th>A<sub>nt</sub></th>
+            <th>U<sub>bs</sub> *</th>
+            <th>φR<sub>n1</sub></th>
+            <th>φR<sub>n2</sub></th>
+            <th>φR<sub>n</sub></th>
+            <th>V<sub>u</sub></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ calc.fin_block_Ant }}</td>
+            <td>1.0</td>
+            <td>{{ calc.fin_block_phi_Rn1 }}</td>
+            <td>{{ calc.fin_block_phi_Rn2 }}</td>
+            <td>{{ calc.fin_phi_Rn_block }}</td>
+            <td>{{ calc.fin_Vu }}</td>
+            <td class="{% if calc.fin_phi_Rn_block > calc.fin_Vu %}ok{% else %}not-ok{% endif %}">
+                {% if calc.fin_phi_Rn_block > calc.fin_Vu %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p class="footnote__content ml-2">* Uniform tensile stress</p>
+
+<h4>Check for Weld</h4>
+<table class="borderless ml-2">
+    <tbody>
+        <tr>
+            <td>Max. horizontal reaction force, F<sub>y</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Ry }} <i>kN</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>No. of plate, n</td>
+            <td>=</td>
+            <td>2 <i>Nos.</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2">Tensile force on each plate weld, P</td>
+            <td>=</td>
+            <td>{{ (calc.design_Ry / 2) }} <i>kN</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2">Length of single weld, d</td>
+            <td>=</td>
+            <td>{{ calc.fin_width }} <i>mm</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2">Total Length of weld, <i>L = 2d</i></td>
+            <td>=</td>
+            <td>{{ calc.fin_width * 2 }} <i>mm</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2 pb-1">Tensile stress, <i>f<sub>n</sub> = P / L</i></td>
+            <td class="pb-1">=</td>
+            <td class="pb-1">{{ calc.weld_fn }} <i>N/mm</i></td>
+            <td class="pb-1"><i>; As line load</i></td>
+        </tr>
+        <tr>
+            <td>Max. vertical reaction force, F<sub>z</sub></td>
+            <td>=</td>
+            <td>{{ calc.design_Rz }} <i>kN</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2">Shear force on each plate weld, V</td>
+            <td>=</td>
+            <td>{{ (calc.design_Rz / 2) }} <i>kN</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2 pb-1">Shear stress, <i>f<sub>v</sub> = V / L</i></td>
+            <td class="pb-1">=</td>
+            <td class="pb-1">{{ calc.weld_fv }} <i>N/mm</i></td>
+            <td class="pb-1"></td>
+        </tr>
+        <tr>
+            <td>Eccentricity, e</td>
+            <td>=</td>
+            <td>{{ anchor.fin_e }} <i>mm</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2">Bending moment, M = V × e</td>
+            <td>=</td>
+            <td>{{ ((calc.design_Rz / 2) * (anchor.fin_e / 1000)) | round(2) }} <i>kN-m</i></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="pl-2">Section modulus of weld, <i>Z<sub>w</sub> = d<sup>2</sup> / 3</i></td>
+            <td>=</td>
+            <td>{{ ((calc.fin_width**2) / 3) | round(2) }} <i>mm<sup>2</sup></i></td>
+            <td><i>; For double line weld</i></td>
+        </tr>
+        <tr>
+            <td class="pl-2 pb-1">Bending stress, <i>f<sub>b</sub> = M / Z<sub>w</sub></i></td>
+            <td class="pb-1">=</td>
+            <td class="pb-1">{{ calc.weld_fb }} <i>N/mm</i></td>
+            <td class="pb-1"></td>
+        </tr>
+        <tr>
+            <td>Resultant stress, <i>f<sub>R</sub> = √(f<sub>n</sub><sup>2</sup> + f<sub>v</sub><sup>2</sup> + f<sub>b</sub><sup>2</sup>)</i></td>
+            <td>=</td>
+            <td>{{ calc.weld_fR }} <i>N/mm</i></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Weld resistance per unit length,</u></p>
+<table class="borderless width__100">
+    <tbody>
+        <tr>
+            <td><i>φR<sub>n</sub> = φ 0.6 F<sub>EXX</sub> 0.707D &nbsp;&nbsp;&nbsp; (N/mm)</i></td>
+            <td style="text-align: right;">(Sec. J2.4, AISC 360-05)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><u>Where,</u></p>
+<table class="borderless ml-1">
+    <tbody>
+        <tr>
+            <td>φ</td>
+            <td>–</td>
+            <td>Strength reduction factor</td>
+        </tr>
+        <tr>
+            <td><i>F<sub>EXX</sub></i></td>
+            <td>–</td>
+            <td>Tensile strength of electrode (MPa)</td>
+        </tr>
+        <tr>
+            <td>D</td>
+            <td>–</td>
+            <td>Weld size (leg length) (mm)</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="width__100 align__center">
+    <thead>
+        <tr>
+            <th>φ</th>
+            <th><i>F<sub>EXX</sub> *</i></th>
+            <th>D</th>
+            <th><i>φR<sub>n</sub></i></th>
+            <th><i>f<sub>R</sub></i></th>
+            <th>Check</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.75</td>
+            <td>482.7</td>
+            <td>4.0</td>
+            <td>{{ calc.weld_phi_Rn }}</td>
+            <td>{{ calc.weld_fR }}</td>
+            <td class="{% if calc.weld_phi_Rn > calc.weld_fR %}ok{% else %}not-ok{% endif %}">
+                {% if calc.weld_phi_Rn > calc.weld_fR %} OK {% else %} NOT OK {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p class="footnote__content ml-2">* E70xx electrode</p>
