@@ -53,6 +53,14 @@ function _fetchSteelCalc() {
         document.getElementById('calc-steel-zx').textContent     = fmt(props.Z_x);
         document.getElementById('calc-steel-j').textContent      = fmt(props.tor_constant);
         document.getElementById('calc-steel-phi-mn').textContent = fmt(props.phi_Mn);
+
+        // Cache computed section properties into the section object for use in frame calculation
+        if (_selectedSteelSecIdx >= 0 && _steelSections[_selectedSteelSecIdx]) {
+            const sec = _steelSections[_selectedSteelSecIdx];
+            sec._phi_Mn = props.phi_Mn;
+            sec._I_xx   = props.I_xx;
+            sec._I_yy   = props.I_yy;
+        }
     })
     .catch(() => {});
 }

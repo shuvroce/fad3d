@@ -4,7 +4,7 @@
 
 Single-page web application for facade engineering analysis with dynamic multi-category input system, collapsible 3-panel layout, and design result visualization.
 
-**Tech Stack**: Vanilla HTML/CSS/JavaScript (no frameworks). Flask/Jinja2 template comments present but paths use static routing (`/static/...`) for initial ui checking. The flask routing will add later.
+**Tech Stack**: Vanilla HTML/CSS/JavaScript (no frameworks). FastAPI/Jinja2 for server-side templating and API routes. Static files served via FastAPI's `StaticFiles` mount at `/static/`.
 
 ## Architecture & File Structure
 

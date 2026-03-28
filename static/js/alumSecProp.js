@@ -110,6 +110,14 @@ function _fetchAlumCalc() {
         document.getElementById('calc-alum-zx').textContent       = fmt(props.Z_x);
         document.getElementById('calc-alum-j').textContent        = fmt(props.tor_constant);
         document.getElementById('calc-alum-phi-mn').textContent   = fmt(props.phi_Mn);
+
+        // Cache computed section properties into the section object for use in frame calculation
+        if (_selectedAlumSecIdx >= 0 && _alumSections[_selectedAlumSecIdx]) {
+            const sec = _alumSections[_selectedAlumSecIdx];
+            sec._phi_Mn = props.phi_Mn;
+            sec._I_xx   = props.I_xx;
+            sec._I_yy   = props.I_yy;
+        }
     })
     .catch(() => {});
 }

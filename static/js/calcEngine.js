@@ -73,32 +73,34 @@ function _resolveProfilePayload(sectionName, profileList, isSteel = false) {
     const mat = (_materials || []).find(m => m.name === sec.grade);
     const fy = mat ? (mat.fy || null) : null;
     return isSteel
-        ? { profile_type: sec.profileType || 'steel-rhs', d: sec.d, b: sec.b, t: sec.t, tf: sec.tf, tw: sec.tw, F_y: fy }
+        ? { profile_type: sec.profileType || 'steel-rhs', d: sec.d, b: sec.b, t: sec.t, tf: sec.tf, tw: sec.tw, F_y: fy,
+            computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null }
         : { profile_type: sec.profileType || 'stick', profile_name: sec.name, web_length: sec.d, flange_length: sec.b, web_thk: sec.tw, flange_thk: sec.tf, F_y: fy,
             tor_constant: sec.j, area: sec.a, I_xx: sec.ix, I_yy: sec.iy, Y: sec.y, X: sec.x,
-            plastic_x: sec.plasticX, plastic_y: sec.plasticY, phi_Mn: sec.mnYield };
+            plastic_x: sec.plasticX, plastic_y: sec.plasticY, phi_Mn: sec.mnYield,
+            computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null };
 }
 
 function collectFrameInputs(catNum) {
     const g = id => document.getElementById(id)?.value || null;
     const geometry    = g(`cat${catNum}-frame-geometry`) || 'regular';
-    const mullionType = g(`cat${catNum}-frame-mullion-type`) || 'Aluminum Only';
+    const mullionType = g(`cat${catNum}-frame-mullion-type`) || 'alu';
+    const frameType   = g(`cat${catNum}-frame-frame-type`) || 'cont';
     const variant     = `${geometry}-${mullionType}`;
-    const prefix      = `cat${catNum}-frame-${variant.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+    const prefix      = `cat${catNum}-frame-${variant}`;
 
-    // Field IDs depend on frame variant
     const frame = {
         geometry:     geometry,
-        mullion_type: mullionType,
-        frame_type:   g(`cat${catNum}-frame-type`),
-        width:        g(`cat${catNum}-frame-width`),
-        length:       g(`cat${catNum}-frame-length`),
-        wind_neg:     g(`cat${catNum}-frame-wind_neg`),
-        glass_thk:    g(`cat${catNum}-frame-glass_thk`),
-        tran_spacing: g(`cat${catNum}-frame-tran_spacing`),
-        mullion:      g(`cat${catNum}-frame-mullion`),
-        transom:      g(`cat${catNum}-frame-transom`),
-        steel:        g(`cat${catNum}-frame-steel`),
+        mullion_type: mullionType === 'alu-steel' ? 'Aluminum + Steel' : 'Aluminum Only',
+        frame_type:   frameType === 'sfgp' ? 'Floor-to-floor' : 'Continuous',
+        width:        g(`${prefix}-width`),
+        length:       g(`${prefix}-length`),
+        wind_neg:     g(`${prefix}-wind_neg`),
+        glass_thk:    g(`${prefix}-glass_thk`),
+        tran_spacing: g(`${prefix}-tran_spacing`),
+        mullion:      g(`${prefix}-mullion`),
+        transom:      g(`${prefix}-transom`),
+        steel:        g(`${prefix}-steel`),
     };
 
     // Resolve profile payloads from the section stores

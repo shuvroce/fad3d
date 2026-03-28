@@ -1,5 +1,8 @@
 import os
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from calculations.alum_profile import calc_alum_profile
 from calculations.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
 from calculations.glass import calc_glass_unit
@@ -9,22 +12,33 @@ from calculations.anchorage import calc_anchorage
 from calculations.wind_load import compute_wind_loads, location_wind_speeds
 from calculations.calc_utils import _to_float
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(__file__)
+
+app = FastAPI()
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+async def _json(request: Request) -> dict:
+    try:
+        return await request.json()
+    except Exception:
+        return {}
 
 
-@app.route("/api/wind/locations")
-def api_wind_locations():
-    return jsonify(sorted(location_wind_speeds.keys()))
+@app.get("/")
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.route("/api/section/calc/alum", methods=["POST"])
-def api_calc_alum():
-    data = request.get_json(silent=True) or {}
+@app.get("/api/wind/locations")
+async def api_wind_locations():
+    return sorted(location_wind_speeds.keys())
+
+
+@app.post("/api/section/calc/alum")
+async def api_calc_alum(request: Request):
+    data = await _json(request)
     # Normalise profile_type to match Python function expectations
     profile_type = data.get("profile_type", "").lower()
     # Map JS field names → Python field names
@@ -49,13 +63,13 @@ def api_calc_alum():
     }
     result = calc_alum_profile(payload)
     if result is None:
-        return jsonify({"error": "Insufficient data"}), 400
-    return jsonify(result)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
+    return result
 
 
-@app.route("/api/section/calc/steel", methods=["POST"])
-def api_calc_steel():
-    data = request.get_json(silent=True) or {}
+@app.post("/api/section/calc/steel")
+async def api_calc_steel(request: Request):
+    data = await _json(request)
     profile_type = data.get("profile_type", "steel-rhs")
     payload = {
         "web_length":    data.get("d"),
@@ -70,76 +84,77 @@ def api_calc_steel():
     else:
         result = calc_steel_iw_profile(payload)
     if result is None:
-        return jsonify({"error": "Insufficient data"}), 400
-    return jsonify(result)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
+    return result
 
 
-@app.route("/api/calc/wind", methods=["POST"])
-def api_calc_wind():
-    data = request.get_json(silent=True) or {}
+@app.post("/api/calc/wind")
+async def api_calc_wind(request: Request):
+    data = await _json(request)
     # Force auto_load so compute_wind_loads runs the full calculation
     data["auto_load"] = True
     try:
         result = compute_wind_loads(data, _to_float)
         auto_calc = result.get("auto_calc")
         if auto_calc:
-            return jsonify(auto_calc)
+            return auto_calc
         if result.get("auto_calc_error"):
-            return jsonify({"error": result["auto_calc_error"]}), 400
-        return jsonify({"error": "Insufficient data"}), 400
+            return JSONResponse({"error": result["auto_calc_error"]}, status_code=400)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return JSONResponse({"error": str(e)}, status_code=400)
 
 
-@app.route("/api/calc/glass", methods=["POST"])
-def api_calc_glass():
-    data = request.get_json(silent=True) or {}
+@app.post("/api/calc/glass")
+async def api_calc_glass(request: Request):
+    data = await _json(request)
     result = calc_glass_unit(data)
     if result is None:
-        return jsonify({"error": "Insufficient data"}), 400
-    return jsonify(result)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
+    return result
 
 
-@app.route("/api/calc/frame", methods=["POST"])
-def api_calc_frame():
-    data = request.get_json(silent=True) or {}
+@app.post("/api/calc/frame")
+async def api_calc_frame(request: Request):
+    data = await _json(request)
     frame = data.get("frame", {})
     alum_profiles = data.get("alum_profiles", [])
     steel_profiles = data.get("steel_profiles", [])
     result = calc_frame(frame, alum_profiles, steel_profiles)
     if result is None:
-        return jsonify({"error": "Insufficient data"}), 400
-    return jsonify(result)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
+    return result
 
 
-@app.route("/api/calc/connection", methods=["POST"])
-def api_calc_connection():
-    data = request.get_json(silent=True) or {}
+@app.post("/api/calc/connection")
+async def api_calc_connection(request: Request):
+    data = await _json(request)
     conn = data.get("conn", {})
     frame = data.get("frame", {})
     result = calc_connection(conn, frame)
     if result is None:
-        return jsonify({"error": "Insufficient data"}), 400
-    return jsonify(result)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
+    return result
 
 
-@app.route("/api/calc/anchorage", methods=["POST"])
-def api_calc_anchorage():
-    data = request.get_json(silent=True) or {}
+@app.post("/api/calc/anchorage")
+async def api_calc_anchorage(request: Request):
+    data = await _json(request)
     anchor = data.get("anchor", {})
     frame = data.get("frame", {})
     alum_profiles = data.get("alum_profiles", [])
     result = calc_anchorage(anchor, frame, alum_profiles)
     if result is None:
-        return jsonify({"error": "Insufficient data"}), 400
-    return jsonify(result)
+        return JSONResponse({"error": "Insufficient data"}, status_code=400)
+    return result
 
 
-@app.route("/report/assets/images/profiles/<path:filename>")
-def serve_profile_image(filename):
-    profiles_dir = os.path.join(app.root_path, 'templates', 'report', 'assets', 'images', 'profiles')
-    return send_from_directory(profiles_dir, filename)
+@app.get("/report/assets/images/profiles/{filename:path}")
+async def serve_profile_image(filename: str):
+    path = os.path.join(BASE_DIR, "templates", "report", "assets", "images", "profiles", filename)
+    return FileResponse(path)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=5001, reload=True)

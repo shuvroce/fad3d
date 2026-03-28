@@ -4,6 +4,18 @@ from calculations.alum_profile import calc_alum_profile
 from calculations.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
 from calculations.loading import frame_loads, joint_forces, reaction_forces
 
+def _profile_props(payload, calc_fn):
+    """Return computed section props, preferring modal-cached values over recalculation."""
+    computed = {
+        "phi_Mn": _to_float(payload.get("computed_phi_Mn")),
+        "I_xx":   _to_float(payload.get("computed_I_xx")),
+        "I_yy":   _to_float(payload.get("computed_I_yy")),
+    }
+    if all(v is not None for v in computed.values()):
+        return computed
+    return calc_fn(payload)
+
+
 def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles: list = None) -> Optional[Dict[str, Any]]:
     if not frame or alum_profiles is None:
         return None
@@ -17,12 +29,12 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
 
     steel_profile_type = steel.get("profile_type")
 
-    mullion_profile = calc_alum_profile(mullion) if mullion else None
-    transom_profile = calc_alum_profile(transom) if transom else None
+    mullion_profile = _profile_props(mullion, calc_alum_profile) if mullion else None
+    transom_profile = _profile_props(transom, calc_alum_profile) if transom else None
     if steel_profile_type == "rhs":
-        steel_profile = calc_steel_rhs_profile(steel) if steel else None
+        steel_profile = _profile_props(steel, calc_steel_rhs_profile) if steel else None
     else:
-        steel_profile = calc_steel_iw_profile(steel) if steel else None
+        steel_profile = _profile_props(steel, calc_steel_iw_profile) if steel else None
 
     # Extract dimensions
     frame_width = _to_float(frame.get("width"))
@@ -48,9 +60,12 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
     glass_sw = glass_thk * 0.025
     acc_sw = glass_sw * 0.3
     
+    if not all([frame_width, frame_length]):
+        return None
+
     if frame_type == "Floor-to-floor":
         eff_area = max(frame_length * frame_width, frame_length**2 / 3) / 1000**2
-    elif frame_type == "Continuous":
+    else:  # Continuous
         _frame_length = frame_length * 2
         eff_area = max(_frame_length * frame_width, _frame_length**2 / 3) / 1000**2
 
@@ -61,9 +76,6 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
         mul_allow_def = (frame_length / 240) + 6.35
     tran_allow_def = frame_width / 175
     
-    if not all([frame_width, frame_length]):
-        return None
-
     mul_w_dead, mul_w_wind, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
 
 

@@ -9,7 +9,7 @@ Web application for facade structural analysis and design with dynamic multi-cat
 ## Technical Stack Requirements
 
 - **Frontend:** Vanilla HTML, CSS, JS (no frameworks)
-- **Backend:** Flask (Python) with Jinja2 templating (for initial UI checking, static routing for now)
+- **Backend:** FastAPI (Python) with Jinja2 templating
 - **Report Generation:** Weasyprint, Jinja2
 - **3D Rendering:** Three.js
 

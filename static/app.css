@@ -2767,7 +2767,7 @@ summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.1rem 1rem;
+    /* padding: 0.1rem 1rem; */
     cursor: pointer;
     transition: background 0.3s ease;
 }
@@ -2860,7 +2860,7 @@ summary {
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
 }
 
 .result__status {
