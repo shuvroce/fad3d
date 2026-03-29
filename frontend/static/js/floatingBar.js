@@ -2,12 +2,26 @@
 // Floating Bar — Shared Utilities & Coordinator
 // ============================
 
-function openModal(id) {
+import { initGeneralModal } from './generalInfo.js';
+import { initMaterialModal, _materials, DEFAULT_MATERIALS } from './materialProp.js';
+import { initAlumSectionModal } from './alumSecProp.js';
+import { initSteelSectionModal } from './steelSecProp.js';
+
+export function openModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.style.display = 'flex';
+    if (!modal) return;
+    // Reset drag position so modal opens centered
+    const target = modal.querySelector('.modal__dialog, .modal__content-calculator');
+    if (target) {
+        target.style.position = '';
+        target.style.margin = '';
+        target.style.left = '';
+        target.style.top = '';
+    }
+    modal.style.display = 'flex';
 }
 
-function closeModal(id) {
+export function closeModal(id) {
     const modal = document.getElementById(id);
     if (modal) modal.style.display = 'none';
 }
@@ -16,7 +30,7 @@ function closeModal(id) {
 
 function initDefineSubmenu() {
     const wrap = document.getElementById('define-wrap');
-    const btn  = document.getElementById('define-modal-btn');
+    const btn = document.getElementById('define-modal-btn');
     const menu = document.getElementById('define-submenu');
     if (!btn || !menu) return;
 
@@ -27,7 +41,7 @@ function initDefineSubmenu() {
         wrap.classList.toggle('open', opening);
         if (!opening) {
             const secSubmenu = document.getElementById('section-submenu');
-            const secWrap    = document.getElementById('section-submenu-wrap');
+            const secWrap = document.getElementById('section-submenu-wrap');
             if (secSubmenu) secSubmenu.hidden = true;
             secWrap?.classList.remove('open');
         }
@@ -38,7 +52,7 @@ function initDefineSubmenu() {
             menu.hidden = true;
             wrap?.classList.remove('open');
             const secSubmenu = document.getElementById('section-submenu');
-            const secWrap    = document.getElementById('section-submenu-wrap');
+            const secWrap = document.getElementById('section-submenu-wrap');
             if (secSubmenu) secSubmenu.hidden = true;
             secWrap?.classList.remove('open');
         }
@@ -47,7 +61,7 @@ function initDefineSubmenu() {
     menu.addEventListener('click', (e) => e.stopPropagation());
 
     // --- Section nested submenu ---
-    const sectionWrap    = document.getElementById('section-submenu-wrap');
+    const sectionWrap = document.getElementById('section-submenu-wrap');
     const sectionTrigger = document.getElementById('section-submenu-trigger');
     const sectionSubmenu = document.getElementById('section-submenu');
     sectionTrigger?.addEventListener('click', (e) => {
@@ -74,17 +88,11 @@ document.addEventListener('keydown', (e) => {
 
 // --- Init ---
 
-function initFloatingBarModals() {
-    if (!_materials.length) _materials = DEFAULT_MATERIALS.map(m => ({ ...m }));
+export function initFloatingBarModals() {
+    if (!_materials.length) _materials.push(...DEFAULT_MATERIALS.map(m => ({ ...m })));
     initGeneralModal();
     initDefineSubmenu();
     initMaterialModal();
     initAlumSectionModal();
     initSteelSectionModal();
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFloatingBarModals);
-} else {
-    initFloatingBarModals();
 }

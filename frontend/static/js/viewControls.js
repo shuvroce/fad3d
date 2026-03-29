@@ -75,8 +75,12 @@ function updateViewportDisplay(mode) {
     }
 }
 
+function getCurrentViewMode() {
+    return currentViewMode;
+}
+
 // Initialize view controls
-function initializeViewControls() {
+function initViewControls() {
     const viewButtons = document.querySelectorAll(
         ".floating__bar-right .floating__bar-btn",
     );
@@ -104,7 +108,7 @@ function initializeViewControls() {
 // ============================
 
 function initFiguresPanel() {
-    const btn   = document.getElementById('figures-btn');
+    const btn = document.getElementById('figures-btn');
     const panel = document.getElementById('figure-panel');
     if (!btn || !panel) return;
 

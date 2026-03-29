@@ -2,6 +2,9 @@
 // Aluminum Section Properties Modal
 // ============================
 
+import { openModal, closeModal } from './floatingBar.js';
+import { _materials, populateSecGradeOptions, animateDefineForm } from './materialProp.js';
+
 const ALUMINUM_PREDEFINED = {
     'M 125x60x2.5': { grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', phiMn: '6.5' },
 };
@@ -382,6 +385,8 @@ function openAlumSectionModal() {
     openModal('alum-section-modal');
 }
 
-function initAlumSectionModal() {
+export function initAlumSectionModal() {
     document.getElementById('section-alum-btn')?.addEventListener('click', openAlumSectionModal);
 }
+
+export { _alumSections };

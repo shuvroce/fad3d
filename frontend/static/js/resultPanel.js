@@ -2,6 +2,8 @@
 // Design Summary Results Management
 // ============================
 
+import { categoryNames } from './category.js';
+
 // Function to switch between Wind and Facade tabs
 function switchResultTab(tabName) {
     const current = document.querySelector(".result__tab-content:not(.hidden)");
@@ -45,10 +47,7 @@ function updateFacadeResultCategory(categoryNum) {
         '.result__tab-content[data-result-tab="facade"] .result__category-label span',
     );
     if (categoryLabel) {
-        const categoryName =
-            typeof categoryNames !== "undefined"
-                ? categoryNames.get(categoryNum) || `Category ${categoryNum}`
-                : `Category ${categoryNum}`;
+        const categoryName = categoryNames.get(categoryNum) || `Category ${categoryNum}`;
         categoryLabel.textContent = categoryName;
     }
 }
@@ -77,7 +76,7 @@ function _stampTabTemplate(templateId, containerSelector) {
 }
 
 // Initialize result panel event listeners
-function initializeResultPanel() {
+export function initializeResultPanel() {
     // Stamp card shells from templates
     _stampTabTemplate("result-wind-tab-template", '.result__tab-content[data-result-tab="wind"]');
     _stampTabTemplate("result-facade-tab-template", '.result__tab-content[data-result-tab="facade"]');
@@ -111,9 +110,4 @@ function initializeResultPanel() {
     });
 }
 
-// Initialize when DOM is ready
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeResultPanel);
-} else {
-    initializeResultPanel();
-}
+export { updateFacadeResultCategory, switchResultTab };

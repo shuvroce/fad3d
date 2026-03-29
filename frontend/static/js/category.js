@@ -587,9 +587,19 @@ async function initializeCategoryManagement() {
     initializeCategoryDragDrop();
 }
 
-// Initialize when DOM is ready
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeCategoryManagement);
-} else {
-    initializeCategoryManagement();
+// Export functions for module use
+function initCategories() {
+    return initializeCategoryManagement();
 }
+
+export {
+    initCategories,
+    switchCategory,
+    switchTab,
+    removeCategory,
+    createCategory,
+    renumberCategories,
+    categoryNames,
+    updateCategoryButtonTooltip,
+    ensureTemplatesLoaded
+};

@@ -1,11 +1,6 @@
 // ============================
-// Main Application Entry Point
+// Panel Toggle and Tooltip Utilities
 // ============================
-
-// This file serves as the main entry point for the application.
-// Individual modules are loaded separately:
-// - theme.js: Theme toggle functionality
-// - category.js: Category and tab management
 
 console.log("FAD-3D Application Initialized");
 
@@ -110,14 +105,4 @@ function initializeRightPanelToggle() {
     syncToggleLabel();
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-        initTooltips();
-        initializeLeftPanelToggle();
-        initializeRightPanelToggle();
-    });
-} else {
-    initTooltips();
-    initializeLeftPanelToggle();
-    initializeRightPanelToggle();
-}
+export { initTooltips, initializeLeftPanelToggle, initializeRightPanelToggle };

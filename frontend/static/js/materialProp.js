@@ -2,6 +2,8 @@
 // Material Properties Modal
 // ============================
 
+import { openModal, closeModal } from './floatingBar.js';
+
 const MATERIAL_DATA = {
     'Aluminum': {
         '6063-T5': { e: '70000', fy: '110', fu: '150' },
@@ -288,3 +290,5 @@ function initMaterialModal() {
 
     initMaterialFormEvents();
 }
+
+export { _materials, DEFAULT_MATERIALS, populateSecGradeOptions, animateDefineForm, initMaterialModal };

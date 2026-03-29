@@ -19,8 +19,18 @@ function syncFrameVariant(categoryNum) {
     if (geo && mul) switchFrameVariant(categoryNum, geo.value, mul.value);
 }
 
-// Delegated listener — works for dynamically created categories.
-document.addEventListener("change", (e) => {
+function initFrameInput() {
+    // Initialize on load for all existing categories
+    initFrameVariants();
+
+    // Delegated listener — works for dynamically created categories
+    document.addEventListener("change", frameInputChangeHandler);
+
+    // Listen for section changes
+    document.addEventListener('frame-sections-changed', populateFrameSectionDropdowns);
+}
+
+function frameInputChangeHandler(e) {
     const select = e.target;
     if (!select.matches("select[id$='-frame-geometry'], select[id$='-frame-mullion-type']")) return;
 
@@ -28,7 +38,7 @@ document.addEventListener("change", (e) => {
     if (!match) return;
 
     syncFrameVariant(match[1]);
-});
+}
 
 // Initialize on load for all existing categories.
 function initFrameVariants() {
@@ -70,10 +80,4 @@ function populateFrameSectionDropdowns() {
         });
 }
 
-document.addEventListener('frame-sections-changed', populateFrameSectionDropdowns);
-
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initFrameVariants);
-} else {
-    initFrameVariants();
-}
+export { initFrameInput, switchFrameVariant, populateFrameSectionDropdowns };

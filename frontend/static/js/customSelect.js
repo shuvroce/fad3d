@@ -3,7 +3,7 @@
 // The native <select> stays hidden so all existing .value reads, .value writes,
 // and delegated "change" listeners continue to work without modification.
 
-(function () {
+function initCustomSelectLogic() {
     const nativeValueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
 
     // Build the option list from the native select
@@ -51,9 +51,9 @@
         const rect = wrapper.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom;
         const openUp = spaceBelow < 220 && rect.top > spaceBelow;
-        list.style.top    = openUp ? 'auto' : '100%';
+        list.style.top = openUp ? 'auto' : '100%';
         list.style.bottom = openUp ? '100%' : 'auto';
-        list.style.marginTop    = openUp ? '0'   : '2px';
+        list.style.marginTop = openUp ? '0' : '2px';
         list.style.marginBottom = openUp ? '2px' : '0';
         list.classList.toggle('open-up', openUp);
     }
@@ -64,7 +64,7 @@
         selectEl.dataset.customSelectInit = 'true';
 
         // Wrapper inherits the flex slot from the native select
-        const wrapper  = document.createElement('div');
+        const wrapper = document.createElement('div');
         wrapper.className = 'custom-select';
 
         const selected = document.createElement('div');
@@ -184,9 +184,18 @@
         domObserver.observe(document.body, { childList: true, subtree: true });
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
+    return init;
+}
+
+// Create initialization function
+const initCustomSelectModule = initCustomSelectLogic();
+
+// Close all dropdowns when clicking outside
+document.addEventListener('click', () => {
+    document.querySelectorAll('.custom-select.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.custom-select__selected').setAttribute('aria-expanded', 'false');
+    });
+});
+
+export { initCustomSelectModule as initCustomSelect };

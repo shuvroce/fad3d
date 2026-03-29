@@ -2,6 +2,8 @@
 // Modal Drag System
 // ============================
 
+import { openModal, closeModal } from './floatingBar.js';
+
 function makeDraggable(handle, target) {
     handle.addEventListener('mousedown', (e) => {
         if (e.target.closest('button, input, select, textarea, [contenteditable], .modal__close')) return;
@@ -40,22 +42,6 @@ function initDraggableModals() {
         const target = header.closest('.modal__dialog, .modal__content-calculator');
         if (target) makeDraggable(header, target);
     });
-
-    // Reset position to default every time a modal is opened
-    const _origOpenModal = window.openModal;
-    window.openModal = function(id) {
-        const modal = document.getElementById(id);
-        if (modal) {
-            const target = modal.querySelector('.modal__dialog, .modal__content-calculator');
-            if (target) {
-                target.style.position = '';
-                target.style.margin = '';
-                target.style.left = '';
-                target.style.top = '';
-            }
-        }
-        _origOpenModal(id);
-    };
 }
 
 function initSimpleModalClickOutside() {
@@ -70,7 +56,7 @@ function initSimpleModalClickOutside() {
 // ============================
 
 function initSupportSubmenu() {
-    const btn     = document.getElementById('support-btn');
+    const btn = document.getElementById('support-btn');
     const submenu = document.getElementById('support-submenu');
     if (!btn || !submenu) return;
 
@@ -110,9 +96,7 @@ function initSupportSubmenu() {
     document.getElementById('close-contact-modal-footer')?.addEventListener('click', () => closeModal('contact-modal'));
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { initDraggableModals(); initSimpleModalClickOutside(); initSupportSubmenu(); });
-} else {
+export function initModals() {
     initDraggableModals();
     initSimpleModalClickOutside();
     initSupportSubmenu();

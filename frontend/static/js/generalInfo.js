@@ -2,7 +2,9 @@
 // General Info Modal
 // ============================
 
-function initGeneralModal() {
+import { openModal, closeModal } from './floatingBar.js';
+
+export function initGeneralModal() {
     const modal     = document.getElementById('general-modal');
     const openBtn   = document.getElementById('general-modal-btn');
     const closeBtn  = document.getElementById('close-general-modal');

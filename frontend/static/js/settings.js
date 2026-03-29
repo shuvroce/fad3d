@@ -2,6 +2,8 @@
 // Settings Modal
 // ============================
 
+import { openModal, closeModal } from './floatingBar.js';
+
 const _settingsDefaults = {
     windCode:        'BNBC2020',
     glassCode:       'ASTME1300',
@@ -142,8 +144,4 @@ function initSettingsModal() {
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal('settings-modal'); });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSettingsModal);
-} else {
-    initSettingsModal();
-}
+export { getSettings, initSettingsModal };

@@ -17,14 +17,21 @@ function syncAnchorVariant(categoryNum) {
     if (sel) switchAnchorVariant(categoryNum, sel.value);
 }
 
-// Delegated listener — works for dynamically created categories.
-document.addEventListener("change", (e) => {
+function initAnchorInput() {
+    // Initialize on load for all existing categories
+    initAnchorVariants();
+
+    // Delegated listener — works for dynamically created categories
+    document.addEventListener("change", anchorInputChangeHandler);
+}
+
+function anchorInputChangeHandler(e) {
     const select = e.target;
     if (!select.matches("select[id$='-anchor-type']")) return;
 
     const match = select.id.match(/^cat(\d+)-anchor-type$/);
     if (match) syncAnchorVariant(match[1]);
-});
+}
 
 // Initialize on load for all existing categories.
 function initAnchorVariants() {
@@ -34,8 +41,4 @@ function initAnchorVariants() {
     });
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAnchorVariants);
-} else {
-    initAnchorVariants();
-}
+export { initAnchorInput, switchAnchorVariant };

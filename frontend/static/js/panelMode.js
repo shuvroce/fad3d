@@ -2,6 +2,9 @@
 // Panel Mode Switching (Wind vs Facade)
 // ============================
 
+// Import calc engine functions
+import { runWindCalc } from './calcEngine.js';
+
 let currentPanelMode = "facade"; // 'wind' or 'facade'
 let savedFacadeContent = ""; // Store facade panel content when switching to wind
 let savedCatbarContent = ""; // Store catbar content when switching to wind
@@ -19,8 +22,8 @@ function switchPanelMode(mode) {
 
     // Wind is left button → exiting to right, entering from left
     // Facade is right button → exiting to left, entering from right
-    const exitClass   = mode === "wind" ? "panel-mode-exiting-right"  : "panel-mode-exiting-left";
-    const enterClass  = mode === "wind" ? "panel-mode-entering-left"  : "panel-mode-entering-right";
+    const exitClass = mode === "wind" ? "panel-mode-exiting-right" : "panel-mode-exiting-left";
+    const enterClass = mode === "wind" ? "panel-mode-entering-left" : "panel-mode-entering-right";
 
     // Fade out catbar, input, and toggle together
     inputContainer.classList.add(exitClass);
@@ -193,30 +196,26 @@ function initializeWindPanel() {
                 const dhaka = Array.from(locationSel.options).find(o => o.value === 'Dhaka');
                 if (dhaka) locationSel.value = 'Dhaka';
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     // Wire calculate button to the calc engine
     const calculateBtn = document.querySelector('.wind__btn-calculate');
-    if (calculateBtn) {
-        calculateBtn.addEventListener('click', () => {
-            if (typeof scheduleWindCalc === 'function') scheduleWindCalc();
-        });
+    if (calculateBtn && typeof runWindCalc === 'function') {
+        calculateBtn.addEventListener('click', runWindCalc);
     }
+}
 
-    // Reset button clears all wind inputs
-    const resetBtn = document.querySelector('.wind__btn-reset');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            document.querySelectorAll('.wind__panel input, .wind__panel select').forEach(input => {
-                if (input.tagName === 'SELECT') {
-                    input.selectedIndex = 0;
-                } else {
-                    input.value = '';
-                }
-            });
-        });
-    }
+function initPanelMode() {
+    const windBtn = document.querySelector('.floating__bar-left-button .floating__bar-btn:first-child');
+    const facadeBtn = document.querySelector('.floating__bar-left-button .floating__bar-btn:last-child');
+
+    if (windBtn) windBtn.addEventListener('click', () => switchPanelMode('wind'));
+    if (facadeBtn) facadeBtn.addEventListener('click', () => switchPanelMode('facade'));
+}
+
+function getCurrentPanelMode() {
+    return currentPanelMode;
 }
 
 // Function to update floating bar button states
@@ -244,32 +243,4 @@ function updateFloatingBarButtons(mode) {
     }
 }
 
-// Initialize panel mode system when DOM is ready
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializePanelMode);
-} else {
-    initializePanelMode();
-}
-
-function initializePanelMode() {
-    // Get floating bar buttons
-    const windBtn = document.querySelector(
-        ".floating__bar-left .floating__bar-btn:first-child",
-    );
-    const facadeBtn = document.querySelector(
-        ".floating__bar-left .floating__bar-btn:last-child",
-    );
-
-    if (windBtn && facadeBtn) {
-        // Add data attributes for easier identification
-        windBtn.setAttribute("data-mode", "wind");
-        facadeBtn.setAttribute("data-mode", "facade");
-
-        // Add click handlers
-        windBtn.addEventListener("click", () => switchPanelMode("wind"));
-        facadeBtn.addEventListener("click", () => switchPanelMode("facade"));
-    }
-
-    // Start in facade mode (default)
-    // Categories will be initialized by category.js
-}
+export { initPanelMode, switchPanelMode, getCurrentPanelMode, reattachCategoryEventListeners };

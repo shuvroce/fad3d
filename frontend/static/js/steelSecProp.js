@@ -2,6 +2,9 @@
 // Steel Section Properties Modal
 // ============================
 
+import { openModal, closeModal } from './floatingBar.js';
+import { _materials, populateSecGradeOptions, animateDefineForm } from './materialProp.js';
+
 const DEFAULT_STEEL_SECTIONS = [
     { name: 'RHS 85x50x2.5', profileType: 'steel-rhs', grade: '', d: '85', b: '50',  t: '2.5', tf: '',  tw: '' },
     { name: 'W 85x50x4-3',   profileType: 'steel-w',   grade: '', d: '85', b: '50',  t: '',    tf: '4', tw: '3' },
@@ -255,6 +258,8 @@ function openSteelSectionModal() {
     openModal('steel-section-modal');
 }
 
-function initSteelSectionModal() {
+export function initSteelSectionModal() {
     document.getElementById('section-steel-btn')?.addEventListener('click', openSteelSectionModal);
 }
+
+export { _steelSections };

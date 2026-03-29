@@ -285,3 +285,5 @@ function updateFacadeResults(catNum, results) {
     _setBody('#facade-conn-body', _renderConnection(results.conn));
     _setBody('#facade-anchor-body', _renderAnchorage(results.anchor));
 }
+
+export { updateWindResults, updateFacadeResults };

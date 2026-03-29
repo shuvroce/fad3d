@@ -27,8 +27,12 @@ function syncPointFixedFields(glassSection, isPointFixed) {
     });
 }
 
-// Delegated listener so it works for dynamically created categories.
-document.addEventListener("change", (e) => {
+function initGlassInput() {
+    // Delegated listener so it works for dynamically created categories
+    document.addEventListener("change", glassInputChangeHandler);
+}
+
+function glassInputChangeHandler(e) {
     const select = e.target;
 
     // Glass type switching
@@ -42,4 +46,6 @@ document.addEventListener("change", (e) => {
         const glassSection = select.closest('.glass__type-fields');
         if (glassSection) syncPointFixedFields(glassSection, select.value === 'Point Fixed');
     }
-});
+}
+
+export { initGlassInput, switchGlassType };
