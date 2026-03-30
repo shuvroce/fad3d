@@ -8,11 +8,11 @@ import pikepdf
 from calcs.calc_helpers import precompute_data
 
 BASE_DIR = os.path.dirname(__file__)
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(BASE_DIR)))
-FRONTEND_DIR = os.path.join(REPO_ROOT, "frontend")
-INPUT_YAML = os.path.join(REPO_ROOT, "input.yaml")
-OUT_PDF = os.path.join(REPO_ROOT, "report.pdf")
-OUT_SUMMARY_PDF = os.path.join(REPO_ROOT, "summary.pdf")
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(BASE_DIR)))
+FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
+INPUT_YAML = os.path.join(ROOT_DIR, "input.yaml")
+OUT_PDF = os.path.join(ROOT_DIR, "report.pdf")
+OUT_SUMMARY_PDF = os.path.join(ROOT_DIR, "summary.pdf")
 TEMPLATE_DIR = os.path.join(FRONTEND_DIR, "templates")
 REPORT_TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 DEFAULT_INPUTS_DIR = os.path.join(REPORT_TEMPLATE_DIR, "inputs")
