@@ -6,7 +6,8 @@
 export const categoryIcons = new Map();
 
 // Available SVG icons: key -> { label, svg path/markup }
-const SVG_ICONS = {
+// FIX: exported so category.js can import and use SVG_ICONS directly
+export const SVG_ICONS = {
     building: { label: "Building", svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M9 22V12h6v10"/><path d="M3 9h18"/><path d="M9 3v6"/><path d="M15 3v6"/></svg>` },
     tower: { label: "Tower", svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V8l6-6 6 6v14"/><path d="M6 12h12"/><path d="M6 17h12"/><path d="M10 22v-4h4v4"/></svg>` },
     columns: { label: "Columns", svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="4" height="20" rx="1"/><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="18" y="2" width="4" height="20" rx="1"/></svg>` },
@@ -133,7 +134,7 @@ export function showCategoryContextMenu(e, categoryNum) {
     menu.className = "catbar__context-menu";
     menu.setAttribute("role", "menu");
 
-    // Customize icon option
+    // ── Customize icon ──────────────────────────────────────────────────────
     const customizeItem = document.createElement("li");
     customizeItem.className = "catbar__context-menu-item";
     customizeItem.setAttribute("role", "menuitem");
@@ -143,23 +144,38 @@ export function showCategoryContextMenu(e, categoryNum) {
         showIconSelector(categoryNum);
     });
 
-    // Delete option
+    // ── Duplicate ───────────────────────────────────────────────────────────
+    const duplicateItem = document.createElement("li");
+    duplicateItem.className = "catbar__context-menu-item";
+    duplicateItem.setAttribute("role", "menuitem");
+    duplicateItem.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicate`;
+    duplicateItem.addEventListener("click", () => {
+        closeCategoryContextMenu();
+        document.dispatchEvent(
+            new CustomEvent("category-duplicate-requested", { detail: { categoryNum } })
+        );
+    });
+
+    // ── Delete ──────────────────────────────────────────────────────────────
     const deleteItem = document.createElement("li");
     deleteItem.className = "catbar__context-menu-item catbar__context-menu-item--danger";
     deleteItem.setAttribute("role", "menuitem");
     deleteItem.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>Delete`;
     deleteItem.addEventListener("click", () => {
         closeCategoryContextMenu();
-        document.dispatchEvent(new CustomEvent('category-remove-requested', { detail: { categoryNum } }));
+        document.dispatchEvent(
+            new CustomEvent("category-remove-requested", { detail: { categoryNum } })
+        );
     });
 
     menu.appendChild(customizeItem);
+    menu.appendChild(duplicateItem);
     menu.appendChild(deleteItem);
     document.body.appendChild(menu);
 
     // Position near cursor, keep within viewport
     const menuWidth = 170;
-    const menuHeight = 88;
+    const menuHeight = 132; // 3 items × ~44px
     let x = e.clientX;
     let y = e.clientY;
     if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - 6;
@@ -180,7 +196,7 @@ function closeCategoryContextMenu() {
 }
 
 export function initCategoryContextMenu() {
-    // Close on Escape key
+    // Close on Escape key — registered only ONCE via initializeCategoryIcons()
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") closeCategoryContextMenu();
     });
@@ -211,5 +227,6 @@ export function initializeCategoryIcons() {
         });
     }
 
+    // Escape key handler — registered once here, not per-category
     initCategoryContextMenu();
 }

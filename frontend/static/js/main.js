@@ -10,12 +10,12 @@ import { initTheme } from './theme.js';
 import { initTooltips, initializeLeftPanelToggle, initializeRightPanelToggle } from './app.js';
 import { initCustomSelect } from './customSelect.js';
 import { initPanelMode } from './panelMode.js';
-import { initViewControls } from './viewControls.js';
-import { initFiguresPanel } from './viewControls.js';
+import { initViewControls, initFiguresPanel } from './viewControls.js';
 
 // Import category system
 import { initCategories } from './category.js';
-import { initializeCategoryIcons } from './categoryIcons.js';
+// NOTE: initializeCategoryIcons is called internally by initCategories() —
+// do NOT import or call it here to avoid duplicate listener registration.
 
 // Import input handlers
 import { initGlassInput } from './glassInput.js';
@@ -115,17 +115,13 @@ async function initPhase3() {
     console.log('[Main] Phase 3: Category system and input handlers');
 
     try {
+        // initCategories() internally calls initializeCategoryIcons() —
+        // no separate call needed here.
         await initCategories();
         console.log('[Main] ✓ Categories initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Categories initialization failed:', error);
-    }
-
-    try {
-        initializeCategoryIcons();
         console.log('[Main] ✓ Category icons initialized');
     } catch (error) {
-        console.error('[Main] ✗ Category icons initialization failed:', error);
+        console.error('[Main] ✗ Categories initialization failed:', error);
     }
 
     try {

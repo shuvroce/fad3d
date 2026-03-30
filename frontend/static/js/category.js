@@ -2,14 +2,28 @@
 // Category & Tab Management
 // ============================
 
+import {
+    categoryIcons,
+    SVG_ICONS,
+    DEFAULT_CATEGORY_ICON,
+    availableIcons,
+    reattachCategoryIcons,
+    showCategoryContextMenu,
+    initializeCategoryIcons,
+} from './categoryIcons.js';
+
+import { populateFrameSectionDropdowns } from './frameInput.js';
+
 let categoryCount = 0;
 const categoryNames = new Map(); // Store custom category names
 
-// Function to switch categories
+// ============================
+// Switch Category
+// ============================
+
 function switchCategory(categoryNum) {
     const current = document.querySelector(".input__category-content:not(.hidden)");
 
-    // Immediately update button states
     document.querySelectorAll(".category__btn").forEach((btn) => {
         btn.classList.remove("active");
     });
@@ -18,7 +32,6 @@ function switchCategory(categoryNum) {
     );
     if (activeButton) activeButton.classList.add("active");
 
-    // Notify dependents immediately
     window.dispatchEvent(
         new CustomEvent("category-switched", {
             detail: { categoryNum: Number(categoryNum) },
@@ -44,13 +57,15 @@ function switchCategory(categoryNum) {
     }
 }
 
-// Function to switch tabs within a category
+// ============================
+// Switch Tab
+// ============================
+
 function switchTab(categoryNum, tabName) {
     const current = document.querySelector(
         `.input__tab-content[data-category="${categoryNum}"]:not(.hidden)`,
     );
 
-    // Immediately update button states
     document
         .querySelectorAll(`.input__box-nav-btn[data-category="${categoryNum}"]`)
         .forEach((button) => button.classList.remove("active"));
@@ -80,54 +95,45 @@ function switchTab(categoryNum, tabName) {
     }
 }
 
-// Function to remove a category
+// ============================
+// Remove Category
+// ============================
+
 function removeCategory(categoryNum) {
-    // Don't allow removal of the last remaining category
     if (categoryCount === 1) {
         alert("Cannot remove the last category");
         return;
     }
 
-    // Check if the category being deleted is currently active
     const categoryButton = document.querySelector(
         `.category__btn[data-category="${categoryNum}"]`,
     );
-    const isActive =
-        categoryButton && categoryButton.classList.contains("active");
+    const isActive = categoryButton && categoryButton.classList.contains("active");
 
-    // Remove category button wrapper
     const categoryWrapper = document.querySelector(
         `.catbar__btn-wrapper[data-category="${categoryNum}"]`,
     );
-    if (categoryWrapper) {
-        categoryWrapper.remove();
-    }
+    if (categoryWrapper) categoryWrapper.remove();
 
-    // Remove category content
     const categoryContent = document.querySelector(
         `.input__category-content[data-category="${categoryNum}"]`,
     );
-    if (categoryContent) {
-        categoryContent.remove();
-    }
+    if (categoryContent) categoryContent.remove();
 
-    // Renumber all categories after the deleted one
     renumberCategories();
-
-    // Decrease category count
     categoryCount--;
 
-    // Only switch categories if the deleted category was active
     if (isActive) {
-        // Switch to the category before the deleted one (or category 1 if deleting category 1)
         const targetCategory = categoryNum > 1 ? categoryNum - 1 : 1;
         switchCategory(targetCategory);
     }
 }
 
-// Function to renumber all categories to maintain sequential order (1, 2, 3, ...)
+// ============================
+// Renumber Categories
+// ============================
+
 function renumberCategories() {
-    // Get all category wrappers in DOM order
     const categoryWrappers = Array.from(
         document.querySelectorAll(".catbar__btn-wrapper"),
     );
@@ -135,59 +141,46 @@ function renumberCategories() {
         document.querySelectorAll(".input__category-content"),
     );
 
-    // Snapshot all per-category data keyed by OLD number before any mutations
+    // Snapshot old numbers before any mutations
     const oldNums = categoryWrappers.map((w) =>
         parseInt(w.getAttribute("data-category")),
     );
     const nameSnapshot = new Map(oldNums.map((n) => [n, categoryNames.get(n)]));
-    const iconSnapshot =
-        typeof categoryIcons !== "undefined"
-            ? new Map(oldNums.map((n) => [n, categoryIcons.get(n)]))
-            : null;
+    const iconSnapshot = new Map(oldNums.map((n) => [n, categoryIcons.get(n)]));
 
-    // Rebuild Maps from scratch using the new sequential order
+    // Rebuild Maps with new sequential numbers
     categoryNames.clear();
     nameSnapshot.forEach((name, oldNum) => {
         const newNum = oldNums.indexOf(oldNum) + 1;
         if (name) categoryNames.set(newNum, name);
     });
-    if (iconSnapshot && typeof categoryIcons !== "undefined") {
-        categoryIcons.clear();
-        iconSnapshot.forEach((icon, oldNum) => {
-            const newNum = oldNums.indexOf(oldNum) + 1;
-            if (icon) categoryIcons.set(newNum, icon);
-        });
-    }
 
-    // Renumber each category wrapper and its content
+    categoryIcons.clear();
+    iconSnapshot.forEach((icon, oldNum) => {
+        const newNum = oldNums.indexOf(oldNum) + 1;
+        if (icon) categoryIcons.set(newNum, icon);
+    });
+
+    // Renumber wrappers and buttons
     categoryWrappers.forEach((wrapper, index) => {
         const newCategoryNum = index + 1;
-        const oldCategoryNum = oldNums[index];
-
-        // Update wrapper data-category
         wrapper.setAttribute("data-category", newCategoryNum);
 
-        // Update category button
         const categoryBtn = wrapper.querySelector(".category__btn");
         if (categoryBtn) {
-            const customName =
-                categoryNames.get(newCategoryNum) ||
-                `Category ${newCategoryNum}`;
+            const customName = categoryNames.get(newCategoryNum) || `Category ${newCategoryNum}`;
             categoryBtn.setAttribute("data-category", newCategoryNum);
             categoryBtn.setAttribute("data-title", customName);
             categoryBtn.setAttribute("aria-label", customName);
 
-            // Update index badge
             const badge = categoryBtn.querySelector(".category__btn-badge");
             if (badge) badge.textContent = newCategoryNum;
 
-            // Re-attach click event
+            // Re-attach events via cloneNode (clears old stale closures)
             categoryBtn.replaceWith(categoryBtn.cloneNode(true));
-            const newCategoryBtn = wrapper.querySelector(".category__btn");
-            newCategoryBtn.addEventListener("click", () => {
-                switchCategory(newCategoryNum);
-            });
-            newCategoryBtn.addEventListener("contextmenu", (e) => {
+            const newBtn = wrapper.querySelector(".category__btn");
+            newBtn.addEventListener("click", () => switchCategory(newCategoryNum));
+            newBtn.addEventListener("contextmenu", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 showCategoryContextMenu(e, newCategoryNum);
@@ -195,15 +188,11 @@ function renumberCategories() {
         }
     });
 
-    // Renumber category contents
+    // Renumber content panels
     categoryContents.forEach((content, index) => {
         const newCategoryNum = index + 1;
-        const oldCategoryNum = parseInt(content.getAttribute("data-category"));
-
-        // Update content data-category
         content.setAttribute("data-category", newCategoryNum);
 
-        // Update h2 heading
         const heading = content.querySelector("h2");
         if (heading) {
             const customName = categoryNames.get(newCategoryNum);
@@ -211,50 +200,33 @@ function renumberCategories() {
             heading.setAttribute("data-category", newCategoryNum);
         }
 
-        // Update all tab buttons
+        // Clone tab buttons to clear stale listeners, then re-attach
         content.querySelectorAll(".input__box-nav-btn").forEach((tabBtn) => {
             tabBtn.setAttribute("data-category", newCategoryNum);
             tabBtn.replaceWith(tabBtn.cloneNode(true));
         });
-
-        // Re-attach events to new tab buttons
         content.querySelectorAll(".input__box-nav-btn").forEach((button) => {
             button.addEventListener("click", () => {
-                const catNum = button.getAttribute("data-category");
-                const tabName = button.getAttribute("data-tab");
-                switchTab(catNum, tabName);
+                switchTab(button.getAttribute("data-category"), button.getAttribute("data-tab"));
             });
         });
 
-        // Update all tab contents
-        content
-            .querySelectorAll(".input__tab-content")
-            .forEach((tabContent) => {
-                tabContent.setAttribute("data-category", newCategoryNum);
-            });
+        content.querySelectorAll(".input__tab-content").forEach((el) =>
+            el.setAttribute("data-category", newCategoryNum)
+        );
+        content.querySelectorAll(".glass__type-fields").forEach((el) =>
+            el.setAttribute("data-category", newCategoryNum)
+        );
+        content.querySelectorAll(".frame__variant-fields").forEach((el) =>
+            el.setAttribute("data-category", newCategoryNum)
+        );
 
-        // Update glass type sub-sections
-        content
-            .querySelectorAll(".glass__type-fields")
-            .forEach((section) => {
-                section.setAttribute("data-category", newCategoryNum);
-            });
-
-        // Update frame variant sub-sections
-        content
-            .querySelectorAll(".frame__variant-fields")
-            .forEach((section) => {
-                section.setAttribute("data-category", newCategoryNum);
-            });
-
-        // Update all form field IDs and labels
         content.querySelectorAll("label[for]").forEach((label) => {
             label.setAttribute(
                 "for",
                 label.getAttribute("for").replace(/cat\d+/, `cat${newCategoryNum}`),
             );
         });
-
         content.querySelectorAll("input[id], select[id]").forEach((field) => {
             field.setAttribute(
                 "id",
@@ -263,48 +235,40 @@ function renumberCategories() {
         });
     });
 
-    // Restore icons after renumber (icons already migrated in Map)
-    if (typeof reattachCategoryIcons === "function") {
-        reattachCategoryIcons();
-    }
+    // Restore icon SVGs after renumber
+    reattachCategoryIcons();
 }
 
-// Function to create new category
+// ============================
+// Create Category
+// ============================
+
 function createCategory(categoryNum) {
-    // Create wrapper for button and remove button
+    // ── Catbar button wrapper ───────────────────────────────────────────────
     const btnWrapper = document.createElement("div");
     btnWrapper.className = "catbar__btn-wrapper";
     btnWrapper.setAttribute("data-category", categoryNum);
     btnWrapper.setAttribute("draggable", "true");
 
-    // Create category button
     const categoryBtn = document.createElement("button");
     categoryBtn.className = "catbar__btn category__btn";
     categoryBtn.setAttribute("data-category", categoryNum);
     categoryBtn.setAttribute("data-title", `Category ${categoryNum}`);
     categoryBtn.setAttribute("aria-label", `Category ${categoryNum}`);
 
-    // Icon element (main content)
     const iconEl = document.createElement("span");
     iconEl.className = "category__btn-icon";
-    const iconKey = (typeof categoryIcons !== "undefined" && categoryIcons.get(categoryNum)) || (typeof DEFAULT_CATEGORY_ICON !== "undefined" ? DEFAULT_CATEGORY_ICON : null);
-    const iconDef = (typeof SVG_ICONS !== "undefined" && iconKey) ? SVG_ICONS[iconKey] : null;
-    iconEl.innerHTML = iconDef ? iconDef.svg : "";
+    const iconKey = categoryIcons.get(categoryNum) || DEFAULT_CATEGORY_ICON;
+    const iconDef = SVG_ICONS[iconKey];
+    iconEl.innerHTML = iconDef ? iconDef.svg : SVG_ICONS[DEFAULT_CATEGORY_ICON].svg;
 
-    // Index badge
     const badge = document.createElement("span");
     badge.className = "category__btn-badge";
     badge.textContent = categoryNum;
 
     categoryBtn.appendChild(iconEl);
     categoryBtn.appendChild(badge);
-
-    // Add click event to new category button
-    categoryBtn.addEventListener("click", () => {
-        switchCategory(categoryNum);
-    });
-
-    // Right-click context menu
+    categoryBtn.addEventListener("click", () => switchCategory(categoryNum));
     categoryBtn.addEventListener("contextmenu", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -312,124 +276,206 @@ function createCategory(categoryNum) {
     });
 
     btnWrapper.appendChild(categoryBtn);
+    document.querySelector(".catbar__scroll").appendChild(btnWrapper);
 
-    // Insert into the scrollable category list
-    const catbarScroll = document.querySelector(".catbar__scroll");
-    catbarScroll.appendChild(btnWrapper);
-
-    // Create category content
+    // ── Content panel ───────────────────────────────────────────────────────
     const categoryContent = document.createElement("div");
-    // First category should not be hidden by default
     categoryContent.className =
-        categoryNum === 1
-            ? "input__category-content"
-            : "input__category-content hidden";
+        categoryNum === 1 ? "input__category-content" : "input__category-content hidden";
     categoryContent.setAttribute("data-category", categoryNum);
-    // Clone template and populate with category-specific data
+
     const template = document.getElementById("category-content-template");
     const clone = template.content.cloneNode(true);
 
-    // Update all data-category attributes
-    clone.querySelectorAll("[data-category]").forEach((el) => {
-        el.setAttribute("data-category", categoryNum);
-    });
-
-    // Update all form field IDs (cat0 → catN)
+    clone.querySelectorAll("[data-category]").forEach((el) =>
+        el.setAttribute("data-category", categoryNum)
+    );
     clone.querySelectorAll("[id]").forEach((el) => {
         el.id = el.id.replace("cat0", `cat${categoryNum}`);
     });
-
-    // Update all label for attributes
     clone.querySelectorAll("label[for]").forEach((label) => {
         label.setAttribute("for", label.getAttribute("for").replace("cat0", `cat${categoryNum}`));
     });
-
-    // Set heading text
     clone.querySelector(".input__category-heading").textContent = `Category ${categoryNum}`;
 
     categoryContent.appendChild(clone);
-
-    // Add category content to input container
     document.getElementById("input-container").appendChild(categoryContent);
 
-    // Add event listeners to new tab buttons
-    categoryContent
-        .querySelectorAll(".input__box-nav-btn")
-        .forEach((button) => {
-            button.addEventListener("click", () => {
-                const catNum = button.getAttribute("data-category");
-                const tabName = button.getAttribute("data-tab");
-                switchTab(catNum, tabName);
-            });
+    // Tab button listeners
+    categoryContent.querySelectorAll(".input__box-nav-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+            switchTab(button.getAttribute("data-category"), button.getAttribute("data-tab"));
         });
+    });
 
-    // Attach context menu to the new button
-    if (typeof initCategoryContextMenu === "function") {
-        initCategoryContextMenu();
-    }
+    // NOTE: initCategoryContextMenu() is NOT called here — registered once
+    // globally inside initializeCategoryIcons() to avoid duplicate listeners.
 
-    // Initialize frame variant visibility for the new category
-    if (typeof syncFrameVariant === "function") {
-        syncFrameVariant(categoryNum);
-    }
+    if (typeof syncFrameVariant === "function") syncFrameVariant(categoryNum);
+    if (typeof syncAnchorVariant === "function") syncAnchorVariant(categoryNum);
 
-    // Initialize anchor variant visibility for the new category
-    if (typeof syncAnchorVariant === "function") {
-        syncAnchorVariant(categoryNum);
-    }
-
-    // Add event listener to category heading for editing
-    const heading = categoryContent.querySelector(".input__category-heading");
-    if (heading) {
-        // Save custom name on blur - read current category number dynamically
-        heading.addEventListener("blur", () => {
-            const currentCatNum = parseInt(
-                heading.getAttribute("data-category"),
-            );
-            const newName = heading.textContent.trim();
-            const defaultName = `Category ${currentCatNum}`;
-            if (newName && newName !== defaultName) {
-                categoryNames.set(currentCatNum, newName);
-                updateCategoryButtonTooltip(currentCatNum, newName);
-            } else {
-                categoryNames.delete(currentCatNum);
-                heading.textContent = defaultName;
-                updateCategoryButtonTooltip(currentCatNum, defaultName);
-            }
-
-            // Keep Design Summary title in sync if this is the active category
-            const activeBtn = document.querySelector(".category__btn.active");
-            const activeCatNum = activeBtn
-                ? Number(activeBtn.getAttribute("data-category"))
-                : null;
-            if (
-                activeCatNum === currentCatNum &&
-                typeof updateFacadeResultCategory === "function"
-            ) {
-                updateFacadeResultCategory(currentCatNum);
-            }
-        });
-
-        // Prevent enter key from creating new line
-        heading.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                heading.blur();
-            }
-        });
-
-        // Select all text when clicked
-        heading.addEventListener("click", () => {
-            const selection = window.getSelection();
-            const range = document.createRange();
-            range.selectNodeContents(heading);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        });
-    }
+    // Heading edit listeners
+    _attachHeadingListeners(categoryContent, categoryNum);
 }
 
-// Function to update category button tooltip
+// ============================
+// Duplicate Category
+// ============================
+
+function duplicateCategory(sourceCategoryNum) {
+    // ── Resolve source elements ─────────────────────────────────────────────
+    const sourceWrapper = document.querySelector(
+        `.catbar__btn-wrapper[data-category="${sourceCategoryNum}"]`,
+    );
+    const sourceContent = document.querySelector(
+        `.input__category-content[data-category="${sourceCategoryNum}"]`,
+    );
+    if (!sourceWrapper || !sourceContent) return;
+
+    categoryCount++;
+    const newNum = categoryCount;
+
+    // Copy icon and name from source
+    const sourceIcon = categoryIcons.get(sourceCategoryNum) || DEFAULT_CATEGORY_ICON;
+    const sourceName = categoryNames.get(sourceCategoryNum) || `Category ${sourceCategoryNum}`;
+    const newName = `${sourceName} (Copy)`;
+
+    categoryIcons.set(newNum, sourceIcon);
+    categoryNames.set(newNum, newName);
+
+    // ── Build new catbar button, insert right after source ──────────────────
+    const newWrapper = document.createElement("div");
+    newWrapper.className = "catbar__btn-wrapper";
+    newWrapper.setAttribute("data-category", newNum);
+    newWrapper.setAttribute("draggable", "true");
+
+    const newBtn = document.createElement("button");
+    newBtn.className = "catbar__btn category__btn";
+    newBtn.setAttribute("data-category", newNum);
+    newBtn.setAttribute("data-title", newName);
+    newBtn.setAttribute("aria-label", newName);
+
+    const iconEl = document.createElement("span");
+    iconEl.className = "category__btn-icon";
+    const iconDef = SVG_ICONS[sourceIcon];
+    iconEl.innerHTML = iconDef ? iconDef.svg : SVG_ICONS[DEFAULT_CATEGORY_ICON].svg;
+
+    const badge = document.createElement("span");
+    badge.className = "category__btn-badge";
+    badge.textContent = newNum;
+
+    newBtn.appendChild(iconEl);
+    newBtn.appendChild(badge);
+    newBtn.addEventListener("click", () => switchCategory(newNum));
+    newBtn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showCategoryContextMenu(e, newNum);
+    });
+
+    newWrapper.appendChild(newBtn);
+    // Insert immediately after the source wrapper in the catbar
+    sourceWrapper.insertAdjacentElement("afterend", newWrapper);
+
+    // ── Deep-clone content panel, insert right after source ─────────────────
+    const newContent = sourceContent.cloneNode(true);
+    newContent.classList.add("hidden");
+    newContent.setAttribute("data-category", newNum);
+
+    // Rewrite all data-category, IDs, and label[for] inside the clone
+    newContent.querySelectorAll("[data-category]").forEach((el) =>
+        el.setAttribute("data-category", newNum)
+    );
+    newContent.querySelectorAll("[id]").forEach((el) => {
+        el.id = el.id.replace(/cat\d+/, `cat${newNum}`);
+    });
+    newContent.querySelectorAll("label[for]").forEach((label) => {
+        label.setAttribute(
+            "for",
+            label.getAttribute("for").replace(/cat\d+/, `cat${newNum}`),
+        );
+    });
+
+    // Update the visible heading
+    const heading = newContent.querySelector(".input__category-heading");
+    if (heading) {
+        heading.textContent = newName;
+        heading.setAttribute("data-category", newNum);
+    }
+
+    // Insert immediately after source content
+    sourceContent.insertAdjacentElement("afterend", newContent);
+
+    // Re-attach tab button listeners on the clone
+    newContent.querySelectorAll(".input__box-nav-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+            switchTab(button.getAttribute("data-category"), button.getAttribute("data-tab"));
+        });
+    });
+
+    // Re-attach heading edit listeners on the clone
+    _attachHeadingListeners(newContent, newNum);
+
+    // ── Renumber to keep sequential order, then switch to the new category ───
+    // renumberCategories will shift newNum if needed; find its final slot by
+    // position (it was inserted right after the source, so its index = sourceCategoryNum)
+    renumberCategories();
+
+    // After renumber, the duplicate sits at sourceCategoryNum + 1 positionally
+    // unless the source was at the end. Derive the final number from the DOM.
+    const allWrappers = Array.from(document.querySelectorAll(".catbar__btn-wrapper"));
+    const finalIdx = allWrappers.indexOf(newWrapper);
+    const finalNum = finalIdx !== -1 ? finalIdx + 1 : newNum;
+
+    switchCategory(finalNum);
+    populateFrameSectionDropdowns?.();
+}
+
+// ============================
+// Heading Edit Listeners (shared by createCategory + duplicateCategory)
+// ============================
+
+function _attachHeadingListeners(contentEl, categoryNum) {
+    const heading = contentEl.querySelector(".input__category-heading");
+    if (!heading) return;
+
+    heading.addEventListener("blur", () => {
+        const currentCatNum = parseInt(heading.getAttribute("data-category"));
+        const newName = heading.textContent.trim();
+        const defaultName = `Category ${currentCatNum}`;
+        if (newName && newName !== defaultName) {
+            categoryNames.set(currentCatNum, newName);
+            updateCategoryButtonTooltip(currentCatNum, newName);
+        } else {
+            categoryNames.delete(currentCatNum);
+            heading.textContent = defaultName;
+            updateCategoryButtonTooltip(currentCatNum, defaultName);
+        }
+
+        const activeBtn = document.querySelector(".category__btn.active");
+        const activeCatNum = activeBtn ? Number(activeBtn.getAttribute("data-category")) : null;
+        if (activeCatNum === currentCatNum && typeof updateFacadeResultCategory === "function") {
+            updateFacadeResultCategory(currentCatNum);
+        }
+    });
+
+    heading.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); heading.blur(); }
+    });
+
+    heading.addEventListener("click", () => {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(heading);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    });
+}
+
+// ============================
+// Update Tooltip
+// ============================
+
 function updateCategoryButtonTooltip(categoryNum, tooltipText) {
     const categoryBtn = document.querySelector(
         `.category__btn[data-category="${categoryNum}"]`,
@@ -440,43 +486,34 @@ function updateCategoryButtonTooltip(categoryNum, tooltipText) {
     }
 }
 
-// Global function to initialize/reinitialize the entire category system
+// ============================
+// Re-initialize (used by external callers)
+// ============================
+
 async function initializeCategories() {
-    // Clear existing categories from DOM
     const inputContainer = document.getElementById("input-container");
-    if (inputContainer) {
-        inputContainer.innerHTML = "";
-    }
+    if (inputContainer) inputContainer.innerHTML = "";
 
-    // Clear existing category buttons from catbar
-    const categoryButtonWrappers = document.querySelectorAll(
-        ".catbar__btn-wrapper",
-    );
-    categoryButtonWrappers.forEach((wrapper) => wrapper.remove());
+    document.querySelectorAll(".catbar__btn-wrapper").forEach((w) => w.remove());
 
-    // Reset category data
     categoryCount = 1;
     categoryNames.clear();
 
     await ensureTemplatesLoaded();
 
-    // Create first category
     createCategory(1);
     switchCategory(1);
 
-    // Reattach add category button handler
     const addBtn = document.getElementById("cat-add");
     if (addBtn) {
-        // Remove old listeners by cloning
         const newAddBtn = addBtn.cloneNode(true);
         addBtn.replaceWith(newAddBtn);
-
-        // Add fresh listener
         newAddBtn.addEventListener("click", () => {
             categoryCount++;
-            if (typeof availableIcons !== "undefined" && typeof categoryIcons !== "undefined") {
-                categoryIcons.set(categoryCount, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
-            }
+            categoryIcons.set(
+                categoryCount,
+                availableIcons[Math.floor(Math.random() * availableIcons.length)]
+            );
             createCategory(categoryCount);
             switchCategory(categoryCount);
             populateFrameSectionDropdowns?.();
@@ -484,7 +521,10 @@ async function initializeCategories() {
     }
 }
 
-// Fetch and inject input-temp.html if not already included by Flask/Jinja2
+// ============================
+// Template Loader
+// ============================
+
 async function ensureTemplatesLoaded() {
     if (document.getElementById("category-content-template")) return;
     const response = await fetch("/templates/input-temp.html");
@@ -494,7 +534,10 @@ async function ensureTemplatesLoaded() {
     document.body.appendChild(container);
 }
 
-// Drag-and-drop reordering of category buttons
+// ============================
+// Drag-and-Drop
+// ============================
+
 function initializeCategoryDragDrop() {
     const catbar = document.querySelector(".catbar__scroll");
     let dragSrc = null;
@@ -536,7 +579,6 @@ function initializeCategoryDragDrop() {
         const targetWrapper = e.target.closest(".catbar__btn-wrapper");
         if (!targetWrapper || !dragSrc || targetWrapper === dragSrc) return;
 
-        // Determine insert position based on cursor position
         const rect = targetWrapper.getBoundingClientRect();
         const insertBefore = e.clientY < rect.top + rect.height / 2;
         const addBtn = document.querySelector("#cat-add");
@@ -547,15 +589,15 @@ function initializeCategoryDragDrop() {
             catbar.insertBefore(dragSrc, targetWrapper.nextSibling || addBtn);
         }
 
-        // Reorder category contents to match new catbar order
         const inputContainer = document.getElementById("input-container");
         document.querySelectorAll(".catbar__btn-wrapper").forEach((wrapper) => {
             const catNum = parseInt(wrapper.getAttribute("data-category"));
-            const content = document.querySelector(`.input__category-content[data-category="${catNum}"]`);
+            const content = document.querySelector(
+                `.input__category-content[data-category="${catNum}"]`
+            );
             if (content) inputContainer.appendChild(content);
         });
 
-        // Get new index of dragged wrapper before renumbering
         const newWrappers = Array.from(document.querySelectorAll(".catbar__btn-wrapper"));
         const newCategoryNum = newWrappers.indexOf(dragSrc) + 1;
 
@@ -564,21 +606,35 @@ function initializeCategoryDragDrop() {
     });
 }
 
-// Initialize event listeners
+// ============================
+// Bootstrap
+// ============================
+
 async function initializeCategoryManagement() {
     await ensureTemplatesLoaded();
 
-    // Create the first category by default
     categoryCount = 1;
     createCategory(1);
     switchCategory(1);
 
-    // Add category button click handler
+    // Initialize icon system (modal, Escape key, remove-icon btn) — called ONCE here
+    initializeCategoryIcons();
+
+    // Listen for context-menu events dispatched by categoryIcons.js
+    document.addEventListener("category-remove-requested", (e) => {
+        removeCategory(e.detail.categoryNum);
+    });
+    document.addEventListener("category-duplicate-requested", (e) => {
+        duplicateCategory(e.detail.categoryNum);
+    });
+
+    // "+" button
     document.getElementById("cat-add").addEventListener("click", () => {
         categoryCount++;
-        if (typeof availableIcons !== "undefined" && typeof categoryIcons !== "undefined") {
-            categoryIcons.set(categoryCount, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
-        }
+        categoryIcons.set(
+            categoryCount,
+            availableIcons[Math.floor(Math.random() * availableIcons.length)]
+        );
         createCategory(categoryCount);
         switchCategory(categoryCount);
         populateFrameSectionDropdowns?.();
@@ -587,7 +643,6 @@ async function initializeCategoryManagement() {
     initializeCategoryDragDrop();
 }
 
-// Export functions for module use
 function initCategories() {
     return initializeCategoryManagement();
 }
@@ -598,8 +653,9 @@ export {
     switchTab,
     removeCategory,
     createCategory,
+    duplicateCategory,
     renumberCategories,
     categoryNames,
     updateCategoryButtonTooltip,
-    ensureTemplatesLoaded
+    ensureTemplatesLoaded,
 };
