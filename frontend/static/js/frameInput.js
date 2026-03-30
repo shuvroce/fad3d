@@ -2,6 +2,10 @@
 // Frame Variant Field Switching
 // ============================
 
+// Import section data from modal modules
+import { _alumSections } from './alumSecProp.js';
+import { _steelSections } from './steelSecProp.js';
+
 // Show only the field set matching the selected geometry + mullion type combination.
 function switchFrameVariant(categoryNum, geometry, mullionType) {
     const variant = `${geometry}-${mullionType}`;

@@ -136,13 +136,11 @@ function updateFiguresIndicator(status) {
     if (dot) dot.dataset.status = status;
 }
 
-// Initialize when DOM is ready
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-        initializeViewControls();
-        initFiguresPanel();
-    });
-} else {
-    initializeViewControls();
-    initFiguresPanel();
-}
+// Export functions
+export {
+    initViewControls,
+    initFiguresPanel,
+    getCurrentViewMode,
+    switchViewMode,
+    updateFiguresIndicator
+};

@@ -14,7 +14,7 @@ import { initViewControls } from './viewControls.js';
 
 // Import category system
 import { initCategories } from './category.js';
-import { initCategoryIcons, initializeCategoryIcons } from './categoryIcons.js';
+import { initializeCategoryIcons } from './categoryIcons.js';
 
 // Import input handlers
 import { initGlassInput } from './glassInput.js';
@@ -114,7 +114,6 @@ async function initPhase3() {
     }
 
     try {
-        initCategoryIcons();
         initializeCategoryIcons();
         console.log('[Main] ✓ Category icons initialized');
     } catch (error) {
