@@ -13,8 +13,9 @@ from calcs.wind_load import compute_wind_loads, location_wind_speeds
 from calcs.calc_utils import _to_float
 
 BASE_DIR = os.path.dirname(__file__)
-REPO_ROOT = os.path.dirname(os.path.dirname(BASE_DIR))
-FRONTEND_DIR = os.path.join(REPO_ROOT, "frontend")
+ROOT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
+FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
+BACKEND_DIR = os.path.join(ROOT_DIR, "backend")
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")), name="static")
@@ -153,7 +154,7 @@ async def api_calc_anchorage(request: Request):
 
 @app.get("/report/assets/profiles/{filename:path}")
 async def serve_profile_image(filename: str):
-    path = os.path.join(FRONTEND_DIR, "templates", "report", "assets", "images", "profiles", filename)
+    path = os.path.join(BACKEND_DIR, "app", "report", "assets", "profiles", filename)
     return FileResponse(path)
 
 

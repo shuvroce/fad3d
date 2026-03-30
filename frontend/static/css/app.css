@@ -99,7 +99,7 @@
 body.theme__dark {
     /* Dark Theme - Background Colors */
     --bg-body: #010409;
-    --bg-primary: #1c1c1c;
+    --bg-primary: #151618;
     --bg-secondary: #141414;
     --bg-hover: #21262d;
     --bg-preview: #1c2010;
@@ -1607,6 +1607,8 @@ summary {
 
 .floating__bar-submenu-btn:hover {
     background: var(--bg-hover);
+    border-radius: 0;
+    transition: none;
 }
 
 .floating__bar-submenu-item--nested {
