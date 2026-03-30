@@ -2107,6 +2107,7 @@ summary {
 /* Wind-mode: translate the whole panel instead of the slide-unit */
 .left__panel.wind-mode .input__slide-unit {
     transition: none;
+    border-left: 0;
 }
 
 .left__panel.wind-mode .input__slide-unit.collapsed {
@@ -2741,7 +2742,7 @@ summary {
 }
 
 .panel-mode-exiting-right {
-    animation: panelSlideOutRight 0.15s ease forwards;
+    animation: panelSlideOutLeft 0.15s ease forwards;
     pointer-events: none;
 }
 
@@ -2750,7 +2751,7 @@ summary {
 }
 
 .panel-mode-entering-right {
-    animation: panelSlideFromRight 0.22s ease;
+    animation: panelSlideFromLeft 0.22s ease;
 }
 
 .result__category-label {
