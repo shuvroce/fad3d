@@ -11,6 +11,7 @@ import { initTooltips, initializeLeftPanelToggle, initializeRightPanelToggle } f
 import { initCustomSelect } from './customSelect.js';
 import { initPanelMode } from './panelMode.js';
 import { initViewControls } from './viewControls.js';
+import { initFiguresPanel } from './viewControls.js';
 
 // Import category system
 import { initCategories } from './category.js';
@@ -99,6 +100,13 @@ function initPhase2() {
         console.log('[Main] ✓ View controls initialized');
     } catch (error) {
         console.error('[Main] ✗ View controls initialization failed:', error);
+    }
+
+    try {
+        initFiguresPanel();
+        console.log('[Figure] ✓ Figure panel initialized');
+    } catch (error) {
+        console.error('[Figure] ✗ Figure panel initialization failed:', error);
     }
 }
 

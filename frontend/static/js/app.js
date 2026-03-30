@@ -2,8 +2,6 @@
 // Panel Toggle and Tooltip Utilities
 // ============================
 
-console.log("FAD-3D Application Initialized");
-
 function initTooltips() {
     const tooltip = document.createElement("div");
     tooltip.id = "global-tooltip";
