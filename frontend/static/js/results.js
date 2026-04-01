@@ -279,11 +279,36 @@ function updateWindResults(result) {
     _setBody('#wind-cladding-body', _renderCladding(result.wall_results));
 }
 
+const _facadeResultsCache = new Map();
+
 function updateFacadeResults(catNum, results) {
-    _setBody('#facade-glass-body', _renderGlass(results.glass));
-    _setBody('#facade-frame-body', _renderFrame(results.frame));
-    _setBody('#facade-conn-body', _renderConnection(results.conn));
-    _setBody('#facade-anchor-body', _renderAnchorage(results.anchor));
+    _facadeResultsCache.set(Number(catNum), results);
+    showFacadeResults(catNum);
 }
 
-export { updateWindResults, updateFacadeResults };
+function showFacadeResults(catNum) {
+    const results = _facadeResultsCache.get(Number(catNum));
+    if (results) {
+        _setBody('#facade-glass-body', _renderGlass(results.glass));
+        _setBody('#facade-frame-body', _renderFrame(results.frame));
+        _setBody('#facade-conn-body', _renderConnection(results.conn));
+        _setBody('#facade-anchor-body', _renderAnchorage(results.anchor));
+    } else {
+        _setBody('#facade-glass-body', _empty());
+        _setBody('#facade-frame-body', _empty());
+        _setBody('#facade-conn-body', _empty());
+        _setBody('#facade-anchor-body', _empty());
+    }
+}
+
+function clearFacadeCache(keepKeys) {
+    if (keepKeys && keepKeys.length) {
+        for (const key of _facadeResultsCache.keys()) {
+            if (!keepKeys.includes(key)) _facadeResultsCache.delete(key);
+        }
+    } else {
+        _facadeResultsCache.clear();
+    }
+}
+
+export { updateWindResults, updateFacadeResults, showFacadeResults, clearFacadeCache };

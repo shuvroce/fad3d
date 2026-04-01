@@ -14,6 +14,7 @@ import {
 
 import { populateFrameSectionDropdowns, syncFrameVariant } from './frameInput.js';
 import { syncAnchorVariant } from './anchorInput.js';
+import { clearFacadeCache, showFacadeResults } from './results.js';
 
 let categoryCount = 0;
 const categoryNames = new Map(); // Store custom category names
@@ -124,8 +125,12 @@ function removeCategory(categoryNum) {
     renumberCategories();
     categoryCount--;
 
+    // Clear stale cache entries after renumbering
+    clearFacadeCache();
+    const targetCategory = categoryNum > 1 ? categoryNum - 1 : 1;
+    showFacadeResults(targetCategory);
+
     if (isActive) {
-        const targetCategory = categoryNum > 1 ? categoryNum - 1 : 1;
         switchCategory(targetCategory);
     }
 }

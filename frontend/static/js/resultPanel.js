@@ -3,6 +3,7 @@
 // ============================
 
 import { categoryNames } from './category.js';
+import { showFacadeResults } from './results.js';
 
 // Function to switch between Wind and Facade tabs
 function switchResultTab(tabName) {
@@ -92,20 +93,22 @@ export function initializeResultPanel() {
     // Initialize with facade tab active
     switchResultTab("facade");
 
-    // Sync category title with the current active category on startup
+    // Sync category title and results with the current active category on startup
     const activeBtn = document.querySelector(".category__btn.active");
     if (activeBtn) {
         const activeCategory = activeBtn.getAttribute("data-category");
         if (activeCategory) {
             updateFacadeResultCategory(Number(activeCategory));
+            showFacadeResults(Number(activeCategory));
         }
     }
 
-    // Keep Design Summary category label synced on category switch
+    // Keep Design Summary category label and results synced on category switch
     window.addEventListener("category-switched", (event) => {
         const categoryNum = event?.detail?.categoryNum;
         if (categoryNum != null) {
             updateFacadeResultCategory(categoryNum);
+            showFacadeResults(categoryNum);
         }
     });
 }
