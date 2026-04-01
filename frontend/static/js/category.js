@@ -12,7 +12,8 @@ import {
     initializeCategoryIcons,
 } from './categoryIcons.js';
 
-import { populateFrameSectionDropdowns } from './frameInput.js';
+import { populateFrameSectionDropdowns, syncFrameVariant } from './frameInput.js';
+import { syncAnchorVariant } from './anchorInput.js';
 
 let categoryCount = 0;
 const categoryNames = new Map(); // Store custom category names
@@ -311,8 +312,8 @@ function createCategory(categoryNum) {
     // NOTE: initCategoryContextMenu() is NOT called here — registered once
     // globally inside initializeCategoryIcons() to avoid duplicate listeners.
 
-    if (typeof syncFrameVariant === "function") syncFrameVariant(categoryNum);
-    if (typeof syncAnchorVariant === "function") syncAnchorVariant(categoryNum);
+    syncFrameVariant(categoryNum);
+    syncAnchorVariant(categoryNum);
 
     // Heading edit listeners
     _attachHeadingListeners(categoryContent, categoryNum);
@@ -394,6 +395,18 @@ function duplicateCategory(sourceCategoryNum) {
             "for",
             label.getAttribute("for").replace(/cat\d+/, `cat${newNum}`),
         );
+    });
+
+    // Remove old custom-select wrappers (cloned from source) and unwrap the
+    // native selects so the MutationObserver in customSelect.js can re-wrap them
+    newContent.querySelectorAll(".custom-select").forEach((wrapper) => {
+        const select = wrapper.querySelector("select");
+        if (select) {
+            wrapper.parentNode.insertBefore(select, wrapper);
+            delete select.dataset.customSelectInit;
+            select.style.display = "";
+        }
+        wrapper.remove();
     });
 
     // Update the visible heading

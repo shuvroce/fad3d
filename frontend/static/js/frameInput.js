@@ -84,4 +84,4 @@ function populateFrameSectionDropdowns() {
         });
 }
 
-export { initFrameInput, switchFrameVariant, populateFrameSectionDropdowns };
+export { initFrameInput, switchFrameVariant, syncFrameVariant, populateFrameSectionDropdowns };

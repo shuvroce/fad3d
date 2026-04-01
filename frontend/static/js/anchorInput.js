@@ -41,4 +41,4 @@ function initAnchorVariants() {
     });
 }
 
-export { initAnchorInput, switchAnchorVariant };
+export { initAnchorInput, switchAnchorVariant, syncAnchorVariant };
