@@ -4,6 +4,20 @@
 
 // Import calc engine functions
 import { runWindCalc } from './calcEngine.js';
+import {
+    switchCategory,
+    switchTab,
+    createCategory,
+    categoryNames,
+    updateCategoryButtonTooltip,
+    initializeCategoryDragDrop,
+} from './category.js';
+import {
+    categoryIcons,
+    availableIcons,
+    reattachCategoryIcons,
+} from './categoryIcons.js';
+import { populateFrameSectionDropdowns } from './frameInput.js';
 
 let currentPanelMode = "facade"; // 'wind' or 'facade'
 let savedFacadeContent = ""; // Store facade panel content when switching to wind
@@ -83,77 +97,44 @@ function reattachCategoryEventListeners() {
     // Reattach category button click handlers
     document.querySelectorAll(".category__btn").forEach((btn) => {
         const categoryNum = parseInt(btn.getAttribute("data-category"));
-        btn.addEventListener("click", () => {
-            if (typeof switchCategory === "function") {
-                switchCategory(categoryNum);
-            }
-        });
+        btn.addEventListener("click", () => switchCategory(categoryNum));
     });
-
-    // Reattach remove button handlers
-    document.querySelectorAll(".catbar__remove-btn").forEach((btn) => {
-        const categoryNum = parseInt(btn.getAttribute("data-category"));
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            if (typeof removeCategory === "function") {
-                removeCategory(categoryNum);
-            }
-        });
-    });
-
-    // Reattach add category button handler
-    const addBtn = document.getElementById("cat-add");
-    if (addBtn) {
-        addBtn.addEventListener("click", () => {
-            if (
-                typeof categoryCount !== "undefined" &&
-                typeof createCategory === "function" &&
-                typeof switchCategory === "function"
-            ) {
-                categoryCount++;
-                if (typeof availableIcons !== "undefined" && typeof categoryIcons !== "undefined") {
-                    categoryIcons.set(categoryCount, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
-                }
-                createCategory(categoryCount);
-                switchCategory(categoryCount);
-                populateFrameSectionDropdowns?.();
-            }
-        });
-    }
 
     // Restore icon SVGs and context menu listeners on catbar buttons
-    if (typeof reattachCategoryIcons === "function") {
-        reattachCategoryIcons();
-    }
+    reattachCategoryIcons();
 
     // Reattach tab switching handlers
     document.querySelectorAll(".input__box-nav-btn").forEach((btn) => {
         const categoryNum = parseInt(btn.getAttribute("data-category"));
         const tabName = btn.getAttribute("data-tab");
-        btn.addEventListener("click", () => {
-            if (typeof switchTab === "function") {
-                switchTab(categoryNum, tabName);
-            }
-        });
+        btn.addEventListener("click", () => switchTab(categoryNum, tabName));
     });
+
+    // Reattach add category button handler (clone to clear stale listeners)
+    const addBtn = document.getElementById("cat-add");
+    if (addBtn) {
+        const newAddBtn = addBtn.cloneNode(true);
+        addBtn.replaceWith(newAddBtn);
+        newAddBtn.addEventListener("click", () => {
+            const count = document.querySelectorAll(".category__btn").length + 1;
+            categoryIcons.set(count, availableIcons[Math.floor(Math.random() * availableIcons.length)]);
+            createCategory(count);
+            switchCategory(count);
+            populateFrameSectionDropdowns?.();
+        });
+    }
 
     // Reattach editable heading handlers
     document.querySelectorAll(".input__category-heading").forEach((heading) => {
         const categoryNum = parseInt(heading.getAttribute("data-category"));
 
-        // Save custom name on blur
         heading.addEventListener("blur", () => {
+            const currentCatNum = parseInt(heading.getAttribute("data-category"));
             const customName = heading.textContent.trim();
-            if (
-                typeof categoryNames !== "undefined" &&
-                typeof updateCategoryButtonTooltip === "function"
-            ) {
-                categoryNames.set(categoryNum, customName);
-                updateCategoryButtonTooltip(categoryNum, customName);
-            }
+            categoryNames.set(currentCatNum, customName);
+            updateCategoryButtonTooltip(currentCatNum, customName);
         });
 
-        // Prevent enter key from creating new line
         heading.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
@@ -161,7 +142,6 @@ function reattachCategoryEventListeners() {
             }
         });
 
-        // Select all text when clicked
         heading.addEventListener("click", () => {
             const selection = window.getSelection();
             const range = document.createRange();
@@ -170,6 +150,9 @@ function reattachCategoryEventListeners() {
             selection.addRange(range);
         });
     });
+
+    // Reinitialize drag-and-drop (catbar__scroll DOM was destroyed by innerHTML restore)
+    initializeCategoryDragDrop();
 }
 
 // Function to create wind panel HTML

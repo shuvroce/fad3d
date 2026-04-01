@@ -658,4 +658,5 @@ export {
     categoryNames,
     updateCategoryButtonTooltip,
     ensureTemplatesLoaded,
+    initializeCategoryDragDrop,
 };
