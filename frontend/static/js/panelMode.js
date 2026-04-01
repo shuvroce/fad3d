@@ -67,6 +67,21 @@ function switchPanelMode(mode) {
             if (savedFacadeContent) {
                 inputContainer.innerHTML = savedFacadeContent;
                 catbar.innerHTML = savedCatbarContent;
+
+                // The saved HTML includes stale .custom-select wrappers with no event
+                // listeners and selects flagged data-custom-select-init='true' which
+                // causes the MutationObserver to skip them.  Unwrap the selects out
+                // of their old wrappers and clear the flag so the observer re-creates
+                // fresh wrappers with working listeners.
+                inputContainer.querySelectorAll(".custom-select").forEach(wrapper => {
+                    const select = wrapper.querySelector("select");
+                    if (!select) return;
+                    delete select.dataset.customSelectInit;
+                    select.style.display = "";
+                    wrapper.parentNode.insertBefore(select, wrapper);
+                    wrapper.remove();
+                });
+
                 reattachCategoryEventListeners();
             }
 
