@@ -6,11 +6,11 @@ import { openModal, closeModal } from './floatingBar.js';
 import { _materials, populateSecGradeOptions, animateDefineForm } from './materialProp.js';
 
 const ALUMINUM_PREDEFINED = {
-    'M 125x60x2.5': { grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', phiMn: '6.5' },
+    'M 125x60x2.5': { grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', mnYield: '6.5' },
 };
 
 const DEFAULT_ALUM_SECTIONS = [
-    { name: 'M 125x60x2.5', profileType: 'predefined', shape: 'M 125x60x2.5', grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', phiMn: '6.5' },
+    { name: 'M 125x60x2.5', profileType: 'predefined', shape: 'M 125x60x2.5', grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', mnYield: '6.5' },
 ];
 
 let _alumSections = DEFAULT_ALUM_SECTIONS.map(s => ({ ...s }));
@@ -39,7 +39,7 @@ function populateAlumSecShapeOptions(selectedShape = null) {
 function fillPredefinedShape(shape) {
     const props = ALUMINUM_PREDEFINED[shape];
     if (!props) return;
-    ['d', 'b', 'tw', 'tf', 'j', 'a', 'ix', 'iy', 'y', 'x', 'plasticX', 'plasticY', 'phiMn'].forEach(p => {
+    ['d', 'b', 'tw', 'tf', 'j', 'a', 'ix', 'iy', 'y', 'x', 'plasticX', 'plasticY', 'mnYield'].forEach(p => {
         const el = document.getElementById(`alum-sec-${p}`);
         if (el) el.value = props[p] || '';
     });

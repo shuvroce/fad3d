@@ -48,12 +48,20 @@ def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
         frames = cat.get("frames", []) or []
         frame = frames[0] if frames else None
 
+        # Merge frame results into frame dict so connection/anchorage get computed forces
+        frame_for_downstream = dict(frame) if frame else {}
+        if frame and frame.get("calc"):
+            fc = frame["calc"]
+            for key in ("joint_fy", "joint_fz", "reaction_Ry", "reaction_Rz"):
+                if fc.get(key) is not None:
+                    frame_for_downstream[key] = fc[key]
+
         for conn in cat.get("connections", []) or []:
-            calc_result = calc_connection(conn, frame)
+            calc_result = calc_connection(conn, frame_for_downstream)
             _set_calc(conn, calc_result)
 
         for anchor in cat.get("anchorage", []) or []:
-            calc_result = calc_anchorage(anchor, frame, alum_profiles_data)
+            calc_result = calc_anchorage(anchor, frame_for_downstream, alum_profiles_data)
             _set_calc(anchor, calc_result)
 
     return data

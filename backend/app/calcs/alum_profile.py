@@ -26,6 +26,10 @@ def calc_alum_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     
     if not all([web_length, flange_length, web_thk, flange_thk]):
         return None
+
+    # F_y is required for all profile types (local buckling + moment capacity)
+    if F_y is None:
+        return None
     
     if profile_type == "Stick":
         tor_constant = (2 * flange_thk * web_thk * ((flange_length - web_thk)**2) * ((web_length - flange_thk)**2)) / (

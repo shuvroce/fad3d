@@ -80,17 +80,31 @@ function _resolveProfilePayload(sectionName, profileList, isSteel = false) {
     if (!sec) return null;
     const mat = (_materials || []).find(m => m.name === sec.grade);
     const fy = mat ? (mat.fy || null) : null;
-    return isSteel
-        ? {
-            profile_type: sec.profileType || 'steel-rhs', d: sec.d, b: sec.b, t: sec.t, tf: sec.tf, tw: sec.tw, F_y: fy,
-            computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null
-        }
-        : {
-            profile_type: sec.profileType || 'stick', profile_name: sec.name, web_length: sec.d, flange_length: sec.b, web_thk: sec.tw, flange_thk: sec.tf, F_y: fy,
-            tor_constant: sec.j, area: sec.a, I_xx: sec.ix, I_yy: sec.iy, Y: sec.y, X: sec.x,
-            plastic_x: sec.plasticX, plastic_y: sec.plasticY, phi_Mn: sec.mnYield,
+    if (isSteel) {
+        // Steel sections: dimensions-only, F_y defaults to 318 MPa (matches backend STEEL_FY)
+        // Map frontend keys (d,b,t) to backend keys (web_length,flange_length,thk)
+        // Map profile_type: 'steel-rhs' → 'rhs', 'steel-w' → 'iw' (for frame.py routing)
+        const steelType = (sec.profileType || 'steel-rhs').replace('steel-', '');
+        return {
+            profile_type: steelType === 'w' ? 'iw' : steelType,
+            web_length: sec.d, flange_length: sec.b,
+            thk: sec.t, flange_thk: sec.tf, web_thk: sec.tw,
+            F_y: fy || 318,
             computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null
         };
+    }
+    // For aluminum: prefer API-cached computed values, fall back to manual properties
+    // Note: default sections use 'phiMn', synced sections use 'mnYield'
+    const cPhiMn = sec._phi_Mn ?? sec.mnYield ?? sec.phiMn ?? null;
+    const cIxx   = sec._I_xx ?? sec.ix ?? null;
+    const cIyy   = sec._I_yy ?? sec.iy ?? null;
+    return {
+        profile_type: sec.profileType || 'stick', profile_name: sec.name,
+        web_length: sec.d, flange_length: sec.b, web_thk: sec.tw, flange_thk: sec.tf, F_y: fy,
+        tor_constant: sec.j, area: sec.a, I_xx: sec.ix, I_yy: sec.iy, Y: sec.y, X: sec.x,
+        plastic_x: sec.plasticX, plastic_y: sec.plasticY, phi_Mn: sec.mnYield,
+        computed_phi_Mn: cPhiMn, computed_I_xx: cIxx, computed_I_yy: cIyy
+    };
 }
 
 function collectFrameInputs(catNum) {
@@ -130,9 +144,9 @@ function collectFrameInputs(catNum) {
 function collectConnectionInputs(catNum) {
     const g = id => document.getElementById(id)?.value || null;
     return {
-        screw_nos: g(`cat${catNum}-conn-screw_nos`),
-        screw_dia: g(`cat${catNum}-conn-screw_dia`),
-        head_dia: g(`cat${catNum}-conn-head_dia`),
+        screw_nos: g(`cat${catNum}-conn-nos`),
+        screw_dia: g(`cat${catNum}-conn-screw-dia`),
+        head_dia: g(`cat${catNum}-conn-screw-head-dia`),
         t1: g(`cat${catNum}-conn-t1`),
         t2: g(`cat${catNum}-conn-t2`),
         tc: g(`cat${catNum}-conn-tc`),
@@ -141,17 +155,24 @@ function collectConnectionInputs(catNum) {
 
 function collectAnchorInputs(catNum) {
     const g = id => document.getElementById(id)?.value || null;
-    const clumpType = g(`cat${catNum}-anchor-type`) || 'Box Clump';
+    // Select values: 'box-clump', 'u-clump', 'l-clump'
+    const clumpValue = g(`cat${catNum}-anchor-type`) || 'box-clump';
+    // Map select value to display text for backend
+    const clumpDisplay = clumpValue === 'box-clump' ? 'Box Clump'
+        : clumpValue === 'u-clump' ? 'U Clump'
+        : 'L/T Clump';
+    // Prefix matches the select value directly (used in HTML IDs)
+    const prefix = `cat${catNum}-anchor-${clumpValue}`;
     return {
-        clump_type: clumpType,
-        anchor_dia: g(`cat${catNum}-anchor-dia`),
-        embed_depth: g(`cat${catNum}-anchor-embed_depth`),
-        N_p5: g(`cat${catNum}-anchor-N_p5`),
-        h_a: g(`cat${catNum}-anchor-h_a`),
-        bp_thk: g(`cat${catNum}-anchor-bp_thk`),
-        anchor_nos: g(`cat${catNum}-anchor-anchor_nos`),
-        C_a1: g(`cat${catNum}-anchor-C_a1`),
-        C_a2: g(`cat${catNum}-anchor-C_a2`),
+        clump_type: clumpDisplay,
+        anchor_dia: g(`${prefix}-anchor_dia`),
+        embed_depth: g(`${prefix}-embed_depth`),
+        N_p5: g(`${prefix}-N_p5`) || g(`cat${catNum}-anchor-N_p5`),
+        h_a: g(`${prefix}-h_a`),
+        bp_thk: g(`${prefix}-bp_thk`),
+        anchor_nos: g(`${prefix}-anchor_nos`),
+        C_a1: g(`${prefix}-C_a1`),
+        C_a2: g(`${prefix}-C_a2`),
     };
 }
 
@@ -194,11 +215,25 @@ async function runCategoryCalc(catNum) {
         };
     });
 
-    const [glassResult, frameResult, connResult, anchorResult] = await Promise.all([
+    // Run glass and frame first (frame results are needed by connection/anchorage)
+    const [glassResult, frameResult] = await Promise.all([
         _post('/api/calc/glass', collectGlassInputs(catNum)),
         _post('/api/calc/frame', { frame: frameInputs, alum_profiles: alumProfiles, steel_profiles: steelProfiles }),
-        _post('/api/calc/connection', { conn: collectConnectionInputs(catNum), frame: frameInputs }),
-        _post('/api/calc/anchorage', { anchor: collectAnchorInputs(catNum), frame: frameInputs, alum_profiles: alumProfiles }),
+    ]);
+
+    // Merge frame results into the frame payload so connection/anchorage get computed forces
+    const frameForDownstream = { ...frameInputs };
+    if (frameResult) {
+        if (frameResult.joint_fy != null) frameForDownstream.joint_fy = frameResult.joint_fy;
+        if (frameResult.joint_fz != null) frameForDownstream.joint_fz = frameResult.joint_fz;
+        if (frameResult.reaction_Ry != null) frameForDownstream.reaction_Ry = frameResult.reaction_Ry;
+        if (frameResult.reaction_Rz != null) frameForDownstream.reaction_Rz = frameResult.reaction_Rz;
+    }
+
+    // Run connection and anchorage with frame results
+    const [connResult, anchorResult] = await Promise.all([
+        _post('/api/calc/connection', { conn: collectConnectionInputs(catNum), frame: frameForDownstream }),
+        _post('/api/calc/anchorage', { anchor: collectAnchorInputs(catNum), frame: frameForDownstream, alum_profiles: alumProfiles }),
     ]);
 
     updateFacadeResults(catNum, { glass: glassResult, frame: frameResult, conn: connResult, anchor: anchorResult });

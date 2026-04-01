@@ -21,9 +21,12 @@ def calc_connection(conn: Dict[str, Any], frame: Dict[str, Any]) -> Optional[Dic
     if not frame_width or not frame_length:
         return None
 
-    if geometry == "regular":
-        _, _, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
-        joint_fy, joint_fz = joint_forces(geometry, frame_width, tran_w_dead, tran_w_wind, joint_fy, joint_fz)
+    # Use pre-computed joint forces from frame result if available;
+    # otherwise recalculate for regular geometry (backward compat / report flow)
+    if not joint_fy or not joint_fz:
+        if geometry == "regular":
+            _, _, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
+            joint_fy, joint_fz = joint_forces(geometry, frame_width, tran_w_dead, tran_w_wind, joint_fy, joint_fz)
 
     if not joint_fy or not joint_fz:
         return None

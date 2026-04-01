@@ -27,8 +27,8 @@ def calc_anchorage(anchor: Dict[str, Any], frame: Dict[str, Any], alum_profiles_
     flange_length = None
     mullion = frame.get("mullion")
 
-    def find_profile(name: str, data_list: list) -> Optional[Dict[str, Any]]:
-        if not name:
+    def find_profile(name, data_list: list) -> Optional[Dict[str, Any]]:
+        if not name or not isinstance(name, str):
             return None
         for p in data_list:
             if p.get("profile_name") == name or p.get("profile_name", "").strip() == name.strip():
@@ -59,9 +59,12 @@ def calc_anchorage(anchor: Dict[str, Any], frame: Dict[str, Any], alum_profiles_
     if not web_length or not flange_length:
         return None
 
-    if geometry == "regular":
-        mul_w_dead, mul_w_wind, _, _ = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
-        reaction_Ry, reaction_Rz = reaction_forces(geometry, frame_type, frame_length, mul_w_dead, mul_w_wind, reaction_Ry, reaction_Rz)
+    # Use pre-computed reaction forces from frame result if available;
+    # otherwise recalculate for regular geometry (backward compat / report flow)
+    if not reaction_Ry or not reaction_Rz:
+        if geometry == "regular":
+            mul_w_dead, mul_w_wind, _, _ = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
+            reaction_Ry, reaction_Rz = reaction_forces(geometry, frame_type, frame_length, mul_w_dead, mul_w_wind, reaction_Ry, reaction_Rz)
 
     if not reaction_Ry or not reaction_Rz:
         return None

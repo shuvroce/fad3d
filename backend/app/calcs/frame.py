@@ -13,7 +13,12 @@ def _profile_props(payload, calc_fn):
     }
     if all(v is not None for v in computed.values()):
         return computed
-    return calc_fn(payload)
+    result = calc_fn(payload)
+    if result is not None:
+        return result
+    # Fallback: use whatever cached partial values are available
+    partial = {k: v for k, v in computed.items() if v is not None}
+    return partial if partial else None
 
 
 def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles: list = None) -> Optional[Dict[str, Any]]:
