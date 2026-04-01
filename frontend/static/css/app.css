@@ -1,9 +1,10 @@
 /* ================ 1. CSS VARIABLES & THEME CONFIGURATION ================ */
 :root {
     /* Transitions */
-    --transition: all 200ms ease;
-    --transition-bg: background-color 0.3s ease, color 0.3s ease;
+    --transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+    --transition-bg: background-color 0.15s ease, color 0.15s ease;
     --transition-border: border-color 0.1s ease 0s;
+    --transition-fast: 0.12s ease;
 
     /* Layout Widths */
     --topbar-height: 3.5rem;
@@ -162,111 +163,97 @@ body.theme__dark {
 
 /* ================ 2. ANIMATIONS ================ */
 @keyframes contentFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 @keyframes modalFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 @keyframes modalSlideDown {
     from {
-        transform: translateY(-50px);
+        transform: translateY(-30px) translateZ(0);
         opacity: 0;
     }
     to {
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
         opacity: 1;
     }
 }
 
 @keyframes spinnerRotate {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(12px) translateZ(0);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
     }
 }
 
 @keyframes tabFadeSlide {
     from {
         opacity: 0;
-        transform: translateY(7px);
+        transform: translateY(5px) translateZ(0);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
     }
 }
 
 @keyframes contentFadeOut {
     to {
         opacity: 0;
-        transform: translateY(-5px);
+        transform: translateY(-4px) translateZ(0);
     }
 }
 
 @keyframes panelSlideFromLeft {
     from {
         opacity: 0;
-        transform: translateX(-18px);
+        transform: translateX(-12px) translateZ(0);
     }
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateX(0) translateZ(0);
     }
 }
 
 @keyframes panelSlideFromRight {
     from {
         opacity: 0;
-        transform: translateX(18px);
+        transform: translateX(12px) translateZ(0);
     }
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateX(0) translateZ(0);
     }
 }
 
 @keyframes panelSlideOutLeft {
     to {
         opacity: 0;
-        transform: translateX(-18px);
+        transform: translateX(-12px) translateZ(0);
     }
 }
 
 @keyframes panelSlideOutRight {
     to {
         opacity: 0;
-        transform: translateX(18px);
+        transform: translateX(12px) translateZ(0);
     }
 }
 
@@ -301,6 +288,8 @@ body {
     background-color: var(--bg-body);
     color: var(--text-primary);
     transition: var(--transition-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbars that follow light/dark theme */
@@ -346,7 +335,7 @@ h2 {
     cursor: text;
     padding: 2px 4px;
     border-radius: var(--radius-1);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.15s ease;
 }
 
 .input__category-heading:hover {
@@ -436,7 +425,7 @@ select {
     align-items: center;
     flex-shrink: 0;
     color: var(--text-secondary);
-    transition: transform 0.2s ease;
+    transition: transform 0.15s ease;
 }
 
 .custom-select.open .custom-select__arrow {
@@ -452,6 +441,7 @@ select {
     /* border-color: var(--color-primary); */
     /* outline: none; */
     box-shadow: 0 0 0 2px var(--color-primary);
+    transition: box-shadow 0.1s ease;
 }
 
 .custom-select__list {
@@ -475,7 +465,7 @@ select {
     transform: translateY(-6px) scaleY(0.96);
     transform-origin: top;
     pointer-events: none;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s 0.15s;
+    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s 0.12s;
 }
 
 .custom-select__list.open-up {
@@ -488,7 +478,7 @@ select {
     opacity: 1;
     transform: none;
     pointer-events: auto;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    transition: opacity 0.12s ease, transform 0.12s ease;
 }
 
 .custom-select__option {
@@ -531,6 +521,7 @@ textarea:focus {
     /* border-color: var(--color-primary); */
     /* outline: none; */
     box-shadow: 0 0 0 2px var(--color-primary);
+    transition: box-shadow 0.1s ease;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -585,7 +576,7 @@ summary {
     pointer-events: none;
     z-index: 9999;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
 }
 
 #global-tooltip.visible {
@@ -604,7 +595,7 @@ summary {
     align-items: center;
     justify-content: center;
     transition:
-        all 0.3s ease,
+        all 0.2s ease,
         var(--transition-border);
     font-size: 18px;
 }
@@ -623,8 +614,8 @@ summary {
     stroke-linecap: round;
     stroke-linejoin: round;
     transition:
-        stroke 0.3s ease,
-        fill 0.3s ease;
+        stroke 0.2s ease,
+        fill 0.2s ease;
 }
 
 .theme__icon.moon {
@@ -646,7 +637,8 @@ summary {
     width: 100%;
     height: 100%;
     pointer-events: auto;
-    animation: modalFadeIn 0.3s ease;
+    animation: modalFadeIn 0.2s ease;
+    will-change: opacity;
     align-items: center;
     justify-content: center;
 }
@@ -755,10 +747,11 @@ summary {
     margin: 0;
     display: flex;
     flex-direction: column;
-    animation: modalSlideDown 0.3s ease;
+    animation: modalSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: auto;
     box-shadow: 0 8px 20px 5px rgba(0, 0, 0, 0.15), 0 2px 20px 5px rgba(0, 0, 0, 0.15);
-    transition: width 0.25s ease, min-width 0.25s ease, max-width 0.25s ease, height 0.25s ease, max-height 0.25s ease;
+    transition: width 0.2s ease, min-width 0.2s ease, max-width 0.2s ease, height 0.2s ease, max-height 0.2s ease;
+    will-change: transform, opacity;
 }
 
 .modal__content-calculator {
@@ -767,10 +760,11 @@ summary {
     width: var(--modal-width-calculator);
     overflow: hidden;
     margin: 0;
-    animation: modalSlideDown 0.3s ease;
+    animation: modalSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: auto;
     box-shadow: 0 8px 20px 5px rgba(0, 0, 0, 0.15), 0 2px 20px 5px rgba(0, 0, 0, 0.15);
-    transition: width 0.25s ease, min-width 0.25s ease, max-width 0.25s ease, height 0.25s ease, max-height 0.25s ease;
+    transition: width 0.2s ease, min-width 0.2s ease, max-width 0.2s ease, height 0.2s ease, max-height 0.2s ease;
+    will-change: transform, opacity;
 }
 
 .modal__dialog-xsmall {
@@ -872,7 +866,7 @@ summary {
     align-items: center;
     justify-content: center;
     color: var(--text-secondary);
-    transition: color 0.3s ease;
+    transition: color 0.15s ease;
 }
 
 .modal__close:hover {
@@ -904,7 +898,7 @@ summary {
     border-radius: var(--radius-2);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
     border: none;
 }
 
@@ -936,7 +930,7 @@ summary {
     border-radius: var(--radius-2);
     cursor: pointer;
     font-size: 1.5rem;
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
 }
 
 .icon-option:hover {
@@ -1220,7 +1214,7 @@ summary {
     min-width: 155px;
     z-index: 10001;
     overflow: hidden;
-    animation: submenu-in 0.15s ease;
+    animation: submenu-in 0.12s ease;
     transition: var(--transition-bg), var(--transition-border);
 }
 
@@ -1346,7 +1340,7 @@ summary {
     padding: 4px 0;
     z-index: 200;
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-4px) translateZ(0);
     pointer-events: none;
     transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
@@ -1548,7 +1542,7 @@ summary {
     stroke-linejoin: round;
     vertical-align: middle;
     margin-left: 3px;
-    transition: transform 0.3s ease;
+    transition: transform 0.15s ease;
 }
 
 .floating__bar-icon {
@@ -1577,12 +1571,12 @@ summary {
     overflow: visible;
     min-width: 110px;
     z-index: 600;
-    animation: submenu-in 0.15s ease;
+    animation: submenu-in 0.12s ease;
 }
 
 @keyframes submenu-in {
-    from { opacity: 0; transform: translateY(-5px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(-4px) translateZ(0); }
+    to   { opacity: 1; transform: translateY(0) translateZ(0); }
 }
 
 .floating__bar-submenu[hidden] {
@@ -1631,7 +1625,7 @@ summary {
     stroke-linejoin: round;
     flex-shrink: 0;
     margin-left: auto;
-    transition: transform 0.15s ease;
+    transition: transform 0.12s ease;
 }
 
 .floating__bar-submenu-item--nested.open > .floating__bar-chevron--right,
@@ -1646,7 +1640,7 @@ summary {
     min-width: 110px;
     overflow: hidden;
     z-index: 601;
-    animation: submenu-in 0.15s ease;
+    animation: submenu-in 0.12s ease;
 }
 
 
@@ -1668,7 +1662,7 @@ summary {
     opacity: 0;
     pointer-events: none;
     transform: translateY(-6px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .figure__panel.open {
@@ -1686,7 +1680,7 @@ summary {
 }
 
 .figures__chevron {
-    transition: transform 0.2s ease;
+    transition: transform 0.15s ease;
 }
 
 .floating__bar-btn--figures.open .figures__chevron {
@@ -1967,7 +1961,7 @@ summary {
 }
 
 .define-modal__form.animate-in {
-    animation: tabFadeSlide 0.2s ease;
+    animation: tabFadeSlide 0.15s ease;
 }
 
 .define-modal__form .input__field {
@@ -2064,7 +2058,7 @@ summary {
     max-width: 100%;
     max-height: 12rem;
     object-fit: contain;
-    transition: opacity 0.2s;
+    transition: opacity 0.15s ease;
 }
 
 /* leftbar */
@@ -2078,7 +2072,8 @@ summary {
     border-radius: var(--radius-3);
     overflow: hidden;
     z-index: 10;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
+    will-change: transform;
 }
 
 .left__panel-toggle-left {
@@ -2098,8 +2093,9 @@ summary {
 .input__slide-unit {
     display: flex;
     transform: translateX(0);
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
     border-left: 1px solid var(--border-primary);;
+    will-change: transform;
 }
 
 .input__slide-unit.collapsed {
@@ -2129,8 +2125,8 @@ summary {
     stroke-linecap: round;
     stroke-linejoin: round;
     transition:
-        transform 0.3s ease,
-        stroke 0.3s ease;
+        transform 0.2s ease,
+        stroke 0.2s ease;
 }
 
 .left__panel-toggle-left.collapsed .panel__toggle-icon {
@@ -2153,8 +2149,8 @@ summary {
     transition:
         var(--transition-bg),
         var(--transition-border),
-        box-shadow 0.3s ease,
-        border-radius 0.3s ease;
+        box-shadow 0.2s ease,
+        border-radius 0.2s ease;
 }
 
 .left__panel:has(.input__slide-unit.collapsed) .catbar {
@@ -2307,7 +2303,7 @@ summary {
     min-width: 120px;
     list-style: none;
     margin: 0;
-    animation: fadeIn 0.1s ease;
+    animation: fadeIn 0.08s ease;
 }
 
 .catbar__context-menu-item {
@@ -2421,7 +2417,7 @@ summary {
 
 .input__category-content {
     display: block;
-    animation: tabFadeSlide 0.2s ease;
+    animation: tabFadeSlide 0.15s ease;
 }
 
 .input__category-content.hidden {
@@ -2434,7 +2430,7 @@ summary {
     gap: 1rem;
     margin-top: 1.5rem;
     padding: 0 0.5rem 0 0.1rem;
-    animation: tabFadeSlide 0.22s ease;
+    animation: tabFadeSlide 0.15s ease;
     overflow-y: auto;
     max-height: calc(100vh - var(--topbar-height) - var(--floating-height) - 9rem);
     margin-bottom: 1rem;
@@ -2642,7 +2638,8 @@ summary {
     overflow: hidden;
     display: flex;
     z-index: 10;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
+    will-change: transform;
 }
 
 .right__panel.collapsed {
@@ -2706,8 +2703,8 @@ summary {
     /* border-bottom: 2px solid transparent; */
     /* margin-bottom: -2px; */
     transition:
-        color 0.3s ease,
-        border-color 0.3s ease;
+        color 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .result__tab-btn:hover {
@@ -2724,7 +2721,7 @@ summary {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    animation: tabFadeSlide 0.2s ease;
+    animation: tabFadeSlide 0.15s ease;
 }
 
 .result__tab-content.hidden {
@@ -2734,26 +2731,26 @@ summary {
 .input__tab-content.is-exiting,
 .input__category-content.is-exiting,
 .result__tab-content.is-exiting {
-    animation: contentFadeOut 0.1s ease forwards;
+    animation: contentFadeOut 0.08s ease forwards;
     pointer-events: none;
 }
 
 .panel-mode-exiting-left {
-    animation: panelSlideOutLeft 0.15s ease forwards;
+    animation: panelSlideOutLeft 0.1s ease forwards;
     pointer-events: none;
 }
 
 .panel-mode-exiting-right {
-    animation: panelSlideOutLeft 0.15s ease forwards;
+    animation: panelSlideOutLeft 0.1s ease forwards;
     pointer-events: none;
 }
 
 .panel-mode-entering-left {
-    animation: panelSlideFromLeft 0.22s ease;
+    animation: panelSlideFromLeft 0.15s ease;
 }
 
 .panel-mode-entering-right {
-    animation: panelSlideFromLeft 0.22s ease;
+    animation: panelSlideFromLeft 0.15s ease;
 }
 
 .result__category-label {
@@ -2772,8 +2769,8 @@ summary {
     overflow: hidden;
     white-space: normal;
     transition:
-        background 0.3s ease,
-        border 0.3s ease;
+        background 0.15s ease,
+        border 0.15s ease;
 }
 
 .result__card-header {
@@ -2782,7 +2779,7 @@ summary {
     align-items: center;
     /* padding: 0.1rem 1rem; */
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.15s ease;
 }
 
 /* .result__card-header:hover {
@@ -2817,7 +2814,7 @@ summary {
     align-items: center;
     justify-content: center;
     transform: rotate(180deg);
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .result__card.collapsed .result__card-toggle {
@@ -2837,7 +2834,7 @@ summary {
 .result__card-body-outer {
     display: grid;
     grid-template-rows: 1fr;
-    transition: grid-template-rows 0.35s ease;
+    transition: grid-template-rows 0.25s ease;
 }
 
 .result__card.collapsed .result__card-body-outer {
