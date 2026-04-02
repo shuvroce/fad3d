@@ -249,7 +249,7 @@ function _renderMWFRS(levels) {
 
 function _renderCladding(wallResults) {
     if (!wallResults || !Object.keys(wallResults).length) return _empty('—');
-    const areas = Object.keys(wallResults).map(Number).sort((a, b) => a - b);
+    const areas = Object.keys(wallResults).sort((a, b) => Number(a) - Number(b));
     const tableWrap = _clone('result-cladding-table-template');
     const tbody = tableWrap.querySelector('tbody');
     for (const area of areas) {
