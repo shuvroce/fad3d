@@ -1,5 +1,5 @@
 // ============================
-// Design Summary Results Management
+// Result Panel & Right Panel Toggle
 // ============================
 
 import { categoryNames } from './category.js';
@@ -113,4 +113,32 @@ export function initializeResultPanel() {
     });
 }
 
-export { updateFacadeResultCategory, switchResultTab };
+function initializeRightPanelToggle() {
+    const rightPanelToggleButton = document.querySelector(
+        ".right__panel-toggle-right",
+    );
+    const rightPanel = document.querySelector(".right__panel");
+
+    if (!rightPanelToggleButton || !rightPanel) {
+        return;
+    }
+
+    const syncToggleLabel = () => {
+        const isCollapsed = rightPanel.classList.contains("collapsed");
+        const label = isCollapsed
+            ? "Expand right panel"
+            : "Collapse right panel";
+        rightPanelToggleButton.setAttribute("aria-label", label);
+        rightPanelToggleButton.setAttribute("data-title", label);
+        rightPanelToggleButton.classList.toggle("collapsed", isCollapsed);
+    };
+
+    rightPanelToggleButton.addEventListener("click", () => {
+        rightPanel.classList.toggle("collapsed");
+        syncToggleLabel();
+    });
+
+    syncToggleLabel();
+}
+
+export { updateFacadeResultCategory, switchResultTab, initializeRightPanelToggle };

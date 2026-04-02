@@ -7,7 +7,6 @@
 import { initTheme, initTooltips } from './theme.js';
 
 // Import UI controls
-import { initializeRightPanelToggle } from './app.js';
 import { initCustomSelect } from './customSelect.js';
 import { initPanelMode, initializeLeftPanelToggle } from './inputPanel.js';
 import { initViewControls, initFiguresPanel } from './viewControls.js';
@@ -35,7 +34,7 @@ import { initSettingsModal } from './settings.js';
 import { initCalcEngine } from './calcEngine.js';
 
 // Import results system
-import { initializeResultPanel } from './resultPanel.js';
+import { initializeResultPanel, initializeRightPanelToggle } from './resultPanel.js';
 
 // Import report system
 import { initReportDropdown } from './report.js';
