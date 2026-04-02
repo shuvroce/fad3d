@@ -263,3 +263,5 @@ export function initSteelSectionModal() {
 }
 
 export { _steelSections };
+
+export function getSteelSections() { return _steelSections; }

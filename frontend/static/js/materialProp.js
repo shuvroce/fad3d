@@ -292,3 +292,5 @@ function initMaterialModal() {
 }
 
 export { _materials, DEFAULT_MATERIALS, populateSecGradeOptions, animateDefineForm, initMaterialModal };
+
+export function getMaterials() { return _materials; }

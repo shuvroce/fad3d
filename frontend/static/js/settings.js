@@ -144,4 +144,4 @@ function initSettingsModal() {
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal('settings-modal'); });
 }
 
-export { getSettings, initSettingsModal };
+export { getSettings, loadSettingsFromStorage, initSettingsModal };

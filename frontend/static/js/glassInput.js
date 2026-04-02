@@ -48,4 +48,4 @@ function glassInputChangeHandler(e) {
     }
 }
 
-export { initGlassInput, switchGlassType };
+export { initGlassInput, switchGlassType, syncPointFixedFields };

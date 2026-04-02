@@ -40,6 +40,9 @@ import { initializeResultPanel } from './resultPanel.js';
 // Import report system
 import { initReportDropdown } from './report.js';
 
+// Import project save/load
+import { initProjectSaveLoad } from './projectSaveLoad.js';
+
 
 // ============================
 // Initialization Sequence
@@ -100,6 +103,13 @@ function initPhase2() {
         console.log('[Main] ✓ View controls initialized');
     } catch (error) {
         console.error('[Main] ✗ View controls initialization failed:', error);
+    }
+
+    try {
+        initProjectSaveLoad();
+        console.log('[Main] ✓ Project save/load initialized');
+    } catch (error) {
+        console.error('[Main] ✗ Project save/load initialization failed:', error);
     }
 
     try {

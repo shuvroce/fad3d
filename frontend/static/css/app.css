@@ -1096,6 +1096,24 @@ summary {
     font-weight: bold;
 }
 
+.topbar__status-notification {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--btn-primary, #4a90d9);
+    color: #fff;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.topbar__status-notification.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .topbar__logo-badge {
     width: 120px;
     height: 42px;

@@ -390,3 +390,5 @@ export function initAlumSectionModal() {
 }
 
 export { _alumSections };
+
+export function getAlumSections() { return _alumSections; }
