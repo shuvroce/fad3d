@@ -4,10 +4,10 @@
 // ============================
 
 // Import theme system
-import { initTheme } from './theme.js';
+import { initTheme, initTooltips } from './theme.js';
 
 // Import UI controls
-import { initTooltips, initializeLeftPanelToggle, initializeRightPanelToggle } from './app.js';
+import { initializeLeftPanelToggle, initializeRightPanelToggle } from './app.js';
 import { initCustomSelect } from './customSelect.js';
 import { initPanelMode } from './inputPanel.js';
 import { initViewControls, initFiguresPanel } from './viewControls.js';
