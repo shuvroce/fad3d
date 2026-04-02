@@ -7,6 +7,7 @@
 import { _materials } from './materialProp.js';
 import { _alumSections } from './alumSecProp.js';
 import { _steelSections } from './steelSecProp.js';
+import { getSettings } from './settings.js';
 
 // Import result updaters
 import { updateWindResults, updateFacadeResults } from './results.js';
@@ -45,13 +46,14 @@ function collectGlassInputs(catNum) {
     const g = id => document.getElementById(id)?.value || null;
     const glassType = g(`cat${catNum}-glass-type`) || 'sgu';
     const prefix = `cat${catNum}-glass-${glassType}`;
+    const settings = getSettings();
 
     const base = {
         glass_type: glassType,
         length: g(`${prefix}-length`),
         width: g(`${prefix}-width`),
         wind_load: g(`${prefix}-wind_load`),
-        def_criteria: g(`${prefix}-def_criteria`),
+        def_criteria: g(`${prefix}-def_criteria`) || settings.glassDeflRatio,
         support_type: g(`${prefix}-support_type`),
     };
 
@@ -81,9 +83,6 @@ function _resolveProfilePayload(sectionName, profileList, isSteel = false) {
     const mat = (_materials || []).find(m => m.name === sec.grade);
     const fy = mat ? (mat.fy || null) : null;
     if (isSteel) {
-        // Steel sections: dimensions-only, F_y defaults to 318 MPa (matches backend STEEL_FY)
-        // Map frontend keys (d,b,t) to backend keys (web_length,flange_length,thk)
-        // Map profile_type: 'steel-rhs' → 'rhs', 'steel-w' → 'iw' (for frame.py routing)
         const steelType = (sec.profileType || 'steel-rhs').replace('steel-', '');
         return {
             profile_type: steelType === 'w' ? 'iw' : steelType,
@@ -93,8 +92,6 @@ function _resolveProfilePayload(sectionName, profileList, isSteel = false) {
             computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null
         };
     }
-    // For aluminum: prefer API-cached computed values, fall back to manual properties
-    // Note: default sections use 'phiMn', synced sections use 'mnYield'
     const cPhiMn = sec._phi_Mn ?? sec.mnYield ?? sec.phiMn ?? null;
     const cIxx   = sec._I_xx ?? sec.ix ?? null;
     const cIyy   = sec._I_yy ?? sec.iy ?? null;
@@ -107,6 +104,30 @@ function _resolveProfilePayload(sectionName, profileList, isSteel = false) {
     };
 }
 
+// Map a section object to an alum profile payload (for sending all profiles to backend)
+function _sectionToAlumProfile(sec) {
+    const mat = (_materials || []).find(m => m.name === sec.grade);
+    return {
+        profile_type: sec.profileType || 'stick',
+        profile_name: sec.name,
+        web_length: sec.d, flange_length: sec.b, web_thk: sec.tw, flange_thk: sec.tf,
+        F_y: mat ? mat.fy : null,
+        tor_constant: sec.j, area: sec.a, I_xx: sec.ix, I_yy: sec.iy,
+        Y: sec.y, X: sec.x, plastic_x: sec.plasticX, plastic_y: sec.plasticY, phi_Mn: sec.mnYield,
+    };
+}
+
+// Map a section object to a steel profile payload
+function _sectionToSteelProfile(sec) {
+    const mat = (_materials || []).find(m => m.name === sec.grade);
+    return {
+        profile_type: sec.profileType || 'steel-rhs',
+        profile_name: sec.name,
+        web_length: sec.d, flange_length: sec.b, thk: sec.t, flange_thk: sec.tf, web_thk: sec.tw,
+        F_y: mat ? mat.fy : null,
+    };
+}
+
 function collectFrameInputs(catNum) {
     const g = id => document.getElementById(id)?.value || null;
     const geometry = g(`cat${catNum}-frame-geometry`) || 'regular';
@@ -114,6 +135,7 @@ function collectFrameInputs(catNum) {
     const frameType = g(`cat${catNum}-frame-frame-type`) || 'cont';
     const variant = `${geometry}-${mullionType}`;
     const prefix = `cat${catNum}-frame-${variant}`;
+    const settings = getSettings();
 
     const frame = {
         geometry: geometry,
@@ -127,6 +149,7 @@ function collectFrameInputs(catNum) {
         mullion: g(`${prefix}-mullion`),
         transom: g(`${prefix}-transom`),
         steel: g(`${prefix}-steel`),
+        defl_ratio: settings.frameDeflRatio,
     };
 
     // Resolve profile payloads from the section stores
@@ -194,26 +217,8 @@ async function runWindCalc() {
 
 async function runCategoryCalc(catNum) {
     const frameInputs = collectFrameInputs(catNum);
-    const alumProfiles = (_alumSections || []).map(s => {
-        const mat = (_materials || []).find(m => m.name === s.grade);
-        return {
-            profile_type: s.profileType || 'stick',
-            profile_name: s.name,
-            web_length: s.d, flange_length: s.b, web_thk: s.tw, flange_thk: s.tf,
-            F_y: mat ? mat.fy : null,
-            tor_constant: s.j, area: s.a, I_xx: s.ix, I_yy: s.iy,
-            Y: s.y, X: s.x, plastic_x: s.plasticX, plastic_y: s.plasticY, phi_Mn: s.mnYield,
-        };
-    });
-    const steelProfiles = (_steelSections || []).map(s => {
-        const mat = (_materials || []).find(m => m.name === s.grade);
-        return {
-            profile_type: s.profileType || 'steel-rhs',
-            profile_name: s.name,
-            web_length: s.d, flange_length: s.b, thk: s.t, flange_thk: s.tf, web_thk: s.tw,
-            F_y: mat ? mat.fy : null,
-        };
-    });
+    const alumProfiles = (_alumSections || []).map(_sectionToAlumProfile);
+    const steelProfiles = (_steelSections || []).map(_sectionToSteelProfile);
 
     // Run glass and frame first (frame results are needed by connection/anchorage)
     const [glassResult, frameResult] = await Promise.all([

@@ -48,204 +48,61 @@ import { initProjectSaveLoad } from './projectSaveLoad.js';
 // Initialization Sequence
 // ============================
 
+const _safe = (name, fn) => { try { fn(); } catch (e) { console.error(`[Main] ${name} failed:`, e); } };
+const _safeAsync = async (name, fn) => { try { await fn(); } catch (e) { console.error(`[Main] ${name} failed:`, e); } };
+
 // Phase 1: Immediate initialization (before DOM ready)
 function initPhase1() {
     console.log('[Main] Phase 1: Theme initialization');
-    try {
-        initTheme();
-        console.log('[Main] ✓ Theme initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Theme initialization failed:', error);
-    }
+    _safe('Theme', initTheme);
 }
 
 // Phase 2: DOM-dependent initialization
 async function initPhase2() {
     console.log('[Main] Phase 2: Core UI initialization');
-
-    try {
-        initTooltips();
-        console.log('[Main] ✓ Tooltips initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Tooltips initialization failed:', error);
-    }
-
-    try {
-        initializeLeftPanelToggle();
-        console.log('[Main] ✓ Left panel toggle initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Left panel toggle initialization failed:', error);
-    }
-
-    try {
-        initializeRightPanelToggle();
-        console.log('[Main] ✓ Right panel toggle initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Right panel toggle initialization failed:', error);
-    }
-
-    try {
-        initCustomSelect();
-        console.log('[Main] ✓ Custom select initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Custom select initialization failed:', error);
-    }
-
-    try {
-        initPanelMode();
-        console.log('[Main] ✓ Panel mode initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Panel mode initialization failed:', error);
-    }
-
-    try {
-        initViewControls();
-        console.log('[Main] ✓ View controls initialized');
-    } catch (error) {
-        console.error('[Main] ✗ View controls initialization failed:', error);
-    }
-
-    try {
-        initProjectSaveLoad();
-        console.log('[Main] ✓ Project save/load initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Project save/load initialization failed:', error);
-    }
-
-    try {
-        initFiguresPanel();
-        console.log('[Figure] ✓ Figure panel initialized');
-    } catch (error) {
-        console.error('[Figure] ✗ Figure panel initialization failed:', error);
-    }
-
-    try {
-        await initFigureChecker();
-        console.log('[Figure] ✓ Figure checker initialized');
-    } catch (error) {
-        console.error('[Figure] ✗ Figure checker initialization failed:', error);
-    }
+    _safe('Tooltips', initTooltips);
+    _safe('Left panel toggle', initializeLeftPanelToggle);
+    _safe('Right panel toggle', initializeRightPanelToggle);
+    _safe('Custom select', initCustomSelect);
+    _safe('Panel mode', initPanelMode);
+    _safe('View controls', initViewControls);
+    _safe('Project save/load', initProjectSaveLoad);
+    _safe('Figures panel', initFiguresPanel);
+    await _safeAsync('Figure checker', initFigureChecker);
 }
 
 // Phase 3: Category system and input handlers
 async function initPhase3() {
     console.log('[Main] Phase 3: Category system and input handlers');
-
-    try {
-        // initCategories() internally calls initializeCategoryIcons() —
-        // no separate call needed here.
-        await initCategories();
-        console.log('[Main] ✓ Categories initialized');
-        console.log('[Main] ✓ Category icons initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Categories initialization failed:', error);
-    }
-
-    try {
-        initGlassInput();
-        console.log('[Main] ✓ Glass input handlers initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Glass input initialization failed:', error);
-    }
-
-    try {
-        initFrameInput();
-        console.log('[Main] ✓ Frame input handlers initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Frame input initialization failed:', error);
-    }
-
-    try {
-        initAnchorInput();
-        console.log('[Main] ✓ Anchor input handlers initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Anchor input initialization failed:', error);
-    }
+    await _safeAsync('Categories', initCategories);
+    _safe('Glass input', initGlassInput);
+    _safe('Frame input', initFrameInput);
+    _safe('Anchor input', initAnchorInput);
 }
 
 // Phase 4: Modal system
 function initPhase4() {
     console.log('[Main] Phase 4: Modal system');
-
-    try {
-        initModals();
-        console.log('[Main] ✓ Modals initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Modals initialization failed:', error);
-    }
-
-    try {
-        initFloatingBarModals();
-        console.log('[Main] ✓ Floating bar modals initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Floating bar modals initialization failed:', error);
-    }
-
-    try {
-        initGeneralModal();
-        console.log('[Main] ✓ General info modal initialized');
-    } catch (error) {
-        console.error('[Main] ✗ General info modal initialization failed:', error);
-    }
-
-    try {
-        initMaterialModal();
-        console.log('[Main] ✓ Material properties modal initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Material modal initialization failed:', error);
-    }
-
-    try {
-        initAlumSectionModal();
-        console.log('[Main] ✓ Aluminum section modal initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Aluminum section modal initialization failed:', error);
-    }
-
-    try {
-        initSteelSectionModal();
-        console.log('[Main] ✓ Steel section modal initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Steel section modal initialization failed:', error);
-    }
-
-    try {
-        initSettingsModal();
-        console.log('[Main] ✓ Settings modal initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Settings modal initialization failed:', error);
-    }
+    _safe('Modals', initModals);
+    _safe('Floating bar modals', initFloatingBarModals);
+    _safe('General info modal', initGeneralModal);
+    _safe('Material modal', initMaterialModal);
+    _safe('Aluminum section modal', initAlumSectionModal);
+    _safe('Steel section modal', initSteelSectionModal);
+    _safe('Settings modal', initSettingsModal);
 }
 
 // Phase 5: Results panel
 function initPhase5() {
     console.log('[Main] Phase 5: Results system');
-
-    try {
-        initializeResultPanel();
-        console.log('[Main] ✓ Result panel initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Result panel initialization failed:', error);
-    }
+    _safe('Result panel', initializeResultPanel);
 }
 
 // Phase 6: Calculation engine and report (after all inputs ready)
 function initPhase6() {
     console.log('[Main] Phase 6: Calculation engine and report');
-
-    try {
-        initCalcEngine();
-        console.log('[Main] ✓ Calculation engine initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Calculation engine initialization failed:', error);
-    }
-
-    try {
-        initReportDropdown();
-        console.log('[Main] ✓ Report dropdown initialized');
-    } catch (error) {
-        console.error('[Main] ✗ Report dropdown initialization failed:', error);
-    }
+    _safe('Calculation engine', initCalcEngine);
+    _safe('Report dropdown', initReportDropdown);
 }
 
 // ============================

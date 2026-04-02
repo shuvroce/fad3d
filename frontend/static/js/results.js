@@ -67,7 +67,7 @@ function _renderGlass(calc) {
     const isDouble = calc.branch === 'dgu' || calc.branch === 'ldgu';
     const showKeys = [];
     if (isSingle) showKeys.push('gtf', 'lr');
-    if (isDouble) showKeys.push('gtf1', 'gtf2', 'dgu_ls1', 'dgu_ls2', 'dgu_lr1', 'dgu_lr2');
+    if (isDouble) showKeys.push('gtf1', 'gtf2', 'ls1', 'ls2', 'lr1', 'lr2');
     if (calc.stress_ratio != null) showKeys.push('stress_ratio');
     if (calc.allow_def != null) showKeys.push('allow_def');
     if (calc.def_ratio != null) showKeys.push('def_ratio');
@@ -77,13 +77,13 @@ function _renderGlass(calc) {
         A_eff: calc.A_eff,
         aspect_ratio: calc.aspect_ratio,
         gtf: calc.gtf,
-        lr: calc.sgu_lr ?? calc.lgu_lr,
+        lr: calc.lr,
         gtf1: calc.gtf1,
         gtf2: calc.gtf2,
-        dgu_ls1: calc.dgu_ls1 ?? calc.ldgu_ls1,
-        dgu_ls2: calc.dgu_ls2 ?? calc.ldgu_ls2,
-        dgu_lr1: calc.dgu_lr1 ?? calc.ldgu_lr1,
-        dgu_lr2: calc.dgu_lr2 ?? calc.ldgu_lr2,
+        ls1: calc.ls1,
+        ls2: calc.ls2,
+        lr1: calc.lr1,
+        lr2: calc.lr2,
         stress_ratio: calc.stress_ratio,
         allow_def: calc.allow_def,
         def_ratio: calc.def_ratio,

@@ -81,10 +81,7 @@
                     <div class="summary__td-item">
                         <div class="summary__td-list">
                             <div>
-                                {% if gu.glass_type == "sgu" %}<span>LR: </span>{{ calc.sgu_lr }} ({{ calc.stress_ratio }})
-                                {% elif gu.glass_type == "dgu" %}<span>LR: </span>{{ calc.dgu_lr }} ({{ calc.stress_ratio }})
-                                {% elif gu.glass_type == "lgu" %}<span>LR: </span>{{ calc.lgu_lr }} ({{ calc.stress_ratio }})
-                                {% else %}<span>LR: </span>{{ calc.ldgu_lr }}
+                                <span>LR: </span>{{ calc.lr }} ({{ calc.stress_ratio }})
                                 {% endif %}
                             </div>
                             <div><span>δ: </span>{{ calc.deflection }} ({{ calc.def_ratio }})</div>

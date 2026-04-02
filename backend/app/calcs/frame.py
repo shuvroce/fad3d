@@ -62,11 +62,13 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
     reaction_Ry = _to_float(frame.get("reaction_Ry")) or 0
     reaction_Rz = _to_float(frame.get("reaction_Rz")) or 0
     
-    glass_sw = glass_thk * 0.025
-    acc_sw = glass_sw * 0.3
-    
     if not all([frame_width, frame_length]):
         return None
+
+    # Compute loads via shared loading module
+    mul_w_dead, mul_w_wind, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
+    glass_sw = glass_thk * 0.025
+    acc_sw = glass_sw * 0.3
 
     if frame_type == "Floor-to-floor":
         eff_area = max(frame_length * frame_width, frame_length**2 / 3) / 1000**2
@@ -75,13 +77,12 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
         eff_area = max(_frame_length * frame_width, _frame_length**2 / 3) / 1000**2
 
     # Deflection limits
+    defl_ratio = _to_float(frame.get("defl_ratio")) or 175
     if frame_length <= 4100:
-        mul_allow_def = frame_length / 175
+        mul_allow_def = frame_length / defl_ratio
     else:
         mul_allow_def = (frame_length / 240) + 6.35
-    tran_allow_def = frame_width / 175
-    
-    mul_w_dead, mul_w_wind, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
+    tran_allow_def = frame_width / defl_ratio
 
 
     # Mullion

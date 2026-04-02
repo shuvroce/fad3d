@@ -21,6 +21,20 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(FRONTEND_DIR, "templates"))
 
+# JS field name → Python field name mappings (shared by section calc routes)
+ALUM_FIELD_MAP = {
+    "name": "profile_name", "d": "web_length", "b": "flange_length",
+    "tw": "web_thk", "tf": "flange_thk", "fy": "F_y",
+    "j": "tor_constant", "a": "area", "ix": "I_xx", "iy": "I_yy",
+    "y": "Y", "x": "X", "plasticX": "plastic_x", "plasticY": "plastic_y",
+    "mnYield": "phi_Mn",
+}
+
+STEEL_FIELD_MAP = {
+    "d": "web_length", "b": "flange_length", "t": "thk",
+    "tf": "flange_thk", "tw": "web_thk", "fy": "F_y",
+}
+
 
 async def _json(request: Request) -> dict:
     try:
@@ -42,28 +56,10 @@ async def api_wind_locations():
 @app.post("/api/section/calc/alum")
 async def api_calc_alum(request: Request):
     data = await _json(request)
-    # Normalise profile_type to match Python function expectations
     profile_type = data.get("profile_type", "").lower()
-    # Map JS field names → Python field names
-    payload = {
-        "profile_type":  "Stick" if profile_type == "stick" else profile_type,
-        "profile_name":  data.get("name", ""),
-        "web_length":    data.get("d"),
-        "flange_length": data.get("b"),
-        "web_thk":       data.get("tw"),
-        "flange_thk":    data.get("tf"),
-        "F_y":           data.get("fy"),
-        # manual-only extras
-        "tor_constant":  data.get("j"),
-        "area":          data.get("a"),
-        "I_xx":          data.get("ix"),
-        "I_yy":          data.get("iy"),
-        "Y":             data.get("y"),
-        "X":             data.get("x"),
-        "plastic_x":     data.get("plasticX"),
-        "plastic_y":     data.get("plasticY"),
-        "phi_Mn":        data.get("mnYield"),
-    }
+    payload = {"profile_type": "Stick" if profile_type == "stick" else profile_type}
+    for js_key, py_key in ALUM_FIELD_MAP.items():
+        payload[py_key] = data.get(js_key)
     result = calc_alum_profile(payload)
     if result is None:
         return JSONResponse({"error": "Insufficient data"}, status_code=400)
@@ -74,14 +70,7 @@ async def api_calc_alum(request: Request):
 async def api_calc_steel(request: Request):
     data = await _json(request)
     profile_type = data.get("profile_type", "steel-rhs")
-    payload = {
-        "web_length":    data.get("d"),
-        "flange_length": data.get("b"),
-        "thk":           data.get("t"),
-        "flange_thk":    data.get("tf"),
-        "web_thk":       data.get("tw"),
-        "F_y":           data.get("fy"),
-    }
+    payload = {py_key: data.get(js_key) for js_key, py_key in STEEL_FIELD_MAP.items()}
     if profile_type == "steel-rhs":
         result = calc_steel_rhs_profile(payload)
     else:

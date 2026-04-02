@@ -63,6 +63,7 @@
     /* Light Theme - Shadow Colors */
     --shadow-nav: rgba(0, 0, 0, 0.1);
     --shadow-container: rgba(0, 0, 0, 0.02);
+    --shadow-box: 0 4px 16px rgba(0, 0, 0, 0.12);
 
     /* Scrollbar Colors */
     --scrollbar-track: #e6e6e6;
@@ -133,6 +134,7 @@ body.theme__dark {
     /* Dark Theme - Shadow Colors */
     --shadow-nav: rgba(0, 0, 0, 0.4);
     --shadow-container: rgba(0, 0, 0, 0.25);
+    --shadow-box: 0 4px 16px rgba(0, 0, 0, 0.35);
 
     /* Dark Theme - Scrollbar Colors */
     --scrollbar-track: #0d1117;
@@ -1482,6 +1484,10 @@ summary {
     padding: 2px 5px;
 }
 
+.floating__bar-middle {
+    box-shadow: var(--shadow-box);
+}
+
 .floating__bar-left {
     width: calc(var(--catbar-width) + var(--input-field-width));
     background: transparent;
@@ -1495,6 +1501,7 @@ summary {
     padding: 2px 5px;
     background-color: var(--bg-primary);
     border-radius: var(--radius-2);
+    box-shadow: var(--shadow-box);
 }
 
 .floating__bar-right {
@@ -1512,6 +1519,7 @@ summary {
     padding: 2px 5px;
     display: flex;
     gap: 0.5rem;
+    box-shadow: var(--shadow-box);
 }
 
 .floating__bar-btn {
@@ -2517,6 +2525,7 @@ summary {
     white-space: nowrap;
     bottom: 0;
     border-radius: 0 var(--radius-3) var(--radius-3) 0;
+    box-shadow: var(--shadow-box);
 }
 
 /* Wind mode: expand input box to cover catbar + input field width */
@@ -2833,6 +2842,7 @@ summary {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    box-shadow: var(--shadow-box);
 }
 
 .result__heading {

@@ -190,12 +190,4 @@ function initCustomSelectLogic() {
 // Create initialization function
 const initCustomSelectModule = initCustomSelectLogic();
 
-// Close all dropdowns when clicking outside
-document.addEventListener('click', () => {
-    document.querySelectorAll('.custom-select.open').forEach(el => {
-        el.classList.remove('open');
-        el.querySelector('.custom-select__selected').setAttribute('aria-expanded', 'false');
-    });
-});
-
 export { initCustomSelectModule as initCustomSelect };

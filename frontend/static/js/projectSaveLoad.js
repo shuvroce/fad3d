@@ -78,45 +78,26 @@ function _collectCategoryInputs(catNum) {
 }
 
 async function _collectProjectData() {
-    // Dynamically import to avoid circular dependency at load time
-    let materials = [];
-    let alumSections = [];
-    let steelSections = [];
-    let catNames = new Map();
-    let catIcons = new Map();
-    let defaultIcon = 'window';
+    const [matMod, alumMod, steelMod, catMod, iconMod] = await Promise.all([
+        import('./materialProp.js').catch(() => null),
+        import('./alumSecProp.js').catch(() => null),
+        import('./steelSecProp.js').catch(() => null),
+        import('./category.js').catch(() => null),
+        import('./categoryIcons.js').catch(() => null),
+    ]);
 
-    try {
-        const matMod = await import('./materialProp.js');
-        materials = (matMod._materials || []).map(m => ({ ...m }));
-    } catch (_) { /* fallback */ }
-
-    try {
-        const alumMod = await import('./alumSecProp.js');
-        alumSections = (alumMod._alumSections || []).map(s => {
-            const c = { ...s }; delete c._phi_Mn; delete c._I_xx;
-            delete c._I_yy; delete c._nameEdited; return c;
-        });
-    } catch (_) { /* fallback */ }
-
-    try {
-        const steelMod = await import('./steelSecProp.js');
-        steelSections = (steelMod._steelSections || []).map(s => {
-            const c = { ...s }; delete c._phi_Mn; delete c._I_xx;
-            delete c._I_yy; delete c._nameEdited; return c;
-        });
-    } catch (_) { /* fallback */ }
-
-    try {
-        const catMod = await import('./category.js');
-        catNames = catMod.categoryNames;
-    } catch (_) { /* fallback */ }
-
-    try {
-        const iconMod = await import('./categoryIcons.js');
-        catIcons = iconMod.categoryIcons;
-        defaultIcon = iconMod.DEFAULT_CATEGORY_ICON;
-    } catch (_) { /* fallback */ }
+    const materials = matMod?._materials ? matMod._materials.map(m => ({ ...m })) : [];
+    const alumSections = alumMod?._alumSections ? alumMod._alumSections.map(s => {
+        const c = { ...s }; delete c._phi_Mn; delete c._I_xx;
+        delete c._I_yy; delete c._nameEdited; return c;
+    }) : [];
+    const steelSections = steelMod?._steelSections ? steelMod._steelSections.map(s => {
+        const c = { ...s }; delete c._phi_Mn; delete c._I_xx;
+        delete c._I_yy; delete c._nameEdited; return c;
+    }) : [];
+    const catNames = catMod?.categoryNames || new Map();
+    const catIcons = iconMod?.categoryIcons || new Map();
+    const defaultIcon = iconMod?.DEFAULT_CATEGORY_ICON || 'window';
 
     // Settings from localStorage (avoids importing settings.js)
     let settings = {};
@@ -202,20 +183,14 @@ async function _restoreProject(data) {
     _restoreGeneralInfo(data.generalInfo);
 
     // 3. Materials, alum sections, steel sections — update arrays via module refs
-    try {
-        const matMod = await import('./materialProp.js');
-        _restoreArray(matMod._materials, data.materials);
-    } catch (_) {}
-
-    try {
-        const alumMod = await import('./alumSecProp.js');
-        _restoreArray(alumMod._alumSections, data.alumSections);
-    } catch (_) {}
-
-    try {
-        const steelMod = await import('./steelSecProp.js');
-        _restoreArray(steelMod._steelSections, data.steelSections);
-    } catch (_) {}
+    const [matMod, alumMod, steelMod] = await Promise.all([
+        import('./materialProp.js').catch(() => null),
+        import('./alumSecProp.js').catch(() => null),
+        import('./steelSecProp.js').catch(() => null),
+    ]);
+    if (matMod) _restoreArray(matMod._materials, data.materials);
+    if (alumMod) _restoreArray(alumMod._alumSections, data.alumSections);
+    if (steelMod) _restoreArray(steelMod._steelSections, data.steelSections);
 
     // 4. Wind inputs
     _restoreWindInputs(data.windInputs);
@@ -282,13 +257,13 @@ function _restoreWindInputs(windData) {
 async function _restoreCategories(categories) {
     if (!categories || !categories.length) return;
 
-    // Dynamically import category module functions
-    let catMod, iconMod, glassMod, frameMod, anchorMod;
-    try { catMod = await import('./category.js'); } catch (_) {}
-    try { iconMod = await import('./categoryIcons.js'); } catch (_) {}
-    try { glassMod = await import('./glassInput.js'); } catch (_) {}
-    try { frameMod = await import('./frameInput.js'); } catch (_) {}
-    try { anchorMod = await import('./anchorInput.js'); } catch (_) {}
+    const [catMod, iconMod, glassMod, frameMod, anchorMod] = await Promise.all([
+        import('./category.js').catch(() => null),
+        import('./categoryIcons.js').catch(() => null),
+        import('./glassInput.js').catch(() => null),
+        import('./frameInput.js').catch(() => null),
+        import('./anchorInput.js').catch(() => null),
+    ]);
 
     // Reset to a single fresh category
     if (catMod?.initializeCategories) {

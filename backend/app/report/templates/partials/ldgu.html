@@ -156,13 +156,13 @@
                 </tr>
                     <td>Load Share factor, <i>LS<sub>1</sub></i></td>
                     <td>=</td>
-                    <td>{{ calc.ldgu_ls1 }}</td>
+                    <td>{{ calc.ls1 }}</td>
                     <td><i>; ASTM E1300, Table 5</i></td>
                 </tr>
                 <tr>
                     <td>Load resisting capacity, <i>LR<sub>1</sub> = NFL<sub>1</sub> x GTF<sub>1</sub> x LS<sub>1</sub></i></td>
                     <td>=</td>
-                    <td>{{ calc.ldgu_lr1 }} <i>kPa</i></td>
+                    <td>{{ calc.lr1 }} <i>kPa</i></td>
                     <td></td>
                 </tr>
             </tbody>
@@ -213,13 +213,13 @@
                 </tr>
                     <td>Load Share factor, <i>LS<sub>2</sub></i></td>
                     <td>=</td>
-                    <td>{{ calc.ldgu_ls2 }}</td>
+                    <td>{{ calc.ls2 }}</td>
                     <td><i>; ASTM E1300, Table 5</i></td>
                 </tr>
                 <tr>
                     <td>Load resisting capacity, <i>LR<sub>2</sub> = NFL<sub>2</sub> x GTF<sub>2</sub> x LS<sub>2</sub></i></td>
                     <td>=</td>
-                    <td>{{ calc.ldgu_lr2 }} <i>kPa</i></td>
+                    <td>{{ calc.lr2 }} <i>kPa</i></td>
                     <td></td>
                 </tr>
             </tbody>
@@ -231,7 +231,7 @@
                 <tr>
                     <td>Load resisting capacity of the glass, <i>LR = min(LR<sub>1</sub>, LR<sub>2</sub>)</i></td>
                     <td>=</td>
-                    <td>{{ calc.ldgu_lr }} <i>kPa</i></td>
+                    <td>{{ calc.lr }} <i>kPa</i></td>
                     <td></td>
                 </tr>
                 <tr>
@@ -269,7 +269,7 @@
                 <tr>
                     <td>Service wind load for deflection, q<sub>1</sub> = 0.7 P<sub>z</sub> / LS<sub>1</sub></td>
                     <td>=</td>
-                    <td>{{ (0.7 * gu.wind_load / calc.ldgu_ls1) | round(2) }}</td>
+                    <td>{{ (0.7 * gu.wind_load / calc.ls1) | round(2) }}</td>
                     <td></td>
                 </tr>
                 <tr>
@@ -315,7 +315,7 @@
                 <tr>
                     <td>Service wind load for deflection, q<sub>2</sub> = 0.7 P<sub>z</sub> / LS<sub>2</sub></td>
                     <td>=</td>
-                    <td>{{ (0.7 * gu.wind_load / calc.ldgu_ls2) | round(2) }}</td>
+                    <td>{{ (0.7 * gu.wind_load / calc.ls2) | round(2) }}</td>
                     <td></td>
                 </tr>
                 <tr>
@@ -357,9 +357,9 @@
                 <tr>
                     <td>Deflection ratio</td>
                     <td>=</td>
-                    <td>{{ calc.deflection_ratio }} <i>mm</i></td>
-                    <td class="{% if calc.deflection_ratio < 1 %}ok{% else %}not-ok{% endif %}">
-                        {% if calc.deflection_ratio < 1 %} OK {% else %} NOT OK {% endif %}
+                    <td>{{ calc.def_ratio }} <i>mm</i></td>
+                    <td class="{% if calc.def_ratio < 1 %}ok{% else %}not-ok{% endif %}">
+                        {% if calc.def_ratio < 1 %} OK {% else %} NOT OK {% endif %}
                     </td>
                 </tr>
             </tbody>
