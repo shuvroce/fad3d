@@ -45,7 +45,7 @@ function initDraggableModals() {
 }
 
 function initSimpleModalClickOutside() {
-    ['calculator-modal', 'glass-chart-modal', 'feedback-modal', 'contact-modal'].forEach(id => {
+    ['calculator-modal', 'glass-chart-modal', 'feedback-modal', 'contact-modal', 'help-modal'].forEach(id => {
         const modal = document.getElementById(id);
         if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(id); });
     });
@@ -54,6 +54,15 @@ function initSimpleModalClickOutside() {
 // ============================
 // Support Submenu
 // ============================
+
+function initHelpModal() {
+    const helpBtn = document.getElementById('help-btn');
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => openModal('help-modal'));
+    }
+    document.getElementById('close-help-modal')?.addEventListener('click', () => closeModal('help-modal'));
+    document.getElementById('close-help-modal-footer')?.addEventListener('click', () => closeModal('help-modal'));
+}
 
 function initSupportSubmenu() {
     const btn = document.getElementById('support-btn');
@@ -99,5 +108,6 @@ function initSupportSubmenu() {
 export function initModals() {
     initDraggableModals();
     initSimpleModalClickOutside();
+    initHelpModal();
     initSupportSubmenu();
 }

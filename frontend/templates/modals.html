@@ -737,6 +737,123 @@
     </div>
 </div>
 
+<!-- Help Modal -->
+<div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+    <div class="modal__dialog modal__dialog-large">
+        <div class="modal__header">
+            <h2 class="modal__title" id="help-modal-title">
+                <svg class="modal__title-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.3c0 1.7-2 2.1-2 3.2"></path>
+                    <circle cx="12" cy="16.5" r="0.9"></circle>
+                </svg>
+                Help &amp; Shortcuts
+            </h2>
+            <button type="button" class="modal__close" id="close-help-modal" aria-label="Close modal">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal__content">
+            <div class="help-modal__body">
+
+                <div class="help-modal__section">
+                    <h3 class="help-modal__section-title">Keyboard Shortcuts</h3>
+                    <table class="help-modal__table">
+                        <thead>
+                            <tr>
+                                <th>Shortcut</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><kbd>Esc</kbd></td>
+                                <td>Close open modal / dialog</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>F2</kbd></td>
+                                <td>Rename active category</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Delete</kbd></td>
+                                <td>Remove selected category</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+                                <td>Save project</td>
+                            </tr>
+                            <tr>
+                                <td><kbd>Ctrl</kbd> + <kbd>O</kbd></td>
+                                <td>Open project</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="help-modal__section">
+                    <h3 class="help-modal__section-title">Usage Guide</h3>
+                    <div class="help-modal__guide">
+                        <div class="help-modal__guide-item">
+                            <div class="help-modal__guide-step">1</div>
+                            <div>
+                                <strong>Define Materials &amp; Sections</strong>
+                                <p>Use the <em>Define</em> dropdown on the floating bar to set up aluminum/steel materials and profile sections before creating categories.</p>
+                            </div>
+                        </div>
+                        <div class="help-modal__guide-item">
+                            <div class="help-modal__guide-step">2</div>
+                            <div>
+                                <strong>Create Categories</strong>
+                                <p>Click the <strong>+</strong> button on the category bar to add facade zones. Each category has Glass, Frame, and Anchorage input tabs.</p>
+                            </div>
+                        </div>
+                        <div class="help-modal__guide-item">
+                            <div class="help-modal__guide-step">3</div>
+                            <div>
+                                <strong>Configure General Info</strong>
+                                <p>Click <em>General</em> on the floating bar to fill in project details, revision number, and report sections.</p>
+                            </div>
+                        </div>
+                        <div class="help-modal__guide-item">
+                            <div class="help-modal__guide-step">4</div>
+                            <div>
+                                <strong>Run Calculations</strong>
+                                <p>Results update automatically as you enter data. Check the right panel for design summary, DC ratios, and deflection values.</p>
+                            </div>
+                        </div>
+                        <div class="help-modal__guide-item">
+                            <div class="help-modal__guide-step">5</div>
+                            <div>
+                                <strong>Generate Report</strong>
+                                <p>Click the <em>Report</em> button in the top bar to generate a PDF summary of your facade analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-modal__section">
+                    <h3 class="help-modal__section-title">Tips</h3>
+                    <ul class="help-modal__tips">
+                        <li>Hover over icons and buttons to see tooltips with descriptions.</li>
+                        <li>Right-click a category tab to rename, duplicate, or delete it.</li>
+                        <li>Use the <em>Figures</em> panel (top-right) to check which profile figure images are available.</li>
+                        <li>Toggle dark mode using the moon/sun icon in the top-right corner.</li>
+                        <li>Drag modal headers to reposition dialogs on screen.</li>
+                        <li>Use the Settings modal to switch between design codes and unit systems.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button type="button" class="modal__btn modal__btn-primary" id="close-help-modal-footer">Got It</button>
+        </div>
+    </div>
+</div>
+
 <!-- Send Feedback Modal -->
 <div id="feedback-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
     <div class="modal__dialog modal__dialog-medium">
