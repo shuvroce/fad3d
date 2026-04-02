@@ -104,6 +104,9 @@ function switchPanelMode(mode) {
 
         // Update floating bar button states
         updateFloatingBarButtons(mode);
+
+        // Notify listeners that panel mode changed
+        window.dispatchEvent(new CustomEvent("panel-mode-changed", { detail: { mode } }));
     }, 150);
 }
 

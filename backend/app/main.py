@@ -158,6 +158,136 @@ async def serve_profile_image(filename: str):
     return FileResponse(path)
 
 
+# ---------------------------------------------------------------------------
+# Figure Checking
+# ---------------------------------------------------------------------------
+
+DEFAULT_FIGURES_DIR = os.path.join(BACKEND_DIR, "app", "report", "figures")
+PROFILES_DIR = os.path.join(BACKEND_DIR, "app", "report", "assets", "profiles")
+_figures_dir = DEFAULT_FIGURES_DIR
+os.makedirs(DEFAULT_FIGURES_DIR, exist_ok=True)
+os.makedirs(PROFILES_DIR, exist_ok=True)
+
+SAP_FIGURE_NAMES = [
+    "sap-model.png", "sap-release.png", "sap-dead-load.png", "sap-wind-load.png",
+    "sap-bmd.png", "sap-sfd.png", "sap-mul-max-moment.png",
+    "sap-tran-max-moment.png", "sap-deformed-shape.png", "sap-mul-def.png",
+    "sap-tran-def-wind.png", "sap-tran-def-dead.png",
+    "sap-joint-force-dead.png", "sap-joint-force-wind.png",
+    "sap-reaction-force-dead.png", "sap-reaction-force-wind.png",
+]
+
+RFEM_FIGURE_NAMES = [
+    "rfem-model-3d.png", "rfem-model-data.png", "rfem-stress.png",
+    "rfem-stress-ratio.png", "rfem-def.png", "rfem-def-ratio.png",
+]
+
+
+def _fig_exists(name: str, figures_dir: str) -> bool:
+    return os.path.isfile(os.path.join(figures_dir, name))
+
+
+def _profile_exists(name: str) -> bool:
+    return os.path.isfile(os.path.join(PROFILES_DIR, name))
+
+
+@app.get("/api/figures/dir")
+async def api_get_figures_dir():
+    return {"directory": _figures_dir}
+
+
+@app.post("/api/figures/dir")
+async def api_set_figures_dir(request: Request):
+    global _figures_dir
+    data = await _json(request)
+    directory = data.get("directory", "")
+    if not directory:
+        return JSONResponse({"error": "No directory provided"}, status_code=400)
+    if not os.path.isdir(directory):
+        return JSONResponse({"error": "Directory does not exist"}, status_code=400)
+    _figures_dir = directory
+    return {"directory": _figures_dir}
+
+
+@app.post("/api/figures/open_picker")
+async def api_open_folder_picker():
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["powershell", "-Command",
+             "Add-Type -AssemblyName System.Windows.Forms;"
+             "$fbd = New-Object System.Windows.Forms.FolderBrowserDialog;"
+             "$fbd.Description = 'Select Figures Directory';"
+             "$fbd.ShowNewFolderButton = $true;"
+             "if ($fbd.ShowDialog() -eq 'OK') { $fbd.SelectedPath }"],
+            capture_output=True, text=True, timeout=60,
+        )
+        selected = result.stdout.strip()
+        if selected and os.path.isdir(selected):
+            global _figures_dir
+            _figures_dir = selected
+            return {"directory": _figures_dir}
+        return JSONResponse({"error": "No folder selected"}, status_code=400)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.post("/api/check_figures")
+async def api_check_figures(request: Request):
+    data = await _json(request)
+    categories = data.get("categories", [])
+    wind_mode = data.get("wind_mode", "facade")
+    figures_dir = data.get("directory", _figures_dir)
+
+    # Validate directory
+    if not os.path.isdir(figures_dir):
+        return JSONResponse({"error": "Figures directory not found"}, status_code=400)
+
+    figures = []
+
+    # Wind figures
+    if wind_mode == "wind":
+        figures.append({"name": "wind-map.png", "category": "Wind", "exists": _fig_exists("wind-map.png", figures_dir)})
+
+    # Category-based figures
+    for cat in categories:
+        idx = cat.get("index", 0)
+        cat_label = f"Category {idx}"
+
+        # Reference elevation (always required)
+        figures.append({"name": f"{idx}-ref-elev.png", "category": cat_label, "exists": _fig_exists(f"{idx}-ref-elev.png", figures_dir)})
+
+        # Glass RFEM figures (only for Point Fixed support type)
+        glass_type = cat.get("glass_type", "sgu")
+        support_type = cat.get("support_type", "")
+        if support_type == "Point Fixed":
+            for g_idx in range(1, 3 if glass_type in ("dgu", "ldgu") else 2):
+                for fig_name in RFEM_FIGURE_NAMES:
+                    full_name = f"{idx}.{g_idx}-{fig_name}"
+                    figures.append({"name": full_name, "category": f"{cat_label} - Glass {g_idx}", "exists": _fig_exists(full_name, figures_dir)})
+
+        # SAP figures (irregular geometry)
+        frame_geometry = cat.get("frame_geometry", "regular")
+        if frame_geometry != "regular":
+            for fig_name in SAP_FIGURE_NAMES:
+                full_name = f"{idx}-{fig_name}"
+                figures.append({"name": full_name, "category": cat_label, "exists": _fig_exists(full_name, figures_dir)})
+
+        # Profile cross-section figure (only for Aluminum + Steel mullion)
+        mullion_name = cat.get("mullion_name", "")
+        mullion_type = cat.get("mullion_type", "")
+        steel_name = cat.get("steel_name", "")
+        if mullion_name and mullion_type == "Aluminum + Steel" and steel_name:
+            steel_thickness = steel_name.split("x")[-1] if "x" in steel_name else steel_name
+            fig_name = f"{mullion_name}+RHS {steel_thickness}.png"
+            figures.append({"name": fig_name, "category": cat_label, "exists": _fig_exists(fig_name, figures_dir)})
+
+    # Summary
+    total = len(figures)
+    found = sum(1 for f in figures if f["exists"])
+    return {"success": True, "figures": figures, "total": total, "found": found}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=True)

@@ -10,6 +10,7 @@ import { initTheme, initTooltips } from './theme.js';
 import { initCustomSelect } from './customSelect.js';
 import { initPanelMode, initializeLeftPanelToggle } from './inputPanel.js';
 import { initViewControls, initFiguresPanel } from './viewControls.js';
+import { initFigureChecker } from './figureChecker.js';
 
 // Import category system
 import { initCategories } from './category.js';
@@ -59,7 +60,7 @@ function initPhase1() {
 }
 
 // Phase 2: DOM-dependent initialization
-function initPhase2() {
+async function initPhase2() {
     console.log('[Main] Phase 2: Core UI initialization');
 
     try {
@@ -116,6 +117,13 @@ function initPhase2() {
         console.log('[Figure] ✓ Figure panel initialized');
     } catch (error) {
         console.error('[Figure] ✗ Figure panel initialization failed:', error);
+    }
+
+    try {
+        await initFigureChecker();
+        console.log('[Figure] ✓ Figure checker initialized');
+    } catch (error) {
+        console.error('[Figure] ✗ Figure checker initialization failed:', error);
     }
 }
 
@@ -250,7 +258,7 @@ initPhase1();
 // Phases 2-6: Wait for DOM
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
-        initPhase2();
+        await initPhase2();
         await initPhase3();
         initPhase4();
         initPhase5();
@@ -264,7 +272,7 @@ if (document.readyState === 'loading') {
 } else {
     // DOM already loaded
     (async () => {
-        initPhase2();
+        await initPhase2();
         await initPhase3();
         initPhase4();
         initPhase5();

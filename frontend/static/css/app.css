@@ -1665,17 +1665,18 @@ summary {
 /* figure status panel */
 .figure__panel {
     background-color: var(--bg-primary);
-    /* border: 1px solid var(--border-primary); */
+    border: 1px solid var(--border-primary);
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - var(--topbar-height) - var(--floating-height) - 2rem);
+    overflow-y: auto;
     width: var(--figure-panel-width);
     position: fixed;
     top: calc(var(--topbar-height) + var(--floating-height) + 0.5rem);
     right: calc(var(--result-width) + 5rem);
     padding: 1rem;
     border-radius: var(--radius-3);
-    /* box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); */
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     z-index: 10;
     opacity: 0;
     pointer-events: none;
@@ -1726,6 +1727,146 @@ summary {
 
 .figures__indicator[data-status="none"] {
     background-color: #f44336;
+}
+
+/* Figure panel content */
+.figure__panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-primary);
+    margin-bottom: 0.4rem;
+}
+
+.figure__panel-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.figure__panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.figure__panel-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.figure__panel-btn:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.figure__panel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.figure__panel-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.figure__panel-dir {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.5rem;
+    margin-bottom: 0.4rem;
+    background-color: var(--bg-secondary, rgba(0,0,0,0.03));
+    border-radius: var(--radius-2);
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    cursor: default;
+    user-select: all;
+}
+
+.figure__panel-dir-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    fill: var(--text-secondary);
+}
+
+.figure__panel-dir-path {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-mono, monospace);
+}
+
+.figure__group {
+    margin-bottom: 0.6rem;
+}
+
+.figure__group-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.4rem 0 0.2rem;
+}
+
+.figure__item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0;
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    font-family: var(--font-mono, monospace);
+}
+
+.figure__item-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.figure__item-icon--found {
+    fill: #4caf50;
+}
+
+.figure__item-icon--missing {
+    fill: #f44336;
+}
+
+.figure__item-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.figure__panel-footer {
+    padding-top: 0.6rem;
+    margin-top: 0.4rem;
+    border-top: 1px solid var(--border-primary);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.figure__panel-empty {
+    padding: 1rem 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
 }
 
 /* Define list (Material / Section modals) */
