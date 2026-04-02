@@ -7,9 +7,9 @@
 import { initTheme, initTooltips } from './theme.js';
 
 // Import UI controls
-import { initializeLeftPanelToggle, initializeRightPanelToggle } from './app.js';
+import { initializeRightPanelToggle } from './app.js';
 import { initCustomSelect } from './customSelect.js';
-import { initPanelMode } from './inputPanel.js';
+import { initPanelMode, initializeLeftPanelToggle } from './inputPanel.js';
 import { initViewControls, initFiguresPanel } from './viewControls.js';
 
 // Import category system
