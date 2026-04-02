@@ -43,6 +43,9 @@ import { initReportDropdown } from './report.js';
 // Import project save/load
 import { initProjectSaveLoad } from './projectSaveLoad.js';
 
+// Import keyboard shortcuts
+import { initKeybinds } from './keybinds.js';
+
 
 // ============================
 // Initialization Sequence
@@ -68,6 +71,7 @@ async function initPhase2() {
     _safe('View controls', initViewControls);
     _safe('Project save/load', initProjectSaveLoad);
     _safe('Figures panel', initFiguresPanel);
+    _safe('Keybinds', initKeybinds);
     await _safeAsync('Figure checker', initFigureChecker);
 }
 

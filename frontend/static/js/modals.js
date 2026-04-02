@@ -3,6 +3,7 @@
 // ============================
 
 import { openModal, closeModal } from './floatingBar.js';
+import { getKeybinds } from './keybinds.js';
 
 function makeDraggable(handle, target) {
     handle.addEventListener('mousedown', (e) => {
@@ -55,10 +56,29 @@ function initSimpleModalClickOutside() {
 // Support Submenu
 // ============================
 
+function _renderHelpShortcuts() {
+    const tbody = document.getElementById('help-shortcuts-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    getKeybinds().forEach(({ combo, description }) => {
+        const tr = document.createElement('tr');
+        const tdKey = document.createElement('td');
+        tdKey.innerHTML = combo.split(' + ').map(k => `<kbd>${k}</kbd>`).join(' + ');
+        const tdDesc = document.createElement('td');
+        tdDesc.textContent = description;
+        tr.appendChild(tdKey);
+        tr.appendChild(tdDesc);
+        tbody.appendChild(tr);
+    });
+}
+
 function initHelpModal() {
     const helpBtn = document.getElementById('help-btn');
     if (helpBtn) {
-        helpBtn.addEventListener('click', () => openModal('help-modal'));
+        helpBtn.addEventListener('click', () => {
+            _renderHelpShortcuts();
+            openModal('help-modal');
+        });
     }
     document.getElementById('close-help-modal')?.addEventListener('click', () => closeModal('help-modal'));
     document.getElementById('close-help-modal-footer')?.addEventListener('click', () => closeModal('help-modal'));
