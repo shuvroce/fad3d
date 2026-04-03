@@ -56,6 +56,7 @@ function _collectWindInputs() {
         'K_d', 'GC_pi', 'b_rigidity', 'b_freq', 'damping',
         'topography_type', 'topo_crest_side', 'topo_height',
         'topo_length', 'topo_distance',
+        'exposure_note', 'occupancy_note', 'topography_note',
     ];
     const data = {};
     ids.forEach(id => {
@@ -78,12 +79,13 @@ function _collectCategoryInputs(catNum) {
 }
 
 async function _collectProjectData() {
-    const [matMod, alumMod, steelMod, catMod, iconMod] = await Promise.all([
+    const [matMod, alumMod, steelMod, catMod, iconMod, windMod] = await Promise.all([
         import('./materialProp.js').catch(() => null),
         import('./alumSecProp.js').catch(() => null),
         import('./steelSecProp.js').catch(() => null),
         import('./category.js').catch(() => null),
         import('./categoryIcons.js').catch(() => null),
+        import('./inputPanel.js').catch(() => null),
     ]);
 
     const materials = matMod?._materials ? matMod._materials.map(m => ({ ...m })) : [];
@@ -104,14 +106,40 @@ async function _collectProjectData() {
     try { settings = JSON.parse(localStorage.getItem('fad3d-settings') || '{}'); } catch (_) {}
 
     const categories = [];
-    document.querySelectorAll('.catbar__btn-wrapper').forEach(wrapper => {
-        const catNum = parseInt(wrapper.getAttribute('data-category'));
-        categories.push({
-            name: catNames.get(catNum) || `Category ${catNum}`,
-            icon: catIcons.get(catNum) || defaultIcon,
-            inputs: _collectCategoryInputs(catNum),
+    
+    // Check if we're in wind mode to determine how to collect category inputs
+    const inputPanelMod = await import('./inputPanel.js').catch(() => null);
+    const isWindMode = inputPanelMod && inputPanelMod.getCurrentPanelMode 
+        ? inputPanelMod.getCurrentPanelMode() === 'wind'
+        : false;
+    
+    if (isWindMode && inputPanelMod) {
+        // When in wind mode, collect category inputs from saved facade content
+        const catbarBtnWrappers = document.querySelectorAll('.catbar__btn-wrapper');
+        catbarBtnWrappers.forEach(wrapper => {
+            const catNum = parseInt(wrapper.getAttribute('data-category'));
+            categories.push({
+                name: catNames.get(catNum) || `Category ${catNum}`,
+                icon: catIcons.get(catNum) || defaultIcon,
+                inputs: _collectCategoryInputsFromSavedFacade(catNum, inputPanelMod.savedFacadeContent),
+            });
         });
-    });
+    } else {
+        // Normal facade mode - collect from DOM
+        document.querySelectorAll('.catbar__btn-wrapper').forEach(wrapper => {
+            const catNum = parseInt(wrapper.getAttribute('data-category'));
+            categories.push({
+                name: catNames.get(catNum) || `Category ${catNum}`,
+                icon: catIcons.get(catNum) || defaultIcon,
+                inputs: _collectCategoryInputs(catNum),
+            });
+        });
+    }
+
+    // Use cached wind inputs if wind panel is not in DOM
+    const windInputs = windMod?.getWindInputsForSave
+        ? windMod.getWindInputsForSave()
+        : _collectWindInputs();
 
     return {
         version: '1.0',
@@ -120,9 +148,41 @@ async function _collectProjectData() {
         materials,
         alumSections,
         steelSections,
-        windInputs: _collectWindInputs(),
+        windInputs,
         categories,
     };
+}
+
+// Helper function to collect category inputs from saved facade content
+function _collectCategoryInputsFromSavedFacade(catNum, savedFacadeContent) {
+    // Try to get saved facade content from parameter
+    let savedContent = savedFacadeContent || '';
+    
+    if (!savedContent) {
+        // Fallback to empty object if no saved content
+        return {};
+    }
+    
+    // Create a temporary element to parse the saved content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = savedContent;
+    
+    // Find the category content for this category number
+    const categoryContent = tempDiv.querySelector(
+        `.input__category-content[data-category="${catNum}"]`
+    );
+    
+    if (!categoryContent) {
+        return {};
+    }
+    
+    // Collect all input values from this category content
+    const inputs = {};
+    categoryContent.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+        inputs[el.id] = el.value;
+    });
+    
+    return inputs;
 }
 
 // ============================
@@ -183,23 +243,34 @@ async function _restoreProject(data) {
     _restoreGeneralInfo(data.generalInfo);
 
     // 3. Materials, alum sections, steel sections — update arrays via module refs
-    const [matMod, alumMod, steelMod] = await Promise.all([
+    const [matMod, alumMod, steelMod, windMod] = await Promise.all([
         import('./materialProp.js').catch(() => null),
         import('./alumSecProp.js').catch(() => null),
         import('./steelSecProp.js').catch(() => null),
+        import('./inputPanel.js').catch(() => null),
     ]);
     if (matMod) _restoreArray(matMod._materials, data.materials);
     if (alumMod) _restoreArray(alumMod._alumSections, data.alumSections);
     if (steelMod) _restoreArray(steelMod._steelSections, data.steelSections);
 
-    // 4. Wind inputs
-    _restoreWindInputs(data.windInputs);
+    // 4. Wind inputs — restore DOM elements and cache
+    if (data.windInputs) {
+        Object.entries(data.windInputs).forEach(([id, value]) => {
+            _setVal(id, value);
+        });
+        // Also populate cache directly for when wind panel is not in DOM
+        if (windMod?.setWindInputsCache) {
+            windMod.setWindInputsCache(data.windInputs);
+        } else if (windMod?.cacheWindInputs) {
+            windMod.cacheWindInputs();
+        }
+    }
 
     // 5. Categories — reset and rebuild via initializeCategories from category.js
     await _restoreCategories(data.categories);
 
-    // 6. Trigger recalculation by dispatching input events
-    _triggerRecalc();
+    // 6. Trigger recalculation for all categories and wind
+    await _triggerRecalc();
 }
 
 // ============================
@@ -245,13 +316,6 @@ function _restoreArray(target, source) {
     if (!target || !source || !Array.isArray(source)) return;
     target.length = 0;
     source.forEach(item => target.push({ ...item }));
-}
-
-function _restoreWindInputs(windData) {
-    if (!windData) return;
-    Object.entries(windData).forEach(([id, value]) => {
-        _setVal(id, value);
-    });
 }
 
 async function _restoreCategories(categories) {
@@ -334,13 +398,17 @@ async function _restoreCategories(categories) {
     if (catMod?.switchCategory) catMod.switchCategory(1);
 }
 
-function _triggerRecalc() {
-    // Dispatch events to trigger the delegated listeners in calcEngine.js
-    const firstInput = document.querySelector('.input__category-content input[id]');
-    if (firstInput) firstInput.dispatchEvent(new Event('input', { bubbles: true }));
+async function _triggerRecalc() {
+    const { scheduleWindCalc, scheduleCategoryCalc } = await import('./calcEngine.js').catch(() => ({}));
 
-    const windInput = document.querySelector('.wind__panel input[id]');
-    if (windInput) windInput.dispatchEvent(new Event('input', { bubbles: true }));
+    // Trigger wind calculation
+    if (scheduleWindCalc) scheduleWindCalc();
+
+    // Trigger calculations for all categories
+    document.querySelectorAll('.catbar__btn-wrapper').forEach(wrapper => {
+        const catNum = parseInt(wrapper.getAttribute('data-category'));
+        if (scheduleCategoryCalc) scheduleCategoryCalc(catNum);
+    });
 }
 
 // ============================

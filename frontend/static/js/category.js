@@ -14,7 +14,8 @@ import {
 
 import { populateFrameSectionDropdowns, syncFrameVariant } from './frameInput.js';
 import { syncAnchorVariant } from './anchorInput.js';
-import { clearFacadeCache, showFacadeResults } from './results.js';
+import { clearFacadeCache, showFacadeResults, clearCollapseStateForCategory, renumberCollapseState } from './results.js';
+import { clearAllCategoryTimers, renumberCategoryTimers } from './calcEngine.js';
 
 let categoryCount = 0;
 const categoryNames = new Map(); // Store custom category names
@@ -121,6 +122,9 @@ function removeCategory(categoryNum) {
     );
     const isActive = categoryButton && categoryButton.classList.contains("active");
 
+    // Clear collapse state for the removed category
+    clearCollapseStateForCategory(categoryNum);
+
     if (categoryWrapper) categoryWrapper.remove();
     if (categoryContent) categoryContent.remove();
 
@@ -156,16 +160,29 @@ function renumberCategories() {
     const nameSnapshot = new Map(oldNums.map((n) => [n, categoryNames.get(n)]));
     const iconSnapshot = new Map(oldNums.map((n) => [n, categoryIcons.get(n)]));
 
+    // Build old-to-new mapping for downstream state migration
+    const oldToNewMap = new Map();
+    oldNums.forEach((oldNum, index) => {
+        oldToNewMap.set(oldNum, index + 1);
+    });
+
+    // Clear and renumber calc timers (stale timers for deleted cats would collect empty values)
+    clearAllCategoryTimers();
+    renumberCategoryTimers(oldToNewMap);
+
+    // Renumber collapse state
+    renumberCollapseState(oldToNewMap);
+
     // Rebuild Maps with new sequential numbers
     categoryNames.clear();
     nameSnapshot.forEach((name, oldNum) => {
-        const newNum = oldNums.indexOf(oldNum) + 1;
+        const newNum = oldToNewMap.get(oldNum);
         if (name) categoryNames.set(newNum, name);
     });
 
     categoryIcons.clear();
     iconSnapshot.forEach((icon, oldNum) => {
-        const newNum = oldNums.indexOf(oldNum) + 1;
+        const newNum = oldToNewMap.get(oldNum);
         if (icon) categoryIcons.set(newNum, icon);
     });
 

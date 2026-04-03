@@ -223,6 +223,28 @@ body.theme__dark {
     }
 }
 
+@keyframes resultContentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px) translateZ(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateZ(0);
+    }
+}
+
+@keyframes resultContentFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) translateZ(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-4px) translateZ(0);
+    }
+}
+
 @keyframes panelSlideFromLeft {
     from {
         opacity: 0;

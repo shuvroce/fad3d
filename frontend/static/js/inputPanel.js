@@ -22,6 +22,69 @@ import { populateFrameSectionDropdowns } from './frameInput.js';
 let currentPanelMode = "facade"; // 'wind' or 'facade'
 let savedFacadeContent = ""; // Store facade panel content when switching to wind
 let savedCatbarContent = ""; // Store catbar content when switching to wind
+let cachedWindInputs = {}; // Cache wind inputs when panel is not in DOM
+
+const WIND_INPUT_IDS = [
+    'b_length', 'b_width', 'b_height', 'b_floor_heights',
+    'location', 'exposure_cat', 'occupancy_cat',
+    'K_d', 'GC_pi', 'b_rigidity', 'b_freq', 'damping',
+    'topography_type', 'topo_crest_side', 'topo_height',
+    'topo_length', 'topo_distance',
+    'exposure_note', 'occupancy_note', 'topography_note',
+];
+
+function cacheWindInputs() {
+    WIND_INPUT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) cachedWindInputs[id] = el.value;
+    });
+}
+
+function setWindInputsCache(data) {
+    cachedWindInputs = { ...data };
+}
+
+function restoreCachedWindInputs() {
+    WIND_INPUT_IDS.forEach(id => {
+        if (cachedWindInputs[id] != null) {
+            const el = document.getElementById(id);
+            if (el) el.value = cachedWindInputs[id];
+        }
+    });
+}
+
+function getWindInputsForSave() {
+    const data = {};
+    WIND_INPUT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        data[id] = el ? el.value : (cachedWindInputs[id] || '');
+    });
+    return data;
+}
+
+// Persist form field values to HTML attributes to survive innerHTML save/restore
+function persistFormValues(container) {
+    if (!container) return;
+    
+    // Persist input values
+    container.querySelectorAll('input, textarea, select').forEach(el => {
+        if (el.tagName === 'INPUT' && (el.type === 'checkbox' || el.type === 'radio')) {
+            el.setAttribute('checked', el.checked ? 'checked' : '');
+        } else if (el.tagName === 'SELECT') {
+            // For selects, set the selected option's selected attribute
+            Array.from(el.options).forEach(option => {
+                option.selected = option.value === el.value;
+            });
+        } else {
+            // For text inputs, textareas, and other inputs
+            if (el.value !== '') {
+                el.setAttribute('value', el.value);
+            } else {
+                el.removeAttribute('value');
+            }
+        }
+    });
+}
 
 // Function to switch panel mode
 function switchPanelMode(mode) {
@@ -50,6 +113,9 @@ function switchPanelMode(mode) {
         if (toggleBtn) toggleBtn.classList.remove(exitClass);
 
         if (mode === "wind") {
+            // Persist form field values to attributes before saving facade content
+            persistFormValues(inputContainer);
+            
             // Save current facade content before switching
             savedFacadeContent = inputContainer.innerHTML;
             savedCatbarContent = catbar.innerHTML;
@@ -181,6 +247,9 @@ function createWindPanel() {
 
 // Function to initialize wind panel event listeners
 function initializeWindPanel() {
+    // Restore cached wind inputs (from .fad load or previous mode switch)
+    restoreCachedWindInputs();
+
     // Populate location dropdown from server
     const locationSel = document.getElementById('location');
     if (locationSel && locationSel.options.length === 0) {
@@ -205,6 +274,14 @@ function initializeWindPanel() {
     if (calculateBtn && typeof runWindCalc === 'function') {
         calculateBtn.addEventListener('click', runWindCalc);
     }
+
+    // Cache wind inputs on change so they persist across mode switches
+    document.addEventListener('change', (e) => {
+        if (e.target.closest('.wind__panel')) cacheWindInputs();
+    });
+    document.addEventListener('input', (e) => {
+        if (e.target.closest('.wind__panel')) cacheWindInputs();
+    });
 }
 
 function initializeLeftPanelToggle() {
@@ -270,4 +347,4 @@ function updateFloatingBarButtons(mode) {
     }
 }
 
-export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, reattachCategoryEventListeners };
+export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent };

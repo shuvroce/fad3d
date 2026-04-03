@@ -3,7 +3,7 @@
 // ============================
 
 import { categoryNames } from './category.js';
-import { showFacadeResults } from './results.js';
+import { showFacadeResults, restoreCollapseStateForCategory, persistCollapseStateForCard } from './results.js';
 
 // Function to switch between Wind and Facade tabs
 function switchResultTab(tabName) {
@@ -37,9 +37,10 @@ function switchResultTab(tabName) {
     }
 }
 
-// Function to toggle result card collapse/expand
+// Function to toggle result card collapse/expand with per-category state
 function toggleResultCard(card) {
     card.classList.toggle("collapsed");
+    persistCollapseStateForCard(card);
 }
 
 // Function to update facade result category label
@@ -93,22 +94,24 @@ export function initializeResultPanel() {
     // Initialize with facade tab active
     switchResultTab("facade");
 
-    // Sync category title and results with the current active category on startup
+    // Sync category title, results, and collapse state with the current active category on startup
     const activeBtn = document.querySelector(".category__btn.active");
     if (activeBtn) {
         const activeCategory = activeBtn.getAttribute("data-category");
         if (activeCategory) {
             updateFacadeResultCategory(Number(activeCategory));
             showFacadeResults(Number(activeCategory));
+            restoreCollapseStateForCategory(Number(activeCategory));
         }
     }
 
-    // Keep Design Summary category label and results synced on category switch
+    // Keep Design Summary category label, results, and collapse state synced on category switch
     window.addEventListener("category-switched", (event) => {
         const categoryNum = event?.detail?.categoryNum;
         if (categoryNum != null) {
             updateFacadeResultCategory(categoryNum);
             showFacadeResults(categoryNum);
+            restoreCollapseStateForCategory(categoryNum);
         }
     });
 }

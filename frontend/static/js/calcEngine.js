@@ -20,7 +20,14 @@ const _calcTimers = { wind: null };
 // ---- Input Collectors ----
 
 function collectWindInputs() {
-    const g = id => document.getElementById(id)?.value || null;
+    const g = id => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (el.tagName === 'SELECT') {
+            return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+        }
+        return el.value || null;
+    };
     return {
         b_length: g('b_length'),
         b_width: g('b_width'),
@@ -43,7 +50,14 @@ function collectWindInputs() {
 }
 
 function collectGlassInputs(catNum) {
-    const g = id => document.getElementById(id)?.value || null;
+    const g = id => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (el.tagName === 'SELECT') {
+            return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+        }
+        return el.value || null;
+    };
     const glassType = g(`cat${catNum}-glass-type`) || 'sgu';
     const prefix = `cat${catNum}-glass-${glassType}`;
     const settings = getSettings();
@@ -129,7 +143,14 @@ function _sectionToSteelProfile(sec) {
 }
 
 function collectFrameInputs(catNum) {
-    const g = id => document.getElementById(id)?.value || null;
+    const g = id => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (el.tagName === 'SELECT') {
+            return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+        }
+        return el.value || null;
+    };
     const geometry = g(`cat${catNum}-frame-geometry`) || 'regular';
     const mullionType = g(`cat${catNum}-frame-mullion-type`) || 'alu';
     const frameType = g(`cat${catNum}-frame-frame-type`) || 'cont';
@@ -165,7 +186,14 @@ function collectFrameInputs(catNum) {
 }
 
 function collectConnectionInputs(catNum) {
-    const g = id => document.getElementById(id)?.value || null;
+    const g = id => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (el.tagName === 'SELECT') {
+            return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+        }
+        return el.value || null;
+    };
     return {
         screw_nos: g(`cat${catNum}-conn-nos`),
         screw_dia: g(`cat${catNum}-conn-screw-dia`),
@@ -177,7 +205,14 @@ function collectConnectionInputs(catNum) {
 }
 
 function collectAnchorInputs(catNum) {
-    const g = id => document.getElementById(id)?.value || null;
+    const g = id => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (el.tagName === 'SELECT') {
+            return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+        }
+        return el.value || null;
+    };
     // Select values: 'box-clump', 'u-clump', 'l-clump'
     const clumpValue = g(`cat${catNum}-anchor-type`) || 'box-clump';
     // Map select value to display text for backend
@@ -295,9 +330,34 @@ function _getActiveCategoryNum() {
     return active ? parseInt(active.getAttribute('data-category')) : null;
 }
 
+// Clear all category calc timers (call before renumbering)
+function clearAllCategoryTimers() {
+    for (const key of Object.keys(_calcTimers)) {
+        if (key !== 'wind') {
+            clearTimeout(_calcTimers[key]);
+            delete _calcTimers[key];
+        }
+    }
+}
+
+// Renumber calc timers after category renumbering (oldNum -> newNum mapping)
+function renumberCategoryTimers(oldToNewMap) {
+    const newTimers = { wind: _calcTimers.wind };
+    for (const [oldNum, timerId] of Object.entries(_calcTimers)) {
+        if (oldNum === 'wind') continue;
+        const newNum = oldToNewMap.get(Number(oldNum));
+        if (newNum != null) {
+            newTimers[newNum] = timerId;
+        }
+    }
+    // Replace the timer object contents
+    for (const key of Object.keys(_calcTimers)) delete _calcTimers[key];
+    for (const [key, val] of Object.entries(newTimers)) _calcTimers[key] = val;
+}
+
 // Initialize calculation engine
 function initCalcEngine() {
     console.log('[CalcEngine] Initializing...');
 }
 
-export { initCalcEngine, runWindCalc, runCategoryCalc, scheduleWindCalc, scheduleCategoryCalc };
+export { initCalcEngine, runWindCalc, runCategoryCalc, scheduleWindCalc, scheduleCategoryCalc, clearAllCategoryTimers, renumberCategoryTimers };
