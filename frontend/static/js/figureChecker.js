@@ -79,12 +79,27 @@ async function _fetchFiguresDir() {
 }
 
 async function _openFolderPicker() {
-    const data = await _post("/api/figures/open_picker");
-    if (data && data.directory) {
-        _figuresDir = data.directory;
-        return true;
-    }
-    return false;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.webkitdirectory = true;
+    input.multiple = false;
+    input.click();
+    
+    return new Promise((resolve) => {
+        input.addEventListener("change", async () => {
+            const dir = input.files[0]?.webkitRelativePath?.split("/")[0] || "";
+            if (dir) {
+                const data = await _post("/api/figures/open_picker", { directory: dir });
+                if (data?.directory) {
+                    _figuresDir = data.directory;
+                    resolve(true);
+                    return;
+                }
+            }
+            resolve(false);
+        });
+        input.addEventListener("cancel", () => resolve(false));
+    });
 }
 
 // ---- Rendering ----

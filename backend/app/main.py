@@ -199,26 +199,14 @@ async def api_set_figures_dir(request: Request):
 
 
 @app.post("/api/figures/open_picker")
-async def api_open_folder_picker():
-    import subprocess
-    try:
-        result = subprocess.run(
-            ["powershell", "-Command",
-             "Add-Type -AssemblyName System.Windows.Forms;"
-             "$fbd = New-Object System.Windows.Forms.FolderBrowserDialog;"
-             "$fbd.Description = 'Select Figures Directory';"
-             "$fbd.ShowNewFolderButton = $true;"
-             "if ($fbd.ShowDialog() -eq 'OK') { $fbd.SelectedPath }"],
-            capture_output=True, text=True, timeout=60,
-        )
-        selected = result.stdout.strip()
-        if selected and os.path.isdir(selected):
-            global _figures_dir
-            _figures_dir = selected
-            return {"directory": _figures_dir}
-        return JSONResponse({"error": "No folder selected"}, status_code=400)
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=400)
+async def api_open_folder_picker(request: Request):
+    data = await _json(request)
+    directory = data.get("directory", "")
+    if directory and os.path.isdir(directory):
+        global _figures_dir
+        _figures_dir = directory
+        return {"directory": _figures_dir}
+    return JSONResponse({"error": "Invalid directory"}, status_code=400)
 
 
 @app.post("/api/check_figures")
