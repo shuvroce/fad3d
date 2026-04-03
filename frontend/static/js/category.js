@@ -107,19 +107,21 @@ function removeCategory(categoryNum) {
         return;
     }
 
+    const categoryWrapper = document.querySelector(
+        `.catbar__btn-wrapper[data-category="${categoryNum}"]`,
+    );
+    const categoryContent = document.querySelector(
+        `.input__category-content[data-category="${categoryNum}"]`,
+    );
+
+    if (!categoryWrapper && !categoryContent) return;
+
     const categoryButton = document.querySelector(
         `.category__btn[data-category="${categoryNum}"]`,
     );
     const isActive = categoryButton && categoryButton.classList.contains("active");
 
-    const categoryWrapper = document.querySelector(
-        `.catbar__btn-wrapper[data-category="${categoryNum}"]`,
-    );
     if (categoryWrapper) categoryWrapper.remove();
-
-    const categoryContent = document.querySelector(
-        `.input__category-content[data-category="${categoryNum}"]`,
-    );
     if (categoryContent) categoryContent.remove();
 
     renumberCategories();
@@ -186,11 +188,6 @@ function renumberCategories() {
             categoryBtn.replaceWith(categoryBtn.cloneNode(true));
             const newBtn = wrapper.querySelector(".category__btn");
             newBtn.addEventListener("click", () => switchCategory(newCategoryNum));
-            newBtn.addEventListener("contextmenu", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                showCategoryContextMenu(e, newCategoryNum);
-            });
         }
     });
 
