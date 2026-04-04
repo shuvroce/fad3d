@@ -13,7 +13,7 @@ def calc_alum_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     flange_thk = _to_float(profile_data.get("flange_thk"))
     F_y = _to_float(profile_data.get("F_y"))
 
-    if profile_type != "Stick":
+    if profile_type != "stick":
         tor_constant = _to_float(profile_data.get("tor_constant"))
         area = _to_float(profile_data.get("area"))
         I_xx = _to_float(profile_data.get("I_xx"))
@@ -31,18 +31,20 @@ def calc_alum_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if F_y is None:
         return None
     
-    if profile_type == "Stick":
+    if profile_type == "stick":
         tor_constant = (2 * flange_thk * web_thk * ((flange_length - web_thk)**2) * ((web_length - flange_thk)**2)) / (
             flange_length * web_thk + web_length * flange_thk - (web_thk**2) - (flange_thk**2)
         )
         area = web_length * flange_length - ((web_length - 2 * flange_thk) * (flange_length - 2 * web_thk))
         I_xx = (flange_length * web_length**3 / 12) - ((flange_length - 2 * web_thk) * (web_length - 2 * flange_thk)**3 / 12)
-        I_yy = (web_length * flange_length**3 / 12) - ((web_length - 2 * flange_thk) * (flange_length - 2 * web_thk)**3 / 12)
+        I_yy = (web_length * flange_length**3 / 12) - ((web_length - 2 * web_thk) * (flange_length - 2 * web_thk)**3 / 12)
         Y = web_length / 2
         X = flange_length / 2
         Z_x = ((flange_length * web_length**2) - ((flange_length - 2 * web_thk) * (web_length - 2 * flange_thk)**2)) / 4
         
     else:
+        if not all([area, plastic_x, plastic_y]):
+            return None
         Z_x = 0.5 * area * (plastic_x + plastic_y)
     
     S_x = I_xx / Y
@@ -52,7 +54,7 @@ def calc_alum_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     web_b = web_length - 2 * (flange_thk - 0.5)
     flange_b = flange_length - 2 * (web_thk - 0.5)
     
-    if profile_type == "Stick":
+    if profile_type == "stick":
         m = 0.65
         I_w = 2 * ((web_thk * web_b**3) / 12)
         c_w = web_b / 2
@@ -116,8 +118,8 @@ def calc_alum_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # Local buckling analysis
         "web_b": round(web_b, 1),
         "flange_b": round(flange_b, 1),
-        "c_c": round(c_c, 1) if profile_type != "Stick" else None,
-        "c_o": round(c_o, 1) if profile_type != "Stick" else None,
+        "c_c": round(c_c, 1) if profile_type != "stick" else None,
+        "c_o": round(c_o, 1) if profile_type != "stick" else None,
         "m": round(m, 2),
         "B_p": round(B_p, 1),
         "D_p": round(D_p, 1),
@@ -127,7 +129,7 @@ def calc_alum_profile(profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         "flange_lambda2": round(flange_lambda2, 2),
         "web_lambda1": round(web_lambda1, 2),
         "web_lambda2": round(web_lambda2, 2),
-        "web_d": round(web_d, 1) if profile_type != "Stick" else None,
+        "web_d": round(web_d, 1) if profile_type != "stick" else None,
         "I_w": round(I_w, 1),
         "I_f": round(I_f, 1),
         "c_w": round(c_w, 1),
