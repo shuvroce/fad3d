@@ -12,7 +12,6 @@ function initReportDropdown() {
         toggle.setAttribute('aria-expanded', String(!isOpen));
     });
 
-    // Close on outside click
     document.addEventListener('click', (e) => {
         if (!container.contains(e.target)) {
             dropdown.classList.remove('open');

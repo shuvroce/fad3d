@@ -39,6 +39,7 @@ import { initializeResultPanel, initializeRightPanelToggle } from './resultPanel
 
 // Import report system
 import { initReportDropdown } from './report.js';
+import { initReportGen } from './reportGen.js';
 
 // Import project save/load
 import { initProjectSaveLoad } from './projectSaveLoad.js';
@@ -107,6 +108,7 @@ function initPhase6() {
     console.log('[Main] Phase 6: Calculation engine and report');
     _safe('Calculation engine', initCalcEngine);
     _safe('Report dropdown', initReportDropdown);
+    _safe('Report generation', initReportGen);
 }
 
 // ============================
