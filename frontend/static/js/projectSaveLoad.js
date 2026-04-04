@@ -297,6 +297,14 @@ async function _restoreProject(data) {
     if (alumMod) _restoreArray(alumMod._alumSections, data.alumSections);
     if (steelMod) _restoreArray(steelMod._steelSections, data.steelSections);
 
+    // Calculate section properties immediately after restoring arrays
+    if (alumMod?.calcAllAlumSections) {
+        await alumMod.calcAllAlumSections();
+    }
+    if (steelMod?.calcAllSteelSections) {
+        await steelMod.calcAllSteelSections();
+    }
+
     // Populate frame section dropdowns after restoring section arrays
     if (frameMod?.populateFrameSectionDropdowns) {
         frameMod.populateFrameSectionDropdowns();
@@ -449,11 +457,10 @@ async function _restoreCategories(categories) {
 
 async function _triggerRecalc() {
     const { runWindCalc, runCategoryCalc } = await import('./calcEngine.js').catch(() => ({}));
-    const inputPanelMod = await import('./inputPanel.js').catch(() => null);
+    const resultsMod = await import('./results.js').catch(() => null);
 
-    // Run wind calculation if wind panel is in DOM, otherwise skip (it's cached)
-    const windPanel = document.querySelector('.wind__panel');
-    if (windPanel && runWindCalc) {
+    // Always run wind calculation on load (inputs are restored regardless of panel visibility)
+    if (runWindCalc) {
         await runWindCalc();
     }
 
@@ -464,6 +471,14 @@ async function _triggerRecalc() {
         if (runCategoryCalc) {
             await runCategoryCalc(catNum);
         }
+    }
+
+    // After all calcs complete, explicitly show results for the active category.
+    // This fixes a race where multiple pending showFacadeResults() setTimeouts
+    // fire out of order and the last category's results overwrite the panel.
+    const activeBtn = document.querySelector('.category__btn.active');
+    if (activeBtn && resultsMod?.showFacadeResults) {
+        resultsMod.showFacadeResults(parseInt(activeBtn.getAttribute('data-category')));
     }
 }
 

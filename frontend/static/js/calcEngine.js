@@ -8,6 +8,7 @@ import { _materials } from './materialProp.js';
 import { _alumSections } from './alumSecProp.js';
 import { _steelSections } from './steelSecProp.js';
 import { getSettings } from './settings.js';
+import { getWindInputsCache } from './inputPanel.js';
 
 // Import result updaters
 import { updateWindResults, updateFacadeResults } from './results.js';
@@ -20,13 +21,16 @@ const _calcTimers = { wind: null };
 // ---- Input Collectors ----
 
 function collectWindInputs() {
+    const cache = getWindInputsCache();
     const g = id => {
         const el = document.getElementById(id);
-        if (!el) return null;
-        if (el.tagName === 'SELECT') {
-            return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+        if (el) {
+            if (el.tagName === 'SELECT') {
+                return el.options.length > 0 ? el.options[el.selectedIndex]?.value ?? null : null;
+            }
+            return el.value || null;
         }
-        return el.value || null;
+        return cache[id] || null;
     };
     return {
         b_length: g('b_length'),
@@ -128,6 +132,7 @@ function _sectionToAlumProfile(sec) {
         F_y: mat ? mat.fy : null,
         tor_constant: sec.j, area: sec.a, I_xx: sec.ix, I_yy: sec.iy,
         Y: sec.y, X: sec.x, plastic_x: sec.plasticX, plastic_y: sec.plasticY, phi_Mn: sec.mnYield,
+        computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null,
     };
 }
 
@@ -139,6 +144,7 @@ function _sectionToSteelProfile(sec) {
         profile_name: sec.name,
         web_length: sec.d, flange_length: sec.b, thk: sec.t, flange_thk: sec.tf, web_thk: sec.tw,
         F_y: mat ? mat.fy : null,
+        computed_phi_Mn: sec._phi_Mn ?? null, computed_I_xx: sec._I_xx ?? null, computed_I_yy: sec._I_yy ?? null,
     };
 }
 
@@ -171,6 +177,17 @@ function collectFrameInputs(catNum) {
         transom: g(`${prefix}-transom`),
         steel: g(`${prefix}-steel`),
         defl_ratio: settings.frameDeflRatio,
+        mul_mu: g(`${prefix}-mul_mu`),
+        mul_vu: g(`${prefix}-mul_vu`),
+        mul_def: g(`${prefix}-mul_def`),
+        tran_mu: g(`${prefix}-tran_mu`),
+        tran_vu: g(`${prefix}-tran_vu`),
+        tran_def_wind: g(`${prefix}-tran_def_wind`),
+        tran_def_dead: g(`${prefix}-tran_def_dead`),
+        joint_fy: g(`${prefix}-joint_fy`),
+        joint_fz: g(`${prefix}-joint_fz`),
+        reaction_Ry: g(`${prefix}-reaction_Ry`),
+        reaction_Rz: g(`${prefix}-reaction_Rz`),
     };
 
     // Resolve profile payloads from the section stores

@@ -391,4 +391,53 @@ export function initAlumSectionModal() {
 
 export { _alumSections };
 
+function _calcAlumSection(sec, profileType, gradeName) {
+    const mat = _materials.find(m => m.name === gradeName);
+    const fy = mat ? (mat.fy || null) : null;
+
+    const payload = {
+        profile_type: profileType,
+        name: sec.name || '',
+        d: sec.d || null,
+        b: sec.b || null,
+        tf: sec.tf || null,
+        tw: sec.tw || null,
+        fy,
+        j: sec.j || null,
+        a: sec.a || null,
+        ix: sec.ix || null,
+        iy: sec.iy || null,
+        y: sec.y || null,
+        x: sec.x || null,
+        plasticX: sec.plasticX || null,
+        plasticY: sec.plasticY || null,
+        mnYield: sec.mnYield || null,
+        mnLb: sec.mnLb || null,
+    };
+
+    return fetch('/api/section/calc/alum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(props => {
+        if (!props) return;
+        sec._phi_Mn = props.phi_Mn;
+        sec._I_xx = props.I_xx;
+        sec._I_yy = props.I_yy;
+    })
+    .catch(() => {});
+}
+
+function calcAllAlumSections() {
+    if (!_alumSections.length) return Promise.resolve();
+    const promises = _alumSections.map(sec => {
+        const profileType = sec.profileType || 'predefined';
+        const gradeName = sec.grade || '';
+        return _calcAlumSection(sec, profileType, gradeName);
+    });
+    return Promise.all(promises);
+}
+
 export function getAlumSections() { return _alumSections; }

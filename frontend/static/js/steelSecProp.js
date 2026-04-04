@@ -264,4 +264,43 @@ export function initSteelSectionModal() {
 
 export { _steelSections };
 
+function _calcSteelSection(sec, profileType, gradeName) {
+    const mat = _materials.find(m => m.name === gradeName);
+    const fy = mat ? (mat.fy || null) : null;
+
+    const payload = {
+        profile_type: profileType,
+        d: sec.d || null,
+        b: sec.b || null,
+        t: sec.t || null,
+        tf: sec.tf || null,
+        tw: sec.tw || null,
+        fy,
+    };
+
+    return fetch('/api/section/calc/steel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(props => {
+        if (!props) return;
+        sec._phi_Mn = props.phi_Mn;
+        sec._I_xx = props.I_xx;
+        sec._I_yy = props.I_yy;
+    })
+    .catch(() => {});
+}
+
+function calcAllSteelSections() {
+    if (!_steelSections.length) return Promise.resolve();
+    const promises = _steelSections.map(sec => {
+        const profileType = sec.profileType || '';
+        const gradeName = sec.grade || '';
+        return _calcSteelSection(sec, profileType, gradeName);
+    });
+    return Promise.all(promises);
+}
+
 export function getSteelSections() { return _steelSections; }

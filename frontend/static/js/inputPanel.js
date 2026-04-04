@@ -403,4 +403,8 @@ function getCachedCategoryData() {
     return cachedCategoryData;
 }
 
-export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, getCachedCategoryData, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent };
+function getWindInputsCache() {
+    return cachedWindInputs;
+}
+
+export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, getCachedCategoryData, getWindInputsCache, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent };
