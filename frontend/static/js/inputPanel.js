@@ -71,9 +71,12 @@ function persistFormValues(container) {
         if (el.tagName === 'INPUT' && (el.type === 'checkbox' || el.type === 'radio')) {
             el.setAttribute('checked', el.checked ? 'checked' : '');
         } else if (el.tagName === 'SELECT') {
-            // For selects, set the selected option's selected attribute
             Array.from(el.options).forEach(option => {
-                option.selected = option.value === el.value;
+                if (option.value === el.value) {
+                    option.setAttribute('selected', 'selected');
+                } else {
+                    option.removeAttribute('selected');
+                }
             });
         } else {
             // For text inputs, textareas, and other inputs

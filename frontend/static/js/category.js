@@ -240,6 +240,9 @@ function renumberCategories() {
         content.querySelectorAll(".frame__variant-fields").forEach((el) =>
             el.setAttribute("data-category", newCategoryNum)
         );
+        content.querySelectorAll(".anchor__variant-fields").forEach((el) =>
+            el.setAttribute("data-category", newCategoryNum)
+        );
 
         content.querySelectorAll("label[for]").forEach((label) => {
             label.setAttribute(
@@ -253,6 +256,13 @@ function renumberCategories() {
                 field.getAttribute("id").replace(/cat\d+/, `cat${newCategoryNum}`),
             );
         });
+    });
+
+    // Re-sync variant field visibility after ID renumbering
+    categoryContents.forEach((_, index) => {
+        const newCategoryNum = index + 1;
+        syncAnchorVariant(newCategoryNum);
+        syncFrameVariant(newCategoryNum);
     });
 
     // Restore icon SVGs after renumber
@@ -398,6 +408,17 @@ function duplicateCategory(sourceCategoryNum) {
     sourceWrapper.insertAdjacentElement("afterend", newWrapper);
 
     // ── Deep-clone content panel, insert right after source ─────────────────
+    // Persist selected attribute on all options before cloning so cloneNode
+    // captures the current selection state (HTML attribute, not DOM property).
+    sourceContent.querySelectorAll('select option').forEach(opt => {
+        const select = opt.parentElement;
+        if (opt.value === select.value) {
+            opt.setAttribute('selected', 'selected');
+        } else {
+            opt.removeAttribute('selected');
+        }
+    });
+
     const newContent = sourceContent.cloneNode(true);
     newContent.classList.add("hidden");
     newContent.setAttribute("data-category", newNum);
