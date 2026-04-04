@@ -38,13 +38,13 @@ function _collectGeneralInfo() {
         reportIncludes[id] = document.getElementById(id)?.checked ?? true;
     });
     return {
-        projectNumber: v('gen-project-number'),
-        projectName: v('gen-project-name'),
-        location: v('gen-project-location'),
-        client: v('gen-client'),
-        rev: v('gen-rev'),
-        date: v('gen-date'),
-        description: v('gen-description'),
+        projectNumber: v('gen-project-number') || undefined,
+        projectName: v('gen-project-name') || undefined,
+        location: v('gen-project-location') || undefined,
+        client: v('gen-client') || undefined,
+        rev: v('gen-rev') || undefined,
+        date: v('gen-date') || undefined,
+        description: v('gen-description') || undefined,
         reportIncludes,
     };
 }
@@ -61,7 +61,9 @@ function _collectWindInputs() {
     const data = {};
     ids.forEach(id => {
         const el = document.getElementById(id);
-        data[id] = el ? el.value : '';
+        if (el && el.value !== '') {
+            data[id] = el.value;
+        }
     });
     return data;
 }
@@ -73,7 +75,9 @@ function _collectCategoryInputs(catNum) {
     if (!content) return {};
     const inputs = {};
     content.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
-        inputs[el.id] = el.value;
+        if (el.value !== '') {
+            inputs[el.id] = el.value;
+        }
     });
     return inputs;
 }
@@ -179,7 +183,9 @@ function _collectCategoryInputsFromSavedFacade(catNum, savedFacadeContent) {
     // Collect all input values from this category content
     const inputs = {};
     categoryContent.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
-        inputs[el.id] = el.value;
+        if (el.value !== '') {
+            inputs[el.id] = el.value;
+        }
     });
     
     return inputs;
@@ -190,7 +196,8 @@ function _collectCategoryInputsFromSavedFacade(catNum, savedFacadeContent) {
 // ============================
 
 function _triggerDownload(data) {
-    const json = JSON.stringify(data, null, 2);
+    const cleaned = _cleanEmptyValues(data);
+    const json = JSON.stringify(cleaned, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
@@ -204,6 +211,33 @@ function _triggerDownload(data) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function _cleanEmptyValues(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(item => _cleanEmptyValues(item)).filter(item => item !== null && item !== undefined);
+    }
+    if (obj && typeof obj === 'object') {
+        const cleaned = {};
+        for (const [key, value] of Object.entries(obj)) {
+            const cleanedValue = _cleanEmptyValues(value);
+            if (cleanedValue !== undefined && cleanedValue !== '') {
+                if (typeof cleanedValue === 'object' && cleanedValue !== null && !Array.isArray(cleanedValue)) {
+                    if (Object.keys(cleanedValue).length > 0) {
+                        cleaned[key] = cleanedValue;
+                    }
+                } else if (Array.isArray(cleanedValue)) {
+                    if (cleanedValue.length > 0) {
+                        cleaned[key] = cleanedValue;
+                    }
+                } else {
+                    cleaned[key] = cleanedValue;
+                }
+            }
+        }
+        return cleaned;
+    }
+    return obj;
 }
 
 async function exportProject() {

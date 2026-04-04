@@ -2678,7 +2678,7 @@ summary {
     background: var(--bg-primary);
     width: var(--input-field-width);
     padding: 1rem 1rem;
-    overflow: hidden;
+    /* overflow: hidden; */
     white-space: nowrap;
     bottom: 0;
     border-radius: 0 var(--radius-3) var(--radius-3) 0;
@@ -2993,14 +2993,16 @@ summary {
 .result__box {
     background: var(--bg-primary);
     width: var(--result-width);
+    height: 100%;
     padding: 1rem 1.5rem;
     border-radius: var(--radius-3);
     white-space: nowrap;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
     box-shadow: var(--shadow-box);
+    flex: 1;
+    min-height: 0;
 }
 
 .result__heading {
@@ -3008,6 +3010,7 @@ summary {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 0;
+    flex-shrink: 0;
 }
 
 /* Result Tabs */
@@ -3017,6 +3020,7 @@ summary {
     border-bottom: 1px solid var(--border-primary);
     /* padding: 0.5rem 1rem; */
     margin-bottom: 0.5rem;
+    flex-shrink: 0;
 }
 
 .result__tab-btn {
@@ -3045,10 +3049,13 @@ summary {
 
 /* Result Tab Content */
 .result__tab-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    display: block;
     animation: tabFadeSlide 0.15s ease;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 .result__tab-content.hidden {
@@ -3095,9 +3102,14 @@ summary {
     border-radius: var(--radius-2);
     overflow: hidden;
     white-space: normal;
+    margin-bottom: 0.75rem;
     transition:
         background 0.15s ease,
         border 0.15s ease;
+}
+
+.result__card:last-child {
+    margin-bottom: 0;
 }
 
 .result__card-header {
