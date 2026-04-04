@@ -68,16 +68,23 @@ function _collectWindInputs() {
     return data;
 }
 
+function _isInHiddenVariant(el) {
+    const variantParent = el.closest('.glass__type-fields, .frame__variant-fields, .anchor__variant-fields');
+    return variantParent && variantParent.classList.contains('hidden');
+}
+
 function _collectCategoryInputs(catNum) {
     const content = document.querySelector(
         `.input__category-content[data-category="${catNum}"]`
     );
     if (!content) return {};
     const inputs = {};
-    content.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
-        if (el.value !== '') {
-            inputs[el.id] = el.value;
-        }
+    content.querySelectorAll('.input__tab-content').forEach(tabContent => {
+        tabContent.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+            if (!_isInHiddenVariant(el)) {
+                inputs[el.id] = el.value;
+            }
+        });
     });
     return inputs;
 }
@@ -182,10 +189,12 @@ function _collectCategoryInputsFromSavedFacade(catNum, savedFacadeContent) {
     
     // Collect all input values from this category content
     const inputs = {};
-    categoryContent.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
-        if (el.value !== '') {
-            inputs[el.id] = el.value;
-        }
+    categoryContent.querySelectorAll('.input__tab-content').forEach(tabContent => {
+        tabContent.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+            if (!_isInHiddenVariant(el)) {
+                inputs[el.id] = el.value;
+            }
+        });
     });
     
     return inputs;
