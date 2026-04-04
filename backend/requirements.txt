@@ -3,3 +3,4 @@ uvicorn[standard]>=0.30
 weasyprint>=62.0
 jinja2
 numpy
+pikepdf

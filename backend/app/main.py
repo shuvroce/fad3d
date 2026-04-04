@@ -1,4 +1,6 @@
 import os
+import tempfile
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +13,7 @@ from calcs.connection import calc_connection
 from calcs.anchorage import calc_anchorage
 from calcs.wind_load import compute_wind_loads, location_wind_speeds
 from calcs.calc_utils import _to_float
+from calcs.calc_helpers import precompute_data
 
 try:
     from tkinter import Tk, PhotoImage
@@ -64,7 +67,7 @@ async def api_wind_locations():
 async def api_calc_alum(request: Request):
     data = await _json(request)
     profile_type = data.get("profile_type", "").lower()
-    payload = {"profile_type": "Stick" if profile_type == "stick" else profile_type}
+    payload = {"profile_type": "stick" if profile_type == "stick" else profile_type}
     for js_key, py_key in ALUM_FIELD_MAP.items():
         payload[py_key] = data.get(js_key)
     result = calc_alum_profile(payload)
@@ -300,6 +303,547 @@ async def api_check_figures(request: Request):
     total = len(figures)
     found = sum(1 for f in figures if f["exists"])
     return {"success": True, "figures": figures, "total": total, "found": found}
+
+
+# ---------------------------------------------------------------------------
+# Report Generation
+# ---------------------------------------------------------------------------
+
+REPORT_TEMPLATE_DIR = os.path.join(BACKEND_DIR, "app", "report", "templates")
+DEFAULT_INPUTS_DIR = os.path.join(REPORT_TEMPLATE_DIR, "inputs")
+PROFILE_YAML = os.path.join(BACKEND_DIR, "app", "report", "assets", "profile.yaml")
+CSS_PATH = os.path.join(BACKEND_DIR, "app", "report", "css", "report.css")
+
+
+def _load_profile_data():
+    if not os.path.exists(PROFILE_YAML):
+        return {}
+    import yaml
+    with open(PROFILE_YAML, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
+    def _num(v):
+        if v is None or v == '':
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    categories_raw = raw_data.get("categories", [])
+    alum_sections = raw_data.get("alumSections", raw_data.get("alum_profiles", []))
+    steel_sections = raw_data.get("steelSections", raw_data.get("steel_profiles", []))
+    wind_inputs = raw_data.get("windInputs", raw_data.get("wind", {}))
+    wind_numeric_fields = [
+        'b_length', 'b_width', 'b_height', 'K_d', 'GC_pi', 'b_freq', 'damping',
+        'topo_height', 'topo_length', 'topo_distance',
+    ]
+    for field in wind_numeric_fields:
+        if field in wind_inputs:
+            wind_inputs[field] = _num(wind_inputs[field])
+    general_info = raw_data.get("generalInfo", {})
+    report_includes = general_info.get("reportIncludes", {})
+    materials = raw_data.get("materials", [])
+
+    def _num(v):
+        if v is None or v == '':
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    def _resolve_fy(grade_name):
+        if not grade_name:
+            return None
+        mat = next((m for m in materials if m.get("name") == grade_name), None)
+        if mat:
+            return _num(mat.get("fy"))
+        return None
+
+    alum_profiles_data = []
+    for sec in alum_sections:
+        ix_val = _num(sec.get("ix"))
+        iy_val = _num(sec.get("iy"))
+        mn_val = _num(sec.get("mnYield"))
+        fy_val = _resolve_fy(sec.get("grade"))
+        profile = {
+            "profile_type": sec.get("profileType", "stick"),
+            "profile_name": sec.get("name", ""),
+            "web_length": _num(sec.get("d")),
+            "flange_length": _num(sec.get("b")),
+            "web_thk": _num(sec.get("tw")),
+            "flange_thk": _num(sec.get("tf")),
+            "F_y": fy_val,
+            "tor_constant": _num(sec.get("j")),
+            "area": _num(sec.get("a")),
+            "I_xx": ix_val,
+            "I_yy": iy_val,
+            "Y": _num(sec.get("y")),
+            "X": _num(sec.get("x")),
+            "plastic_x": _num(sec.get("plasticX")),
+            "plastic_y": _num(sec.get("plasticY")),
+            "phi_Mn": mn_val,
+            "computed_I_xx": ix_val,
+            "computed_I_yy": iy_val,
+            "computed_phi_Mn": mn_val,
+        }
+        alum_profiles_data.append(profile)
+
+    steel_profiles_data = []
+    for sec in steel_sections:
+        steel_fy_val = _resolve_fy(sec.get("grade"))
+        profile = {
+            "profile_type": sec.get("profileType", "steel-rhs").replace("steel-", ""),
+            "profile_name": sec.get("name", ""),
+            "web_length": _num(sec.get("d")),
+            "flange_length": _num(sec.get("b")),
+            "thk": _num(sec.get("t")),
+            "flange_thk": _num(sec.get("tf")),
+            "web_thk": _num(sec.get("tw")),
+            "F_y": steel_fy_val,
+            "computed_I_xx": _num(sec.get("ix")),
+            "computed_I_yy": _num(sec.get("iy")),
+            "computed_phi_Mn": _num(sec.get("mnYield")),
+        }
+        steel_profiles_data.append(profile)
+
+    categories = []
+    for cat in categories_raw:
+        cat_num = cat.get("index", cat.get("num", 0))
+        cat_name = cat.get("name", f"Category {cat_num}")
+        inputs = cat.get("inputs", {})
+
+        glass_units = []
+        glass_type = inputs.get(f"cat{cat_num}-glass-type", "sgu")
+        prefix = f"cat{cat_num}-glass-{glass_type}"
+
+        gu = {
+            "glass_type": glass_type,
+            "length": _num(inputs.get(f"{prefix}-length")),
+            "width": _num(inputs.get(f"{prefix}-width")),
+            "wind_load": _num(inputs.get(f"{prefix}-wind_load")),
+            "def_criteria": _num(inputs.get(f"{prefix}-def_criteria")),
+            "support_type": inputs.get(f"{prefix}-support_type"),
+        }
+
+        if glass_type in ("sgu", "lgu"):
+            gu.update({
+                "grade": inputs.get(f"{prefix}-grade"),
+                "nfl": _num(inputs.get(f"{prefix}-nfl")),
+                "def": _num(inputs.get(f"{prefix}-def")),
+            })
+        elif glass_type in ("dgu", "ldgu"):
+            gu.update({
+                "grade1": inputs.get(f"{prefix}-grade1"),
+                "grade2": inputs.get(f"{prefix}-grade2"),
+                "thickness1": _num(inputs.get(f"{prefix}-thickness1")),
+                "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
+                "nfl1": _num(inputs.get(f"{prefix}-nfl1")),
+                "nfl2": _num(inputs.get(f"{prefix}-nfl2")),
+                "def1": _num(inputs.get(f"{prefix}-def1")),
+                "def2": _num(inputs.get(f"{prefix}-def2")),
+            })
+
+        glass_units.append(gu)
+
+        frame_variant = inputs.get(f"cat{cat_num}-frame-geometry", "regular")
+        mullion_type = inputs.get(f"cat{cat_num}-frame-mullion-type", "alu")
+        frame_type = inputs.get(f"cat{cat_num}-frame-frame-type", "cont")
+        frame_prefix = f"cat{cat_num}-frame-{frame_variant}-{mullion_type}"
+
+        mullion_name = inputs.get(f"{frame_prefix}-mullion") or ""
+        transom_name = inputs.get(f"{frame_prefix}-transom") or ""
+        steel_name = inputs.get(f"{frame_prefix}-steel") or ""
+
+        mullion_profile = next((p for p in alum_profiles_data if p.get("profile_name") == mullion_name), None)
+        transom_profile = next((p for p in alum_profiles_data if p.get("profile_name") == transom_name), None)
+        steel_profile = next((p for p in steel_profiles_data if p.get("profile_name") == steel_name), None)
+
+        frame = {
+            "geometry": frame_variant,
+            "mullion_type": "Aluminum + Steel" if mullion_type == "alu-steel" else "Aluminum Only",
+            "frame_type": "Floor-to-floor" if frame_type == "sfgp" else "Continuous",
+            "width": _num(inputs.get(f"{frame_prefix}-width")),
+            "length": _num(inputs.get(f"{frame_prefix}-length")),
+            "wind_neg": _num(inputs.get(f"{frame_prefix}-wind_neg")),
+            "glass_thk": _num(inputs.get(f"{frame_prefix}-glass_thk")),
+            "tran_spacing": _num(inputs.get(f"{frame_prefix}-tran_spacing")),
+            "mullion": mullion_profile,
+            "transom": transom_profile,
+            "steel": steel_profile,
+            "mullion_name": mullion_name,
+            "transom_name": transom_name,
+            "steel_name": steel_name,
+            "mul_mu": _num(inputs.get(f"{frame_prefix}-mul_mu")),
+            "mul_vu": _num(inputs.get(f"{frame_prefix}-mul_vu")),
+            "mul_def": _num(inputs.get(f"{frame_prefix}-mul_def")),
+            "tran_mu": _num(inputs.get(f"{frame_prefix}-tran_mu")),
+            "tran_vu": _num(inputs.get(f"{frame_prefix}-tran_vu")),
+            "tran_def_wind": _num(inputs.get(f"{frame_prefix}-tran_def_wind")),
+            "tran_def_dead": _num(inputs.get(f"{frame_prefix}-tran_def_dead")),
+            "joint_fy": _num(inputs.get(f"{frame_prefix}-joint_fy")),
+            "joint_fz": _num(inputs.get(f"{frame_prefix}-joint_fz")),
+            "reaction_Ry": _num(inputs.get(f"{frame_prefix}-reaction_Ry")),
+            "reaction_Rz": _num(inputs.get(f"{frame_prefix}-reaction_Rz")),
+        }
+
+        frames = [frame]
+
+        conn_prefix = f"cat{cat_num}-conn"
+        connection = {
+            "screw_nos": _num(inputs.get(f"{conn_prefix}-nos")),
+            "screw_dia": _num(inputs.get(f"{conn_prefix}-screw-dia")),
+            "head_dia": _num(inputs.get(f"{conn_prefix}-screw-head-dia")),
+            "t1": _num(inputs.get(f"{conn_prefix}-t1")),
+            "t2": _num(inputs.get(f"{conn_prefix}-t2")),
+            "tc": _num(inputs.get(f"{conn_prefix}-tc")),
+        }
+        connections = [connection]
+
+        clump_value = inputs.get(f"cat{cat_num}-anchor-type", "box-clump")
+        clump_display = {"box-clump": "Box Clump", "u-clump": "U Clump", "l-clump": "L/T Clump"}.get(clump_value, "Box Clump")
+        anchor_prefix = f"cat{cat_num}-anchor-{clump_value}"
+
+        anchorage = {
+            "clump_type": clump_display,
+            "anchor_dia": _num(inputs.get(f"{anchor_prefix}-anchor_dia")),
+            "embed_depth": _num(inputs.get(f"{anchor_prefix}-embed_depth")),
+            "N_p5": _num(inputs.get(f"{anchor_prefix}-N_p5")),
+            "h_a": _num(inputs.get(f"{anchor_prefix}-h_a")),
+            "bp_thk": _num(inputs.get(f"{anchor_prefix}-bp_thk")),
+            "anchor_nos": _num(inputs.get(f"{anchor_prefix}-anchor_nos")),
+            "C_a1": _num(inputs.get(f"{anchor_prefix}-C_a1")),
+            "C_a2": _num(inputs.get(f"{anchor_prefix}-C_a2")),
+        }
+
+        categories.append({
+            "category_name": cat_name,
+            "glass_units": glass_units,
+            "frames": frames,
+            "connections": connections,
+            "anchorage": [anchorage],
+        })
+
+    include = {
+        "toc": report_includes.get("toc", False),
+        "intro": report_includes.get("intro", True),
+        "moment_capacity": report_includes.get("moment-capacity", False),
+        "wind_pressure": report_includes.get("wind-pressure", False),
+        "categories": report_includes.get("categories", True),
+        "reference": report_includes.get("reference", False),
+    }
+
+    project_info = {
+        "project_name": general_info.get("projectName", ""),
+        "project_number": general_info.get("projectNumber", ""),
+        "ref_no": general_info.get("rev", ""),
+        "rev_no": general_info.get("rev", ""),
+        "date": general_info.get("date", ""),
+        "location": general_info.get("location", ""),
+        "client": general_info.get("client", ""),
+        "description": general_info.get("description", ""),
+    }
+
+    data = {
+        "project_info": project_info,
+        "categories": categories,
+        "alum_profiles_data": alum_profiles_data,
+        "steel_profiles_data": steel_profiles_data,
+        "wind": wind_inputs,
+        "include": include,
+    }
+
+    if not include_summary:
+        profile_data = _load_profile_data()
+        if profile_data:
+            merged = {}
+            merged.update(profile_data)
+            merged.update(data)
+            data = merged
+
+    return data
+
+
+def _generate_pdf(data: dict, template_name: str) -> str:
+    from jinja2 import Environment, FileSystemLoader, Undefined
+    from weasyprint import HTML, CSS
+    import pikepdf
+
+    class SilentUndefined(Undefined):
+        def __float__(self):
+            return 0.0
+        def __int__(self):
+            return 0
+        def __add__(self, other):
+            return SilentUndefined()
+        def __radd__(self, other):
+            return SilentUndefined()
+        def __sub__(self, other):
+            return SilentUndefined()
+        def __rsub__(self, other):
+            return SilentUndefined()
+        def __mul__(self, other):
+            return SilentUndefined()
+        def __rmul__(self, other):
+            return SilentUndefined()
+        def __truediv__(self, other):
+            return SilentUndefined()
+        def __rtruediv__(self, other):
+            return SilentUndefined()
+        def __mod__(self, other):
+            return SilentUndefined()
+        def __rmod__(self, other):
+            return SilentUndefined()
+        def __pow__(self, other):
+            return SilentUndefined()
+        def __rpow__(self, other):
+            return SilentUndefined()
+        def __gt__(self, other):
+            return False
+        def __lt__(self, other):
+            return False
+        def __ge__(self, other):
+            return False
+        def __le__(self, other):
+            return False
+        def __eq__(self, other):
+            return other is None or isinstance(other, SilentUndefined)
+        def __ne__(self, other):
+            return not self.__eq__(other)
+        def __neg__(self):
+            return SilentUndefined()
+        def __abs__(self):
+            return SilentUndefined()
+        def __bool__(self):
+            return False
+        def __str__(self):
+            return "N/A"
+        def __repr__(self):
+            return "N/A"
+
+    class ZeroFloat(float):
+        """Float that acts like SilentUndefined when used in arithmetic."""
+        def __add__(self, other):
+            return SilentUndefined()
+        def __radd__(self, other):
+            return SilentUndefined()
+        def __sub__(self, other):
+            return SilentUndefined()
+        def __rsub__(self, other):
+            return SilentUndefined()
+        def __mul__(self, other):
+            return SilentUndefined()
+        def __rmul__(self, other):
+            return SilentUndefined()
+        def __truediv__(self, other):
+            return SilentUndefined()
+        def __rtruediv__(self, other):
+            return SilentUndefined()
+        def __mod__(self, other):
+            return SilentUndefined()
+        def __pow__(self, other):
+            return SilentUndefined()
+        def __gt__(self, other):
+            return False
+        def __lt__(self, other):
+            return False
+        def __ge__(self, other):
+            return False
+        def __le__(self, other):
+            return False
+        def __eq__(self, other):
+            return other == 0.0 or isinstance(other, SilentUndefined)
+        def __ne__(self, other):
+            return not self.__eq__(other)
+        def __neg__(self):
+            return SilentUndefined()
+        def __abs__(self):
+            return SilentUndefined()
+        def __bool__(self):
+            return False
+        def __str__(self):
+            return "N/A"
+        def __repr__(self):
+            return "N/A"
+
+    _ZERO = ZeroFloat(0.0)
+
+    title = "Structural Calculation & Design Report"
+    author = "Md. Akram Hossain"
+
+    data = precompute_data(data)
+
+    def _ensure_calc(item, defaults=None):
+        if "calc" not in item or item["calc"] is None:
+            item["calc"] = {k: _ZERO for k in (defaults or {})}
+        elif defaults:
+            for k in defaults:
+                if k not in item["calc"] or item["calc"][k] is None or item["calc"][k] == 0:
+                    item["calc"][k] = _ZERO
+
+    _anchor_defaults = {
+        "reaction_Ry": 0.0, "reaction_Rz": 0.0, "design_Ry": 0.0, "design_Rz": 0.0,
+        "bp_length": 0.0, "bp_width": 0.0, "N_ua": 0.0, "N_ug": 0.0, "V_ua": 0.0, "V_ug": 0.0,
+        "phi_Nsa": 0.0, "phi_Ncbg": 0.0, "phi_Npn": 0.0, "phi_Vsa": 0.0, "phi_Vcbg": 0.0, "phi_Vcp": 0.0,
+        "interaction": 0.0, "bp_t_req_bear": 0.0, "bp_t_req_tension": 0.0,
+        "bp_Pu": 0.0, "bp_fp_max": 0.0,
+        "e_f1": 0.0, "e_f2": 0.0, "e_t1": 0.0, "e_t2": 0.0, "Bx": 0.0, "Ax": 0.0, "By": 0.0, "Ay": 0.0,
+        "bolt_Vu": 0.0, "bolt_phi_Rn_shear": 0.0, "bolt_phi_Rn_bear": 0.0,
+        "thr_bolt_AseN": 0.0,
+        "top_phi_Ncbg": 0.0, "front_phi_Ncbg": 0.0, "A_seN": 0.0,
+        "beta_N1": 0.0, "beta_N2": 0.0, "beta_N3": 0.0,
+        "beta_V1": 0.0, "beta_V2": 0.0, "beta_V3": 0.0,
+        "beta_N": 0.0, "beta_V": 0.0,
+        "A_NC": 0.0, "A_NCO": 0.0, "psi_edN": 0.0, "N_b": 0.0,
+        "A_VC": 0.0, "A_VCO": 0.0, "psi_edV": 0.0, "psi_hV": 0.0, "l_e": 0.0, "V_b": 0.0,
+        "bp_d": 0.0, "bp_b": 0.0, "bp_m": 0.0, "bp_n": 0.0, "bp_lambda_n": 0.0, "bp_l": 0.0,
+        "bp_q": 0.0, "bp_bearing_Mu": 0.0, "bp_A1": 0.0,
+        "bolt_phi_Rn_bear": 0.0, "thr_Vh": 0.0, "thr_Vv": 0.0, "thr_Ab": 0.0,
+        "thr_bearing_lc": 0.0, "thr_bearing_phi_Rn1": 0.0, "thr_bearing_phi_Rn2": 0.0,
+        "thr_bolt_nos": 0.0, "thr_bolt_length": 0.0,
+        "fin_Vu": 0.0, "fin_Vh": 0.0, "fin_Vv": 0.0, "fin_t_req": 0.0, "fin_thk": 0.0,
+        "fin_phi_Rn_yield": 0.0, "fin_phi_Rn_rupture": 0.0, "fin_phi_Rn_block": 0.0,
+        "fin_Mu": 0.0, "fin_length": 0.0, "fin_width": 0.0, "fin_dh": 0.0,
+        "fin_rupture_Anv": 0.0, "fin_bgv": 0.0, "fin_bnt": 0.0,
+        "fin_block_Anv": 0.0, "fin_block_Ant": 0.0,
+        "fin_block_phi_Rn1": 0.0, "fin_block_phi_Rn2": 0.0,
+        "weld_fn": 0.0, "weld_fv": 0.0, "weld_fb": 0.0, "weld_fR": 0.0, "weld_phi_Rn": 0.0,
+        "bp_Tu": 0.0, "bp_x": 0.0, "bp_Beff": 0.0, "bp_tension_Mu": 0.0,
+        "top_N_ua": 0.0, "top_N_ug": 0.0, "top_V_ua": 0.0, "top_V_ug": 0.0,
+        "top_phi_Nsa": 0.0, "top_psi_edN": 0.0, "top_N_b": 0.0, "top_A_NC": 0.0,
+        "front_N_ua": 0.0, "front_N_ug": 0.0, "front_V_ua": 0.0, "front_V_ug": 0.0,
+        "front_phi_Nsa": 0.0, "front_psi_edN": 0.0, "front_N_b": 0.0, "front_A_NC": 0.0,
+        "top_beta_N1": 0.0, "top_beta_N2": 0.0, "top_beta_N3": 0.0,
+        "top_beta_V1": 0.0, "top_beta_V2": 0.0, "top_beta_V3": 0.0,
+        "top_beta_N": 0.0, "top_beta_V": 0.0, "top_interaction": 0.0,
+        "front_beta_N1": 0.0, "front_beta_N2": 0.0, "front_beta_N3": 0.0,
+        "front_beta_V1": 0.0, "front_beta_V2": 0.0, "front_beta_V3": 0.0,
+        "front_beta_N": 0.0, "front_beta_V": 0.0, "front_interaction": 0.0,
+    }
+    _frame_defaults = {
+        "mul_mu": 0.0, "mul_vu": 0.0, "mul_def": 0.0, "mul_allow_def": 0.0,
+        "tran_mu": 0.0, "tran_vu": 0.0, "tran_def_wind": 0.0, "tran_def_dead": 0.0, "tran_allow_def": 0.0,
+        "mul_dc": 0.0, "tran_dc": 0.0, "reaction_Ry": 0.0, "reaction_Rz": 0.0,
+        "joint_fy": 0.0, "joint_fz": 0.0,
+    }
+    _conn_defaults = {
+        "Vu": 0.0, "phi_Pnv": 0.0, "phi_Pnot": 0.0, "phi_Pnov": 0.0,
+        "beta_pullover": 0.0, "beta_pullout": 0.0, "joint_fy": 0.0, "joint_fz": 0.0,
+        "R_zA": 0.0,
+    }
+    _glass_defaults = {
+        "stress_ratio": 0.0, "def_ratio": 0.0, "allow_def": 0.0, "deflection": 0.0,
+    }
+
+    for cat in data.get("categories", []):
+        for gu in cat.get("glass_units", []) or []:
+            _ensure_calc(gu, _glass_defaults)
+        for frame in cat.get("frames", []) or []:
+            _ensure_calc(frame, _frame_defaults)
+        for conn in cat.get("connections", []) or []:
+            _ensure_calc(conn, _conn_defaults)
+        for anchor in cat.get("anchorage", []) or []:
+            _ensure_calc(anchor, _anchor_defaults)
+
+    wind_data = data.get("wind", {})
+    if "calc" not in wind_data:
+        wind_data["calc"] = {
+            "summary": {"wind_speed": 0.0, "velocity_pressure": 0.0, "design_pressure": 0.0},
+            "K_z": 0.0, "K_zt": 0.0, "K_d": 0.0, "q_z": 0.0, "GC_pi": 0.0,
+            "GC_pf": 0.0, "p_net": 0.0, "p_pos": 0.0, "p_neg": 0.0,
+        }
+    elif "summary" not in wind_data.get("calc", {}):
+        wind_data["calc"]["summary"] = {"wind_speed": 0.0, "velocity_pressure": 0.0, "design_pressure": 0.0}
+
+    if "alum_profiles_data" in data and "alum_profiles" not in data:
+        data["alum_profiles"] = data["alum_profiles_data"]
+    if "steel_profiles_data" in data and "steel_profiles" not in data:
+        data["steel_profiles"] = data["steel_profiles_data"]
+
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    tmp.close()
+
+    try:
+        env = Environment(loader=FileSystemLoader(REPORT_TEMPLATE_DIR), undefined=SilentUndefined)
+
+        def safe_round(value, places=2):
+            try:
+                if value is None or (isinstance(value, (int, float)) and value == 0):
+                    return "N/A"
+                return round(float(value), places)
+            except (TypeError, ValueError, ZeroDivisionError):
+                return "N/A"
+
+        env.filters['round'] = safe_round
+
+        template = env.get_template(template_name)
+        inputs_uri = Path(DEFAULT_INPUTS_DIR).as_uri()
+        data["inputs_dir"] = inputs_uri
+        html_out = template.render(data)
+
+        HTML(string=html_out, base_url=REPORT_TEMPLATE_DIR).write_pdf(
+            tmp.name, stylesheets=[CSS(filename=CSS_PATH)]
+        )
+
+        with pikepdf.Pdf.open(tmp.name, allow_overwriting_input=True) as pdf:
+            pdf.docinfo["/Title"] = title
+            pdf.docinfo["/Author"] = author
+            pdf.Root.PageMode = pikepdf.Name("/UseOutlines")
+            pdf.Root.PageLayout = pikepdf.Name("/SinglePage")
+            if "/Outlines" in pdf.Root and "/First" in pdf.Root.Outlines:
+                pdf.Root.Outlines.Count = 0
+                _collapse_outlines(pdf.Root.Outlines.First)
+            pdf.save(tmp.name)
+
+        return tmp.name
+    except Exception:
+        if os.path.exists(tmp.name):
+            os.remove(tmp.name)
+        raise
+
+
+def _collapse_outlines(item):
+    while item:
+        if "/First" in item:
+            item.Count = 0
+            _collapse_outlines(item.First)
+        if "/Next" in item:
+            item = item.Next
+        else:
+            break
+
+
+@app.post("/api/report/generate")
+async def api_generate_report(request: Request):
+    data = await _json(request)
+    try:
+        report_data = _build_report_data(data, include_summary=False)
+        pdf_path = _generate_pdf(report_data, "full-report.html")
+        return FileResponse(
+            pdf_path,
+            media_type="application/pdf",
+            filename="structural-report.pdf",
+        )
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.post("/api/report/generate/summary")
+async def api_generate_summary_report(request: Request):
+    data = await _json(request)
+    try:
+        report_data = _build_report_data(data, include_summary=True)
+        pdf_path = _generate_pdf(report_data, "summary-report.html")
+        return FileResponse(
+            pdf_path,
+            media_type="application/pdf",
+            filename="structural-summary-report.pdf",
+        )
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
 if __name__ == "__main__":

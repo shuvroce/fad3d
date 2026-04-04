@@ -82,7 +82,6 @@
                         <div class="summary__td-list">
                             <div>
                                 <span>LR: </span>{{ calc.lr }} ({{ calc.stress_ratio }})
-                                {% endif %}
                             </div>
                             <div><span>δ: </span>{{ calc.deflection }} ({{ calc.def_ratio }})</div>
                         </div>
@@ -148,14 +147,14 @@
                 <td>
                     <div class="summary__td-list">
                         {% if frame.mullion_type == "Aluminum Only" %}
-                        <div>{{ frame.mullion }} (6063-T6)</div>
+                        <div>{{ frame.mullion_name }} (6063-T6)</div>
                         {% else %}
                         <div>
-                            {{ frame.mullion }} (6063-T6) 
-                            <p style="padding-left: 1rem;">+ {{ frame.steel }} (50 gr.)</p>
+                            {{ frame.mullion_name }} (6063-T6) 
+                            <p style="padding-left: 1rem;">+ {{ frame.steel_name }} (50 gr.)</p>
                         </div>
                         {% endif %}
-                        <div>{{ frame.transom }} (6063-T5)</div>
+                        <div>{{ frame.transom_name }} (6063-T5)</div>
                     </div>
                 </td>
                 <td>{{ frame.wind_neg }} kPa</td>

@@ -38,12 +38,18 @@ def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
 
     for cat in data.get("categories", []):
         for gu in cat.get("glass_units", []) or []:
-            calc_result = calc_glass_unit(gu)
-            _set_calc(gu, calc_result)
+            try:
+                calc_result = calc_glass_unit(gu)
+                _set_calc(gu, calc_result)
+            except (ValueError, TypeError, ZeroDivisionError):
+                pass
 
         for frame in cat.get("frames", []) or []:
-            calc_result = calc_frame(frame, alum_profiles_data, steel_profiles_data)
-            _set_calc(frame, calc_result)
+            try:
+                calc_result = calc_frame(frame, alum_profiles_data, steel_profiles_data)
+                _set_calc(frame, calc_result)
+            except (ValueError, TypeError, ZeroDivisionError):
+                pass
 
         frames = cat.get("frames", []) or []
         frame = frames[0] if frames else None
@@ -57,12 +63,18 @@ def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
                     frame_for_downstream[key] = fc[key]
 
         for conn in cat.get("connections", []) or []:
-            calc_result = calc_connection(conn, frame_for_downstream)
-            _set_calc(conn, calc_result)
+            try:
+                calc_result = calc_connection(conn, frame_for_downstream)
+                _set_calc(conn, calc_result)
+            except (ValueError, TypeError, ZeroDivisionError):
+                pass
 
         for anchor in cat.get("anchorage", []) or []:
-            calc_result = calc_anchorage(anchor, frame_for_downstream, alum_profiles_data)
-            _set_calc(anchor, calc_result)
+            try:
+                calc_result = calc_anchorage(anchor, frame_for_downstream, alum_profiles_data)
+                _set_calc(anchor, calc_result)
+            except (ValueError, TypeError, ZeroDivisionError):
+                pass
 
     return data
 
