@@ -248,6 +248,11 @@ function createWindPanel() {
     return template.innerHTML;
 }
 
+// Function to toggle wind section collapse/expand
+function toggleWindSection(card) {
+    card.classList.toggle("collapsed");
+}
+
 // Function to initialize wind panel event listeners
 function initializeWindPanel() {
     // Restore cached wind inputs (from .fad load or previous mode switch)
@@ -277,6 +282,23 @@ function initializeWindPanel() {
     if (calculateBtn && typeof runWindCalc === 'function') {
         calculateBtn.addEventListener('click', runWindCalc);
     }
+
+    // Attach collapsible toggle listeners to all wind section cards
+    document.querySelectorAll('.wind__panel .result__card').forEach((card) => {
+        const header = card.querySelector('.result__card-header');
+        const toggleBtn = card.querySelector('.result__card-toggle');
+        if (header && toggleBtn) {
+            header.addEventListener('click', (e) => {
+                if (e.target === header || e.target.closest('.result__card-toggle')) {
+                    toggleWindSection(card);
+                }
+            });
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleWindSection(card);
+            });
+        }
+    });
 
     // Cache wind inputs on change so they persist across mode switches
     document.addEventListener('change', (e) => {

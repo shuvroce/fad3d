@@ -2679,6 +2679,7 @@ summary {
 /* Wind mode: expand input box to cover catbar + input field width */
 .left__panel.wind-mode .input__box {
     width: calc(var(--catbar-width) + var(--input-field-width));
+    overflow-y: auto;
 }
 
 .input__box-nav {
@@ -3266,7 +3267,7 @@ summary {
     flex-direction: column;
     gap: 1.5rem;
     overflow-y: auto;
-    max-height: calc(100vh - var(--topbar-height) - 4rem);
+    /* max-height: calc(100vh - var(--topbar-height) - 4rem); */
 }
 
 .wind__section {

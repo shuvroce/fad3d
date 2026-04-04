@@ -1,157 +1,212 @@
 <!-- Template for wind load input panel -->
 <template id="wind-panel-template">
     <div class="wind__panel">
-        <div class="wind__section">
-            <h3 class="wind__section-heading">Geometry</h3>
-            <div class="input__field">
-                <label for="b_length">Building Length</label>
-                <div class="input__group">
-                    <input type="number" step="0.1" id="b_length" name="b_length">
-                    <span class="input__unit">m</span>
-                </div>
+        <div class="result__card">
+            <div class="result__card-header">
+                <h3 class="result__card-title">Geometry</h3>
+                <button class="result__card-toggle" aria-label="Toggle section">
+                    <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </button>
             </div>
-            <div class="input__field">
-                <label for="b_width">Building Width</label>
-                <div class="input__group">
-                    <input type="number" step="0.1" id="b_width" name="b_width">
-                    <span class="input__unit">m</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="b_height">Building Height</label>
-                <div class="input__group">
-                    <input type="number" step="0.1" id="b_height" name="b_height">
-                    <span class="input__unit">m</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="b_floor_heights">Floor Heights (Separated by space)</label>
-                <div class="input__group">
-                    <input type="text" id="b_floor_heights" name="b_floor_heights" placeholder="e.g. 3.2 3.0 3.0">
-                    <span class="input__unit">m</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="wind__section">
-            <h3 class="wind__section-heading">Basic Parameters</h3>
-            <div class="input__field">
-                <label for="location">Location</label>
-                <select id="location" name="location">
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="exposure_cat">Exposure Category</label>
-                <select id="exposure_cat" name="exposure_cat">
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="occupancy_cat">Occupancy Category</label>
-                <select id="occupancy_cat" name="occupancy_cat">
-                    <option value="I">Occupancy I</option>
-                    <option value="II">Occupancy II</option>
-                    <option value="III">Occupancy III</option>
-                    <option value="IV">Occupancy IV</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="K_d">Directionality Factor, K<sub>d</sub></label>
-                <div class="input__group">
-                    <input type="number" step="0.1" id="K_d" name="K_d" value="0.85">
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="GC_pi">Internal Pressure Coefficient, GC<sub>pi</sub></label>
-                <select id="GC_pi" name="GC_pi">
-                    <option value="0.18">0.18 (Enclosed)</option>
-                    <option value="0.55">0.55 (Partially Enclosed)</option>
-                    <option value="0">0.0 (Open)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="wind__section">
-            <h3 class="wind__section-heading">Gust Factor</h3>
-            <div class="input__field">
-                <label for="b_rigidity">Building Rigidity</label>
-                <select id="b_rigidity" name="b_rigidity">
-                    <option value="Rigid">Rigid</option>
-                    <option value="Flexible">Flexible</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="b_freq">Building Natural Frequency, f<sub>n</sub></label>
-                <div class="input__group">
-                    <input type="number" step="0.1" id="b_freq" name="b_freq" value="1.2">
-                    <span class="input__unit">H<sub>z</sub></span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="damping">Damping Ratio</label>
-                <div class="input__group">
-                    <input type="number" step="0.1" id="damping" name="damping" value="0.02">
+            <div class="result__card-body-outer">
+                <div class="result__card-body">
+                    <div class="input__field">
+                        <label for="b_length">Building Length</label>
+                        <div class="input__group">
+                            <input type="number" step="0.1" id="b_length" name="b_length">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="b_width">Building Width</label>
+                        <div class="input__group">
+                            <input type="number" step="0.1" id="b_width" name="b_width">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="b_height">Building Height</label>
+                        <div class="input__group">
+                            <input type="number" step="0.1" id="b_height" name="b_height">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="b_floor_heights">Floor Heights (Separated by space)</label>
+                        <div class="input__group">
+                            <input type="text" id="b_floor_heights" name="b_floor_heights" placeholder="e.g. 3.2 3.0 3.0">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="wind__section">
-            <h3 class="wind__section-heading">Topography</h3>
-            <div class="input__field">
-                <label for="topography_type">Topography Type</label>
-                <select id="topography_type" name="topography_type">
-                    <option value="Homogeneous">Homogeneous</option>
-                    <option value="Hill">Hill</option>
-                    <option value="Ridge">Ridge</option>
-                    <option value="Escarpment">Escarpment</option>
-                </select>
+        <div class="result__card">
+            <div class="result__card-header">
+                <h3 class="result__card-title">Basic Parameters</h3>
+                <button class="result__card-toggle" aria-label="Toggle section">
+                    <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </button>
             </div>
-            <div class="input__field">
-                <label for="topo_crest_side">Topography Crest Side</label>
-                <select id="topo_crest_side" name="topo_crest_side">
-                    <option value="Upwind">Upwind</option>
-                    <option value="Downwind">Downwind</option>
-                </select>
-            </div>
-            <div class="input__field">
-                <label for="topo_height">Topography Height</label>
-                <div class="input__group">
-                    <input type="number" id="topo_height" name="topo_height">
-                    <span class="input__unit">m</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="topo_length">Topography Length</label>
-                <div class="input__group">
-                    <input type="number" id="topo_length" name="topo_length">
-                    <span class="input__unit">m</span>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="topo_distance">Topography Distance</label>
-                <div class="input__group">
-                    <input type="number" id="topo_distance" name="topo_distance">
-                    <span class="input__unit">m</span>
+            <div class="result__card-body-outer">
+                <div class="result__card-body">
+                    <div class="input__field">
+                        <label for="location">Location</label>
+                        <select id="location" name="location">
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="exposure_cat">Exposure Category</label>
+                        <select id="exposure_cat" name="exposure_cat">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="occupancy_cat">Occupancy Category</label>
+                        <select id="occupancy_cat" name="occupancy_cat">
+                            <option value="I">Occupancy I</option>
+                            <option value="II">Occupancy II</option>
+                            <option value="III">Occupancy III</option>
+                            <option value="IV">Occupancy IV</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="K_d">Directionality Factor, K<sub>d</sub></label>
+                        <div class="input__group">
+                            <input type="number" step="0.1" id="K_d" name="K_d" value="0.85">
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="GC_pi">Internal Pressure Coefficient, GC<sub>pi</sub></label>
+                        <select id="GC_pi" name="GC_pi">
+                            <option value="0.18">0.18 (Enclosed)</option>
+                            <option value="0.55">0.55 (Partially Enclosed)</option>
+                            <option value="0">0.0 (Open)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="wind__section">
-            <h3 class="wind__section-heading">Notes</h3>
-            <div class="input__field">
-                <label for="exposure_note">Exposure Note</label>
-                <textarea id="exposure_note" name="exposure_note"></textarea>
+        <div class="result__card">
+            <div class="result__card-header">
+                <h3 class="result__card-title">Gust Factor</h3>
+                <button class="result__card-toggle" aria-label="Toggle section">
+                    <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </button>
             </div>
-            <div class="input__field">
-                <label for="occupancy_note">Occupancy Note</label>
-                <textarea id="occupancy_note"
-                    name="occupancy_note">Likely to gather more than 300 people at the same time.</textarea>
+            <div class="result__card-body-outer">
+                <div class="result__card-body">
+                    <div class="input__field">
+                        <label for="b_rigidity">Building Rigidity</label>
+                        <select id="b_rigidity" name="b_rigidity">
+                            <option value="Rigid">Rigid</option>
+                            <option value="Flexible">Flexible</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="b_freq">Building Natural Frequency, f<sub>n</sub></label>
+                        <div class="input__group">
+                            <input type="number" step="0.1" id="b_freq" name="b_freq" value="1.2">
+                            <span class="input__unit">H<sub>z</sub></span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="damping">Damping Ratio</label>
+                        <div class="input__group">
+                            <input type="number" step="0.1" id="damping" name="damping" value="0.02">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="input__field">
-                <label for="topography_note">Topography Note</label>
-                <textarea id="topography_note" name="topography_note"></textarea>
+        </div>
+
+        <div class="result__card">
+            <div class="result__card-header">
+                <h3 class="result__card-title">Topography</h3>
+                <button class="result__card-toggle" aria-label="Toggle section">
+                    <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="result__card-body-outer">
+                <div class="result__card-body">
+                    <div class="input__field">
+                        <label for="topography_type">Topography Type</label>
+                        <select id="topography_type" name="topography_type">
+                            <option value="Homogeneous">Homogeneous</option>
+                            <option value="Hill">Hill</option>
+                            <option value="Ridge">Ridge</option>
+                            <option value="Escarpment">Escarpment</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="topo_crest_side">Topography Crest Side</label>
+                        <select id="topo_crest_side" name="topo_crest_side">
+                            <option value="Upwind">Upwind</option>
+                            <option value="Downwind">Downwind</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="topo_height">Topography Height</label>
+                        <div class="input__group">
+                            <input type="number" id="topo_height" name="topo_height">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="topo_length">Topography Length</label>
+                        <div class="input__group">
+                            <input type="number" id="topo_length" name="topo_length">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="topo_distance">Topography Distance</label>
+                        <div class="input__group">
+                            <input type="number" id="topo_distance" name="topo_distance">
+                            <span class="input__unit">m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result__card">
+            <div class="result__card-header">
+                <h3 class="result__card-title">Notes</h3>
+                <button class="result__card-toggle" aria-label="Toggle section">
+                    <svg class="result__card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="result__card-body-outer">
+                <div class="result__card-body">
+                    <div class="input__field">
+                        <label for="exposure_note">Exposure Note</label>
+                        <textarea id="exposure_note" name="exposure_note"></textarea>
+                    </div>
+                    <div class="input__field">
+                        <label for="occupancy_note">Occupancy Note</label>
+                        <textarea id="occupancy_note"
+                            name="occupancy_note">Likely to gather more than 300 people at the same time.</textarea>
+                    </div>
+                    <div class="input__field">
+                        <label for="topography_note">Topography Note</label>
+                        <textarea id="topography_note" name="topography_note"></textarea>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
