@@ -3,8 +3,9 @@
 // Verifies required report images exist
 // ============================
 
-import { getCurrentPanelMode } from './inputPanel.js';
+import { getCurrentPanelMode, getCachedCategoryData } from './inputPanel.js';
 import { updateFiguresIndicator } from './viewControls.js';
+import { getAlumSections } from './alumSecProp.js';
 
 const DEBOUNCE_MS = 400;
 let _checkTimer = null;
@@ -40,6 +41,10 @@ async function _get(url) {
 // ---- Data Collection ----
 
 function _collectCategoryData() {
+    if (getCurrentPanelMode() === "wind") {
+        return getCachedCategoryData();
+    }
+
     const categories = [];
     document.querySelectorAll(".input__category-content").forEach((content) => {
         const catNum = parseInt(content.getAttribute("data-category"));
@@ -68,6 +73,13 @@ function _collectCategoryData() {
     return categories;
 }
 
+function _collectAlumProfiles() {
+    const alumSections = getAlumSections() || [];
+    return alumSections
+        .filter(s => s.name && (s.profileType === "stick" || s.profileType === "manual"))
+        .map(s => ({ name: s.name, profileType: s.profileType || "stick" }));
+}
+
 // ---- Directory Management ----
 
 async function _fetchFiguresDir() {
@@ -78,27 +90,63 @@ async function _fetchFiguresDir() {
     return _figuresDir;
 }
 
-async function _openFolderPicker() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.webkitdirectory = true;
-    input.multiple = false;
-    input.click();
-    
+async function _openDirectoryPicker() {
     return new Promise((resolve) => {
-        input.addEventListener("change", async () => {
-            const dir = input.files[0]?.webkitRelativePath?.split("/")[0] || "";
-            if (dir) {
-                const data = await _post("/api/figures/open_picker", { directory: dir });
-                if (data?.directory) {
-                    _figuresDir = data.directory;
-                    resolve(true);
-                    return;
-                }
+        const overlay = document.createElement("div");
+        overlay.className = "figure__dir-overlay";
+        overlay.innerHTML = `
+            <div class="figure__dir-dialog">
+                <h4>Set Figures Directory</h4>
+                <input type="text" class="figure__dir-input" placeholder="Enter full directory path" value="${_figuresDir}" />
+                <div class="figure__dir-actions">
+                    <button class="figure__dir-btn figure__dir-btn--browse">Browse</button>
+                    <button class="figure__dir-btn figure__dir-btn--cancel">Cancel</button>
+                    <button class="figure__dir-btn figure__dir-btn--confirm">Set</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const input = overlay.querySelector(".figure__dir-input");
+        const browseBtn = overlay.querySelector(".figure__dir-btn--browse");
+        const cancelBtn = overlay.querySelector(".figure__dir-btn--cancel");
+        const confirmBtn = overlay.querySelector(".figure__dir-btn--confirm");
+
+        const cleanup = () => overlay.remove();
+
+        const confirm = async () => {
+            const path = input.value.trim();
+            cleanup();
+            if (!path) {
+                resolve(false);
+                return;
             }
-            resolve(false);
+            const data = await _post("/api/figures/set_dir", { directory: path });
+            if (data?.directory) {
+                _figuresDir = data.directory;
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        };
+
+        browseBtn.addEventListener("click", async () => {
+            const data = await _post("/api/figures/open_picker", {});
+            if (data?.directory) {
+                _figuresDir = data.directory;
+                input.value = data.directory;
+            }
         });
-        input.addEventListener("cancel", () => resolve(false));
+
+        confirmBtn.addEventListener("click", confirm);
+        cancelBtn.addEventListener("click", () => { cleanup(); resolve(false); });
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") confirm();
+            if (e.key === "Escape") { cleanup(); resolve(false); }
+        });
+
+        input.focus();
+        input.select();
     });
 }
 
@@ -114,7 +162,7 @@ function _renderFigurePanel(figures, total, found) {
     html += `<div class="figure__panel-header">
         <span class="figure__panel-title">Required Figures</span>
         <div class="figure__panel-actions">
-            <button class="figure__panel-btn" id="figure-picker-btn" aria-label="Select folder" data-title="Select figures folder">
+            <button class="figure__panel-btn" id="figure-picker-btn" aria-label="Set directory" data-title="Set figures directory">
                 <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H8v-2h6v2zm4-4H8v-2h10v2z"/></svg>
             </button>
             <button class="figure__panel-btn" id="figure-refresh-btn" aria-label="Refresh" data-title="Refresh">
@@ -175,10 +223,9 @@ function _renderFigurePanel(figures, total, found) {
         pickerBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
             pickerBtn.disabled = true;
-            const opened = await _openFolderPicker();
+            const opened = await _openDirectoryPicker();
             pickerBtn.disabled = false;
             if (opened) {
-                // Re-render with loading state then trigger check
                 const dirEl = document.querySelector(".figure__panel-dir");
                 if (dirEl) {
                     const display = _figuresDir.length > 40 ? "..." + _figuresDir.slice(-37) : _figuresDir;
@@ -217,7 +264,7 @@ async function _runCheck() {
     _isChecking = true;
     const payload = {
         categories: _collectCategoryData(),
-        wind_mode: getCurrentPanelMode(),
+        alum_profiles: _collectAlumProfiles(),
         directory: _figuresDir,
     };
 

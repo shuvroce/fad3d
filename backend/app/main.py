@@ -12,6 +12,13 @@ from calcs.anchorage import calc_anchorage
 from calcs.wind_load import compute_wind_loads, location_wind_speeds
 from calcs.calc_utils import _to_float
 
+try:
+    from tkinter import Tk, PhotoImage
+    from tkinter.filedialog import askdirectory
+    TKINTER_AVAILABLE = True
+except ImportError:
+    TKINTER_AVAILABLE = False
+
 BASE_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
@@ -152,10 +159,8 @@ async def serve_profile_image(filename: str):
 # ---------------------------------------------------------------------------
 
 DEFAULT_FIGURES_DIR = os.path.join(BACKEND_DIR, "app", "report", "figures")
-PROFILES_DIR = os.path.join(BACKEND_DIR, "app", "report", "assets", "profiles")
 _figures_dir = DEFAULT_FIGURES_DIR
 os.makedirs(DEFAULT_FIGURES_DIR, exist_ok=True)
-os.makedirs(PROFILES_DIR, exist_ok=True)
 
 SAP_FIGURE_NAMES = [
     "sap-model.png", "sap-release.png", "sap-dead-load.png", "sap-wind-load.png",
@@ -174,10 +179,6 @@ RFEM_FIGURE_NAMES = [
 
 def _fig_exists(name: str, figures_dir: str) -> bool:
     return os.path.isfile(os.path.join(figures_dir, name))
-
-
-def _profile_exists(name: str) -> bool:
-    return os.path.isfile(os.path.join(PROFILES_DIR, name))
 
 
 @app.get("/api/figures/dir")
@@ -200,20 +201,42 @@ async def api_set_figures_dir(request: Request):
 
 @app.post("/api/figures/open_picker")
 async def api_open_folder_picker(request: Request):
-    data = await _json(request)
-    directory = data.get("directory", "")
-    if directory and os.path.isdir(directory):
+    if not TKINTER_AVAILABLE:
+        return JSONResponse({"error": "Folder picker not available on this system"}, status_code=400)
+
+    try:
+        root = Tk()  # type: ignore[name-defined]
+        root.withdraw()
+        root.attributes("-topmost", True)
+        selected_dir = askdirectory(title="Select Figures Directory", mustexist=True)  # type: ignore[name-defined]
+        root.destroy()
+
+        if not selected_dir or not os.path.isdir(selected_dir):
+            return JSONResponse({"error": "No folder selected or folder does not exist"}, status_code=400)
+
         global _figures_dir
-        _figures_dir = directory
+        _figures_dir = selected_dir
         return {"directory": _figures_dir}
-    return JSONResponse({"error": "Invalid directory"}, status_code=400)
+    except Exception as e:
+        return JSONResponse({"error": f"Error opening folder picker: {str(e)}"}, status_code=500)
+
+
+def _get_stick_profile_figures(profile_name):
+    clean_name = profile_name.strip()
+    return [{"name": f"{clean_name}.png", "category": "Aluminum Profile", "exists": False}]
+
+def _get_manual_profile_figures(profile_name):
+    clean_name = profile_name.strip()
+    suffixes = [".png", "-wp.png", "p.png", "-lb-web.png", "-lb-flange.png",
+                "-lb-table.png", "-lb-web-cap.png", "-lb-flange-cap.png"]
+    return [{"name": f"{clean_name}{s}", "category": "Aluminum Profile", "exists": False} for s in suffixes]
 
 
 @app.post("/api/check_figures")
 async def api_check_figures(request: Request):
     data = await _json(request)
     categories = data.get("categories", [])
-    wind_mode = data.get("wind_mode", "facade")
+    alum_profiles = data.get("alum_profiles", [])
     figures_dir = data.get("directory", _figures_dir)
 
     # Validate directory
@@ -222,11 +245,25 @@ async def api_check_figures(request: Request):
 
     figures = []
 
-    # Wind figures
-    if wind_mode == "wind":
-        figures.append({"name": "wind-map.png", "category": "Wind", "exists": _fig_exists("wind-map.png", figures_dir)})
+    # 1. Wind figures (always included)
+    figures.append({"name": "wind-location-map.png", "category": "Wind", "exists": _fig_exists("wind-location-map.png", figures_dir)})
 
-    # Category-based figures
+    # 2. Aluminum profile figures (stick and manual types from defined profiles)
+    for prof in alum_profiles:
+        prof_name = prof.get("name", "")
+        prof_type = prof.get("profileType", "stick")
+        if not prof_name:
+            continue
+        if prof_type == "stick":
+            for fig in _get_stick_profile_figures(prof_name):
+                fig["exists"] = _fig_exists(fig["name"], figures_dir)
+                figures.append(fig)
+        elif prof_type == "manual":
+            for fig in _get_manual_profile_figures(prof_name):
+                fig["exists"] = _fig_exists(fig["name"], figures_dir)
+                figures.append(fig)
+
+    # 3. Category-based figures
     for cat in categories:
         idx = cat.get("index", 0)
         cat_label = f"Category {idx}"
@@ -234,10 +271,10 @@ async def api_check_figures(request: Request):
         # Reference elevation (always required)
         figures.append({"name": f"{idx}-ref-elev.png", "category": cat_label, "exists": _fig_exists(f"{idx}-ref-elev.png", figures_dir)})
 
-        # Glass RFEM figures (only for Point Fixed support type)
+        # Glass RFEM figures (only for point-fixed support type)
         glass_type = cat.get("glass_type", "sgu")
         support_type = cat.get("support_type", "")
-        if support_type == "Point Fixed":
+        if support_type == "point-fixed":
             for g_idx in range(1, 3 if glass_type in ("dgu", "ldgu") else 2):
                 for fig_name in RFEM_FIGURE_NAMES:
                     full_name = f"{idx}.{g_idx}-{fig_name}"

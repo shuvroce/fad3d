@@ -23,6 +23,7 @@ let currentPanelMode = "facade"; // 'wind' or 'facade'
 let savedFacadeContent = ""; // Store facade panel content when switching to wind
 let savedCatbarContent = ""; // Store catbar content when switching to wind
 let cachedWindInputs = {}; // Cache wind inputs when panel is not in DOM
+let cachedCategoryData = []; // Cache category data when switching to wind mode
 
 const WIND_INPUT_IDS = [
     'b_length', 'b_width', 'b_height', 'b_floor_heights',
@@ -116,6 +117,32 @@ function switchPanelMode(mode) {
         if (toggleBtn) toggleBtn.classList.remove(exitClass);
 
         if (mode === "wind") {
+            // Cache category data before destroying facade content
+            cachedCategoryData = [];
+            document.querySelectorAll(".input__category-content").forEach((content) => {
+                const catNum = parseInt(content.getAttribute("data-category"));
+                if (isNaN(catNum)) return;
+
+                const g = id => document.getElementById(id)?.value || "";
+                const glassType = g(`cat${catNum}-glass-type`) || "sgu";
+                const supportType = g(`cat${catNum}-glass-${glassType}-support_type`);
+                const frameGeometry = g(`cat${catNum}-frame-geometry`) || "regular";
+                const mullionType = g(`cat${catNum}-frame-mullion-type`) || "alu";
+                const variant = `${frameGeometry}-${mullionType}`;
+                const mullionName = g(`cat${catNum}-frame-${variant}-mullion`);
+                const steelName = g(`cat${catNum}-frame-${variant}-steel`);
+
+                cachedCategoryData.push({
+                    index: catNum,
+                    glass_type: glassType,
+                    support_type: supportType,
+                    frame_geometry: frameGeometry,
+                    mullion_type: mullionType === "alu-steel" ? "Aluminum + Steel" : "Aluminum Only",
+                    mullion_name: mullionName,
+                    steel_name: steelName,
+                });
+            });
+
             // Persist form field values to attributes before saving facade content
             persistFormValues(inputContainer);
             
@@ -372,4 +399,8 @@ function updateFloatingBarButtons(mode) {
     }
 }
 
-export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent };
+function getCachedCategoryData() {
+    return cachedCategoryData;
+}
+
+export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, getCachedCategoryData, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent };
