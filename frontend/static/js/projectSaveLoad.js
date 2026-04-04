@@ -286,15 +286,21 @@ async function _restoreProject(data) {
     _restoreGeneralInfo(data.generalInfo);
 
     // 3. Materials, alum sections, steel sections — update arrays via module refs
-    const [matMod, alumMod, steelMod, windMod] = await Promise.all([
+    const [matMod, alumMod, steelMod, windMod, frameMod] = await Promise.all([
         import('./materialProp.js').catch(() => null),
         import('./alumSecProp.js').catch(() => null),
         import('./steelSecProp.js').catch(() => null),
         import('./inputPanel.js').catch(() => null),
+        import('./frameInput.js').catch(() => null),
     ]);
     if (matMod) _restoreArray(matMod._materials, data.materials);
     if (alumMod) _restoreArray(alumMod._alumSections, data.alumSections);
     if (steelMod) _restoreArray(steelMod._steelSections, data.steelSections);
+
+    // Populate frame section dropdowns after restoring section arrays
+    if (frameMod?.populateFrameSectionDropdowns) {
+        frameMod.populateFrameSectionDropdowns();
+    }
 
     // 4. Wind inputs — restore DOM elements and cache
     if (data.windInputs) {
@@ -442,16 +448,23 @@ async function _restoreCategories(categories) {
 }
 
 async function _triggerRecalc() {
-    const { scheduleWindCalc, scheduleCategoryCalc } = await import('./calcEngine.js').catch(() => ({}));
+    const { runWindCalc, runCategoryCalc } = await import('./calcEngine.js').catch(() => ({}));
+    const inputPanelMod = await import('./inputPanel.js').catch(() => null);
 
-    // Trigger wind calculation
-    if (scheduleWindCalc) scheduleWindCalc();
+    // Run wind calculation if wind panel is in DOM, otherwise skip (it's cached)
+    const windPanel = document.querySelector('.wind__panel');
+    if (windPanel && runWindCalc) {
+        await runWindCalc();
+    }
 
-    // Trigger calculations for all categories
-    document.querySelectorAll('.catbar__btn-wrapper').forEach(wrapper => {
+    // Run calculations for all categories sequentially to avoid race conditions
+    const wrappers = document.querySelectorAll('.catbar__btn-wrapper');
+    for (const wrapper of wrappers) {
         const catNum = parseInt(wrapper.getAttribute('data-category'));
-        if (scheduleCategoryCalc) scheduleCategoryCalc(catNum);
-    });
+        if (runCategoryCalc) {
+            await runCategoryCalc(catNum);
+        }
+    }
 }
 
 // ============================
