@@ -383,7 +383,7 @@ async function _restoreCategories(categories) {
                 );
                 if (glassSection && glassMod.syncPointFixedFields) {
                     const supportEl = glassSection.querySelector('[id$="-support_type"]');
-                    if (supportEl) glassMod.syncPointFixedFields(glassSection, supportEl.value === 'Point Fixed');
+                    if (supportEl) glassMod.syncPointFixedFields(glassSection, supportEl.value === 'point-fixed');
                 }
             }
         }

@@ -44,7 +44,7 @@ function glassInputChangeHandler(e) {
     // Support type — hide irrelevant fields when Point Fixed
     if (select.matches("select[id*='-glass-'][id$='-support_type']")) {
         const glassSection = select.closest('.glass__type-fields');
-        if (glassSection) syncPointFixedFields(glassSection, select.value === 'Point Fixed');
+        if (glassSection) syncPointFixedFields(glassSection, select.value === 'point-fixed');
     }
 }
 

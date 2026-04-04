@@ -76,7 +76,7 @@
                 </td>
                 <td>
                     {% for gu in cat.glass_units %}
-                    {% if gu.support_type != "Point Fixed" %}
+                    {% if gu.support_type != "point-fixed" %}
                     {% set calc = gu.calc %}
                     <div class="summary__td-item">
                         <div class="summary__td-list">
@@ -94,8 +94,8 @@
                 </td>
                 <td>
                     {% for gu in cat.glass_units %}
-                    {% if gu.support_type == "Point Fixed" %}
-                    <div style="text-align: center;"><i>Point Fixed; RFEM Alalysis</i></div>
+                    {% if gu.support_type == "point-fixed" %}
+                    <div style="text-align: center;"><i>Point Fixed; RFEM Analysis</i></div>
                     {% endif %}
                     {% endfor %}
                 </td>
@@ -108,7 +108,7 @@
                 <td>Silicone</td>
                 <td>
                     {% for gu in cat.glass_units %}
-                    {% if gu.support_type != "Point Fixed" %}
+                    {% if gu.support_type != "point-fixed" %}
                     {% set calc = gu.calc %}
                     <div class="summary__td-item">
                         {{ calc.bite_req }} x {{ calc.glue_pro }}
@@ -120,7 +120,7 @@
                 </td>
                 <td>
                     {% for gu in cat.glass_units %}
-                    {% if gu.support_type != "Point Fixed" %}
+                    {% if gu.support_type != "point-fixed" %}
                     {% set calc = gu.calc %}
                         <div class="summary__td-item">{{ gu.wind_load }} kPa</div>
                     {% else %}
@@ -131,8 +131,8 @@
                 <td style="text-align: center;">–</td>
                 <td>
                     {% for gu in cat.glass_units %}
-                    {% if gu.support_type == "Point Fixed" %}
-                    <div style="text-align: center;"><i>Point Fixed; RFEM Alalysis</i></div>
+                    {% if gu.support_type == "point-fixed" %}
+                    <div style="text-align: center;"><i>Point Fixed; RFEM Analysis</i></div>
                     {% endif %}
                     {% endfor %}
                 </td>

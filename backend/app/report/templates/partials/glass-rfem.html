@@ -378,7 +378,7 @@
     {% if gu.length > 5000 %}
         <p>As the glass length is more than 5000 mm, the glass cannot be designed using ASTM chart. Therefore, software analysis is required. In that case, RFEM with RF-Glass module is utilized to design this glass.</p>
 
-    {% elif gu.support_type == "Point Fixed" %}
+    {% elif gu.support_type == "point-fixed" %}
         <p>As the point supported glass is out of scope of ASTM chart. Therefore, software analysis is required. In that case, RFEM with RF-Glass module is utilized to design this glass.</p>
     
     {% else %}
