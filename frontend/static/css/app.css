@@ -1825,7 +1825,6 @@ summary {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - var(--topbar-height) - var(--floating-height) - 2rem);
-    overflow-y: auto;
     width: var(--figure-panel-width);
     position: fixed;
     top: calc(var(--topbar-height) + var(--floating-height) + 0.5rem);
@@ -1838,6 +1837,7 @@ summary {
     pointer-events: none;
     transform: translateY(-6px);
     transition: opacity 0.15s ease, transform 0.15s ease;
+    overflow: hidden;
 }
 
 .figure__panel.open {
@@ -1888,11 +1888,17 @@ summary {
 /* Figure panel content */
 .figure__panel-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 0.4rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border-primary);
-    margin-bottom: 0.4rem;
+    flex-shrink: 0;
+}
+
+.figure__panel-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .figure__panel-title {
@@ -1900,6 +1906,11 @@ summary {
     font-weight: 600;
     color: var(--text-primary);
     letter-spacing: 0.02em;
+}
+
+.figure__panel-status {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
 }
 
 .figure__panel-actions {
@@ -2009,13 +2020,11 @@ summary {
     text-overflow: ellipsis;
 }
 
-.figure__panel-footer {
-    padding-top: 0.6rem;
+.figure__panel-list {
+    flex: 1;
+    overflow-y: auto;
     margin-top: 0.4rem;
-    border-top: 1px solid var(--border-primary);
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+    min-height: 0;
 }
 
 .figure__panel-empty {

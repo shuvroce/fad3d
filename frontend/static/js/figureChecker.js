@@ -158,9 +158,16 @@ function _renderFigurePanel(figures, total, found) {
 
     let html = "";
 
-    // Header with directory path and controls
+    // Fixed header with directory path, controls, and status
     html += `<div class="figure__panel-header">
-        <span class="figure__panel-title">Required Figures</span>
+        <div class="figure__panel-header-top">
+            <span class="figure__panel-title">Required Figures</span>
+            <span class="figure__panel-status">${found} of ${total} figures found</span>
+        </div>
+        <div class="figure__panel-dir" title="${_figuresDir}">
+            <svg class="figure__panel-dir-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+            <span class="figure__panel-dir-path">${_figuresDir || "Not set"}</span>
+        </div>
         <div class="figure__panel-actions">
             <button class="figure__panel-btn" id="figure-picker-btn" aria-label="Set directory" data-title="Set figures directory">
                 <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H8v-2h6v2zm4-4H8v-2h10v2z"/></svg>
@@ -171,12 +178,8 @@ function _renderFigurePanel(figures, total, found) {
         </div>
     </div>`;
 
-    // Directory path display
-    const dirDisplay = _figuresDir.length > 40 ? "..." + _figuresDir.slice(-37) : _figuresDir;
-    html += `<div class="figure__panel-dir" title="${_figuresDir}">
-        <svg class="figure__panel-dir-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-        <span class="figure__panel-dir-path">${dirDisplay}</span>
-    </div>`;
+    // Scrollable figure list
+    html += `<div class="figure__panel-list">`;
 
     if (!figures || figures.length === 0) {
         html += `<div class="figure__panel-empty">No figures required for current inputs</div>`;
@@ -202,10 +205,7 @@ function _renderFigurePanel(figures, total, found) {
         }
     }
 
-    // Footer
-    html += `<div class="figure__panel-footer">
-        <span>${found} of ${total} figures found</span>
-    </div>`;
+    html += `</div>`;
 
     panel.innerHTML = html;
 
