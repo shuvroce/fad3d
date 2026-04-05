@@ -64,6 +64,12 @@
     --shadow-nav: rgba(0, 0, 0, 0.1);
     --shadow-container: rgba(0, 0, 0, 0.02);
     --shadow-box: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+    --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.15);
+    --shadow-context: 0 4px 16px rgba(0, 0, 0, 0.14);
+    --shadow-modal: 0 8px 20px 5px rgba(0, 0, 0, 0.15), 0 2px 20px 5px rgba(0, 0, 0, 0.15);
 
     /* Scrollbar Colors */
     --scrollbar-track: #e6e6e6;
@@ -135,6 +141,12 @@ body.theme__dark {
     --shadow-nav: rgba(0, 0, 0, 0.4);
     --shadow-container: rgba(0, 0, 0, 0.25);
     --shadow-box: 0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-context: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-modal: 0 8px 20px 5px rgba(0, 0, 0, 0.4), 0 2px 20px 5px rgba(0, 0, 0, 0.4);
 
     /* Dark Theme - Scrollbar Colors */
     --scrollbar-track: #0d1117;
@@ -480,7 +492,7 @@ select {
     margin-top: 2px;
     max-height: 220px;
     overflow-y: auto;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     /* closed state */
@@ -773,7 +785,7 @@ summary {
     flex-direction: column;
     animation: modalSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: auto;
-    box-shadow: 0 8px 20px 5px rgba(0, 0, 0, 0.15), 0 2px 20px 5px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-modal);
     transition: width 0.2s ease, min-width 0.2s ease, max-width 0.2s ease, height 0.2s ease, max-height 0.2s ease;
     will-change: transform, opacity;
 }
@@ -786,7 +798,7 @@ summary {
     margin: 0;
     animation: modalSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: auto;
-    box-shadow: 0 8px 20px 5px rgba(0, 0, 0, 0.15), 0 2px 20px 5px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-modal);
     transition: width 0.2s ease, min-width 0.2s ease, max-width 0.2s ease, height 0.2s ease, max-height 0.2s ease;
     will-change: transform, opacity;
 }
@@ -1252,7 +1264,7 @@ summary {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-2);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
     min-width: 155px;
     z-index: 10001;
     overflow: hidden;
@@ -1770,7 +1782,7 @@ summary {
     background: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-2);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
     overflow: visible;
     min-width: 110px;
     z-index: 600;
@@ -1860,7 +1872,7 @@ summary {
     right: calc(var(--result-width) + 5rem);
     padding: 1rem;
     border-radius: var(--radius-3);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
     z-index: 10;
     opacity: 0;
     pointer-events: none;
@@ -2651,7 +2663,7 @@ summary {
     background: var(--bg-primary);
     border: 1px solid var(--border-secondary);
     border-radius: var(--radius-3);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    box-shadow: var(--shadow-context);
     padding: 4px 0;
     min-width: 120px;
     list-style: none;
