@@ -33,8 +33,8 @@ function createSkyDome() {
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
     gradient.addColorStop(0, '#82a9ed');
-    gradient.addColorStop(0.5, '#c5d6e8');
-    gradient.addColorStop(1, '#cbcbcb');
+    gradient.addColorStop(0.4, '#c5d6e8');
+    gradient.addColorStop(1, '#e2e2e2');
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 2, 512);
@@ -98,9 +98,9 @@ function _initScene(container) {
     const w = container.clientWidth;
     const h = container.clientHeight;
 
-    camera = new THREE.PerspectiveCamera(28, w / h, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(25, w / h, 0.1, 1000);
     // Z-up: X/Y horizontal, Z is height. Isometric view showing LEFT, FRONT, TOP.
-    camera.position.set(-35, -30, 25);
+    camera.position.set(-20, -50, 10);
     camera.up.set(0, 0, 1);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -177,7 +177,7 @@ function createBuildingWireframe() {
         ];
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.4 });
+        const material = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.3 });
         buildingGroup.add(new THREE.Line(geometry, material));
     }
 
@@ -197,7 +197,7 @@ function createBuildingWireframe() {
         ];
 
         const floorGeometry = new THREE.BufferGeometry().setFromPoints(floorPoints);
-        const floorMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.4 });
+        const floorMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.3 });
         buildingGroup.add(new THREE.Line(floorGeometry, floorMaterial));
     }
 
@@ -212,20 +212,20 @@ function createTransparentWalls(width, depth, totalHeight) {
     const wallMaterial = new THREE.MeshPhongMaterial({
         color: 0xcccccc,
         transparent: true,
-        opacity: 0.05,
+        opacity: 0.04,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
 
     // Z-up: walls are vertical planes spanning (X or Y) and Z (height).
-    // PlaneGeometry lies in XY by default. Rotation.x=PI/2 makes it lie in XZ-like plane:
-    //   - Front/Back walls at y=±halfD: rot.x=PI/2 → spans world X and Z ✓
-    //   - Left/Right walls at x=±halfW: rot=(PI/2,0,PI/2) → spans world Y and Z ✓
+    // PlaneGeometry lies in XY by default.
+    //   - Front/Back walls at y=±halfD: Rx(PI/2) → spans world X and Z, normal ±Y ✓
+    //   - Left/Right walls at x=±halfW: Rx(PI/2)*Ry(PI/2) → spans world Y and Z, normal ±X ✓
     const walls = [
         { pos: [0, halfD, wallHeight / 2], rot: [Math.PI / 2, 0, 0], size: [width, wallHeight] },
         { pos: [0, -halfD, wallHeight / 2], rot: [Math.PI / 2, 0, 0], size: [width, wallHeight] },
-        { pos: [halfW, 0, wallHeight / 2], rot: [Math.PI / 2, 0, Math.PI / 2], size: [depth, wallHeight] },
-        { pos: [-halfW, 0, wallHeight / 2], rot: [Math.PI / 2, 0, Math.PI / 2], size: [depth, wallHeight] },
+        { pos: [halfW, 0, wallHeight / 2], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, wallHeight] },
+        { pos: [-halfW, 0, wallHeight / 2], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, wallHeight] },
     ];
 
     walls.forEach(wall => {
@@ -243,9 +243,9 @@ function createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const halfD = depth / 2;
 
     const transparentMaterial = new THREE.MeshPhongMaterial({
-        color: 0xdddddd,
+        color: 0xcccccc,
         transparent: true,
-        opacity: 0.05,
+        opacity: 0.04,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
@@ -408,27 +408,27 @@ function initNavCube() {
 }
 
 function handleNavCubeClick(event) {
-    const container = document.getElementById('nav-cube-container');
-    const rect = container.getBoundingClientRect();
+    // Use the canvas element's own rect so coordinates are exact regardless of container padding
+    const canvas = navCubeRenderer.domElement;
+    const rect = canvas.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-    // Raycast against the nav cube to determine which face was clicked
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera({ x, y }, navCubeCamera);
     const intersects = raycaster.intersectObject(navCube);
 
     if (intersects.length > 0) {
-        // BoxGeometry triangle groups (after rotation.x=PI/2): 0=RIGHT, 1=LEFT, 2=TOP, 3=BOTTOM, 4=FRONT, 5=BACK
-        // Each face has 2 triangles, so divide faceIndex by 2 to get the material group
-        const faceGroup = Math.floor(intersects[0].faceIndex / 2);
+        // face.materialIndex directly maps to which material group was hit:
+        // 0=right, 1=left, 2=top, 3=bottom, 4=front, 5=back (matches faceLabels order)
         const views = ['right', 'left', 'top', 'bottom', 'front', 'back'];
-        moveToView(views[faceGroup]);
+        const view = views[intersects[0].face.materialIndex];
+        if (view) moveToView(view);
     }
 }
 
 function moveToView(axis) {
-    const distance = 30;
+    const distance = 50;
     const centerZ = currentConfig.totalHeight / 2;
 
     // Z-up: X/Y horizontal, Z is height (up)
@@ -474,6 +474,12 @@ function animateCamera(position, target) {
 
         if (progress < 1) {
             requestAnimationFrame(update);
+        } else {
+            // Enforce exact final position and orientation
+            camera.position.set(...position);
+            controls.target.set(...target);
+            camera.lookAt(controls.target);
+            controls.update();
         }
     }
 
