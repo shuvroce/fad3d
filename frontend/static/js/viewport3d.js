@@ -12,7 +12,7 @@ let buildingGroup, navCubeScene, navCubeCamera, navCubeRenderer, navCube;
 const DEFAULT_FLOOR_HEIGHT = 3.2;
 const DEFAULT_BUILDING_WIDTH = 20;
 const DEFAULT_BUILDING_DEPTH = 15;
-const DEFAULT_NUM_FLOORS = 5;
+const DEFAULT_NUM_FLOORS = 6;
 
 let currentConfig = {
     width: DEFAULT_BUILDING_WIDTH,
@@ -32,9 +32,9 @@ function createSkyDome() {
     const ctx = canvas.getContext('2d');
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#d2e0f8');
-    gradient.addColorStop(0.6, '#c5d6e8');
-    gradient.addColorStop(1, '#a8a8a8');
+    gradient.addColorStop(0, '#82a9ed');
+    gradient.addColorStop(0.5, '#c5d6e8');
+    gradient.addColorStop(1, '#cbcbcb');
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 2, 512);
@@ -152,7 +152,7 @@ function createBuildingWireframe() {
     }
 
     const { width, depth, numFloors, floorHeight, totalHeight } = currentConfig;
-    const wireframeColor = 0x888888;
+    const wireframeColor = 0x757575;
     const floorColor = 0x999999;
     const halfW = width / 2;
     const halfD = depth / 2;
@@ -171,14 +171,14 @@ function createBuildingWireframe() {
         ];
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: wireframeColor });
+        const material = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.4 });
         buildingGroup.add(new THREE.Line(geometry, material));
     }
 
     createTransparentWalls(width, depth, totalHeight);
     createTransparentSlabs(width, depth, numFloors, floorHeight);
 
-    for (let floor = 0; floor <= numFloors; floor++) {
+    for (let floor = 1; floor <= numFloors; floor++) {
         const y = floor * floorHeight;
 
         const floorPoints = [
@@ -190,18 +190,8 @@ function createBuildingWireframe() {
         ];
 
         const floorGeometry = new THREE.BufferGeometry().setFromPoints(floorPoints);
-        const floorMaterial = new THREE.LineBasicMaterial({ color: floorColor });
+        const floorMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.4 });
         buildingGroup.add(new THREE.Line(floorGeometry, floorMaterial));
-    }
-
-    for (let floor = 0; floor <= numFloors; floor++) {
-        const y = floor * floorHeight;
-        const heightMm = Math.round(y * 1000);
-        const label = `${heightMm}`;
-        const sprite = createTextSprite(label);
-        sprite.position.set(-width / 2 - 2, y, depth / 2 + 1);
-        sprite.scale.set(3, 1, 1);
-        buildingGroup.add(sprite);
     }
 
     console.log(`[Viewport3D] Wireframe rebuilt: ${width}m x ${depth}m x ${totalHeight}m (${numFloors} floors)`);
@@ -215,7 +205,7 @@ function createTransparentWalls(width, depth, totalHeight) {
     const wallMaterial = new THREE.MeshPhongMaterial({
         color: 0xcccccc,
         transparent: true,
-        opacity: 0.08,
+        opacity: 0.06,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
@@ -241,7 +231,7 @@ function createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const halfW = width / 2;
     const halfD = depth / 2;
 
-    const slabMaterial = new THREE.MeshPhongMaterial({
+    const transparentMaterial = new THREE.MeshPhongMaterial({
         color: 0xdddddd,
         transparent: true,
         opacity: 0.12,
@@ -249,15 +239,34 @@ function createTransparentSlabs(width, depth, numFloors, floorHeight) {
         depthWrite: false,
     });
 
+    const solidMaterial = new THREE.MeshPhongMaterial({
+        color: 0x1f211e,
+        transparent: true,
+        opacity: 0.03,
+        side: THREE.DoubleSide,
+    });
+
     for (let floor = 0; floor <= numFloors; floor++) {
         const y = floor * floorHeight;
-        const geometry = new THREE.PlaneGeometry(width, depth);
-        const slab = new THREE.Mesh(geometry, slabMaterial);
-        slab.rotation.x = -Math.PI / 2;
-        slab.position.set(0, y, 0);
+        const offset = floor === 0 ? 1.2 : 0;
+        const thickness = floor === 0 ? 0.3 : 0.01;
+        const geometry = new THREE.BoxGeometry(width + offset * 2, thickness, depth + offset * 2);
+        const slab = new THREE.Mesh(geometry, floor === 0 ? solidMaterial : transparentMaterial);
+        slab.position.set(0, y - thickness / 2, 0);
         slab.userData.isSlab = true;
         buildingGroup.add(slab);
     }
+
+    const borderPoints = [
+        new THREE.Vector3(-halfW, 0.01, -halfD),
+        new THREE.Vector3(halfW, 0.01, -halfD),
+        new THREE.Vector3(halfW, 0.01, halfD),
+        new THREE.Vector3(-halfW, 0.01, halfD),
+        new THREE.Vector3(-halfW, 0.01, -halfD),
+    ];
+    const borderGeometry = new THREE.BufferGeometry().setFromPoints(borderPoints);
+    const borderMaterial = new THREE.LineBasicMaterial({ color: 0x757575, transparent: true, opacity: 0.4 });
+    buildingGroup.add(new THREE.Line(borderGeometry, borderMaterial));
 }
 
 function createTextSprite(text, color = 0x94a3b8) {
@@ -320,7 +329,7 @@ function initNavCube() {
     navCubeScene.add(navCube);
 
     const edgesGeometry = new THREE.EdgesGeometry(cubeGeometry);
-    const edgesMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+    const edgesMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
     const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
     navCube.add(edges);
 
@@ -376,7 +385,7 @@ function initNavCube() {
             spherical.theta -= deltaX * 0.01;
             spherical.phi -= deltaY * 0.01;
             spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
-            
+
             const newPos = new THREE.Vector3().setFromSpherical(spherical).add(controls.target);
             camera.position.copy(newPos);
             camera.lookAt(controls.target);
