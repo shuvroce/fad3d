@@ -205,7 +205,7 @@ function createTransparentWalls(width, depth, totalHeight) {
     const wallMaterial = new THREE.MeshPhongMaterial({
         color: 0xcccccc,
         transparent: true,
-        opacity: 0.06,
+        opacity: 0.05,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
@@ -234,7 +234,7 @@ function createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const transparentMaterial = new THREE.MeshPhongMaterial({
         color: 0xdddddd,
         transparent: true,
-        opacity: 0.12,
+        opacity: 0.05,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
