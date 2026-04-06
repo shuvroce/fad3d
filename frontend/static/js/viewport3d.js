@@ -100,7 +100,7 @@ function _initScene(container) {
 
     camera = new THREE.PerspectiveCamera(30, w / h, 0.1, 1000);
     // Z-up: X/Y horizontal, Z is height. Isometric view showing LEFT, FRONT, TOP.
-    camera.position.set(-20, -50, 30);
+    camera.position.set(-20, -50, 8);
     camera.up.set(0, 0, 1);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
