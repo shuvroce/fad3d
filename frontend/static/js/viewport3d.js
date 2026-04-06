@@ -10,9 +10,9 @@ let scene, camera, renderer, controls;
 let buildingGroup, navCubeScene, navCubeCamera, navCubeRenderer, navCube;
 
 const DEFAULT_FLOOR_HEIGHT = 3.2;
-const DEFAULT_BUILDING_WIDTH = 20;
+const DEFAULT_BUILDING_WIDTH = 10;
 const DEFAULT_BUILDING_DEPTH = 15;
-const DEFAULT_NUM_FLOORS = 6;
+const DEFAULT_NUM_FLOORS = 4;
 
 let currentConfig = {
     width: DEFAULT_BUILDING_WIDTH,
@@ -96,8 +96,8 @@ function _initScene(container) {
     const w = container.clientWidth;
     const h = container.clientHeight;
 
-    camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 1000);
-    camera.position.set(30, 20, 30);
+    camera = new THREE.PerspectiveCamera(28, w / h, 0.1, 1000);
+    camera.position.set(50, 16, 30);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(w, h);
