@@ -10,8 +10,8 @@ let scene, camera, renderer, controls;
 let buildingGroup, navCubeScene, navCubeCamera, navCubeRenderer, navCube;
 
 const DEFAULT_FLOOR_HEIGHT = 3.2;
-const DEFAULT_BUILDING_WIDTH = 10;
-const DEFAULT_BUILDING_DEPTH = 15;
+const DEFAULT_BUILDING_WIDTH = 15;
+const DEFAULT_BUILDING_DEPTH = 10;
 const DEFAULT_NUM_FLOORS = 4;
 
 let currentConfig = {
@@ -91,13 +91,17 @@ function _initScene(container) {
     scene.background = new THREE.Color(0x1a1a2e);
 
     const skyDome = createSkyDome();
+    // Rotate sky sphere so north pole (+Y) aligns with world +Z (up)
+    skyDome.rotation.x = Math.PI / 2;
     scene.add(skyDome);
 
     const w = container.clientWidth;
     const h = container.clientHeight;
 
     camera = new THREE.PerspectiveCamera(28, w / h, 0.1, 1000);
-    camera.position.set(50, 16, 30);
+    // Z-up: X/Y horizontal, Z is height. Isometric view showing LEFT, FRONT, TOP.
+    camera.position.set(-35, -30, 25);
+    camera.up.set(0, 0, 1);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(w, h);
@@ -110,14 +114,15 @@ function _initScene(container) {
     controls.rotateSpeed = 1.2;
     controls.minDistance = 10;
     controls.maxDistance = 150;
-    controls.target.set(0, currentConfig.totalHeight / 2, 0);
+    controls.target.set(0, 0, currentConfig.totalHeight / 2);
     controls.update();
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(20, 30, 20);
+    // Light from X+ front-side, elevated in Z
+    directionalLight.position.set(20, -15, 30);
     scene.add(directionalLight);
 
     buildingGroup = new THREE.Group();
@@ -157,6 +162,7 @@ function createBuildingWireframe() {
     const halfW = width / 2;
     const halfD = depth / 2;
 
+    // Z-up: corners in XY plane, columns rise along Z
     const cornerPositions = [
         [-halfW, -halfD],
         [halfW, -halfD],
@@ -164,10 +170,10 @@ function createBuildingWireframe() {
         [-halfW, halfD],
     ];
 
-    for (const [x, z] of cornerPositions) {
+    for (const [x, y] of cornerPositions) {
         const points = [
-            new THREE.Vector3(x, 0, z),
-            new THREE.Vector3(x, totalHeight, z),
+            new THREE.Vector3(x, y, 0),
+            new THREE.Vector3(x, y, totalHeight),
         ];
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -178,15 +184,16 @@ function createBuildingWireframe() {
     createTransparentWalls(width, depth, totalHeight);
     createTransparentSlabs(width, depth, numFloors, floorHeight);
 
+    // Z-up: floor outlines are horizontal rectangles in XY at each z level
     for (let floor = 1; floor <= numFloors; floor++) {
-        const y = floor * floorHeight;
+        const z = floor * floorHeight;
 
         const floorPoints = [
-            new THREE.Vector3(-halfW, y, -halfD),
-            new THREE.Vector3(halfW, y, -halfD),
-            new THREE.Vector3(halfW, y, halfD),
-            new THREE.Vector3(-halfW, y, halfD),
-            new THREE.Vector3(-halfW, y, -halfD),
+            new THREE.Vector3(-halfW, -halfD, z),
+            new THREE.Vector3(halfW, -halfD, z),
+            new THREE.Vector3(halfW, halfD, z),
+            new THREE.Vector3(-halfW, halfD, z),
+            new THREE.Vector3(-halfW, -halfD, z),
         ];
 
         const floorGeometry = new THREE.BufferGeometry().setFromPoints(floorPoints);
@@ -210,11 +217,15 @@ function createTransparentWalls(width, depth, totalHeight) {
         depthWrite: false,
     });
 
+    // Z-up: walls are vertical planes spanning (X or Y) and Z (height).
+    // PlaneGeometry lies in XY by default. Rotation.x=PI/2 makes it lie in XZ-like plane:
+    //   - Front/Back walls at y=±halfD: rot.x=PI/2 → spans world X and Z ✓
+    //   - Left/Right walls at x=±halfW: rot=(PI/2,0,PI/2) → spans world Y and Z ✓
     const walls = [
-        { pos: [0, wallHeight / 2, halfD], rot: [0, 0, 0], size: [width, wallHeight] },
-        { pos: [0, wallHeight / 2, -halfD], rot: [0, 0, 0], size: [width, wallHeight] },
-        { pos: [halfW, wallHeight / 2, 0], rot: [0, Math.PI / 2, 0], size: [depth, wallHeight] },
-        { pos: [-halfW, wallHeight / 2, 0], rot: [0, Math.PI / 2, 0], size: [depth, wallHeight] },
+        { pos: [0, halfD, wallHeight / 2], rot: [Math.PI / 2, 0, 0], size: [width, wallHeight] },
+        { pos: [0, -halfD, wallHeight / 2], rot: [Math.PI / 2, 0, 0], size: [width, wallHeight] },
+        { pos: [halfW, 0, wallHeight / 2], rot: [Math.PI / 2, 0, Math.PI / 2], size: [depth, wallHeight] },
+        { pos: [-halfW, 0, wallHeight / 2], rot: [Math.PI / 2, 0, Math.PI / 2], size: [depth, wallHeight] },
     ];
 
     walls.forEach(wall => {
@@ -246,48 +257,50 @@ function createTransparentSlabs(width, depth, numFloors, floorHeight) {
         side: THREE.DoubleSide,
     });
 
+    // Z-up: slabs are horizontal boxes in XY plane, thin in Z.
+    // BoxGeometry(width, depth, thickness) is already correct — thin in Z dimension.
     for (let floor = 0; floor <= numFloors; floor++) {
-        const y = floor * floorHeight;
+        const z = floor * floorHeight;
         const offset = floor === 0 ? 1.2 : 0;
         const thickness = floor === 0 ? 0.3 : 0.01;
-        const geometry = new THREE.BoxGeometry(width + offset * 2, thickness, depth + offset * 2);
+        const geometry = new THREE.BoxGeometry(width + offset * 2, depth + offset * 2, thickness);
         const slab = new THREE.Mesh(geometry, floor === 0 ? solidMaterial : transparentMaterial);
-        slab.position.set(0, y - thickness / 2, 0);
+        slab.position.set(0, 0, z - thickness / 2);
         slab.userData.isSlab = true;
         buildingGroup.add(slab);
     }
 
+    // Ground border outline in XY plane at z≈0
     const borderPoints = [
-        new THREE.Vector3(-halfW, 0.01, -halfD),
-        new THREE.Vector3(halfW, 0.01, -halfD),
-        new THREE.Vector3(halfW, 0.01, halfD),
-        new THREE.Vector3(-halfW, 0.01, halfD),
-        new THREE.Vector3(-halfW, 0.01, -halfD),
+        new THREE.Vector3(-halfW, -halfD, 0.01),
+        new THREE.Vector3(halfW, -halfD, 0.01),
+        new THREE.Vector3(halfW, halfD, 0.01),
+        new THREE.Vector3(-halfW, halfD, 0.01),
+        new THREE.Vector3(-halfW, -halfD, 0.01),
     ];
     const borderGeometry = new THREE.BufferGeometry().setFromPoints(borderPoints);
     const borderMaterial = new THREE.LineBasicMaterial({ color: 0x757575, transparent: true, opacity: 0.4 });
     buildingGroup.add(new THREE.Line(borderGeometry, borderMaterial));
 }
 
-function createTextSprite(text, color = 0x94a3b8) {
+function createFaceTexture(text, bgColor, textColor) {
     const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
     canvas.width = 256;
-    canvas.height = 64;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
 
-    context.fillStyle = 'rgba(0, 0, 0, 0)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    // Background fill
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, 256, 256);
 
-    const colorHex = '#' + color.toString(16).padStart(6, '0');
-    context.font = 'Bold 28px Arial';
-    context.fillStyle = colorHex;
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(text, canvas.width / 2, canvas.height / 2);
+    // Label text
+    ctx.font = `Bold ${text.length > 4 ? '30px' : '40px'} Arial`;
+    ctx.fillStyle = textColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 128, 128);
 
-    const texture = new THREE.CanvasTexture(canvas);
-    const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-    return new THREE.Sprite(material);
+    return new THREE.CanvasTexture(canvas);
 }
 
 function initNavCube() {
@@ -299,58 +312,47 @@ function initNavCube() {
 
     navCubeScene = new THREE.Scene();
 
-    const navSize = 120;
-    navCubeCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-    navCubeCamera.position.set(3, 3, 3);
+    const navSize = 100;
+    navCubeCamera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    // Z-up: isometric position showing LEFT(-X), FRONT(-Y), TOP(+Z) faces
+    navCubeCamera.position.set(-2.5, -1.5, 2.5);
     navCubeCamera.lookAt(0, 0, 0);
+    navCubeCamera.up.set(0, 0, 1); // Z is up
 
     navCubeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     navCubeRenderer.setSize(navSize, navSize);
     navCubeRenderer.setPixelRatio(window.devicePixelRatio);
     navContainer.appendChild(navCubeRenderer.domElement);
 
-    const cubeGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+    const cubeGeometry = new THREE.BoxGeometry(1.3, 1.3, 1.3);
 
-    const faceColors = [
-        0xef4444,
-        0xf97316,
-        0x22c55e,
-        0x3b82f6,
-        0x8b5cf6,
-        0xec4899,
-    ];
+    // Three.js BoxGeometry material index order: +X, -X, +Y, -Y, +Z, -Z
+    // After navCube.rotation.x = PI/2: +X→RIGHT, -X→LEFT, +Y→TOP(+Z world), -Y→BOTTOM(-Z world), +Z→FRONT(-Y world), -Z→BACK(+Y world)
+    const faceLabels = ['RIGHT', 'LEFT', 'TOP', 'BOTTOM', 'FRONT', 'BACK'];
+    // TOP lightest, SIDES medium gray, FRONT blue-tinted, BACK/BOTTOM darker
+    const faceBg = ['#d6dce4', '#d6dce4', '#e8ecf0', '#b8c4ce', '#c8d4e0', '#c0cad4'];
+    const faceText = ['#2d3a4a', '#2d3a4a', '#1a2733', '#2d3a4a', '#2d3a4a', '#2d3a4a'];
 
-    const faceMaterials = faceColors.map(color =>
-        new THREE.MeshBasicMaterial({ color, wireframe: false, transparent: true, opacity: 0.8 }),
+    const faceMaterials = faceLabels.map((label, i) =>
+        new THREE.MeshBasicMaterial({
+            map: createFaceTexture(label, faceBg[i], faceText[i]),
+            transparent: false,
+        }),
     );
 
     navCube = new THREE.Mesh(cubeGeometry, faceMaterials);
-
+    // Rotate base so side faces have texture-up = world +Z (matches Z-up convention)
+    navCube.rotation.x = Math.PI / 2;
     navCubeScene.add(navCube);
 
+    // Dark thin edges for the CAD look
     const edgesGeometry = new THREE.EdgesGeometry(cubeGeometry);
-    const edgesMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
+    const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x5a6a7a, linewidth: 1 });
     const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
     navCube.add(edges);
 
-    const labelData = [
-        { text: 'RIGHT', pos: [1.6, 0, 0], rot: [0, Math.PI / 2, 0], color: 0xef4444 },
-        { text: 'LEFT', pos: [-1.6, 0, 0], rot: [0, -Math.PI / 2, 0], color: 0xf97316 },
-        { text: 'TOP', pos: [0, 1.6, 0], rot: [-Math.PI / 2, 0, 0], color: 0x22c55e },
-        { text: 'BOTTOM', pos: [0, -1.6, 0], rot: [Math.PI / 2, 0, 0], color: 0x3b82f6 },
-        { text: 'FRONT', pos: [0, 0, 1.6], rot: [0, 0, 0], color: 0x8b5cf6 },
-        { text: 'BACK', pos: [0, 0, -1.6], rot: [0, Math.PI, 0], color: 0xec4899 },
-    ];
-
-    labelData.forEach(label => {
-        const sprite = createTextSprite(label.text, label.color);
-        sprite.position.set(...label.pos);
-        sprite.rotation.set(...label.rot);
-        sprite.scale.set(1.2, 0.4, 1);
-        navCube.add(sprite);
-    });
-
-    createAxisArrows();
+    // Subtle ambient light for the cube faces
+    navCubeScene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
     navCube.userData.isNavCube = true;
     navCube.userData.isDragging = false;
@@ -368,10 +370,10 @@ function initNavCube() {
 
     container.addEventListener('mouseup', (event) => {
         const dragDuration = Date.now() - navCube.userData.dragStartTime;
-        if (!navCube.userData.isDragging || dragDuration < 200) {
+        navCube.userData.isDragging = false;
+        if (dragDuration < 200) {
             handleNavCubeClick(event);
         }
-        navCube.userData.isDragging = false;
     });
 
     container.addEventListener('mousemove', (event) => {
@@ -380,15 +382,23 @@ function initNavCube() {
             const deltaX = event.clientX - navCube.userData.lastMouse.x;
             const deltaY = event.clientY - navCube.userData.lastMouse.y;
 
-            const spherical = new THREE.Spherical();
-            spherical.setFromVector3(camera.position.clone().sub(controls.target));
-            spherical.theta -= deltaX * 0.01;
-            spherical.phi -= deltaY * 0.01;
-            spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+            // Z-up spherical: azimuth rotates around Z, elevation is angle above XY plane
+            const offset = camera.position.clone().sub(controls.target);
+            const r = offset.length();
+            let azimuth = Math.atan2(offset.y, offset.x);
+            let elevation = Math.asin(Math.max(-1, Math.min(1, offset.z / r)));
 
-            const newPos = new THREE.Vector3().setFromSpherical(spherical).add(controls.target);
-            camera.position.copy(newPos);
-            camera.lookAt(controls.target);
+            azimuth -= deltaX * 0.01;
+            elevation += deltaY * 0.01;
+            elevation = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, elevation));
+
+            const newOffset = new THREE.Vector3(
+                r * Math.cos(elevation) * Math.cos(azimuth),
+                r * Math.cos(elevation) * Math.sin(azimuth),
+                r * Math.sin(elevation),
+            );
+            camera.position.copy(controls.target).add(newOffset);
+            controls.update();
 
             navCube.userData.lastMouse = { x: event.clientX, y: event.clientY };
         }
@@ -397,87 +407,44 @@ function initNavCube() {
     container.style.cursor = 'grab';
 }
 
-function createAxisArrows() {
-    const arrowLength = 1.2;
-    const arrowHeadLen = 0.25;
-    const arrowHeadWidth = 0.15;
-    const colors = {
-        x: 0xff4444,
-        y: 0x44ff44,
-        z: 0x4444ff,
-    };
-
-    const xDir = new THREE.Vector3(1, 0, 0);
-    const xArrow = new THREE.ArrowHelper(xDir, new THREE.Vector3(0.75, 0, 0), arrowLength, colors.x, arrowHeadLen, arrowHeadWidth);
-    navCube.add(xArrow);
-
-    const yDir = new THREE.Vector3(0, 1, 0);
-    const yArrow = new THREE.ArrowHelper(yDir, new THREE.Vector3(0, 0.75, 0), arrowLength, colors.y, arrowHeadLen, arrowHeadWidth);
-    navCube.add(yArrow);
-
-    const zDir = new THREE.Vector3(0, 0, 1);
-    const zArrow = new THREE.ArrowHelper(zDir, new THREE.Vector3(0, 0, 0.75), arrowLength, colors.z, arrowHeadLen, arrowHeadWidth);
-    navCube.add(zArrow);
-}
-
 function handleNavCubeClick(event) {
-    if (navCube.userData.isDragging) {
-        navCube.userData.isDragging = false;
-        return;
-    }
-
     const container = document.getElementById('nav-cube-container');
     const rect = container.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-    let axis;
-    if (y > 0.3) {
-        axis = 'top';
-    } else if (y < -0.3) {
-        axis = 'bottom';
-    } else if (x > 0.3) {
-        axis = 'right';
-    } else if (x < -0.3) {
-        axis = 'left';
-    } else if (y > -0.3 && y < 0.3 && x > -0.3 && x < 0.3) {
-        axis = 'front';
-    } else {
-        axis = 'front';
-    }
+    // Raycast against the nav cube to determine which face was clicked
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera({ x, y }, navCubeCamera);
+    const intersects = raycaster.intersectObject(navCube);
 
-    moveToView(axis);
+    if (intersects.length > 0) {
+        // BoxGeometry triangle groups (after rotation.x=PI/2): 0=RIGHT, 1=LEFT, 2=TOP, 3=BOTTOM, 4=FRONT, 5=BACK
+        // Each face has 2 triangles, so divide faceIndex by 2 to get the material group
+        const faceGroup = Math.floor(intersects[0].faceIndex / 2);
+        const views = ['right', 'left', 'top', 'bottom', 'front', 'back'];
+        moveToView(views[faceGroup]);
+    }
 }
 
 function moveToView(axis) {
     const distance = 30;
-    const centerY = currentConfig.totalHeight / 2;
+    const centerZ = currentConfig.totalHeight / 2;
 
+    // Z-up: X/Y horizontal, Z is height (up)
     const viewMap = {
-        right: { pos: [distance, centerY, 0], target: [0, centerY, 0] },
-        left: { pos: [-distance, centerY, 0], target: [0, centerY, 0] },
-        top: { pos: [0, distance, 0.1], target: [0, 0, 0] },
-        bottom: { pos: [0, -distance, 0.1], target: [0, 0, 0] },
-        front: { pos: [0, centerY, distance], target: [0, centerY, 0] },
-        back: { pos: [0, centerY, -distance], target: [0, centerY, 0] },
+        right: { pos: [distance, 0, centerZ], target: [0, 0, centerZ] },
+        left: { pos: [-distance, 0, centerZ], target: [0, 0, centerZ] },
+        front: { pos: [0, -distance, centerZ], target: [0, 0, centerZ] },
+        back: { pos: [0, distance, centerZ], target: [0, 0, centerZ] },
+        top: { pos: [0, 0, distance * 2], target: [0, 0, 0] },
+        bottom: { pos: [0.1, 0, -distance], target: [0, 0, 0] },
     };
 
     const view = viewMap[axis];
     if (view) {
         animateCamera(view.pos, view.target);
     }
-}
-
-function determineFaceFromNormal(normal) {
-    const absX = Math.abs(normal.x);
-    const absY = Math.abs(normal.y);
-    const absZ = Math.abs(normal.z);
-
-    const max = Math.max(absX, absY, absZ);
-
-    if (max === absX) return normal.x > 0 ? 'right' : 'left';
-    if (max === absY) return normal.y > 0 ? 'top' : 'bottom';
-    return normal.z > 0 ? 'front' : 'back';
 }
 
 function animateCamera(position, target) {
@@ -539,26 +506,20 @@ function animate() {
 }
 
 function updateNavCubeOrientation() {
-    const camDir = camera.position.clone().sub(controls.target).normalize();
-    const absX = Math.abs(camDir.x);
-    const absY = Math.abs(camDir.y);
-    const absZ = Math.abs(camDir.z);
-    const max = Math.max(absX, absY, absZ);
-
-    const front = new THREE.Vector3(0, 0, 1);
-    const right = new THREE.Vector3(1, 0, 0);
-    const top = new THREE.Vector3(0, 1, 0);
-
-    let lookDir;
-    if (max === absX) {
-        lookDir = camDir.x > 0 ? right.clone().negate() : right.clone();
-    } else if (max === absY) {
-        lookDir = camDir.y > 0 ? top.clone() : top.clone().negate();
+    // Position the nav cube camera in the same orbital direction as the main camera.
+    // The cube stays at its base rotation — only the nav cam moves each frame.
+    // This is convention-agnostic: no quaternion math, no Z-up/Y-up mismatch.
+    const offset = camera.position.clone().sub(controls.target);
+    const dir = offset.normalize(); // normalize in-place; offset no longer needed
+    navCubeCamera.position.set(dir.x * 3.84, dir.y * 3.84, dir.z * 3.84);
+    // Use Z as up for all views except when looking nearly straight up/down
+    if (Math.abs(dir.z) > 0.999) {
+        // For top/bottom views: align text-up (+Y for TOP face, -Y for BOTTOM face)
+        navCubeCamera.up.set(0, dir.z > 0 ? 1 : -1, 0);
     } else {
-        lookDir = camDir.z > 0 ? front.clone() : front.clone().negate();
+        navCubeCamera.up.set(0, 0, 1);
     }
-
-    navCube.quaternion.setFromUnitVectors(front, camDir);
+    navCubeCamera.lookAt(0, 0, 0);
 }
 
 function updateBuilding(config = {}) {
@@ -583,8 +544,8 @@ function updateBuilding(config = {}) {
 
     if (config.numFloors !== undefined || config.floorHeight !== undefined) {
         currentConfig.totalHeight = currentConfig.numFloors * currentConfig.floorHeight;
-        const centerY = currentConfig.totalHeight / 2;
-        controls.target.set(0, centerY, 0);
+        const centerZ = currentConfig.totalHeight / 2;
+        controls.target.set(0, 0, centerZ);
     }
 
     if (changed) {
