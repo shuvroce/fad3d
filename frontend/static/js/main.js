@@ -11,6 +11,7 @@ import { initCustomSelect } from './customSelect.js';
 import { initPanelMode, initializeLeftPanelToggle } from './inputPanel.js';
 import { initViewControls, initFiguresPanel } from './viewControls.js';
 import { initFigureChecker } from './figureChecker.js';
+import { initViewport3D } from './viewport3d.js';
 
 // Import category system
 import { initCategories } from './category.js';
@@ -73,6 +74,7 @@ async function initPhase2() {
     _safe('Project save/load', initProjectSaveLoad);
     _safe('Figures panel', initFiguresPanel);
     _safe('Keybinds', initKeybinds);
+    _safe('3D Viewport', initViewport3D);
     await _safeAsync('Figure checker', initFigureChecker);
 }
 

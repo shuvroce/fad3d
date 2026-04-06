@@ -16,7 +16,13 @@ function switchViewMode(mode) {
     // Update viewport visualization
     updateViewportDisplay(mode);
 
-    // Log for debugging
+    // Notify 3D viewport of mode change
+    window.dispatchEvent(
+        new CustomEvent('viewport-mode-changed', {
+            detail: { mode },
+        }),
+    );
+
     console.log(`View mode switched to: ${mode}`);
 }
 
@@ -55,21 +61,14 @@ function updateViewportDisplay(mode) {
     // Add appropriate class for styling
     viewport.classList.add(`view-${mode}`);
 
-    // TODO: Update Three.js visualization based on mode
-    // This is where the actual 3D rendering logic will be implemented
-    // For now, we'll just update the viewport class for styling purposes
-
     switch (mode) {
         case "model":
-            // Show structural model
             console.log("Displaying structural model");
             break;
         case "dc-ratio":
-            // Show demand-capacity ratio visualization
             console.log("Displaying DC ratio visualization");
             break;
         case "deflection":
-            // Show deflection visualization
             console.log("Displaying deflection visualization");
             break;
     }

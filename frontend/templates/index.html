@@ -7,6 +7,14 @@
     <title>FAD - Facade Analysis & Design v2.0</title>
     <link rel="icon" href="/static/assets/fav.png" type="image/png">
     <link rel="stylesheet" href="/static/css/app.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
 </head>
 
 <body>
@@ -326,7 +334,9 @@
         </div>
     </section>
 
-    <section class="viewport__container"></section>
+    <section class="viewport__container">
+        <div id="viewport-3d"></div>
+    </section>
 
     <section class="right__panel">
         <button class="right__panel-toggle-right" type="button" aria-label="Collapse right panel"
@@ -355,6 +365,8 @@
             <div class="result__tab-content" data-result-tab="facade"></div>
         </div>
     </section>
+
+    <div id="nav-cube-container"></div>
 
     {% include "modals.html" %}
     {% include "input-temp.html" %}

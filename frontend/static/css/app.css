@@ -2995,6 +2995,41 @@ summary {
     /* Viewport takes full width, panels overlay on top */
 }
 
+#viewport-3d {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#viewport-3d canvas {
+    display: block;
+}
+
+#nav-cube-container {
+    position: fixed;
+    bottom: 1rem;
+    right: calc(var(--result-width) + 1rem);
+    width: 120px;
+    height: 120px;
+    z-index: 20;
+    /* border-radius: var(--radius-2); */
+    overflow: hidden;
+    /* background: var(--bg-primary); */
+    /* border: 1px solid var(--border-primary); */
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); */
+    transition: right 0.2s ease;
+}
+
+.right__panel.collapsed + #nav-cube-container {
+    right: 1rem;
+}
+
+#nav-cube-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 /* result box */
 .right__panel {
     position: fixed;

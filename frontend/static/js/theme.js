@@ -26,6 +26,7 @@ function initTheme() {
         const newTheme = body.classList.contains("theme__dark") ? "light" : "dark";
         applyTheme(newTheme);
         localStorage.setItem("theme", newTheme);
+        document.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: newTheme } }));
     });
 }
 
