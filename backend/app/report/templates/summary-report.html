@@ -16,7 +16,7 @@
     <div class="summary__header_left">
         <p class="summary__header_title">Summary Report</p>
         <div class="summary__header_logo">
-            <img src="assets/logo.png">
+            <img src="{{ project_info.logo_url }}">
         </div>
     </div>
     <div class="summary__header_right">
@@ -157,7 +157,7 @@
                         <div>{{ frame.transom_name }} (6063-T5)</div>
                     </div>
                 </td>
-                <td>{{ frame.wind_neg }} kPa</td>
+                <td>{{ frame.wind_neg_str if frame.wind_neg_str else (frame.wind_neg if frame.wind_neg is not none else '–') }} kPa</td>
                 <td style="padding: 0;">
                     <table class="borderless align__center width__100 summary__inside-table">
                         <tbody>

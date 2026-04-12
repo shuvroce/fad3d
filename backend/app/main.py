@@ -429,17 +429,41 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "support_type": inputs.get(f"{prefix}-support_type"),
         }
 
-        if glass_type in ("sgu", "lgu"):
+        if glass_type == "sgu":
             gu.update({
                 "grade": inputs.get(f"{prefix}-grade"),
                 "nfl": _num(inputs.get(f"{prefix}-nfl")),
                 "def": _num(inputs.get(f"{prefix}-def")),
             })
-        elif glass_type in ("dgu", "ldgu"):
+        elif glass_type == "lgu":
+            gu.update({
+                "grade": inputs.get(f"{prefix}-grade"),
+                "nfl": _num(inputs.get(f"{prefix}-nfl")),
+                "def": _num(inputs.get(f"{prefix}-def")),
+                "thickness1": _num(inputs.get(f"{prefix}-thickness1")),
+                "thickness_inner": _num(inputs.get(f"{prefix}-thickness_inner")),
+                "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
+            })
+        elif glass_type == "dgu":
             gu.update({
                 "grade1": inputs.get(f"{prefix}-grade1"),
                 "grade2": inputs.get(f"{prefix}-grade2"),
                 "thickness1": _num(inputs.get(f"{prefix}-thickness1")),
+                "gap": _num(inputs.get(f"{prefix}-gap")),
+                "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
+                "nfl1": _num(inputs.get(f"{prefix}-nfl1")),
+                "nfl2": _num(inputs.get(f"{prefix}-nfl2")),
+                "def1": _num(inputs.get(f"{prefix}-def1")),
+                "def2": _num(inputs.get(f"{prefix}-def2")),
+            })
+        elif glass_type == "ldgu":
+            gu.update({
+                "grade1": inputs.get(f"{prefix}-grade1"),
+                "grade2": inputs.get(f"{prefix}-grade2"),
+                "thickness1_1": _num(inputs.get(f"{prefix}-thickness1_1")),
+                "thickness_inner": _num(inputs.get(f"{prefix}-thickness_inner")),
+                "thickness1_2": _num(inputs.get(f"{prefix}-thickness1_2")),
+                "gap": _num(inputs.get(f"{prefix}-gap")),
                 "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
                 "nfl1": _num(inputs.get(f"{prefix}-nfl1")),
                 "nfl2": _num(inputs.get(f"{prefix}-nfl2")),
@@ -469,6 +493,7 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "width": _num(inputs.get(f"{frame_prefix}-width")),
             "length": _num(inputs.get(f"{frame_prefix}-length")),
             "wind_neg": _num(inputs.get(f"{frame_prefix}-wind_neg")),
+            "wind_neg_str": inputs.get(f"{frame_prefix}-wind_neg") or "",
             "glass_thk": _num(inputs.get(f"{frame_prefix}-glass_thk")),
             "tran_spacing": _num(inputs.get(f"{frame_prefix}-tran_spacing")),
             "mullion": mullion_profile,
@@ -494,6 +519,7 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
 
         conn_prefix = f"cat{cat_num}-conn"
         connection = {
+            "cleat_size": inputs.get(f"{conn_prefix}-cleat-size"),
             "screw_nos": _num(inputs.get(f"{conn_prefix}-nos")),
             "screw_dia": _num(inputs.get(f"{conn_prefix}-screw-dia")),
             "head_dia": _num(inputs.get(f"{conn_prefix}-screw-head-dia")),
@@ -504,7 +530,7 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         connections = [connection]
 
         clump_value = inputs.get(f"cat{cat_num}-anchor-type", "box-clump")
-        clump_display = {"box-clump": "Box Clump", "u-clump": "U Clump", "l-clump": "L/T Clump"}.get(clump_value, "Box Clump")
+        clump_display = {"box-clump": "Box Clump", "u-clump": "U Clump", "l-clump": "L Clump"}.get(clump_value, "Box Clump")
         anchor_prefix = f"cat{cat_num}-anchor-{clump_value}"
 
         anchorage = {
@@ -517,6 +543,17 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "anchor_nos": _num(inputs.get(f"{anchor_prefix}-anchor_nos")),
             "C_a1": _num(inputs.get(f"{anchor_prefix}-C_a1")),
             "C_a2": _num(inputs.get(f"{anchor_prefix}-C_a2")),
+            # U Clump and L Clump shared
+            "fin_thk": _num(inputs.get(f"{anchor_prefix}-fin_thk")),
+            "fin_e": _num(inputs.get(f"{anchor_prefix}-fin_e")),
+            "thr_bolt_dia": _num(inputs.get(f"{anchor_prefix}-thr_bolt_dia")),
+            # L Clump specific
+            "front_bp_length_N": _num(inputs.get(f"{anchor_prefix}-front_bp_length_N")),
+            "front_bp_width_B": _num(inputs.get(f"{anchor_prefix}-front_bp_width_B")),
+            "top_bp_width_B": _num(inputs.get(f"{anchor_prefix}-top_bp_width_B")),
+            "top_anchor_nos": _num(inputs.get(f"{anchor_prefix}-top_anchor_nos")),
+            "front_C_a1": _num(inputs.get(f"{anchor_prefix}-front_C_a1")),
+            "top_C_a1": _num(inputs.get(f"{anchor_prefix}-top_C_a1")),
         }
 
         categories.append({
@@ -545,6 +582,7 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         "location": general_info.get("location", ""),
         "client": general_info.get("client", ""),
         "description": general_info.get("description", ""),
+        "logo_url": Path(os.path.join(FRONTEND_DIR, "static", "assets", "logo.png")).as_uri(),
     }
 
     data = {

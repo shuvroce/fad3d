@@ -75,15 +75,43 @@ function collectGlassInputs(catNum) {
         support_type: g(`${prefix}-support_type`),
     };
 
-    if (glassType === 'sgu' || glassType === 'lgu') {
+    if (glassType === 'sgu') {
         return { ...base, grade: g(`${prefix}-grade`), nfl: g(`${prefix}-nfl`), def: g(`${prefix}-def`) };
     }
-    if (glassType === 'dgu' || glassType === 'ldgu') {
+    if (glassType === 'lgu') {
+        return {
+            ...base,
+            grade: g(`${prefix}-grade`),
+            nfl: g(`${prefix}-nfl`),
+            def: g(`${prefix}-def`),
+            thickness1: g(`${prefix}-thickness1`),
+            thickness_inner: g(`${prefix}-thickness_inner`),
+            thickness2: g(`${prefix}-thickness2`),
+        };
+    }
+    if (glassType === 'dgu') {
         return {
             ...base,
             grade1: g(`${prefix}-grade1`),
             grade2: g(`${prefix}-grade2`),
             thickness1: g(`${prefix}-thickness1`),
+            gap: g(`${prefix}-gap`),
+            thickness2: g(`${prefix}-thickness2`),
+            nfl1: g(`${prefix}-nfl1`),
+            nfl2: g(`${prefix}-nfl2`),
+            def1: g(`${prefix}-def1`),
+            def2: g(`${prefix}-def2`),
+        };
+    }
+    if (glassType === 'ldgu') {
+        return {
+            ...base,
+            grade1: g(`${prefix}-grade1`),
+            grade2: g(`${prefix}-grade2`),
+            thickness1_1: g(`${prefix}-thickness1_1`),
+            thickness_inner: g(`${prefix}-thickness_inner`),
+            thickness1_2: g(`${prefix}-thickness1_2`),
+            gap: g(`${prefix}-gap`),
             thickness2: g(`${prefix}-thickness2`),
             nfl1: g(`${prefix}-nfl1`),
             nfl2: g(`${prefix}-nfl2`),
@@ -235,7 +263,7 @@ function collectAnchorInputs(catNum) {
     // Map select value to display text for backend
     const clumpDisplay = clumpValue === 'box-clump' ? 'Box Clump'
         : clumpValue === 'u-clump' ? 'U Clump'
-        : 'L/T Clump';
+        : 'L Clump';
     // Prefix matches the select value directly (used in HTML IDs)
     const prefix = `cat${catNum}-anchor-${clumpValue}`;
     return {
@@ -248,6 +276,17 @@ function collectAnchorInputs(catNum) {
         anchor_nos: g(`${prefix}-anchor_nos`),
         C_a1: g(`${prefix}-C_a1`),
         C_a2: g(`${prefix}-C_a2`),
+        // U Clump and L Clump shared
+        fin_thk: g(`${prefix}-fin_thk`),
+        fin_e: g(`${prefix}-fin_e`),
+        thr_bolt_dia: g(`${prefix}-thr_bolt_dia`),
+        // L Clump specific
+        front_bp_length_N: g(`${prefix}-front_bp_length_N`),
+        front_bp_width_B: g(`${prefix}-front_bp_width_B`),
+        top_bp_width_B: g(`${prefix}-top_bp_width_B`),
+        top_anchor_nos: g(`${prefix}-top_anchor_nos`),
+        front_C_a1: g(`${prefix}-front_C_a1`),
+        top_C_a1: g(`${prefix}-top_C_a1`),
     };
 }
 

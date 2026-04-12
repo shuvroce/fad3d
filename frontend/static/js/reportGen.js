@@ -12,10 +12,8 @@ import { getWindInputsForSave, getCurrentPanelMode, savedFacadeContent } from '.
 
 let _isGenerating = false;
 
-function _setVal(id, value) {
-    const el = document.getElementById(id);
-    if (!el || value == null) return '';
-    return el.value;
+function _setVal(id) {
+    return document.getElementById(id)?.value || '';
 }
 
 function _isChecked(id) {
@@ -34,7 +32,7 @@ function _collectGeneralInfo() {
         projectName: _setVal('gen-project-name'),
         location: _setVal('gen-project-location'),
         client: _setVal('gen-client'),
-        rev: _setVal('gen-date'),
+        rev: _setVal('gen-rev'),
         date: _setVal('gen-date'),
         description: _setVal('gen-description'),
         reportIncludes,
