@@ -636,6 +636,7 @@ summary {
         all 0.2s ease,
         var(--transition-border);
     font-size: 18px;
+    display: none;
 }
 
 .theme__toggle:hover {
@@ -1107,7 +1108,7 @@ summary {
 .topbar {
     width: 100%;
     height: var(--topbar-height);
-    padding: 0.5rem 1.5rem 0.5rem 0.7rem;
+    padding: 0.5rem 0.7rem 0.5rem 0.7rem;
     background: var(--bg-primary);
     /* box-shadow: 0 4px 12px var(--shadow-container); */
     border-bottom: 1px solid var(--border-header);
