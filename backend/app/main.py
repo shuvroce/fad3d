@@ -356,6 +356,13 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         except (TypeError, ValueError):
             return None
 
+    def _fmt_thk(v):
+        """Format thickness as integer string if whole number, else decimal (for chart filename lookup)."""
+        n = _num(v)
+        if n is None:
+            return ""
+        return str(int(n)) if n == int(n) else str(n)
+
     def _resolve_fy(grade_name):
         if not grade_name:
             return None
@@ -433,40 +440,56 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
 
         if glass_type == "sgu":
             gu.update({
+                "thickness": _num(inputs.get(f"{prefix}-thickness")),
+                "chart_thickness": _fmt_thk(inputs.get(f"{prefix}-thickness")),
                 "grade": inputs.get(f"{prefix}-grade"),
                 "nfl": _num(inputs.get(f"{prefix}-nfl")),
                 "def": _num(inputs.get(f"{prefix}-def")),
             })
         elif glass_type == "lgu":
+            t1 = _num(inputs.get(f"{prefix}-thickness1"))
+            t2 = _num(inputs.get(f"{prefix}-thickness2"))
+            chart_thk = (t1 or 0) + (t2 or 0)
             gu.update({
                 "grade": inputs.get(f"{prefix}-grade"),
                 "nfl": _num(inputs.get(f"{prefix}-nfl")),
                 "def": _num(inputs.get(f"{prefix}-def")),
-                "thickness1": _num(inputs.get(f"{prefix}-thickness1")),
+                "thickness1": t1,
                 "thickness_inner": _num(inputs.get(f"{prefix}-thickness_inner")),
-                "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
+                "thickness2": t2,
+                "chart_thickness": _fmt_thk(chart_thk) if chart_thk else "",
             })
         elif glass_type == "dgu":
+            t1 = _num(inputs.get(f"{prefix}-thickness1"))
+            t2 = _num(inputs.get(f"{prefix}-thickness2"))
             gu.update({
                 "grade1": inputs.get(f"{prefix}-grade1"),
                 "grade2": inputs.get(f"{prefix}-grade2"),
-                "thickness1": _num(inputs.get(f"{prefix}-thickness1")),
+                "thickness1": t1,
+                "chart_thickness1": _fmt_thk(t1),
                 "gap": _num(inputs.get(f"{prefix}-gap")),
-                "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
+                "thickness2": t2,
+                "chart_thickness2": _fmt_thk(t2),
                 "nfl1": _num(inputs.get(f"{prefix}-nfl1")),
                 "nfl2": _num(inputs.get(f"{prefix}-nfl2")),
                 "def1": _num(inputs.get(f"{prefix}-def1")),
                 "def2": _num(inputs.get(f"{prefix}-def2")),
             })
         elif glass_type == "ldgu":
+            t1_1 = _num(inputs.get(f"{prefix}-thickness1_1"))
+            t1_2 = _num(inputs.get(f"{prefix}-thickness1_2"))
+            t2 = _num(inputs.get(f"{prefix}-thickness2"))
+            chart_thk = (t1_1 or 0) + (t1_2 or 0)
             gu.update({
                 "grade1": inputs.get(f"{prefix}-grade1"),
                 "grade2": inputs.get(f"{prefix}-grade2"),
-                "thickness1_1": _num(inputs.get(f"{prefix}-thickness1_1")),
+                "thickness1_1": t1_1,
                 "thickness_inner": _num(inputs.get(f"{prefix}-thickness_inner")),
-                "thickness1_2": _num(inputs.get(f"{prefix}-thickness1_2")),
+                "thickness1_2": t1_2,
                 "gap": _num(inputs.get(f"{prefix}-gap")),
-                "thickness2": _num(inputs.get(f"{prefix}-thickness2")),
+                "thickness2": t2,
+                "chart_thickness": _fmt_thk(chart_thk) if chart_thk else "",
+                "chart_thickness2": _fmt_thk(t2),
                 "nfl1": _num(inputs.get(f"{prefix}-nfl1")),
                 "nfl2": _num(inputs.get(f"{prefix}-nfl2")),
                 "def1": _num(inputs.get(f"{prefix}-def1")),
@@ -850,7 +873,7 @@ def _generate_pdf(data: dict, template_name: str) -> str:
         env.filters['safe_div'] = safe_div
 
         template = env.get_template(template_name)
-        inputs_uri = Path(DEFAULT_INPUTS_DIR).as_uri()
+        inputs_uri = Path(_figures_dir).as_uri()
         data["inputs_dir"] = inputs_uri
         html_out = template.render(data)
 

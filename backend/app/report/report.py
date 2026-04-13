@@ -77,7 +77,7 @@ def generate_report_from_data(data, OUT_PDF=None, inputs_dir=None):
         data['inputs_dir'] = inputs_uri
         html_out = template.render(data)
 
-        HTML(string=html_out, base_url=REPORT_TEMPLATE_DIR).write_pdf(OUT_PDF, stylesheets=[CSS(filename=CSS_PATH)])
+        HTML(string=html_out, base_url=BASE_DIR).write_pdf(OUT_PDF, stylesheets=[CSS(filename=CSS_PATH)])
 
         with pikepdf.Pdf.open(OUT_PDF, allow_overwriting_input=True) as pdf:
             pdf.docinfo["/Title"] = title
@@ -120,7 +120,7 @@ def generate_summary_report_from_data(data, OUT_SUMMARY_PDF=None, inputs_dir=Non
         data['inputs_dir'] = inputs_uri
         html_out = template.render(data)
 
-        HTML(string=html_out, base_url=REPORT_TEMPLATE_DIR).write_pdf(OUT_SUMMARY_PDF, stylesheets=[CSS(filename=CSS_PATH)])
+        HTML(string=html_out, base_url=BASE_DIR).write_pdf(OUT_SUMMARY_PDF, stylesheets=[CSS(filename=CSS_PATH)])
         return OUT_SUMMARY_PDF
 
     except Exception:

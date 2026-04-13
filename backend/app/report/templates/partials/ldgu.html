@@ -175,9 +175,9 @@
     <p class="dgu__head">For Inner Panel:</p>
     <div class="calc__fig">
         {% if gu.support_type == "four-edges" %}
-            <img src="assets/glass-load-charts/monolithic/four-edge/{{ gu.thickness2 }}mm.png" alt="Non-factored Load Chart">
+            <img src="assets/glass-load-charts/monolithic/four-edge/{{ gu.chart_thickness2 }}mm.png" alt="Non-factored Load Chart">
         {% elif gu.support_type == "three-edges" %}
-            <img src="assets/glass-load-charts/monolithic/three-edge/{{ gu.thickness2 }}mm.png" alt="Non-factored Load Chart">
+            <img src="assets/glass-load-charts/monolithic/three-edge/{{ gu.chart_thickness2 }}mm.png" alt="Non-factored Load Chart">
         {% elif gu.support_type == "two-edges" %}
             <img src="assets/glass-load-charts/monolithic/two-edge/all-thk.png" alt="Non-factored Load Chart">
         {% elif gu.support_type == "one-edge" %}
@@ -305,9 +305,9 @@
     <p class="dgu__head">For Inner Panel:</p>
     <div class="calc__fig">
         {% if gu.support_type == "four-edges" %}
-            <img src="assets/glass-defl-charts/monolithic/four-edge/{{ gu.thickness2 }}mm.png" alt="Deflection Chart">
+            <img src="assets/glass-defl-charts/monolithic/four-edge/{{ gu.chart_thickness2 }}mm.png" alt="Deflection Chart">
         {% elif gu.support_type == "three-edges" %}
-            <img src="assets/glass-defl-charts/monolithic/three-edge/{{ gu.thickness2 }}mm.png" alt="Deflection Chart">
+            <img src="assets/glass-defl-charts/monolithic/three-edge/{{ gu.chart_thickness2 }}mm.png" alt="Deflection Chart">
         {% elif gu.support_type == "two-edges" %}
             <img src="assets/glass-defl-charts/monolithic/two-edge/all-thk.png" alt="Deflection Chart">
         {% elif gu.support_type == "one-edge" %}
