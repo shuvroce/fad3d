@@ -74,7 +74,7 @@
             <tr>
                 <td>Total glass thickness, <i>t<sub>g</sub></i></td>
                 <td>=</td>
-                <td>{{ gu.thickness1 + gu.thickness2 }} <i>mm</i></td>
+                <td>{{ (gu.thickness1 or 0) + (gu.thickness2 or 0) }} <i>mm</i></td>
                 <td><i>; without interlayer</i></td>
             </tr>
             <tr>
@@ -181,7 +181,7 @@
                 <tr>
                     <td>Service wind load for deflection, q = 0.7 P<sub>z</sub></td>
                     <td>=</td>
-                    <td>{{ (0.7 * gu.wind_load) | round(2) }}</td>
+                    <td>{{ (0.7 * (gu.wind_load or 0)) | round(2) }}</td>
                     <td></td>
                 </tr>
                 <tr>

@@ -309,10 +309,11 @@ async def api_check_figures(request: Request):
 # Report Generation
 # ---------------------------------------------------------------------------
 
-REPORT_TEMPLATE_DIR = os.path.join(BACKEND_DIR, "app", "report", "templates")
+REPORT_DIR = os.path.join(BACKEND_DIR, "app", "report")
+REPORT_TEMPLATE_DIR = os.path.join(REPORT_DIR, "templates")
 DEFAULT_INPUTS_DIR = os.path.join(REPORT_TEMPLATE_DIR, "inputs")
-PROFILE_YAML = os.path.join(BACKEND_DIR, "app", "report", "assets", "profile.yaml")
-CSS_PATH = os.path.join(BACKEND_DIR, "app", "report", "css", "report.css")
+PROFILE_YAML = os.path.join(REPORT_DIR, "assets", "profile.yaml")
+CSS_PATH = os.path.join(REPORT_DIR, "css", "report.css")
 
 
 def _load_profile_data():
@@ -369,8 +370,9 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         iy_val = _num(sec.get("iy"))
         mn_val = _num(sec.get("mnYield"))
         fy_val = _resolve_fy(sec.get("grade"))
+        _raw_type = sec.get("profileType", "stick")
         profile = {
-            "profile_type": sec.get("profileType", "stick"),
+            "profile_type": "Pre-defined" if _raw_type == "predefined" else _raw_type,
             "profile_name": sec.get("name", ""),
             "web_length": _num(sec.get("d")),
             "flange_length": _num(sec.get("b")),
@@ -486,14 +488,24 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         transom_profile = next((p for p in alum_profiles_data if p.get("profile_name") == transom_name), None)
         steel_profile = next((p for p in steel_profiles_data if p.get("profile_name") == steel_name), None)
 
+        _zone_map = {
+            "zone4": "Zone 4 (Wall Mid Zone)", "zone5": "Zone 5 (Wall Edge Zone)",
+            "zone1": "Zone 1 (Roof Mid Zone)", "zone2": "Zone 2 (Roof Edge Zone)",
+            "zone3": "Zone 3 (Roof Corner Zone)",
+        }
+        _sys_map = {"semi-uni": "Semi-unitized", "uni": "Unitized", "stick": "Stick"}
         frame = {
             "geometry": frame_variant,
             "mullion_type": "Aluminum + Steel" if mullion_type == "alu-steel" else "Aluminum Only",
             "frame_type": "Floor-to-floor" if frame_type == "sfgp" else "Continuous",
+            "zone": _zone_map.get(inputs.get(f"cat{cat_num}-frame-zone", ""), inputs.get(f"cat{cat_num}-frame-zone", "")),
+            "system_type": _sys_map.get(inputs.get(f"cat{cat_num}-frame-system-type", ""), ""),
             "width": _num(inputs.get(f"{frame_prefix}-width")),
             "length": _num(inputs.get(f"{frame_prefix}-length")),
             "wind_neg": _num(inputs.get(f"{frame_prefix}-wind_neg")),
             "wind_neg_str": inputs.get(f"{frame_prefix}-wind_neg") or "",
+            "wind_pos": _num(inputs.get(f"{frame_prefix}-wind_pos")),
+            "wind_pos_str": inputs.get(f"{frame_prefix}-wind_pos") or "",
             "glass_thk": _num(inputs.get(f"{frame_prefix}-glass_thk")),
             "tran_spacing": _num(inputs.get(f"{frame_prefix}-tran_spacing")),
             "mullion": mullion_profile,
@@ -576,11 +588,12 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
     project_info = {
         "project_name": general_info.get("projectName", ""),
         "project_number": general_info.get("projectNumber", ""),
-        "ref_no": general_info.get("rev", ""),
+        "ref_no": general_info.get("projectNumber", ""),
         "rev_no": general_info.get("rev", ""),
         "date": general_info.get("date", ""),
         "location": general_info.get("location", ""),
         "client": general_info.get("client", ""),
+        "project_client": general_info.get("client", ""),
         "description": general_info.get("description", ""),
         "logo_url": Path(os.path.join(FRONTEND_DIR, "static", "assets", "logo.png")).as_uri(),
     }
@@ -719,7 +732,7 @@ def _generate_pdf(data: dict, template_name: str) -> str:
             item["calc"] = {k: _ZERO for k in (defaults or {})}
         elif defaults:
             for k in defaults:
-                if k not in item["calc"] or item["calc"][k] is None or item["calc"][k] == 0:
+                if k not in item["calc"] or item["calc"][k] is None:
                     item["calc"][k] = _ZERO
 
     _anchor_defaults = {
@@ -789,12 +802,22 @@ def _generate_pdf(data: dict, template_name: str) -> str:
     wind_data = data.get("wind", {})
     if "calc" not in wind_data:
         wind_data["calc"] = {
-            "summary": {"wind_speed": 0.0, "velocity_pressure": 0.0, "design_pressure": 0.0},
+            "summary": {
+                "wind_speed": 0.0, "velocity_pressure": 0.0, "design_pressure": 0.0,
+                "Imp_factor": 0.0, "gust_factor": 0.0, "C_pl": 0.0,
+                "C_pw": 0.0, "C_ps": 0.0, "K_h": 0.0, "K_ht": 0.0,
+                "q_h": 0.0, "P_hi": 0.0, "P_hl": 0.0, "P_hs": 0.0,
+            },
             "K_z": 0.0, "K_zt": 0.0, "K_d": 0.0, "q_z": 0.0, "GC_pi": 0.0,
             "GC_pf": 0.0, "p_net": 0.0, "p_pos": 0.0, "p_neg": 0.0,
         }
     elif "summary" not in wind_data.get("calc", {}):
-        wind_data["calc"]["summary"] = {"wind_speed": 0.0, "velocity_pressure": 0.0, "design_pressure": 0.0}
+        wind_data["calc"]["summary"] = {
+            "wind_speed": 0.0, "velocity_pressure": 0.0, "design_pressure": 0.0,
+            "Imp_factor": 0.0, "gust_factor": 0.0, "C_pl": 0.0,
+            "C_pw": 0.0, "C_ps": 0.0, "K_h": 0.0, "K_ht": 0.0,
+            "q_h": 0.0, "P_hi": 0.0, "P_hl": 0.0, "P_hs": 0.0,
+        }
 
     if "alum_profiles_data" in data and "alum_profiles" not in data:
         data["alum_profiles"] = data["alum_profiles_data"]
@@ -815,14 +838,23 @@ def _generate_pdf(data: dict, template_name: str) -> str:
             except (TypeError, ValueError, ZeroDivisionError):
                 return "N/A"
 
+        def safe_div(a, b):
+            try:
+                if a is None or b is None or b == 0:
+                    return None
+                return a / b
+            except (TypeError, ZeroDivisionError):
+                return None
+
         env.filters['round'] = safe_round
+        env.filters['safe_div'] = safe_div
 
         template = env.get_template(template_name)
         inputs_uri = Path(DEFAULT_INPUTS_DIR).as_uri()
         data["inputs_dir"] = inputs_uri
         html_out = template.render(data)
 
-        HTML(string=html_out, base_url=REPORT_TEMPLATE_DIR).write_pdf(
+        HTML(string=html_out, base_url=REPORT_DIR).write_pdf(
             tmp.name, stylesheets=[CSS(filename=CSS_PATH)]
         )
 
@@ -866,6 +898,8 @@ async def api_generate_report(request: Request):
             filename="structural-report.pdf",
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
@@ -881,6 +915,8 @@ async def api_generate_summary_report(request: Request):
             filename="structural-summary-report.pdf",
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JSONResponse({"error": str(e)}, status_code=500)
 
 

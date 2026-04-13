@@ -208,7 +208,7 @@
             <td>450</td>
             <td>{{ calc.thr_bolt_AseN }}</td>
             <td>{{ (0.75 * 450 * calc.thr_bolt_AseN / 1000) | round(2) }}</td>
-            <td>{{ (0.2 * anchor.thr_bolt_dia * (0.75 * 450 * calc.thr_bolt_AseN / 1000)) | round(2) }}</td>
+            <td>{{ (0.2 * (anchor.thr_bolt_dia or 0) * (0.75 * 450 * calc.thr_bolt_AseN / 1000)) | round(2) }}</td>
         </tr>
     </tbody>
 </table>

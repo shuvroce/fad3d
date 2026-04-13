@@ -200,7 +200,7 @@
                         <td>{{ calc.m }}</td>
                         <td>{{ calc.web_b }}</td>
                         <td>{{ ns.found_data.web_thk }}</td>
-                        <td>{{ (calc.web_b / ns.found_data.web_thk) | round(2) }}</td>
+                        <td>{{ calc.web_b | safe_div(ns.found_data.web_thk) | round(2) }}</td>
                         <td>{{ calc.web_lambda1 }}</td>
                         <td>{{ calc.web_lambda2 }}</td>
                         <td>{{ calc.F_b }}</td>
@@ -215,7 +215,7 @@
                         <td>–</td>
                         <td>{{ calc.flange_b }}</td>
                         <td>{{ ns.found_data.flange_thk }}</td>
-                        <td>{{ (calc.flange_b / ns.found_data.flange_thk) | round(2) }}</td>
+                        <td>{{ calc.flange_b | safe_div(ns.found_data.flange_thk) | round(2) }}</td>
                         <td>{{ calc.flange_lambda1 }}</td>
                         <td>{{ calc.flange_lambda2 }}</td>
                         <td>{{ calc.F_c }}</td>
@@ -373,7 +373,7 @@
         {% endif %}
     </div>
 
-{% elif profile.profile_type == "Stick" %}
+{% elif profile.profile_type == "stick" %}
     <div class="page__break"></div>
     <h2>{{ ns.found_data.profile_name }}</h2>
     <div>
@@ -435,13 +435,13 @@
                 <tr>
                     <td>Extreme fiber Distance from N.A (minor axis)</td>
                     <td>Y</td>
-                    <td>{{ ns.found_data.web_length / 2 }}</td>
+                    <td>{{ ns.found_data.web_length | safe_div(2) }}</td>
                     <td><i>mm</i></td>
                 </tr>
                 <tr>
                     <td>Extreme fiber Distance from N.A (major axis)</td>
                     <td>X</td>
-                    <td>{{ ns.found_data.flange_length / 2 }}</td>
+                    <td>{{ ns.found_data.flange_length | safe_div(2) }}</td>
                     <td><i>mm</i></td>
                 </tr>
                 <tr>
@@ -521,7 +521,7 @@
                         <td>Both Edges</td>
                         <td>{{ calc.web_b }}</td>
                         <td>{{ ns.found_data.web_thk }}</td>
-                        <td>{{ (calc.web_b / ns.found_data.web_thk) | round(2) }}</td>
+                        <td>{{ calc.web_b | safe_div(ns.found_data.web_thk) | round(2) }}</td>
                         <td>{{ calc.web_lambda1 }}</td>
                         <td>{{ calc.web_lambda2 }}</td>
                         <td>{{ calc.F_b }}</td>
@@ -534,7 +534,7 @@
                         <td>Both Edges</td>
                         <td>{{ calc.flange_b }}</td>
                         <td>{{ ns.found_data.flange_thk }}</td>
-                        <td>{{ (calc.flange_b / ns.found_data.flange_thk) | round(2) }}</td>
+                        <td>{{ calc.flange_b | safe_div(ns.found_data.flange_thk) | round(2) }}</td>
                         <td>{{ calc.flange_lambda1 }}</td>
                         <td>{{ calc.flange_lambda2 }}</td>
                         <td>{{ calc.F_c }}</td>
@@ -686,13 +686,13 @@
                 <tr>
                     <td>Elastic section modulus about major axis</td>
                     <td><i>S<sub>x</sub> = I<sub>x</sub> / Y</i></td>
-                    <td>{{ (ns.found_data.I_xx / ns.found_data.Y) | round(1) }}</td>
+                    <td>{{ ns.found_data.I_xx | safe_div(ns.found_data.Y) | round(1) }}</td>
                     <td><i>mm<sup>3</sup></i></td>
                 </tr>
                 <tr>
                     <td>Elastic section modulus about minor axis</td>
                     <td><i>S<sub>y</sub> = I<sub>y</sub> / X</i></td>
-                    <td>{{ (ns.found_data.I_yy / ns.found_data.X) | round(1) }}</td>
+                    <td>{{ ns.found_data.I_yy | safe_div(ns.found_data.X) | round(1) }}</td>
                     <td><i>mm<sup>3</sup></i></td>
                 </tr>
             </tbody>
@@ -723,7 +723,7 @@
                 <tr>
                     <td>Plastic section modulus about major axis</td>
                     <td><i>Z<sub>x</sub> = 0.5 A(x + y)</i></td>
-                    <td>{{ (0.5 * ns.found_data.area * (ns.found_data.plastic_x + ns.found_data.plastic_y)) | round(1) }}</td>
+                    <td>{{ (0.5 * (ns.found_data.area or 0) * ((ns.found_data.plastic_x or 0) + (ns.found_data.plastic_y or 0))) | round(1) }}</td>
                     <td><i>mm<sup>3</sup></i></td>
                 </tr>
 

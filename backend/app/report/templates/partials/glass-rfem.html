@@ -148,7 +148,7 @@
                 <tr>
                     <td>Total glass thickness, <i>t<sub>g</sub> = t<sub>1</sub> + t<sub>2</sub></i></td>
                     <td>=</td>
-                    <td>{{ gu.thickness1 + gu.thickness2 }} <i>mm</i></td>
+                    <td>{{ (gu.thickness1 or 0) + (gu.thickness2 or 0) }} <i>mm</i></td>
                     <td><i>; without air/gas gap</i></td>
                 </tr>
                 <tr>
@@ -242,8 +242,7 @@
                 <tr>
                     <td>Total glass thickness, <i>t<sub>g</sub></i></td>
                     <td>=</td>
-                    <td>{{ gu.thickness1 + gu.thickness2 }} <i>mm</i></td>
-                    <td><i>; without interlayer</i></td>
+                    <td>{{ (gu.thickness1 or 0) + (gu.thickness2 or 0) }} <i>mm</i></td>
                 </tr>
                 <tr>
                     <td>Modulus of Elasticity, <i>E</i></td>
@@ -342,7 +341,7 @@
                 <tr>
                     <td>So, Thickness of outer panel, <i>t<sub>1</sub> = t<sub>1-1</sub> + t<sub>1-2</sub></i></td>
                     <td>=</td>
-                    <td>{{ gu.thickness1_1 + gu.thickness1_2 }} <i>mm</i></td>
+                    <td>{{ (gu.thickness1_1 or 0) + (gu.thickness1_2 or 0) }} <i>mm</i></td>
                     <td><i>; without interlayer</i></td>
                 </tr>
                     <td>Thickness of inner panel, <i>t<sub>2</sub></td>
@@ -353,7 +352,7 @@
                 <tr>
                     <td>Total glass thickness, <i>t<sub>g</sub> = t<sub>1</sub> + t<sub>2</sub></i></td>
                     <td>=</td>
-                    <td>{{ gu.thickness1_1 + gu.thickness1_2 + gu.thickness2 }} <i>mm</i></td>
+                    <td>{{ (gu.thickness1_1 or 0) + (gu.thickness1_2 or 0) + (gu.thickness2 or 0) }} <i>mm</i></td>
                     <td><i>; without air/gas gap</i></td>
                 </tr>
                 <tr>

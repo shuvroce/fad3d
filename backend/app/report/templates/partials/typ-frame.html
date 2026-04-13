@@ -78,13 +78,13 @@
             <tr>
                 <td>Therefore, Max. +Ve Wind Pressure</td>
                 <td><i>P<sub>z(+ve)</sub></i></td>
-                <td>{{ frame.wind_pos }} <i>kN/m<sup>2</sup></i></td>
+                <td>{{ frame.wind_pos_str if frame.wind_pos_str else (frame.wind_pos if frame.wind_pos is not none else '–') }} <i>kN/m<sup>2</sup></i></td>
                 <td rowspan="2"><i>; from wind load table</i></td>
             </tr>
             <tr>
                 <td style="padding-left: 4rem;">Max. -Ve Wind Pressure</td>
                 <td><i>P<sub>z(-ve)</sub></i></td>
-                <td>{{ frame.wind_neg }} <i>kN/m<sup>2</sup></i></td>
+                <td>{{ frame.wind_neg_str if frame.wind_neg_str else (frame.wind_neg if frame.wind_neg is not none else '–') }} <i>kN/m<sup>2</sup></i></td>
             </tr>
         </tbody>
     </table>
@@ -99,12 +99,12 @@
                     <figure>
                         {% if frame.mullion_type == "Aluminum Only" %}
                             {% if frame.system_type == "Semi-unitized" %}
-                                <img style="width: 50mm;" src="assets/profiles/{{ frame.mullion }}.png" class="fig__50">
+                                <img style="width: 50mm;" src="assets/profiles/{{ frame.mullion_name }}.png" class="fig__50">
                             {% else %}
-                                <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.mullion }}.png" class="fig__50">
+                                <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.mullion_name }}.png" class="fig__50">
                             {% endif %}
                         {% else %}
-                        <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.mullion }}+RHS {{ frame.steel.split('x')[-1] }}.png" class="fig__50">
+                        <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.mullion_name }}+RHS {{ (frame.steel_name or '').split('x')[-1] }}.png" class="fig__50">
                         {% endif %}
                         <figcaption>Mullion</figcaption>
                     </figure>
@@ -112,9 +112,9 @@
                 <td>
                     <figure>
                         {% if frame.system_type == "Semi-unitized" %}
-                            <img style="width: 50mm;" src="assets/profiles/{{ frame.transom }}.png" class="fig__50">
+                            <img style="width: 50mm;" src="assets/profiles/{{ frame.transom_name }}.png" class="fig__50">
                         {% else %}
-                            <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.transom }}.png" class="fig__50">
+                            <img style="width: 50mm;" src="{{ inputs_dir }}/{{ frame.transom_name }}.png" class="fig__50">
                         {% endif %}
                         <figcaption>Transom</figcaption>
                     </figure>

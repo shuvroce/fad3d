@@ -20,7 +20,7 @@ def _get_profile_sets(data: Dict[str, Any]) -> Tuple[list, list]:
 
 def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
     wind = data.get("wind") or {}
-    computed_wind = compute_wind_loads(wind, _to_float)
+    computed_wind = compute_wind_loads({**wind, "auto_load": True}, _to_float)
     auto_calc = computed_wind.get("auto_calc")
     if auto_calc:
         computed_wind["calc"] = auto_calc
@@ -41,6 +41,10 @@ def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
             try:
                 calc_result = calc_glass_unit(gu)
                 _set_calc(gu, calc_result)
+                if calc_result:
+                    for key in ("load_x_area2", "load1_x_area2", "load2_x_area2"):
+                        if key in calc_result:
+                            gu[key] = calc_result[key]
             except (ValueError, TypeError, ZeroDivisionError):
                 pass
 

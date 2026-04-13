@@ -13,9 +13,6 @@ const _settingsDefaults = {
     glassDeflType:   'span_ratio',
     glassDeflRatio:  60,
     glassDeflAbs:    25,
-    frameDeflType:   'span_ratio',
-    frameDeflRatio:  175,
-    frameDeflAbs:    20,
 };
 
 let _settingsCurrent = Object.assign({}, _settingsDefaults);
@@ -51,9 +48,6 @@ function _applyToForm() {
     g('setting-glass-defl-type').value  = _settingsCurrent.glassDeflType;
     g('setting-glass-defl-ratio').value = _settingsCurrent.glassDeflRatio;
     g('setting-glass-defl-abs').value   = _settingsCurrent.glassDeflAbs;
-    g('setting-frame-defl-type').value  = _settingsCurrent.frameDeflType;
-    g('setting-frame-defl-ratio').value = _settingsCurrent.frameDeflRatio;
-    g('setting-frame-defl-abs').value   = _settingsCurrent.frameDeflAbs;
 
     _syncDeflFields('glass');
     _syncDeflFields('frame');
@@ -74,9 +68,6 @@ function _readFromForm() {
     _settingsCurrent.glassDeflType   = g('setting-glass-defl-type').value;
     _settingsCurrent.glassDeflRatio  = Number(g('setting-glass-defl-ratio').value);
     _settingsCurrent.glassDeflAbs    = Number(g('setting-glass-defl-abs').value);
-    _settingsCurrent.frameDeflType   = g('setting-frame-defl-type').value;
-    _settingsCurrent.frameDeflRatio  = Number(g('setting-frame-defl-ratio').value);
-    _settingsCurrent.frameDeflAbs    = Number(g('setting-frame-defl-abs').value);
 }
 
 // Show/hide ratio vs absolute deflection fields

@@ -155,7 +155,7 @@
             <td>345</td>
             <td>{{ calc.fin_width }}</td>
             <td>{{ anchor.fin_thk }}</td>
-            <td>{{ (calc.fin_width * anchor.fin_thk) | round(2) }}</td>
+            <td>{{ (calc.fin_width * (anchor.fin_thk or 0)) | round(2) }}</td>
             <td>{{ calc.fin_phi_Rn_yield }}</td>
             <td>{{ calc.fin_Vu }}</td>
             <td class="{% if calc.fin_phi_Rn_yield > calc.fin_Vu %}ok{% else %}not-ok{% endif %}">
@@ -352,7 +352,7 @@
             <td>{{ anchor.fin_thk }}</td>
             <td>{{ calc.thr_bolt_nos }}</td>
             <td>{{ calc.fin_dh }}</td>
-            <td>{{ (calc.fin_bgv * anchor.fin_thk) | round(2) }}</td>
+            <td>{{ (calc.fin_bgv * (anchor.fin_thk or 0)) | round(2) }}</td>
             <td>{{ calc.fin_block_Anv }}</td>
         </tr>
     </tbody>

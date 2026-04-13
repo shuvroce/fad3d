@@ -67,6 +67,9 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
         nfl = _f("nfl")
         defl = _f("def")
 
+        if wind_load:
+            result["load_x_area2"] = round(0.7 * wind_load * A_eff ** 2, 4)
+
         if nfl and defl and grade:
             lr = nfl * gtf
             result["gtf"] = gtf
@@ -78,7 +81,7 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
 
         return result
 
-    if glass_type == "dgu" and length < 5000 and support_type != "Point Fixed":
+    if glass_type == "dgu"and length < 5000 and support_type != "Point Fixed":
         grade1, grade2 = gu.get("grade1"), gu.get("grade2")
         t1 = _f("thickness1")
         t2 = _f("thickness2")
@@ -111,6 +114,9 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
             result["deflection1"] = round(def1, 2)
             result["deflection2"] = round(def2, 2)
             result["deflection"] = round(dgu_def, 2)
+            if wind_load:
+                result["load1_x_area2"] = round((0.7 * wind_load / ls1) * A_eff ** 2, 4)
+                result["load2_x_area2"] = round((0.7 * wind_load / ls2) * A_eff ** 2, 4)
 
         return result
 
@@ -119,6 +125,9 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
         gtf = 4.0 if grade == "FT" else 2.0 if grade == "HS" else 1.0
         nfl = _f("nfl")
         defl = _f("def")
+
+        if wind_load:
+            result["load_x_area2"] = round(0.7 * wind_load * A_eff ** 2, 4)
 
         if nfl and defl and grade:
             lr = nfl * gtf
@@ -131,7 +140,7 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
 
         return result
 
-    if glass_type == "ldgu" and length < 5000 and support_type != "Point Fixed":
+    if glass_type == "ldgu"and length < 5000 and support_type != "Point Fixed":
         grade1, grade2 = gu.get("grade1"), gu.get("grade2")
         t1_1 = _f("thickness1_1")
         t1_2 = _f("thickness1_2")
@@ -166,6 +175,9 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
             result["deflection1"] = round(def1, 2)
             result["deflection2"] = round(def2, 2)
             result["deflection"] = round(ldgu_def, 2)
+            if wind_load:
+                result["load1_x_area2"] = round((0.7 * wind_load / ls1) * A_eff ** 2, 4)
+                result["load2_x_area2"] = round((0.7 * wind_load / ls2) * A_eff ** 2, 4)
 
         return result
 

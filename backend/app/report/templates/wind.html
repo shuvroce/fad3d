@@ -154,7 +154,7 @@
                 </tr>
                 <tr>
                     <td>Leeward Wall</td>
-                    <td>{{ (wind.b_width / wind.b_length) | round(2) }}</td>
+                    <td>{{ wind.b_width | safe_div(wind.b_length) | round(2) }}</td>
                     <td>{{ calc.summary.C_pl }}</td>
                 </tr>
             </tbody>

@@ -1,3 +1,4 @@
+import math
 from typing import Dict, Optional, Any
 from calcs.calc_utils import _to_float
 from calcs.loading import frame_loads, reaction_forces
@@ -114,7 +115,7 @@ def _fin_plate(bolt_dia, design_Ry, design_Rz, fin_e, fin_thk, fin_width, bolt_n
     Vu = (Vh**2 + Vv**2)**0.5
     Mu = Vv * fin_e / 1000
     length = fin_e + 50
-    thk_req = (4 * Mu) / (0.9 * BASE_PLATE_FY * fin_width**2) if fin_width else 0
+    thk_req = math.sqrt(4 * Mu * 1e6 / (0.9 * BASE_PLATE_FY * fin_width)) if fin_width else 0
     dh = bolt_dia + 2
 
     phi_Rn_yield = 0.6 * BASE_PLATE_FY * fin_width * fin_thk / 1000

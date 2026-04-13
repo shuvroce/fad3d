@@ -99,8 +99,8 @@ async function _openDirectoryPicker() {
                 <h4>Set Figures Directory</h4>
                 <input type="text" class="figure__dir-input" placeholder="Enter full directory path" value="${_figuresDir}" />
                 <div class="figure__dir-actions">
-                    <button class="figure__dir-btn figure__dir-btn--browse">Browse</button>
                     <button class="figure__dir-btn figure__dir-btn--cancel">Cancel</button>
+                    <button class="figure__dir-btn figure__dir-btn--browse">Browse</button>
                     <button class="figure__dir-btn figure__dir-btn--confirm">Set</button>
                 </div>
             </div>

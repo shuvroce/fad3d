@@ -158,7 +158,7 @@
                 <tr>
                     <td>Service wind load for deflection, q = 0.7 P<sub>z</sub></td>
                     <td>=</td>
-                    <td>{{ (0.7 * gu.wind_load) | round(2) }}</td>
+                    <td>{{ (0.7 * (gu.wind_load or 0)) | round(2) }}</td>
                     <td></td>
                 </tr>
                 <tr>

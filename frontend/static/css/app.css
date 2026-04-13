@@ -362,7 +362,7 @@ h4 {
 }
 
 h2 {
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin-bottom: 1rem;
 }
 
@@ -1110,7 +1110,7 @@ summary {
     height: var(--topbar-height);
     padding: 0.5rem 0.7rem 0.5rem 0.7rem;
     background: var(--bg-primary);
-    /* box-shadow: 0 4px 12px var(--shadow-container); */
+    box-shadow: 0 4px 12px var(--shadow-container);
     border-bottom: 1px solid var(--border-header);
     position: fixed;
     top: 0;
@@ -2513,6 +2513,8 @@ summary {
     align-items: center;
     gap: 0.5rem;
     overflow: hidden;
+    border: 1px solid var(--border-primary);
+    border-right: none;
     border-radius: 0;
     transition:
         var(--transition-bg),
@@ -2727,6 +2729,8 @@ summary {
     bottom: 0;
     border-radius: 0 var(--radius-3) var(--radius-3) 0;
     box-shadow: var(--shadow-box);
+    border: 1px solid var(--border-primary);
+    border-left: none;
 }
 
 /* Wind mode: expand input box to cover catbar + input field width */
@@ -3014,7 +3018,7 @@ summary {
     right: calc(var(--result-width) + 1rem);
     width: 100px;
     height: 130px;
-    z-index: 20;
+    z-index: 9;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -3104,6 +3108,7 @@ summary {
     width: var(--result-width);
     height: 100%;
     padding: 1rem 1.5rem;
+    border: 1px solid var(--border-primary);
     border-radius: var(--radius-3);
     white-space: nowrap;
     overflow: hidden;
@@ -3289,7 +3294,7 @@ summary {
 }
 
 .result__card-body {
-    padding: 0 1rem 0 4rem;
+    padding: 0 1rem 0 1rem;
     /* border-top: 1px solid var(--border-primary); */
     display: flex;
     flex-direction: column;
@@ -3484,6 +3489,7 @@ summary {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
+    text-align: left;
 }
 
 .figure__dir-input {
@@ -3523,7 +3529,7 @@ summary {
 .figure__dir-btn--browse {
     background: var(--bg-secondary);
     color: var(--text-primary);
-    margin-right: auto;
+    /* margin-right: auto; */
 }
 
 .figure__dir-btn--browse:hover {
@@ -3533,6 +3539,7 @@ summary {
 .figure__dir-btn--cancel {
     background: var(--bg-secondary);
     color: var(--text-primary);
+    margin-right: auto;
 }
 
 .figure__dir-btn--cancel:hover {

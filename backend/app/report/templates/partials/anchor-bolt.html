@@ -663,12 +663,7 @@
             <td>360</td>
             <td>{{ calc.A_seN }}</td>
             <td>{{ (0.75 * 360 * calc.A_seN / 1000) | round(2) }}</td>
-            <td>{{ (0.2 * anchor.anchor_dia * (0.75 * 360 * calc.A_seN / 1000)) | round(2) }}</td>
-        </tr>
-    </tbody>
-</table>
-
-
+            <td>{{ (0.2 * (anchor.anchor_dia or 0) * (0.75 * 360 * calc.A_seN / 1000)) | round(2) }}</td>
 {% elif anchor.clump_type == "L Clump" %}
 <h3>Design of Top Anchors (A*)</h3>
 
@@ -1533,7 +1528,7 @@
             <td>360</td>
             <td>{{ calc.A_seN }}</td>
             <td>{{ (0.75 * 360 * calc.A_seN / 1000) | round(2) }}</td>
-            <td>{{ (0.2 * anchor.anchor_dia * (0.75 * 360 * calc.A_seN / 1000)) | round(2) }}</td>
+            <td>{{ (0.2 * (anchor.anchor_dia or 0) * (0.75 * 360 * calc.A_seN / 1000)) | round(2) }}</td>
         </tr>
     </tbody>
 </table>

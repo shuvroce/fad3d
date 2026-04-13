@@ -48,25 +48,25 @@
     <table class="borderless ml-2 mt-1">
         <tbody>
             <tr>
-                <td>For screws on transom (A *), <i>R<sub>yA</sub> = F<sub>y</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td>For screws on transom (A *), <i>R<sub>yA</sub> = F<sub>y</sub> / {{ conn.screw_nos | safe_div(2) }}</i></td>
                 <td>=</td>
                 <td>{{ calc.R_yA }} <i>kN</i></td>
                 <td><i>; shear</i></td>
             </tr>
             <tr>
-                <td style="padding-left: 4rem;"><i>R<sub>zA</sub> = F<sub>z</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td style="padding-left: 4rem;"><i>R<sub>zA</sub> = F<sub>z</sub> / {{ conn.screw_nos | safe_div(2) }}</i></td>
                 <td>=</td>
                 <td>{{ calc.R_zA }} <i>kN</i></td>
                 <td><i>; tension</i></td>
             </tr>
             <tr>
-                <td>For screws on mullion (B *), <i>R<sub>yB</sub> = F<sub>y</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td>For screws on mullion (B *), <i>R<sub>yB</sub> = F<sub>y</sub> / {{ conn.screw_nos | safe_div(2) }}</i></td>
                 <td>=</td>
                 <td>{{ calc.R_yA }} <i>kN</i></td>
                 <td><i>; shear</i></td>
             </tr>
             <tr>
-                <td style="padding-left: 4rem;"><i>R<sub>zB</sub> = F<sub>z</sub> / {{ conn.screw_nos / 2 }}</i></td>
+                <td style="padding-left: 4rem;"><i>R<sub>zB</sub> = F<sub>z</sub> / {{ conn.screw_nos | safe_div(2) }}</i></td>
                 <td>=</td>
                 <td>{{ calc.R_zA }} <i>kN</i></td>
                 <td><i>; shear</i></td>
