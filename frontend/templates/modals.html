@@ -70,6 +70,7 @@
             </button>
         </div>
         <div class="modal__content">
+            <p class="modal__section-heading">Project Info</p>
             <div class="modal__form-grid">
                 <div class="input__field">
                     <label for="gen-project-number">Ref. No.</label>
@@ -101,9 +102,82 @@
                 </div>
             </div>
 
-            <div>
-                <!-- company and specifier info including company logo will be here.
-                this info will be used in pdf report rather than hardcoded data in pdf. -->
+            <div class="modal__section">
+                <p class="modal__section-heading">Company Info <span class="modal__section-hint">(appears on report cover)</span></p>
+                <div class="modal__logo-row">
+                    <label class="modal__logo-label">Company Logo</label>
+                    <div class="logo-upload">
+                        <div class="logo-upload__preview" id="logo-upload-preview">
+                            <img id="logo-upload-img" src="/static/assets/logo.png" alt="Company logo">
+                        </div>
+                        <div class="logo-upload__controls">
+                            <button type="button" class="modal__btn modal__btn-secondary logo-upload__btn" id="logo-upload-btn">Upload Logo</button>
+                            <button type="button" class="modal__btn modal__btn-ghost logo-upload__remove" id="logo-upload-remove" hidden>Remove</button>
+                            <input type="file" id="logo-upload-input" accept="image/*" hidden>
+                            <span class="logo-upload__hint">PNG, JPG, SVG. Recommended: transparent background.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal__form-grid">
+                    <div class="input__field">
+                        <label for="gen-company-name">Company Name</label>
+                        <input type="text" id="gen-company-name" placeholder="e.g. Arman Engineering Ltd.">
+                    </div>
+                    <div class="input__field">
+                        <label for="gen-company-website">Website</label>
+                        <input type="text" id="gen-company-website" placeholder="e.g. www.example.com">
+                    </div>
+                    <div class="input__field">
+                        <label for="gen-company-email">Email</label>
+                        <input type="text" id="gen-company-email" placeholder="e.g. info@example.com">
+                    </div>
+                    <div class="input__field">
+                        <label for="gen-company-address1">Address Line 1</label>
+                        <input type="text" id="gen-company-address1" placeholder="e.g. 4th Floor (Level-05) 464/H">
+                    </div>
+                    <div class="input__field">
+                        <label for="gen-company-address2">Address Line 2</label>
+                        <input type="text" id="gen-company-address2" placeholder="e.g. Islam Tower, DIT Road">
+                    </div>
+                    <div class="input__field">
+                        <label for="gen-company-address3">Address Line 3</label>
+                        <input type="text" id="gen-company-address3" placeholder="e.g. Rampura, Dhaka-1219, Bangladesh.">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal__section">
+                <p class="modal__section-heading">Specifier Info <span class="modal__section-hint">(appears on report revision table)</span></p>
+                <div class="modal__form-grid">
+                    <div class="modal__form-full modal__specifier-row">
+                        <div class="input__field">
+                            <label for="gen-prepared-name">Prepared By – Name</label>
+                            <input type="text" id="gen-prepared-name" placeholder="e.g. Md. Akram Hossain">
+                        </div>
+                        <div class="input__field">
+                            <label for="gen-prepared-title">Title / Designation</label>
+                            <input type="text" id="gen-prepared-title" placeholder="e.g. Structural Engineer">
+                        </div>
+                        <div class="input__field">
+                            <label for="gen-prepared-reg">Reg. No.</label>
+                            <input type="text" id="gen-prepared-reg" placeholder="e.g. AMIEB A-26033">
+                        </div>
+                    </div>
+                    <div class="modal__form-full modal__specifier-row">
+                        <div class="input__field">
+                            <label for="gen-checked-name">Checked By – Name</label>
+                            <input type="text" id="gen-checked-name" placeholder="e.g. Bashir Ahmed Khan">
+                        </div>
+                        <div class="input__field">
+                            <label for="gen-checked-title">Title / Designation</label>
+                            <input type="text" id="gen-checked-title" placeholder="e.g. Managing Director">
+                        </div>
+                        <div class="input__field">
+                            <label for="gen-checked-reg">Reg. No.</label>
+                            <input type="text" id="gen-checked-reg" placeholder="e.g. (optional)">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="modal__include-area">

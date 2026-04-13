@@ -9,6 +9,7 @@ import { _materials } from './materialProp.js';
 import { _alumSections } from './alumSecProp.js';
 import { _steelSections } from './steelSecProp.js';
 import { getWindInputsForSave, getCurrentPanelMode, savedFacadeContent } from './inputPanel.js';
+import { getLogoDataUrl } from './generalInfo.js';
 
 let _isGenerating = false;
 
@@ -35,6 +36,19 @@ function _collectGeneralInfo() {
         rev: _setVal('gen-rev'),
         date: _setVal('gen-date'),
         description: _setVal('gen-description'),
+        companyName: _setVal('gen-company-name'),
+        companyAddress1: _setVal('gen-company-address1'),
+        companyAddress2: _setVal('gen-company-address2'),
+        companyAddress3: _setVal('gen-company-address3'),
+        companyWebsite: _setVal('gen-company-website'),
+        companyEmail: _setVal('gen-company-email'),
+        preparedName: _setVal('gen-prepared-name'),
+        preparedTitle: _setVal('gen-prepared-title'),
+        preparedReg: _setVal('gen-prepared-reg'),
+        checkedName: _setVal('gen-checked-name'),
+        checkedTitle: _setVal('gen-checked-title'),
+        checkedReg: _setVal('gen-checked-reg'),
+        logoDataUrl: getLogoDataUrl() || undefined,
         reportIncludes,
     };
 }

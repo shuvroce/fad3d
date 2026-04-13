@@ -618,7 +618,19 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         "client": general_info.get("client", ""),
         "project_client": general_info.get("client", ""),
         "description": general_info.get("description", ""),
-        "logo_url": Path(os.path.join(FRONTEND_DIR, "static", "assets", "logo.png")).as_uri(),
+        "company_name": general_info.get("companyName", ""),
+        "company_address1": general_info.get("companyAddress1", ""),
+        "company_address2": general_info.get("companyAddress2", ""),
+        "company_address3": general_info.get("companyAddress3", ""),
+        "company_website": general_info.get("companyWebsite", ""),
+        "company_email": general_info.get("companyEmail", ""),
+        "prepared_name": general_info.get("preparedName", ""),
+        "prepared_title": general_info.get("preparedTitle", ""),
+        "prepared_reg": general_info.get("preparedReg", ""),
+        "checked_name": general_info.get("checkedName", ""),
+        "checked_title": general_info.get("checkedTitle", ""),
+        "checked_reg": general_info.get("checkedReg", ""),
+        "logo_url": general_info.get("logoDataUrl") or Path(os.path.join(FRONTEND_DIR, "static", "assets", "logo.png")).as_uri(),
     }
 
     data = {

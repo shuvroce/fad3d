@@ -64,8 +64,8 @@
             <tr>
                 <td>{{ project_info.date }}</td>
                 <td>{{ project_info.rev_no }}</td>
-                <td>Md. Akram Hossain <span>Structural Engineer</span> <span>AMIEB A-26033</span></td>
-                <td>Bashir Ahmed Khan <span>Managing Director</span></td>
+                <td>{{ project_info.prepared_name }}{% if project_info.prepared_title %} <span>{{ project_info.prepared_title }}</span>{% endif %}{% if project_info.prepared_reg %} <span>{{ project_info.prepared_reg }}</span>{% endif %}</td>
+                <td>{{ project_info.checked_name }}{% if project_info.checked_title %} <span>{{ project_info.checked_title }}</span>{% endif %}{% if project_info.checked_reg %} <span>{{ project_info.checked_reg }}</span>{% endif %}</td>
             </tr>
         </tbody>
     </table>

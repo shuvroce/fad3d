@@ -17,6 +17,18 @@ function _setVal(id, value) {
     el.value = value;
 }
 
+function _getLogoDataUrl() {
+    // Dynamic import to avoid circular dependency at module evaluation time
+    try {
+        // Access via cached module if already loaded
+        const mod = _logoModuleCache;
+        return mod ? mod.getLogoDataUrl() : null;
+    } catch { return null; }
+}
+
+let _logoModuleCache = null;
+import('./generalInfo.js').then(mod => { _logoModuleCache = mod; }).catch(() => {});
+
 function _notify(message) {
     const bar = document.getElementById('topbar__status-notification');
     if (!bar) return;
@@ -45,6 +57,19 @@ function _collectGeneralInfo() {
         rev: v('gen-rev') || undefined,
         date: v('gen-date') || undefined,
         description: v('gen-description') || undefined,
+        companyName: v('gen-company-name') || undefined,
+        companyAddress1: v('gen-company-address1') || undefined,
+        companyAddress2: v('gen-company-address2') || undefined,
+        companyAddress3: v('gen-company-address3') || undefined,
+        companyWebsite: v('gen-company-website') || undefined,
+        companyEmail: v('gen-company-email') || undefined,
+        preparedName: v('gen-prepared-name') || undefined,
+        preparedTitle: v('gen-prepared-title') || undefined,
+        preparedReg: v('gen-prepared-reg') || undefined,
+        checkedName: v('gen-checked-name') || undefined,
+        checkedTitle: v('gen-checked-title') || undefined,
+        checkedReg: v('gen-checked-reg') || undefined,
+        logoDataUrl: _getLogoDataUrl() || undefined,
         reportIncludes,
     };
 }
@@ -354,6 +379,22 @@ function _restoreGeneralInfo(info) {
     _setVal('gen-rev', info.rev);
     _setVal('gen-date', info.date);
     _setVal('gen-description', info.description);
+    _setVal('gen-company-name', info.companyName);
+    _setVal('gen-company-address1', info.companyAddress1);
+    _setVal('gen-company-address2', info.companyAddress2);
+    _setVal('gen-company-address3', info.companyAddress3);
+    _setVal('gen-company-website', info.companyWebsite);
+    _setVal('gen-company-email', info.companyEmail);
+    _setVal('gen-prepared-name', info.preparedName);
+    _setVal('gen-prepared-title', info.preparedTitle);
+    _setVal('gen-prepared-reg', info.preparedReg);
+    _setVal('gen-checked-name', info.checkedName);
+    _setVal('gen-checked-title', info.checkedTitle);
+    _setVal('gen-checked-reg', info.checkedReg);
+
+    if (info.logoDataUrl !== undefined) {
+        import('./generalInfo.js').then(mod => mod.setLogoDataUrl(info.logoDataUrl)).catch(() => {});
+    }
 
     if (info.reportIncludes) {
         Object.entries(info.reportIncludes).forEach(([id, checked]) => {
