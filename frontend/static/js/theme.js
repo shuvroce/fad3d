@@ -2,31 +2,61 @@
 // Theme Toggle Functionality
 // ============================
 
-function initTheme() {
-    const themeToggle = document.getElementById("theme__toggle");
-    const themeIconSun = document.getElementById("theme-icon-sun");
-    const themeIconMoon = document.getElementById("theme-icon-moon");
-    const body = document.body;
+let _systemMediaQuery = null;
 
-    function applyTheme(theme) {
-        if (theme === "dark") {
-            body.classList.add("theme__dark");
-            themeIconSun.classList.remove("hidden");
-            themeIconMoon.classList.add("hidden");
-        } else {
-            body.classList.remove("theme__dark");
-            themeIconSun.classList.add("hidden");
-            themeIconMoon.classList.remove("hidden");
-        }
+function _effectiveIsDark(theme) {
+    if (theme === 'dark') return true;
+    if (theme === 'system') return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return false;
+}
+
+function _applyEffectiveDark(isDark) {
+    document.body.classList.toggle('theme__dark', isDark);
+    const sun  = document.getElementById('theme-icon-sun');
+    const moon = document.getElementById('theme-icon-moon');
+    if (sun && moon) {
+        sun.classList.toggle('hidden', !isDark);
+        moon.classList.toggle('hidden', isDark);
+    }
+}
+
+/** Apply a theme value ('light' | 'dark' | 'system') without saving to localStorage. */
+function applyTheme(theme) {
+    _applyEffectiveDark(_effectiveIsDark(theme));
+}
+
+/** Set and persist a theme value; manages the system media-query listener. */
+function setTheme(theme) {
+    localStorage.setItem('theme', theme);
+    _applyEffectiveDark(_effectiveIsDark(theme));
+
+    // Manage system listener
+    if (_systemMediaQuery) {
+        _systemMediaQuery.removeEventListener('change', _onSystemChange);
+        _systemMediaQuery = null;
+    }
+    if (theme === 'system') {
+        _systemMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        _systemMediaQuery.addEventListener('change', _onSystemChange);
     }
 
-    applyTheme(localStorage.getItem("theme") || "light");
+    document.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme } }));
+}
 
-    themeToggle?.addEventListener("click", () => {
-        const newTheme = body.classList.contains("theme__dark") ? "light" : "dark";
-        applyTheme(newTheme);
-        localStorage.setItem("theme", newTheme);
-        document.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: newTheme } }));
+function _onSystemChange() {
+    _applyEffectiveDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+
+function initTheme() {
+    const themeToggle = document.getElementById("theme__toggle");
+
+    // Apply persisted theme (including system listener if needed)
+    setTheme(localStorage.getItem('theme') || 'light');
+
+    // Topbar toggle: quick-switch between light and dark
+    themeToggle?.addEventListener('click', () => {
+        const newTheme = document.body.classList.contains('theme__dark') ? 'light' : 'dark';
+        setTheme(newTheme);
     });
 }
 
@@ -77,4 +107,4 @@ function initTooltips() {
     }
 }
 
-export { initTheme, initTooltips };
+export { initTheme, initTooltips, setTheme, applyTheme };

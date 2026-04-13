@@ -691,7 +691,7 @@
         <div class="settings-modal__layout">
             <!-- Sidebar nav -->
             <nav class="settings-modal__nav" aria-label="Settings sections">
-                <button class="settings-modal__nav-btn active" data-settings-tab="general">General</button>
+                <button class="settings-modal__nav-btn active" data-settings-tab="appearance">Appearance</button>
                 <button class="settings-modal__nav-btn" data-settings-tab="design">Design Codes</button>
                 <button class="settings-modal__nav-btn" data-settings-tab="units">Units</button>
                 <button class="settings-modal__nav-btn" data-settings-tab="deflection">Deflection</button>
@@ -699,8 +699,41 @@
 
             <!-- Content pane -->
             <div class="settings-modal__pane">
-                <!-- General tab -->
-                <!-- theme, animation setting etc. -->
+                <!-- Appearance tab -->
+                <div class="settings-modal__tab" data-settings-tab="appearance">
+                    <p class="modal__form-section-title">Appearance</p>
+                    <div class="modal__form-grid">
+                        <div class="input__field modal__form-full">
+                            <label>Theme</label>
+                            <div class="settings__radio-group settings__radio-group--row">
+                                <label class="settings__radio-option">
+                                    <input type="radio" name="setting-theme" value="light">
+                                    <span>Light</span>
+                                </label>
+                                <label class="settings__radio-option">
+                                    <input type="radio" name="setting-theme" value="dark">
+                                    <span>Dark</span>
+                                </label>
+                                <label class="settings__radio-option">
+                                    <input type="radio" name="setting-theme" value="system">
+                                    <span>System</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input__field modal__form-full">
+                            <div class="settings__toggle-row">
+                                <div>
+                                    <span class="settings__toggle-label">UI Animations</span>
+                                    <span class="settings__toggle-desc">Enable transition and motion effects</span>
+                                </div>
+                                <label class="settings__toggle-switch">
+                                    <input type="checkbox" id="setting-animations" checked>
+                                    <span class="settings__toggle-track"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Design Codes -->
                 <div class="settings-modal__tab" data-settings-tab="design">

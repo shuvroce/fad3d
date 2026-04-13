@@ -3,6 +3,7 @@
 // ============================
 
 import { openModal, closeModal } from './floatingBar.js';
+import { setTheme } from './theme.js';
 
 const _settingsDefaults = {
     windCode:        'BNBC2020',
@@ -13,6 +14,7 @@ const _settingsDefaults = {
     glassDeflType:   'span_ratio',
     glassDeflRatio:  60,
     glassDeflAbs:    25,
+    animationsEnabled: true,
 };
 
 let _settingsCurrent = Object.assign({}, _settingsDefaults);
@@ -22,6 +24,7 @@ function loadSettingsFromStorage() {
     if (saved) {
         try { Object.assign(_settingsCurrent, JSON.parse(saved)); } catch (_) {}
     }
+    _applyAnimationSetting();
 }
 
 function saveSettingsToStorage() {
@@ -49,6 +52,14 @@ function _applyToForm() {
     g('setting-glass-defl-ratio').value = _settingsCurrent.glassDeflRatio;
     g('setting-glass-defl-abs').value   = _settingsCurrent.glassDeflAbs;
 
+    // Theme radio — read from localStorage (theme is not in fad3d-settings)
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.querySelectorAll('input[name="setting-theme"]').forEach(r => {
+        r.checked = r.value === currentTheme;
+    });
+
+    g('setting-animations').checked = _settingsCurrent.animationsEnabled !== false;
+
     _syncDeflFields('glass');
     _syncDeflFields('frame');
 }
@@ -68,6 +79,8 @@ function _readFromForm() {
     _settingsCurrent.glassDeflType   = g('setting-glass-defl-type').value;
     _settingsCurrent.glassDeflRatio  = Number(g('setting-glass-defl-ratio').value);
     _settingsCurrent.glassDeflAbs    = Number(g('setting-glass-defl-abs').value);
+
+    _settingsCurrent.animationsEnabled = g('setting-animations').checked;
 }
 
 // Show/hide ratio vs absolute deflection fields
@@ -78,6 +91,10 @@ function _syncDeflFields(prefix) {
     if (!ratioWrap || !absWrap) return;
     ratioWrap.classList.toggle('hidden', type === 'absolute');
     absWrap.classList.toggle('hidden',   type === 'span_ratio');
+}
+
+function _applyAnimationSetting() {
+    document.body.classList.toggle('no-animations', !_settingsCurrent.animationsEnabled);
 }
 
 // Sidebar tab switching
@@ -128,6 +145,12 @@ function initSettingsModal() {
     applyBtn?.addEventListener('click', () => {
         _readFromForm();
         saveSettingsToStorage();
+        _applyAnimationSetting();
+
+        // Apply theme selection
+        const themeRadio = document.querySelector('input[name="setting-theme"]:checked');
+        if (themeRadio) setTheme(themeRadio.value);
+
         closeModal('settings-modal');
         document.dispatchEvent(new CustomEvent('settingsChanged', { detail: getSettings() }));
     });
