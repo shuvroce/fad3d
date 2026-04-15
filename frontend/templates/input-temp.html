@@ -171,21 +171,21 @@
 
                     <div class="input__field-row">
                         <div class="input__field">
-                            <label for="topo_height">Topography Height</label>
+                            <label for="topo_height">Height</label>
                             <div class="input__group">
                                 <input type="number" id="topo_height" name="topo_height">
                                 <span class="input__unit">m</span>
                             </div>
                         </div>
                         <div class="input__field">
-                            <label for="topo_length">Topography Length</label>
+                            <label for="topo_length">Length</label>
                             <div class="input__group">
                                 <input type="number" id="topo_length" name="topo_length">
                                 <span class="input__unit">m</span>
                             </div>
                         </div>
                         <div class="input__field">
-                            <label for="topo_distance">Topography Distance</label>
+                            <label for="topo_distance">Distance</label>
                             <div class="input__group">
                                 <input type="number" id="topo_distance" name="topo_distance">
                                 <span class="input__unit">m</span>
@@ -1061,7 +1061,7 @@
                             <path d="M14,10 h12 v20 h-12 Z"/>
                         </svg>
                     </span>
-                    <span class="type-radio__label">Alu Only</span>
+                    <span class="type-radio__label">Alum Only</span>
                 </button>
                 <button type="button" class="type-radio__card" data-value="alu-steel">
                     <span class="type-radio__icon">
@@ -1071,7 +1071,7 @@
                             <rect x="16" y="13" width="8" height="14" fill="currentColor" fill-opacity="0.6" stroke="none"/>
                         </svg>
                     </span>
-                    <span class="type-radio__label">Alu + Steel</span>
+                    <span class="type-radio__label">Alum + Steel</span>
                 </button>
             </div>
         </div>
@@ -1338,14 +1338,14 @@
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="cat0-frame-irregular-alu-mul_vu">Mullion Shear, V<sub>u</sub></label>
+                        <label for="cat0-frame-irregular-alu-mul_vu">Shear, V<sub>u</sub></label>
                         <div class="input__group">
                             <input type="number" id="cat0-frame-irregular-alu-mul_vu">
                             <span class="input__unit">kN</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="cat0-frame-irregular-alu-mul_def">Mullion Deflection, δ</label>
+                        <label for="cat0-frame-irregular-alu-mul_def">Deflection, δ</label>
                         <div class="input__group">
                             <input type="number" id="cat0-frame-irregular-alu-mul_def">
                             <span class="input__unit">mm</span>
@@ -1361,7 +1361,7 @@
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="cat0-frame-irregular-alu-tran_vu">Transom Shear, V<sub>u</sub></label>
+                        <label for="cat0-frame-irregular-alu-tran_vu">Shear, V<sub>u</sub></label>
                         <div class="input__group">
                             <input type="number" id="cat0-frame-irregular-alu-tran_vu">
                             <span class="input__unit">kN</span>
@@ -1370,14 +1370,14 @@
                 </div>
                 <div class="input__field-row">
                     <div class="input__field">
-                        <label for="cat0-frame-irregular-alu-tran_def_wind">Transom Deflection (Wind), δ<sub>w</sub></label>
+                        <label for="cat0-frame-irregular-alu-tran_def_wind">T. Deflection (Wind), δ<sub>w</sub></label>
                         <div class="input__group">
                             <input type="number" id="cat0-frame-irregular-alu-tran_def_wind">
                             <span class="input__unit">mm</span>
                         </div>
                     </div>
                     <div class="input__field">
-                        <label for="cat0-frame-irregular-alu-tran_def_dead">Transom Deflection (Dead), δ<sub>d</sub></label>
+                        <label for="cat0-frame-irregular-alu-tran_def_dead">Deflection (Dead), δ<sub>d</sub></label>
                         <div class="input__group">
                             <input type="number" id="cat0-frame-irregular-alu-tran_def_dead">
                             <span class="input__unit">mm</span>
@@ -1662,20 +1662,26 @@
                         <input type="number" id="cat0-anchor-box-clump-anchor_nos" value="4">
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-box-clump-anchor_dia">Diameter of Anchor bolt, d<sub>a</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-box-clump-anchor_dia" value="12">
-                        <span class="input__unit">mm</span>
+
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-anchor-box-clump-anchor_dia">Diameter of Anchor bolt, d<sub>a</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-box-clump-anchor_dia" value="12">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-anchor-box-clump-embed_depth">Embed. Depth of Anchor, h<sub>ef</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-box-clump-embed_depth" value="70">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-box-clump-embed_depth">Embed. Depth of Anchor, h<sub>ef</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-box-clump-embed_depth" value="70">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
+                    
+
+
                 <div class="input__field">
                     <label for="cat0-anchor-box-clump-C_a1">Edge Distance, C<sub>a1</sub></label>
                     <div class="input__group">
@@ -1689,20 +1695,23 @@
         <!-- U Clump -->
         <div class="anchor__variant-fields hidden" data-category="0" data-anchor-variant="u-clump">
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-anchor-u-clump-bp_thk">Thickness of Base Plate, t</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-u-clump-bp_thk" value="6">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-anchor-u-clump-bp_thk">Thickness of Base Plate, t</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-u-clump-bp_thk" value="6">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-anchor-u-clump-fin_thk">Thickness of Fin Plate</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-u-clump-fin_thk" value="5">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-u-clump-fin_thk">Thickness of Fin Plate</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-u-clump-fin_thk" value="5">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
+                    
                 <div class="input__field">
                     <label for="cat0-anchor-u-clump-fin_e">Eccentricity, e</label>
                     <div class="input__group">
@@ -1716,20 +1725,24 @@
                         <input type="number" id="cat0-anchor-u-clump-anchor_nos" value="4">
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-u-clump-anchor_dia">Diameter of Anchor bolt, d<sub>a</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-u-clump-anchor_dia" value="12">
-                        <span class="input__unit">mm</span>
+
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-anchor-u-clump-anchor_dia">Diameter of Anchor bolt, d<sub>a</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-u-clump-anchor_dia" value="12">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-anchor-u-clump-embed_depth">Embed. Depth of Anchor, h<sub>ef</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-u-clump-embed_depth" value="70">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-u-clump-embed_depth">Embed. Depth of Anchor, h<sub>ef</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-u-clump-embed_depth" value="70">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
+
                 <div class="input__field">
                     <label for="cat0-anchor-u-clump-C_a1">Edge Distance, C<sub>a1</sub></label>
                     <div class="input__group">
@@ -1750,41 +1763,51 @@
         <!-- L Clump -->
         <div class="anchor__variant-fields hidden" data-category="0" data-anchor-variant="l-clump">
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-front_bp_length_N">Length of Front Base Plate, N</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-front_bp_length_N" value="250">
-                        <span class="input__unit">mm</span>
+
+                <div class="input__field-ex">
+                    <label for="cat0-anchor-l-clump-front_bp_length_N">Base Plate Size, (N x B x L)</label>
+                    <div class="input__field-row">
+                        <div class="input__field">
+                            <!-- <label for="cat0-anchor-l-clump-front_bp_length_N">Length of Front Base Plate, N</label> -->
+                            <div class="input__group">
+                                <input type="number" id="cat0-anchor-l-clump-front_bp_length_N" value="250">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <!-- <label for="cat0-anchor-l-clump-front_bp_width_B">Width of Front Base Plate, B</label> -->
+                            <div class="input__group">
+                                <input type="number" id="cat0-anchor-l-clump-front_bp_width_B" value="150">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <!-- <label for="cat0-anchor-l-clump-top_bp_width_B">Depth of Top Base Plate, H</label> -->
+                            <div class="input__group">
+                                <input type="number" id="cat0-anchor-l-clump-top_bp_width_B" value="250">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-front_bp_width_B">Width of Front Base Plate, B</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-front_bp_width_B" value="150">
-                        <span class="input__unit">mm</span>
+                    
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-anchor-l-clump-bp_thk">Thickness of Base Plate, t</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-l-clump-bp_thk" value="8">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-anchor-l-clump-fin_thk">Thickness of Fin Plate</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-l-clump-fin_thk" value="5">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-top_bp_width_B">Depth of Top Base Plate, H</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-top_bp_width_B" value="250">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-bp_thk">Thickness of Base Plate, t</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-bp_thk" value="8">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-fin_thk">Thickness of Fin Plate</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-fin_thk" value="5">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
+                    
                 <div class="input__field">
                     <label for="cat0-anchor-l-clump-fin_e">Eccentricity, e</label>
                     <div class="input__group">
@@ -1798,34 +1821,41 @@
                         <input type="number" id="cat0-anchor-l-clump-top_anchor_nos" value="2">
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-anchor_dia">Diameter of Anchor bolt, d<sub>a</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-anchor_dia" value="12">
-                        <span class="input__unit">mm</span>
+
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-anchor-l-clump-anchor_dia">Diameter of Anchor bolt, d<sub>a</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-l-clump-anchor_dia" value="12">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-anchor-l-clump-embed_depth">Embed. Depth of Anchor, h<sub>ef</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-l-clump-embed_depth" value="70">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-embed_depth">Embed. Depth of Anchor, h<sub>ef</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-embed_depth" value="70">
-                        <span class="input__unit">mm</span>
+
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-anchor-l-clump-front_C_a1">Front Anchor, C<sub>a1</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-l-clump-front_C_a1" value="75">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-anchor-l-clump-top_C_a1">Top Anchor, C<sub>a1</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-anchor-l-clump-top_C_a1" value="150">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-front_C_a1">Edge Distance for Front Anchor, C<sub>a1</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-front_C_a1" value="75">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-top_C_a1">Edge Distance of Top Anchor, C<sub>a1</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-top_C_a1" value="150">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
+
                 <div class="input__field">
                     <label for="cat0-anchor-l-clump-thr_bolt_dia">Diameter of Through bolt, d<sub>b</sub></label>
                     <div class="input__group">

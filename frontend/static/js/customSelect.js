@@ -7,7 +7,7 @@ function initCustomSelectLogic() {
     const nativeValueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
 
     // Build the option list from the native select
-    function buildList(list, selectEl, selected) {
+    function buildList(list, selectEl, selected, closeCallback) {
         list.innerHTML = '';
         Array.from(selectEl.options).forEach(opt => {
             const item = document.createElement('div');
@@ -23,8 +23,7 @@ function initCustomSelectLogic() {
                     selectEl.dispatchEvent(new Event('change', { bubbles: true }));
                     syncHighlight(list, selectEl);
                     syncDisplay(selected, selectEl);
-                    list.parentElement.classList.remove('open');
-                    list.parentElement.querySelector('.custom-select__selected').setAttribute('aria-expanded', 'false');
+                    closeCallback();
                 });
             }
             list.appendChild(item);
@@ -46,15 +45,25 @@ function initCustomSelectLogic() {
         });
     }
 
-    // Flip the list above the trigger if there's not enough space below
+    // Position the list using fixed coords so it escapes overflow-clipping ancestors
     function positionList(wrapper, list) {
         const rect = wrapper.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom;
         const openUp = spaceBelow < 220 && rect.top > spaceBelow;
-        list.style.top = openUp ? 'auto' : '100%';
-        list.style.bottom = openUp ? '100%' : 'auto';
-        list.style.marginTop = openUp ? '0' : '2px';
-        list.style.marginBottom = openUp ? '2px' : '0';
+
+        list.style.width = rect.width + 'px';
+        list.style.left = rect.left + 'px';
+        list.style.right = 'auto';
+        list.style.marginTop = '0';
+        list.style.marginBottom = '0';
+
+        if (openUp) {
+            list.style.top = 'auto';
+            list.style.bottom = (window.innerHeight - rect.top + 2) + 'px';
+        } else {
+            list.style.top = (rect.bottom + 2) + 'px';
+            list.style.bottom = 'auto';
+        }
         list.classList.toggle('open-up', openUp);
     }
 
@@ -96,23 +105,38 @@ function initCustomSelectLogic() {
         selectEl.style.display = 'none';
         wrapper.appendChild(selectEl);
 
-        buildList(list, selectEl, selected);
+        buildList(list, selectEl, selected, () => close());
 
         // Open / close helpers
         function open() {
             document.querySelectorAll('.custom-select.open').forEach(el => {
                 el.classList.remove('open');
                 el.querySelector('.custom-select__selected').setAttribute('aria-expanded', 'false');
+                // return any portalled list back to its wrapper
+                const orphan = el._portalList;
+                if (orphan && orphan.parentNode === document.body) {
+                    el.appendChild(orphan);
+                }
             });
             wrapper.classList.add('open');
             selected.setAttribute('aria-expanded', 'true');
+            // Portal: move list to <body> so no ancestor transform affects fixed coords
+            document.body.appendChild(list);
+            wrapper._portalList = list;
             positionList(wrapper, list);
         }
 
         function close() {
             wrapper.classList.remove('open');
             selected.setAttribute('aria-expanded', 'false');
+            // Return list to wrapper
+            if (list.parentNode === document.body) {
+                wrapper.appendChild(list);
+            }
         }
+
+        // Close on scroll so the list doesn't drift from its trigger
+        window.addEventListener('scroll', close, { passive: true, capture: true });
 
         // Mouse interaction
         selected.addEventListener('click', e => {
@@ -146,7 +170,7 @@ function initCustomSelectLogic() {
         });
 
         // Rebuild list when options are added / removed (dynamic population)
-        const optObserver = new MutationObserver(() => buildList(list, selectEl, selected));
+        const optObserver = new MutationObserver(() => buildList(list, selectEl, selected, () => close()));
         optObserver.observe(selectEl, { childList: true, subtree: true });
 
         // Intercept programmatic value changes (e.g. sel.value = prev)
@@ -166,6 +190,10 @@ function initCustomSelectLogic() {
         document.querySelectorAll('.custom-select.open').forEach(el => {
             el.classList.remove('open');
             el.querySelector('.custom-select__selected').setAttribute('aria-expanded', 'false');
+            const orphan = el._portalList;
+            if (orphan && orphan.parentNode === document.body) {
+                el.appendChild(orphan);
+            }
         });
     });
 

@@ -10,7 +10,7 @@
     --topbar-height: 3.5rem;
     --floating-height: 2rem;
     --catbar-width: 3.8rem;
-    --input-field-width: 26.5rem;
+    --input-field-width: 25rem;
     --viewport-width: 60rem;
     --figure-panel-width: 20rem;
     --result-width: 25rem;
@@ -420,125 +420,36 @@ textarea {
     font-family: monospace;
 }
 
-/* native select is hidden — custom-select widget takes over */
+/* Native select styling */
 select {
     -webkit-appearance: none;
     appearance: none;
-}
-
-/* Custom Select Widget */
-.custom-select {
-    position: relative;
-    flex: 1 1 calc(50% - 15px);
-    min-width: 200px;
-    box-sizing: border-box;
-    user-select: none;
-}
-
-.custom-select__selected {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 8px;
+    padding: 5px 28px 5px 8px;
     border: 1px solid var(--border-input);
     background-color: var(--bg-input);
     color: var(--text-primary);
     border-radius: var(--radius-1);
     cursor: pointer;
-    transition: var(--transition-bg), var(--transition-border);
+    font-size: 0.875rem;
+    font-family: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpolyline points='2,4 6,8 10,4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    width: 100%;
 }
 
-.custom-select__selected-text {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.custom-select__arrow {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    color: var(--text-secondary);
-    transition: transform 0.15s ease;
-}
-
-.custom-select.open .custom-select__arrow {
-    transform: rotate(180deg);
-}
-
-.custom-select__selected:hover {
+select:hover {
     border-color: var(--border-secondary);
 }
 
-.custom-select.open .custom-select__selected,
-.custom-select__selected:focus {
-    /* border-color: var(--color-primary); */
-    /* outline: none; */
-    /* box-shadow: 0 0 0 1px var(--color-primary); */
-    transition: box-shadow 0.1s ease;
+select:focus {
+    outline: none;
+    border-color: var(--border-secondary);
 }
 
-.custom-select__list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 2000;
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border-input);
-    border-radius: var(--radius-1);
-    margin-top: 2px;
-    max-height: 220px;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-    /* closed state */
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(-6px) scaleY(0.96);
-    transform-origin: top;
-    pointer-events: none;
-    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s 0.12s;
-}
-
-.custom-select__list.open-up {
-    transform: translateY(6px) scaleY(0.96);
-    transform-origin: bottom;
-}
-
-.custom-select.open .custom-select__list {
-    visibility: visible;
-    padding: 0.5rem;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    transition: opacity 0.12s ease, transform 0.12s ease;
-}
-
-.custom-select__option {
-    padding: 6px 10px;
-    border-radius: var(--radius-2);
-    cursor: pointer;
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    transition: background-color 0.12s;
-}
-
-.custom-select__option:hover {
-    background-color: var(--bg-hover);
-}
-
-.custom-select__option.active {
-    background-color: var(--btn-selected);
-    color: var(--text-link);
-}
-
-.custom-select__option.disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+body.theme__dark select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpolyline points='2,4 6,8 10,4' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 input[type="checkbox"] {
@@ -3057,11 +2968,22 @@ body.no-animations *::after {
     min-width: 0;
 }
 
-.input__field-row .input__field .custom-select,
 .input__field-row .input__field select {
     min-width: 0;
     flex: 1;
     width: 100%;
+}
+
+.input__field-ex {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.input__field-ex label {
+    color: var(--text-label);
+    font-size: 0.73rem;
+    font-weight: 500;
 }
 
 /* Glass thickness row */
