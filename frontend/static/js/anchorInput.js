@@ -11,32 +11,29 @@ function switchAnchorVariant(categoryNum, clumpType) {
         });
 }
 
-// Reads the current clump type select value and triggers the switch.
+// Reads the current clump type hidden input value and triggers the switch.
 function syncAnchorVariant(categoryNum) {
-    const sel = document.getElementById(`cat${categoryNum}-anchor-type`);
-    if (sel) switchAnchorVariant(categoryNum, sel.value);
+    const input = document.getElementById(`cat${categoryNum}-anchor-type`);
+    if (input) switchAnchorVariant(categoryNum, input.value);
 }
 
 function initAnchorInput() {
-    // Initialize on load for all existing categories
     initAnchorVariants();
-
-    // Delegated listener — works for dynamically created categories
     document.addEventListener("change", anchorInputChangeHandler);
 }
 
 function anchorInputChangeHandler(e) {
-    const select = e.target;
-    if (!select.matches("select[id$='-anchor-type']")) return;
+    const el = e.target;
+    if (!el.matches("input[type='hidden'][id$='-anchor-type']")) return;
 
-    const match = select.id.match(/^cat(\d+)-anchor-type$/);
+    const match = el.id.match(/^cat(\d+)-anchor-type$/);
     if (match) syncAnchorVariant(match[1]);
 }
 
 // Initialize on load for all existing categories.
 function initAnchorVariants() {
-    document.querySelectorAll("select[id$='-anchor-type']").forEach((sel) => {
-        const match = sel.id.match(/^cat(\d+)-anchor-type$/);
+    document.querySelectorAll("input[type='hidden'][id$='-anchor-type']").forEach((input) => {
+        const match = input.id.match(/^cat(\d+)-anchor-type$/);
         if (match) syncAnchorVariant(match[1]);
     });
 }

@@ -22,6 +22,7 @@ import { initCategories } from './category.js';
 import { initGlassInput } from './glassInput.js';
 import { initFrameInput } from './frameInput.js';
 import { initAnchorInput } from './anchorInput.js';
+import { initGeneralInput } from './generalInput.js';
 
 // Import modal system
 import { initModals } from './modals.js';
@@ -85,6 +86,7 @@ async function initPhase3() {
     _safe('Glass input', initGlassInput);
     _safe('Frame input', initFrameInput);
     _safe('Anchor input', initAnchorInput);
+    _safe('General input', initGeneralInput);
 }
 
 // Phase 4: Modal system

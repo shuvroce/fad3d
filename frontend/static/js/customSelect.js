@@ -61,6 +61,7 @@ function initCustomSelectLogic() {
     // Initialize one native <select>
     function initCustomSelect(selectEl) {
         if (selectEl.dataset.customSelectInit) return;
+        if (selectEl.dataset.noCustomSelect !== undefined) return;
         selectEl.dataset.customSelectInit = 'true';
 
         // Wrapper inherits the flex slot from the native select

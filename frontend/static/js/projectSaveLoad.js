@@ -15,6 +15,15 @@ function _setVal(id, value) {
     const el = document.getElementById(id);
     if (!el || value == null) return;
     el.value = value;
+    // Sync radio card active state if this hidden input drives a type-radio group
+    const group = document.querySelector(`[data-radio-target="${id}"]`);
+    if (group) {
+        group.querySelectorAll('.type-radio__card').forEach(card => {
+            card.classList.toggle('active', card.dataset.value === value);
+        });
+        // Dispatch change so dependent handlers (e.g. glass type switch, point-fixed fields) run
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 }
 
 function _getLogoDataUrl() {

@@ -220,7 +220,17 @@
         <h2 class="input__category-heading" contenteditable="true" data-category="0" spellcheck="false">Category 0</h2>
     </div>
     <div class="input__box-nav">
-        <button class="input__box-nav-btn active" data-category="0" data-tab="glass">
+        <button class="input__box-nav-btn active" data-category="0" data-tab="general">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <line x1="12" y1="2" x2="12" y2="6" />
+                <line x1="12" y1="18" x2="12" y2="22" />
+                <line x1="2" y1="12" x2="6" y2="12" />
+                <line x1="18" y1="12" x2="22" y2="12" />
+            </svg>
+            <!-- General -->
+        </button>
+        <button class="input__box-nav-btn" data-category="0" data-tab="glass">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <line x1="3" y1="12" x2="21" y2="12" />
@@ -253,60 +263,216 @@
         </button>
     </div>
 
+    <!-- General Tab Content -->
+    <div class="input__tab-content" data-category="0" data-tab="general">
+        <div class="input__field">
+            <label>Facade / Frame Type</label>
+            <input type="hidden" id="cat0-general-facade_type" value="cont">
+            <div class="type-radio__group" data-radio-target="cat0-general-facade_type">
+                <button type="button" class="type-radio__card active" data-value="cont">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="2" width="20" height="13" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <rect x="10" y="15" width="20" height="12" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <rect x="10" y="27" width="20" height="11" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <line x1="10" y1="2" x2="10" y2="38"/>
+                            <line x1="30" y1="2" x2="30" y2="38"/>
+                            <line x1="10" y1="15" x2="30" y2="15"/>
+                            <line x1="10" y1="27" x2="30" y2="27"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Continuous</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="sfgp">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="17" width="32" height="6" fill="currentColor" fill-opacity="0.2" stroke="none"/>
+                            <line x1="4" y1="17" x2="36" y2="17"/>
+                            <line x1="4" y1="23" x2="36" y2="23"/>
+                            <rect x="14" y="2" width="12" height="15" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <rect x="14" y="23" width="12" height="15" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <line x1="14" y1="2" x2="14" y2="17"/>
+                            <line x1="26" y1="2" x2="26" y2="17"/>
+                            <line x1="14" y1="23" x2="14" y2="38"/>
+                            <line x1="26" y1="23" x2="26" y2="38"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Floor-to-floor</span>
+                </button>
+            </div>
+        </div>
+        <div class="input__field">
+            <label for="cat0-general-floor_height">Floor Height</label>
+            <div class="input__group">
+                <input type="number" step="1" id="cat0-general-floor_height">
+                <span class="input__unit">mm</span>
+            </div>
+        </div>
+        <div class="input__field-row">
+            <div class="input__field">
+                <label for="cat0-general-span_length">Span Length</label>
+                <div class="input__group">
+                    <input type="number" step="1" id="cat0-general-span_length">
+                    <span class="input__unit">mm</span>
+                </div>
+            </div>
+            <div class="input__field">
+                <label for="cat0-general-vertical_spacing">Vertical Spacing</label>
+                <div class="input__group">
+                    <input type="number" step="1" id="cat0-general-vertical_spacing">
+                    <span class="input__unit">mm</span>
+                </div>
+            </div>
+        </div>
+        <div class="input__field">
+            <label for="cat0-general-slab_thickness">Slab Thickness</label>
+            <div class="input__group">
+                <input type="number" step="1" id="cat0-general-slab_thickness">
+                <span class="input__unit">mm</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Glass Tab Content -->
-    <div class="input__tab-content" data-category="0" data-tab="glass">
+    <div class="input__tab-content hidden" data-category="0" data-tab="glass">
         <!-- Glass type selector -->
         <div class="input__field">
-            <label for="cat0-glass-type">Glass Type</label>
-            <select id="cat0-glass-type" data-category="0">
-                <option value="sgu">SGU (Single Glazed)</option>
-                <option value="dgu">DGU (Double Glazed)</option>
-                <option value="lgu">LGU (Laminated Glazed)</option>
-                <option value="ldgu">LDGU (Laminated DGU)</option>
-            </select>
+            <label>Glass Type</label>
+            <input type="hidden" id="cat0-glass-type" value="sgu">
+            <div class="type-radio__group" data-radio-target="cat0-glass-type">
+                <button type="button" class="type-radio__card active" data-value="sgu">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="14" y="5" width="12" height="23" fill="currentColor" fill-opacity="0.15"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">SGU</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="dgu">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="5" width="10" height="23" fill="currentColor" fill-opacity="0.15"/>
+                            <rect x="26" y="5" width="10" height="23" fill="currentColor" fill-opacity="0.15"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">DGU</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="lgu">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="9" y="5" width="9" height="23" fill="currentColor" fill-opacity="0.15"/>
+                            <rect x="19" y="5" width="3" height="23" fill="currentColor" fill-opacity="0.4" stroke="none"/>
+                            <rect x="23" y="5" width="9" height="23" fill="currentColor" fill-opacity="0.15"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">LGU</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="ldgu">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="5" width="7" height="23" fill="currentColor" fill-opacity="0.15"/>
+                            <rect x="10" y="5" width="2" height="23" fill="currentColor" fill-opacity="0.4" stroke="none"/>
+                            <rect x="13" y="5" width="7" height="23" fill="currentColor" fill-opacity="0.15"/>
+                            <rect x="27" y="5" width="11" height="23" fill="currentColor" fill-opacity="0.15"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">LDGU</span>
+                </button>
+            </div>
         </div>
 
         <!-- SGU -->
         <div class="glass__type-fields" data-category="0" data-glass-type="sgu">
             <div class="input__section">
                 <div class="input__field">
-                    <label for="cat0-glass-sgu-length">Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-length">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field-header">
+                        <label>Thickness</label>
+                        <button class="input__info-btn" type="button" data-title="Single glass pane, e.g. 12 mm">i</button>
+                    </div>
+                    <div class="glass__thickness-pill">
+                        <div class="glass__thickness-inner-group">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-sgu-thickness" placeholder="">
+                            </div>
+                            <div class="glass__gcell">
+                                <select id="cat0-glass-sgu-grade" data-no-custom-select>
+                                    <option value="FT">FT</option>
+                                    <option value="HS">HS</option>
+                                    <option value="AN">AN</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="input__field">
-                    <label for="cat0-glass-sgu-width">Width</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-width">
-                        <span class="input__unit">mm</span>
+                    <label>Support Type</label>
+                    <input type="hidden" id="cat0-glass-sgu-support_type" value="four-edges">
+                    <div class="type-radio__group" data-radio-target="cat0-glass-sgu-support_type">
+                        <button type="button" class="type-radio__card active" data-value="four-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">4 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="three-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">3 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="two-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">2 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="one-edge">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">1 Edge</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="point-fixed">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <rect x="6" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="6" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">Point</span>
+                        </button>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-thickness">Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-thickness">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-grade">Glass Grade</label>
-                    <select id="cat0-glass-sgu-grade">
-                        <option value="FT">FT (Fully Tempered)</option>
-                        <option value="HS">HS (Heat Strengthened)</option>
-                        <option value="AN">AN (Annealed)</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-support_type">Support Type</label>
-                    <select id="cat0-glass-sgu-support_type">
-                        <option value="four-edges">Four Edges</option>
-                        <option value="three-edges">Three Edges</option>
-                        <option value="two-edges">Two Edges</option>
-                        <option value="one-edge">One Edge</option>
-                        <option value="point-fixed">Point Fixed</option>
-                    </select>
                 </div>
 
                 <div class="input__field">
@@ -316,13 +482,6 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-def_criteria">Deflection Criteria</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-def_criteria">
-                    </div>
-                </div>
-
                 <div class="input__field">
                     <label for="cat0-glass-sgu-nfl">Non-factored Load, NFL</label>
                     <div class="input__group">
@@ -351,65 +510,114 @@
         <div class="glass__type-fields hidden" data-category="0" data-glass-type="dgu">
             <div class="input__section">
                 <div class="input__field">
-                    <label for="cat0-glass-dgu-length">Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-length">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field-header">
+                        <label>Thickness</label>
+                        <button class="input__info-btn" type="button" data-title="Outer glass + air gap + inner glass, e.g. 6 + 12 + 6 mm">i</button>
+                    </div>
+                    <div class="glass__thickness-pill">
+                        <div class="glass__thickness-inner-group">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-dgu-thickness1" placeholder="">
+                            </div>
+                            <div class="glass__gcell">
+                                <select id="cat0-glass-dgu-grade1" data-no-custom-select>
+                                    <option value="FT">FT</option>
+                                    <option value="HS">HS</option>
+                                    <option value="AN">AN</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="glass__thickness-inner-group gap">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-dgu-gap" placeholder="">
+                            </div>
+                        </div>
+
+                        <div class="glass__thickness-inner-group">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-dgu-thickness2" placeholder="">
+                            </div>
+                            <div class="glass__gcell">
+                                <select id="cat0-glass-dgu-grade2" data-no-custom-select>
+                                    <option value="FT">FT</option>
+                                    <option value="HS">HS</option>
+                                    <option value="AN">AN</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <div class="input__field">
-                    <label for="cat0-glass-dgu-width">Width</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-width">
-                        <span class="input__unit">mm</span>
+                    <label>Support Type</label>
+                    <input type="hidden" id="cat0-glass-dgu-support_type" value="four-edges">
+                    <div class="type-radio__group" data-radio-target="cat0-glass-dgu-support_type">
+                        <button type="button" class="type-radio__card active" data-value="four-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">4 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="three-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">3 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="two-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">2 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="one-edge">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">1 Edge</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="point-fixed">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <rect x="6" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="6" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">Point</span>
+                        </button>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-thickness1">Thickness (Outer)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-thickness1">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-gap">Gap</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-gap">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-thickness2">Thickness (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-thickness2">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-grade1">Grade (Outer)</label>
-                    <select id="cat0-glass-dgu-grade1">
-                        <option value="FT">FT (Fully Tempered)</option>
-                        <option value="HS">HS (Heat Strengthened)</option>
-                        <option value="AN">AN (Annealed)</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-grade2">Grade (Inner)</label>
-                    <select id="cat0-glass-dgu-grade2">
-                        <option value="FT">FT (Fully Tempered)</option>
-                        <option value="HS">HS (Heat Strengthened)</option>
-                        <option value="AN">AN (Annealed)</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-support_type">Support Type</label>
-                    <select id="cat0-glass-dgu-support_type">
-                        <option value="four-edges">Four Edges</option>
-                        <option value="three-edges">Three Edges</option>
-                        <option value="two-edges">Two Edges</option>
-                        <option value="one-edge">One Edge</option>
-                        <option value="point-fixed">Point Fixed</option>
-                    </select>
                 </div>
 
                 <div class="input__field">
@@ -419,13 +627,6 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-def_criteria">Deflection Criteria</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-def_criteria">
-                    </div>
-                </div>
-
                 <div class="input__field">
                     <label for="cat0-glass-dgu-nfl1">NFL<sub>1</sub> (Outer)</label>
                     <div class="input__group">
@@ -475,38 +676,29 @@
         <div class="glass__type-fields hidden" data-category="0" data-glass-type="lgu">
             <div class="input__section">
                 <div class="input__field">
-                    <label for="cat0-glass-lgu-length">Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-length">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field-header">
+                        <label>Thickness</label>
+                        <button class="input__info-btn" type="button" data-title="Ply 1 + PVB interlayer + Ply 2, e.g. 6 + 1.52 + 6 mm">i</button>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-width">Width</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-width">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-thickness1">Thickness (Outer Ply)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-thickness1">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-thickness_inner">Interlayer Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-thickness_inner">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-thickness2">Thickness (Inner Ply)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-thickness2">
-                        <span class="input__unit">mm</span>
+                    <div class="glass__thickness-pill">
+                        <div class="glass__thickness-inner-group">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-lgu-thickness1" placeholder="">
+                            </div>
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-lgu-thickness_inner" placeholder="">
+                            </div>
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-lgu-thickness2" placeholder="">
+                            </div>
+                            <div class="glass__gcell">
+                                <select id="cat0-glass-lgu-grade" data-no-custom-select>
+                                    <option value="FT">FT</option>
+                                    <option value="HS">HS</option>
+                                    <option value="AN">AN</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="input__field">
@@ -517,22 +709,74 @@
                     </div>
                 </div>
                 <div class="input__field">
-                    <label for="cat0-glass-lgu-grade">Grade</label>
-                    <select id="cat0-glass-lgu-grade">
-                        <option value="FT">FT (Fully Tempered)</option>
-                        <option value="HS">HS (Heat Strengthened)</option>
-                        <option value="AN">AN (Annealed)</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-support_type">Support Type</label>
-                    <select id="cat0-glass-lgu-support_type">
-                        <option value="four-edges">Four Edges</option>
-                        <option value="three-edges">Three Edges</option>
-                        <option value="two-edges">Two Edges</option>
-                        <option value="one-edge">One Edge</option>
-                        <option value="point-fixed">Point Fixed</option>
-                    </select>
+                    <label>Support Type</label>
+                    <input type="hidden" id="cat0-glass-lgu-support_type" value="four-edges">
+                    <div class="type-radio__group" data-radio-target="cat0-glass-lgu-support_type">
+                        <button type="button" class="type-radio__card active" data-value="four-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">4 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="three-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">3 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="two-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">2 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="one-edge">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">1 Edge</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="point-fixed">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <rect x="6" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="6" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">Point</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="input__field">
@@ -542,13 +786,6 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-def_criteria">Deflection Criteria</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-def_criteria">
-                    </div>
-                </div>
-
                 <div class="input__field">
                     <label for="cat0-glass-lgu-nfl">NFL</label>
                     <div class="input__group">
@@ -577,38 +814,48 @@
         <div class="glass__type-fields hidden" data-category="0" data-glass-type="ldgu">
             <div class="input__section">
                 <div class="input__field">
-                    <label for="cat0-glass-ldgu-length">Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-length">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field-header">
+                        <label>Thickness</label>
+                        <button class="input__info-btn" type="button" data-title="[Ply 1 + PVB + Ply 2] + Air Gap + Inner, e.g. 6+1.52+6 + 12 + 6 mm">i</button>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-width">Width</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-width">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-thickness1_1">Thickness (Outer Ply 1)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-thickness1_1">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-thickness_inner">Interlayer Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-thickness_inner">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-thickness1_2">Thickness (Outer Ply 2)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-thickness1_2">
-                        <span class="input__unit">mm</span>
+                    <div class="glass__thickness-pill">
+                        <div class="glass__thickness-inner-group">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-ldgu-thickness1_1" placeholder="">
+                            </div>
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-ldgu-thickness_inner" placeholder="">
+                            </div>
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-ldgu-thickness1_2" placeholder="">
+                            </div>
+                            <div class="glass__gcell">
+                                <select id="cat0-glass-ldgu-grade1" data-no-custom-select>
+                                    <option value="FT">FT</option>
+                                    <option value="HS">HS</option>
+                                    <option value="AN">AN</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="glass__thickness-inner-group gap">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-ldgu-gap" placeholder="">
+                            </div>
+                        </div>
+                        
+                        <div class="glass__thickness-inner-group outer">
+                            <div class="glass__tcell">
+                                <input type="number" id="cat0-glass-ldgu-thickness2" placeholder="">
+                            </div>
+                            <div class="glass__gcell">
+                                <select id="cat0-glass-ldgu-grade2" data-no-custom-select>
+                                    <option value="FT">FT</option>
+                                    <option value="HS">HS</option>
+                                    <option value="AN">AN</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="input__field">
@@ -619,44 +866,74 @@
                     </div>
                 </div>
                 <div class="input__field">
-                    <label for="cat0-glass-ldgu-gap">Gap</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-gap">
-                        <span class="input__unit">mm</span>
+                    <label>Support Type</label>
+                    <input type="hidden" id="cat0-glass-ldgu-support_type" value="four-edges">
+                    <div class="type-radio__group" data-radio-target="cat0-glass-ldgu-support_type">
+                        <button type="button" class="type-radio__card active" data-value="four-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">4 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="three-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">3 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="two-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">2 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="one-edge">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">1 Edge</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="point-fixed">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <rect x="6" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="6" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">Point</span>
+                        </button>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-thickness2">Thickness (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-thickness2">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-grade1">Grade (Outer Laminate)</label>
-                    <select id="cat0-glass-ldgu-grade1">
-                        <option value="FT">FT (Fully Tempered)</option>
-                        <option value="HS">HS (Heat Strengthened)</option>
-                        <option value="AN">AN (Annealed)</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-grade2">Grade (Inner)</label>
-                    <select id="cat0-glass-ldgu-grade2">
-                        <option value="FT">FT (Fully Tempered)</option>
-                        <option value="HS">HS (Heat Strengthened)</option>
-                        <option value="AN">AN (Annealed)</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-support_type">Support Type</label>
-                    <select id="cat0-glass-ldgu-support_type">
-                        <option value="four-edges">Four Edges</option>
-                        <option value="three-edges">Three Edges</option>
-                        <option value="two-edges">Two Edges</option>
-                        <option value="one-edge">One Edge</option>
-                        <option value="point-fixed">Point Fixed</option>
-                    </select>
                 </div>
 
                 <div class="input__field">
@@ -666,13 +943,6 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-def_criteria">Deflection Criteria</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-def_criteria">
-                    </div>
-                </div>
-
                 <div class="input__field">
                     <label for="cat0-glass-ldgu-nfl1">NFL<sub>1</sub> (Outer Laminate)</label>
                     <div class="input__group">
@@ -722,100 +992,229 @@
     <!-- Frame Tab Content -->
     <div class="input__tab-content hidden" data-category="0" data-tab="frame">
         <div class="input__field">
-            <label for="cat0-frame-geometry">Geometry Type</label>
-            <select id="cat0-frame-geometry" data-category="0">
-                <option value="regular">Regular (Auto Calc.)</option>
-                <option value="irregular">Irregular (Manual Calc.)</option>
-            </select>
+            <label>Geometry Type</label>
+            <input type="hidden" id="cat0-frame-geometry" data-category="0" value="regular">
+            <div class="type-radio__group" data-radio-target="cat0-frame-geometry">
+                <button type="button" class="type-radio__card active" data-value="regular">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" fill="currentColor" fill-opacity="0.07" stroke="none"/>
+                            <path d="M4,4 h32 v32 h-32 Z"/>
+                            <line x1="20" y1="4" x2="20" y2="36"/>
+                            <line x1="4" y1="20" x2="36" y2="20"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Regular</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="irregular">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6,4 L34,4 L36,36 L4,36 Z" fill="currentColor" fill-opacity="0.07" stroke="none"/>
+                            <path d="M6,4 L34,4 L36,36 L4,36 Z"/>
+                            <line x1="17" y1="4" x2="14" y2="36"/>
+                            <line x1="4" y1="15" x2="36" y2="21"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Irregular</span>
+                </button>
+            </div>
         </div>
         <div class="input__field">
-            <label for="cat0-frame-mullion-type">Mullion Type</label>
-            <select id="cat0-frame-mullion-type" data-category="0">
-                <option value="alu">Aluminum Only</option>
-                <option value="alu-steel">Aluminum + Steel</option>
-            </select>
+            <label>Mullion Type</label>
+            <input type="hidden" id="cat0-frame-mullion-type" data-category="0" value="alu">
+            <div class="type-radio__group" data-radio-target="cat0-frame-mullion-type">
+                <button type="button" class="type-radio__card active" data-value="alu">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10,5 h20 v30 h-20 Z"/>
+                            <path d="M14,10 h12 v20 h-12 Z"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Alu Only</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="alu-steel">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10,5 h20 v30 h-20 Z"/>
+                            <path d="M14,10 h12 v20 h-12 Z"/>
+                            <rect x="16" y="13" width="8" height="14" fill="currentColor" fill-opacity="0.6" stroke="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Alu + Steel</span>
+                </button>
+            </div>
         </div>
         <div class="input__field">
-            <label for="cat0-frame-frame-type">Frame Type</label>
-            <select id="cat0-frame-frame-type" data-category="0">
-                <option value="cont">Continuous</option>
-                <option value="sfgp">Floor-to-floor</option>
-            </select>
+            <label>Zone</label>
+            <input type="hidden" id="cat0-frame-zone" data-category="0" value="zone4">
+            <div class="type-radio__group" data-radio-target="cat0-frame-zone">
+                <button type="button" class="type-radio__card active" data-value="zone4">
+                    <span class="type-radio__icon">
+                        <!-- Wall Mid Zone: portrait 3x3 grid, center cell -->
+                        <svg viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1,1 h30 v38 h-30 Z"/>
+                            <line x1="11" y1="1" x2="11" y2="39"/>
+                            <line x1="21" y1="1" x2="21" y2="39"/>
+                            <line x1="1" y1="14" x2="31" y2="14"/>
+                            <line x1="1" y1="27" x2="31" y2="27"/>
+                            <rect x="12" y="15" width="8" height="11" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Zone 4</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="zone5">
+                    <span class="type-radio__icon">
+                        <!-- Wall Edge Zone: portrait 3x3 grid, left+right columns -->
+                        <svg viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1,1 h30 v38 h-30 Z"/>
+                            <line x1="11" y1="1" x2="11" y2="39"/>
+                            <line x1="21" y1="1" x2="21" y2="39"/>
+                            <line x1="1" y1="14" x2="31" y2="14"/>
+                            <line x1="1" y1="27" x2="31" y2="27"/>
+                            <rect x="2" y="2" width="8" height="11" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="2" y="15" width="8" height="11" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="2" y="28" width="8" height="10" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="22" y="2" width="8" height="11" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="22" y="15" width="8" height="11" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="22" y="28" width="8" height="10" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Zone 5</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="zone1">
+                    <span class="type-radio__icon">
+                        <!-- Roof Mid Zone: landscape 3x3 grid, center cell -->
+                        <svg viewBox="0 0 40 32" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1,1 h38 v30 h-38 Z"/>
+                            <line x1="14" y1="1" x2="14" y2="31"/>
+                            <line x1="27" y1="1" x2="27" y2="31"/>
+                            <line x1="1" y1="11" x2="39" y2="11"/>
+                            <line x1="1" y1="21" x2="39" y2="21"/>
+                            <rect x="15" y="12" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Zone 1</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="zone2">
+                    <span class="type-radio__icon">
+                        <!-- Roof Edge Zone: landscape 3x3 grid, perimeter cells -->
+                        <svg viewBox="0 0 40 32" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1,1 h38 v30 h-38 Z"/>
+                            <line x1="14" y1="1" x2="14" y2="31"/>
+                            <line x1="27" y1="1" x2="27" y2="31"/>
+                            <line x1="1" y1="11" x2="39" y2="11"/>
+                            <line x1="1" y1="21" x2="39" y2="21"/>
+                            <rect x="2" y="2" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="15" y="2" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="28" y="2" width="10" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="2" y="12" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="28" y="12" width="10" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="2" y="22" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="15" y="22" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="28" y="22" width="10" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Zone 2</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="zone3">
+                    <span class="type-radio__icon">
+                        <!-- Roof Corner Zone: landscape 3x3 grid, corner cells -->
+                        <svg viewBox="0 0 40 32" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1,1 h38 v30 h-38 Z"/>
+                            <line x1="14" y1="1" x2="14" y2="31"/>
+                            <line x1="27" y1="1" x2="27" y2="31"/>
+                            <line x1="1" y1="11" x2="39" y2="11"/>
+                            <line x1="1" y1="21" x2="39" y2="21"/>
+                            <rect x="2" y="2" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="28" y="2" width="10" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="2" y="22" width="11" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                            <rect x="28" y="22" width="10" height="8" fill="currentColor" fill-opacity="0.5" stroke="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Zone 3</span>
+                </button>
+            </div>
         </div>
         <div class="input__field">
-            <label for="cat0-frame-zone">Zone</label>
-            <select id="cat0-frame-zone" data-category="0">
-                <option value="zone4">Zone 4 (Wall Mid Zone)</option>
-                <option value="zone5">Zone 5 (Wall Edge Zone)</option>
-                <option value="zone1">Zone 1 (Roof Mid Zone)</option>
-                <option value="zone2">Zone 2 (Roof Edge Zone)</option>
-                <option value="zone3">Zone 3 (Roof Corner Zone)</option>
-            </select>
-        </div>
-        <div class="input__field">
-            <label for="cat0-frame-system-type">System Type</label>
-            <select id="cat0-frame-system-type" data-category="0">
-                <option value="semi-uni">Semi-unitized System</option>
-                <option value="uni">Unitized System</option>
-                <option value="stick">Stick System</option>
-            </select>
+            <label>System Type</label>
+            <input type="hidden" id="cat0-frame-system-type" data-category="0" value="semi-uni">
+            <div class="type-radio__group" data-radio-target="cat0-frame-system-type">
+                <button type="button" class="type-radio__card active" data-value="semi-uni">
+                    <span class="type-radio__icon">
+                        <!-- Semi-unitized: 2 tall panels (full-height units) side by side -->
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="16" height="34" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <rect x="21" y="3" width="16" height="34" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                            <path d="M3,3 h16 v34 h-16 Z"/>
+                            <path d="M21,3 h16 v34 h-16 Z"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Semi-Uni</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="uni">
+                    <span class="type-radio__icon">
+                        <!-- Unitized: 2x2 separate cassette units with gaps -->
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="16" height="16" fill="currentColor" fill-opacity="0.12" stroke="none"/>
+                            <rect x="21" y="3" width="16" height="16" fill="currentColor" fill-opacity="0.12" stroke="none"/>
+                            <rect x="3" y="21" width="16" height="16" fill="currentColor" fill-opacity="0.12" stroke="none"/>
+                            <rect x="21" y="21" width="16" height="16" fill="currentColor" fill-opacity="0.12" stroke="none"/>
+                            <path d="M3,3 h16 v16 h-16 Z"/>
+                            <path d="M21,3 h16 v16 h-16 Z"/>
+                            <path d="M3,21 h16 v16 h-16 Z"/>
+                            <path d="M21,21 h16 v16 h-16 Z"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Unitized</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="stick">
+                    <span class="type-radio__icon">
+                        <!-- Stick: continuous frame with field-glazed panels -->
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" fill="currentColor" fill-opacity="0.06" stroke="none"/>
+                            <path d="M4,4 h32 v32 h-32 Z"/>
+                            <line x1="15" y1="4" x2="15" y2="36"/>
+                            <line x1="25" y1="4" x2="25" y2="36"/>
+                            <line x1="4" y1="18" x2="36" y2="18"/>
+                            <line x1="4" y1="28" x2="36" y2="28"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Stick</span>
+                </button>
+            </div>
         </div>
 
         <!-- Regular + Aluminum Only -->
         <div class="frame__variant-fields hidden" data-category="0" data-frame-variant="regular-alu">
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-mullion">Mullion Section</label>
-                    <select id="cat0-frame-regular-alu-mullion">
-                        <option value="">-- Select Section --</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-transom">Transom Section</label>
-                    <select id="cat0-frame-regular-alu-transom">
-                        <option value="">-- Select Section --</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-length">Mullion Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-length">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-mullion">Mullion Section</label>
+                        <select id="cat0-frame-regular-alu-mullion">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-transom">Transom Section</label>
+                        <select id="cat0-frame-regular-alu-transom">
+                            <option value="">-- Select Section --</option>
+                        </select>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-width">Transom Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-width">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-wind_pos">Wind (+ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-regular-alu-wind_pos">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-tran_spacing">Transom Spacing</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-tran_spacing">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-glass_thk">Glass Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-glass_thk">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-wind_pos">Wind Load (+ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-regular-alu-wind_pos">
-                        <span class="input__unit">kPa</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-wind_neg">Wind Load (−ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-regular-alu-wind_neg">
-                        <span class="input__unit">kPa</span>
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-wind_neg">Wind (−ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-regular-alu-wind_neg">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -824,11 +1223,19 @@
         <!-- Regular + Aluminum + Steel -->
         <div class="frame__variant-fields hidden" data-category="0" data-frame-variant="regular-alu-steel">
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-mullion">Mullion Section</label>
-                    <select id="cat0-frame-regular-alu-steel-mullion">
-                        <option value="">-- Select Section --</option>
-                    </select>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-steel-mullion">Mullion Section</label>
+                        <select id="cat0-frame-regular-alu-steel-mullion">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-steel-transom">Transom Section</label>
+                        <select id="cat0-frame-regular-alu-steel-transom">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="input__field">
                     <label for="cat0-frame-regular-alu-steel-steel">Embedded Steel Section</label>
@@ -836,52 +1243,20 @@
                         <option value="">-- Select Section --</option>
                     </select>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-transom">Transom Section</label>
-                    <select id="cat0-frame-regular-alu-steel-transom">
-                        <option value="">-- Select Section --</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-length">Mullion Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-steel-length">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-steel-wind_pos">Wind (+ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-regular-alu-steel-wind_pos">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-width">Transom Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-steel-width">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-tran_spacing">Transom Spacing</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-steel-tran_spacing">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-glass_thk">Glass Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-regular-alu-steel-glass_thk">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-wind_pos">Wind Load (+ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-regular-alu-steel-wind_pos">
-                        <span class="input__unit">kPa</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-regular-alu-steel-wind_neg">Wind Load (−ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-regular-alu-steel-wind_neg">
-                        <span class="input__unit">kPa</span>
+                    <div class="input__field">
+                        <label for="cat0-frame-regular-alu-steel-wind_neg">Wind (−ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-regular-alu-steel-wind_neg">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -890,138 +1265,124 @@
         <!-- Irregular + Aluminum Only -->
         <div class="frame__variant-fields hidden" data-category="0" data-frame-variant="irregular-alu">
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-mullion">Mullion Section</label>
-                    <select id="cat0-frame-irregular-alu-mullion">
-                        <option value="">-- Select Section --</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-transom">Transom Section</label>
-                    <select id="cat0-frame-irregular-alu-transom">
-                        <option value="">-- Select Section --</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-length">Mullion Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-length">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-mullion">Mullion Section</label>
+                        <select id="cat0-frame-irregular-alu-mullion">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-transom">Transom Section</label>
+                        <select id="cat0-frame-irregular-alu-transom">
+                            <option value="">-- Select Section --</option>
+                        </select>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-width">Transom Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-width">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-wind_pos">Wind (+ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-irregular-alu-wind_pos">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-tran_spacing">Transom Spacing</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-tran_spacing">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-glass_thk">Glass Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-glass_thk">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-wind_pos">Wind Load (+ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-irregular-alu-wind_pos">
-                        <span class="input__unit">kPa</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-wind_neg">Wind Load (−ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-irregular-alu-wind_neg">
-                        <span class="input__unit">kPa</span>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-wind_neg">Wind (−ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-irregular-alu-wind_neg">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-mul_mu">Mullion Moment, M<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-mul_mu">
-                        <span class="input__unit">kN·m</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-mul_mu">Mullion Moment, M<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-mul_mu">
+                            <span class="input__unit">kN·m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-mul_vu">Mullion Shear, V<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-mul_vu">
+                            <span class="input__unit">kN</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-mul_def">Mullion Deflection, δ</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-mul_def">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-mul_vu">Mullion Shear, V<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-mul_vu">
-                        <span class="input__unit">kN</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-tran_mu">Transom Moment, M<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-tran_mu">
+                            <span class="input__unit">kN·m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-tran_vu">Transom Shear, V<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-tran_vu">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-mul_def">Mullion Deflection, δ</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-mul_def">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-tran_def_wind">Transom Deflection (Wind), δ<sub>w</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-tran_def_wind">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-tran_def_dead">Transom Deflection (Dead), δ<sub>d</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-tran_def_dead">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-tran_mu">Transom Moment, M<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-tran_mu">
-                        <span class="input__unit">kN·m</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-joint_fy">Horizontal Joint Force, F<sub>y</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-joint_fy">
+                            <span class="input__unit">kN</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-joint_fz">Vertical Joint Force, F<sub>z</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-joint_fz">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-tran_vu">Transom Shear, V<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-tran_vu">
-                        <span class="input__unit">kN</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-reaction_Ry">Horizontal Reaction, R<sub>y</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-reaction_Ry">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-tran_def_wind">Transom Deflection (Wind), δ<sub>w</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-tran_def_wind">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-tran_def_dead">Transom Deflection (Dead), δ<sub>d</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-tran_def_dead">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-joint_fy">Horizontal Joint Force, F<sub>y</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-joint_fy">
-                        <span class="input__unit">kN</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-joint_fz">Vertical Joint Force, F<sub>z</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-joint_fz">
-                        <span class="input__unit">kN</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-reaction_Ry">Horizontal Reaction, R<sub>y</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-reaction_Ry">
-                        <span class="input__unit">kN</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-reaction_Rz">Vertical Reaction, R<sub>z</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-reaction_Rz">
-                        <span class="input__unit">kN</span>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-reaction_Rz">Vertical Reaction, R<sub>z</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-reaction_Rz">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1030,11 +1391,19 @@
         <!-- Irregular + Aluminum + Steel -->
         <div class="frame__variant-fields hidden" data-category="0" data-frame-variant="irregular-alu-steel">
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-mullion">Mullion Section</label>
-                    <select id="cat0-frame-irregular-alu-steel-mullion">
-                        <option value="">-- Select Section --</option>
-                    </select>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-mullion">Mullion Section</label>
+                        <select id="cat0-frame-irregular-alu-steel-mullion">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-transom">Transom Section</label>
+                        <select id="cat0-frame-irregular-alu-steel-transom">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="input__field">
                     <label for="cat0-frame-irregular-alu-steel-steel">Embedded Steel Section</label>
@@ -1042,134 +1411,110 @@
                         <option value="">-- Select Section --</option>
                     </select>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-transom">Transom Section</label>
-                    <select id="cat0-frame-irregular-alu-steel-transom">
-                        <option value="">-- Select Section --</option>
-                    </select>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-length">Mullion Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-length">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-wind_pos">Wind (+ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-irregular-alu-steel-wind_pos">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-width">Transom Length</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-width">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-tran_spacing">Transom Spacing</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-tran_spacing">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-glass_thk">Glass Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-glass_thk">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-wind_pos">Wind Load (+ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-irregular-alu-steel-wind_pos">
-                        <span class="input__unit">kPa</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-wind_neg">Wind Load (−ve)</label>
-                    <div class="input__group">
-                        <input type="text" id="cat0-frame-irregular-alu-steel-wind_neg">
-                        <span class="input__unit">kPa</span>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-wind_neg">Wind (−ve)</label>
+                        <div class="input__group">
+                            <input type="text" id="cat0-frame-irregular-alu-steel-wind_neg">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="input__section">
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-mul_mu">Mullion Moment, M<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-mul_mu">
-                        <span class="input__unit">kN·m</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-mul_mu">Mullion Moment, M<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-mul_mu">
+                            <span class="input__unit">kN·m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-mul_vu">Mullion Shear, V<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-mul_vu">
+                            <span class="input__unit">kN</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-mul_def">Mullion Deflection, δ</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-mul_def">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-mul_vu">Mullion Shear, V<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-mul_vu">
-                        <span class="input__unit">kN</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-tran_mu">Transom Moment, M<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-tran_mu">
+                            <span class="input__unit">kN·m</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-tran_vu">Transom Shear, V<sub>u</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-tran_vu">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-mul_def">Mullion Deflection, δ</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-mul_def">
-                        <span class="input__unit">mm</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-tran_def_wind">Transom Deflection (Wind), δ<sub>w</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-tran_def_wind">
+                            <span class="input__unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-tran_def_dead">Transom Deflection (Dead), δ<sub>d</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-tran_def_dead">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-tran_mu">Transom Moment, M<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-tran_mu">
-                        <span class="input__unit">kN·m</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-joint_fy">Horizontal Joint Force, F<sub>y</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-joint_fy">
+                            <span class="input__unit">kN</span>
+                        </div>
+                    </div>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-joint_fz">Vertical Joint Force, F<sub>z</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-joint_fz">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-tran_vu">Transom Shear, V<sub>u</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-tran_vu">
-                        <span class="input__unit">kN</span>
+                <div class="input__field-row">
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-reaction_Ry">Horizontal Reaction, R<sub>y</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-reaction_Ry">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-tran_def_wind">Transom Deflection (Wind),
-                        δ<sub>w</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-tran_def_wind">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-tran_def_dead">Transom Deflection (Dead),
-                        δ<sub>d</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-tran_def_dead">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-joint_fy">Horizontal Joint Force, F<sub>y</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-joint_fy">
-                        <span class="input__unit">kN</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-joint_fz">Vertical Joint Force, F<sub>z</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-joint_fz">
-                        <span class="input__unit">kN</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-reaction_Ry">Horizontal Reaction, R<sub>y</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-reaction_Ry">
-                        <span class="input__unit">kN</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-frame-irregular-alu-steel-reaction_Rz">Vertical Reaction, R<sub>z</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-frame-irregular-alu-steel-reaction_Rz">
-                        <span class="input__unit">kN</span>
+                    <div class="input__field">
+                        <label for="cat0-frame-irregular-alu-steel-reaction_Rz">Vertical Reaction, R<sub>z</sub></label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-frame-irregular-alu-steel-reaction_Rz">
+                            <span class="input__unit">kN</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1179,22 +1524,24 @@
     <!-- Connection Tab Content -->
     <div class="input__tab-content hidden" data-category="0" data-tab="conn">
         <div class="input__field">
-            <label for="cat0-conn-nos">No. of Screw</label>
-            <div class="input__group">
-                <input type="number" id="cat0-conn-nos" value="4">
-            </div>
-        </div>
-        <div class="input__field">
-            <label for="cat0-conn-screw-dia">Screw Diameter, d</label>
-            <div class="input__group">
-                <input type="number" id="cat0-conn-screw-dia" value="4.8">
-                <span class="input__unit">mm</span>
-            </div>
-        </div>
-        <div class="input__field">
             <label for="cat0-conn-cleat-size">Cleat Size</label>
             <div class="input__group">
                 <input type="text" id="cat0-conn-cleat-size" value="25 x 32 x 3.5 (L = 85)">
+            </div>
+        </div>
+        <div class="input__field-row">
+            <div class="input__field">
+                <label for="cat0-conn-nos">No. of Screw</label>
+                <div class="input__group">
+                    <input type="number" id="cat0-conn-nos" value="4">
+                </div>
+            </div>
+            <div class="input__field">
+                <label for="cat0-conn-screw-dia">Screw Diameter, d</label>
+                <div class="input__group">
+                    <input type="number" id="cat0-conn-screw-dia" value="4.8">
+                    <span class="input__unit">mm</span>
+                </div>
             </div>
         </div>
         <div class="input__field">
@@ -1204,18 +1551,20 @@
                 <span class="input__unit">mm</span>
             </div>
         </div>
-        <div class="input__field">
-            <label for="cat0-conn-t1">Thickness t<sub>1</sub></label>
-            <div class="input__group">
-                <input type="number" id="cat0-conn-t1" value="3.5">
-                <span class="input__unit">mm</span>
+        <div class="input__field-row">
+            <div class="input__field">
+                <label for="cat0-conn-t1">Thickness t<sub>1</sub></label>
+                <div class="input__group">
+                    <input type="number" id="cat0-conn-t1" value="3.5">
+                    <span class="input__unit">mm</span>
+                </div>
             </div>
-        </div>
-        <div class="input__field">
-            <label for="cat0-conn-t2">Thickness t<sub>2</sub></label>
-            <div class="input__group">
-                <input type="number" id="cat0-conn-t2" value="2.5">
-                <span class="input__unit">mm</span>
+            <div class="input__field">
+                <label for="cat0-conn-t2">Thickness t<sub>2</sub></label>
+                <div class="input__group">
+                    <input type="number" id="cat0-conn-t2" value="2.5">
+                    <span class="input__unit">mm</span>
+                </div>
             </div>
         </div>
         <div class="input__field">
@@ -1230,12 +1579,40 @@
     <!-- Anchor Tab Content -->
     <div class="input__tab-content hidden" data-category="0" data-tab="anchor">
         <div class="input__field">
-            <label for="cat0-anchor-type">Clump Type</label>
-            <select id="cat0-anchor-type" data-category="0">
-                <option value="box-clump">Box Clump</option>
-                <option value="u-clump">U Clump</option>
-                <option value="l-clump">L/T Clump</option>
-            </select>
+            <label>Clamp Type</label>
+            <input type="hidden" id="cat0-anchor-type" data-category="0" value="box-clump">
+            <div class="type-radio__group" data-radio-target="cat0-anchor-type">
+                <button type="button" class="type-radio__card active" data-value="box-clump">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="8" width="20" height="24" fill="currentColor" fill-opacity="0.1" stroke="none"/>
+                            <rect x="10" y="8" width="20" height="24" fill="none"/>
+                            <rect x="15" y="13" width="10" height="14" fill="none"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">Box</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="u-clump">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="8" width="20" height="24" fill="currentColor" fill-opacity="0.06" stroke="none"/>
+                            <polyline points="10,8 10,32 30,32 30,8"/>
+                            <polyline points="15,10 15,28 25,28 25,10"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">U</span>
+                </button>
+                <button type="button" class="type-radio__card" data-value="l-clump">
+                    <span class="type-radio__icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="7" width="24" height="6" fill="currentColor" fill-opacity="0.1" stroke="none"/>
+                            <rect x="17" y="13" width="6" height="20" fill="currentColor" fill-opacity="0.1" stroke="none"/>
+                            <polyline points="8,7 32,7 32,13 23,13 23,33 17,33 17,13 8,13 8,7"/>
+                        </svg>
+                    </span>
+                    <span class="type-radio__label">L / T</span>
+                </button>
+            </div>
         </div>
 
         <!-- Box Clump -->
@@ -1272,13 +1649,6 @@
                     <label for="cat0-anchor-box-clump-C_a1">Edge Distance, C<sub>a1</sub></label>
                     <div class="input__group">
                         <input type="number" id="cat0-anchor-box-clump-C_a1" value="150">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-box-clump-h_a">Depth of Concrete Member, h<sub>a</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-box-clump-h_a" value="150">
                         <span class="input__unit">mm</span>
                     </div>
                 </div>
@@ -1422,13 +1792,6 @@
                     <label for="cat0-anchor-l-clump-top_C_a1">Edge Distance of Top Anchor, C<sub>a1</sub></label>
                     <div class="input__group">
                         <input type="number" id="cat0-anchor-l-clump-top_C_a1" value="150">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-anchor-l-clump-h_a">Depth of Concrete Member, h<sub>a</sub></label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-anchor-l-clump-h_a" value="150">
                         <span class="input__unit">mm</span>
                     </div>
                 </div>

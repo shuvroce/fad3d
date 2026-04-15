@@ -13,7 +13,7 @@ function switchGlassType(categoryNum, glassType) {
 
 // Fields not required when support type is Point Fixed
 const POINT_FIXED_HIDDEN = [
-    'def_criteria', 'nfl', 'nfl1', 'nfl2',
+    'nfl', 'nfl1', 'nfl2',
     'load_x_area2', 'load1_x_area2', 'load2_x_area2',
     'def', 'def1', 'def2'
 ];
@@ -33,18 +33,18 @@ function initGlassInput() {
 }
 
 function glassInputChangeHandler(e) {
-    const select = e.target;
+    const el = e.target;
 
-    // Glass type switching
-    if (select.matches("select[id$='-glass-type']")) {
-        const match = select.id.match(/^cat(\d+)-glass-type$/);
-        if (match) switchGlassType(match[1], select.value);
+    // Glass type switching — matches hidden input (from radio cards) or legacy select
+    const glassTypeMatch = el.id?.match(/^cat(\d+)-glass-type$/);
+    if (glassTypeMatch) {
+        switchGlassType(glassTypeMatch[1], el.value);
     }
 
     // Support type — hide irrelevant fields when Point Fixed
-    if (select.matches("select[id*='-glass-'][id$='-support_type']")) {
-        const glassSection = select.closest('.glass__type-fields');
-        if (glassSection) syncPointFixedFields(glassSection, select.value === 'point-fixed');
+    if (el.id?.match(/^cat\d+-glass-(?:sgu|dgu|lgu|ldgu)-support_type$/)) {
+        const glassSection = el.closest('.glass__type-fields');
+        if (glassSection) syncPointFixedFields(glassSection, el.value === 'point-fixed');
     }
 }
 

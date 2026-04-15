@@ -250,6 +250,12 @@ function renumberCategories() {
                 label.getAttribute("for").replace(/cat\d+/, `cat${newCategoryNum}`),
             );
         });
+        content.querySelectorAll("[data-radio-target]").forEach((el) => {
+            el.setAttribute(
+                "data-radio-target",
+                el.getAttribute("data-radio-target").replace(/cat\d+/, `cat${newCategoryNum}`),
+            );
+        });
         content.querySelectorAll("input[id], select[id]").forEach((field) => {
             field.setAttribute(
                 "id",
@@ -325,6 +331,9 @@ function createCategory(categoryNum) {
     });
     clone.querySelectorAll("label[for]").forEach((label) => {
         label.setAttribute("for", label.getAttribute("for").replace("cat0", `cat${categoryNum}`));
+    });
+    clone.querySelectorAll("[data-radio-target]").forEach((el) => {
+        el.setAttribute("data-radio-target", el.getAttribute("data-radio-target").replace("cat0", `cat${categoryNum}`));
     });
     clone.querySelector(".input__category-heading").textContent = `Category ${categoryNum}`;
 
@@ -434,6 +443,12 @@ function duplicateCategory(sourceCategoryNum) {
         label.setAttribute(
             "for",
             label.getAttribute("for").replace(/cat\d+/, `cat${newNum}`),
+        );
+    });
+    newContent.querySelectorAll("[data-radio-target]").forEach((el) => {
+        el.setAttribute(
+            "data-radio-target",
+            el.getAttribute("data-radio-target").replace(/cat\d+/, `cat${newNum}`),
         );
     });
 

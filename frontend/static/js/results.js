@@ -210,6 +210,22 @@ function _renderAnchorage(calc) {
     return _fillTemplate('result-anchorage-template', data, passMap, showKeys, showSections);
 }
 
+// ---- Geometry Results ----
+
+function _renderGeometry(gen) {
+    if (!gen || (!gen.glass_length && !gen.mullion_length)) return _empty('Enter general inputs to calculate');
+    const data = {
+        glass_length: gen.glass_length,
+        glass_width: gen.glass_width,
+        mullion_length: gen.mullion_length,
+        transom_length: gen.transom_length,
+        tran_spacing: gen.tran_spacing,
+        glass_thk: gen.glass_thk ?? null,
+        h_a: gen.h_a,
+    };
+    return _fillTemplate('result-geometry-template', data);
+}
+
 // ---- Wind Results ----
 
 function _renderWindGeneral(summary) {
@@ -292,12 +308,13 @@ function updateFacadeResults(catNum, results) {
 function showFacadeResults(catNum) {
     const results = _facadeResultsCache.get(Number(catNum));
     const bodies = [
+        { sel: '#facade-geometry-body', key: 'geometry' },
         { sel: '#facade-glass-body', key: 'glass' },
         { sel: '#facade-frame-body', key: 'frame' },
         { sel: '#facade-conn-body', key: 'conn' },
         { sel: '#facade-anchor-body', key: 'anchor' },
     ];
-    const renderers = { glass: _renderGlass, frame: _renderFrame, conn: _renderConnection, anchor: _renderAnchorage };
+    const renderers = { geometry: _renderGeometry, glass: _renderGlass, frame: _renderFrame, conn: _renderConnection, anchor: _renderAnchorage };
 
     // Exit animation
     bodies.forEach(({ sel }) => {

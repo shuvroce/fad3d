@@ -10,7 +10,7 @@
     --topbar-height: 3.5rem;
     --floating-height: 2rem;
     --catbar-width: 3.8rem;
-    --input-field-width: 23rem;
+    --input-field-width: 26.5rem;
     --viewport-width: 60rem;
     --figure-panel-width: 20rem;
     --result-width: 25rem;
@@ -33,7 +33,7 @@
     --bg-secondary: #fafafa;
     --bg-hover: #f5f5f5;
     --bg-preview: #fff8cc;
-    --bg-input: #fff;
+    --bg-input: #f6f6f6;
     --bg-select: #fff;
     --bg-code: #f7f7f7;
     --bg-details: #ffdede;
@@ -111,7 +111,7 @@ body.theme__dark {
     --bg-secondary: #141414;
     --bg-hover: #21262d;
     --bg-preview: #1c2010;
-    --bg-input: #171717;
+    --bg-input: #202020;
     --bg-select: #171717;
     --bg-code: #0d1117;
     --bg-category: #121c1f;
@@ -408,7 +408,7 @@ select {
     color: var(--text-primary);
     border-radius: var(--radius-1);
     flex: 1 1 calc(50% - 15px);
-    min-width: 200px;
+    /* min-width: 200px; */
     box-sizing: border-box;
     transition: var(--transition-bg), var(--transition-border);
 }
@@ -476,7 +476,7 @@ select {
 .custom-select__selected:focus {
     /* border-color: var(--color-primary); */
     /* outline: none; */
-    box-shadow: 0 0 0 1px var(--color-primary);
+    /* box-shadow: 0 0 0 1px var(--color-primary); */
     transition: box-shadow 0.1s ease;
 }
 
@@ -3046,6 +3046,149 @@ body.no-animations *::after {
     min-width: 200px;
 }
 
+.input__field-row {
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+}
+
+.input__field-row .input__field {
+    flex: 1;
+    min-width: 0;
+}
+
+.input__field-row .input__field .custom-select,
+.input__field-row .input__field select {
+    min-width: 0;
+    flex: 1;
+    width: 100%;
+}
+
+/* Glass thickness row */
+.input__field-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+.input__field-header label {
+    margin-bottom: 0;
+}
+.input__info-btn {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-secondary);
+    background: none;
+    color: var(--text-secondary);
+    font-size: 0.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    line-height: 1;
+}
+.input__info-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+/* Glass thickness pill */
+.glass__thickness-pill {
+    display: flex;
+    gap: 0.35rem;
+    align-items: stretch;
+    /* border: 1px solid var(--border-input); */
+    border-radius: var(--radius-1);
+    overflow: hidden;
+    height: 26px;
+    /* width: 100%; */
+    box-sizing: border-box;
+    /* background: var(--bg-input); */
+}
+
+.glass__thickness-inner-group {
+    display: flex;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-1);
+    width: 100%;
+    background: var(--bg-input);
+}
+
+.glass__thickness-inner-group.gap {
+    flex: 0 0 2.8rem;
+}
+
+.glass__thickness-inner-group.outer {
+    flex: 0 0 7rem;
+}
+
+.glass__tcell {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border-input);
+    overflow: hidden;
+}
+.glass__tcell:last-child { border-right: none; }
+/* Reset all global input rules that break the pill layout */
+.glass__tcell input[type="number"],
+.glass__tcell input {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;    /* let flex-grow fill the cell */
+    height: 100%;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--text-primary);
+    /* font-size: 0.73rem; */
+    text-align: center;
+    padding: 0 4px;
+    box-sizing: border-box;
+    outline: none;
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+    appearance: textfield;
+}
+.glass__tcell input::-webkit-outer-spin-button,
+.glass__tcell input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.glass__tcell input:focus { background: color-mix(in srgb, var(--bg-hover) 60%, transparent); box-shadow: none; }
+.glass__gcell {
+    flex: 0 0 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border-input);
+    background: var(--bg-secondary);
+    overflow: hidden;
+}
+.glass__gcell:last-child { border-right: none; }
+/* Reset all global select rules */
+.glass__gcell select {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    padding: 0;
+    outline: none;
+    box-sizing: border-box;
+}
+.glass__gcell select:focus { background: var(--bg-hover); box-shadow: none; }
+
 .input__field label {
     font-size: 0.73rem;
     font-weight: 500;
@@ -3065,6 +3208,7 @@ body.no-animations *::after {
 .input__group input {
     flex: 1;
     padding-right: 28px;
+    min-width: 0;
 }
 
 .input__unit {
@@ -3108,6 +3252,88 @@ body.no-animations *::after {
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+/* ── Facade / Frame Type radio cards ── */
+.type-radio__group {
+    display: flex;
+    gap: 0.5rem;
+    /* width: fit-content; */
+}
+
+.type-radio__card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.5rem;
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-2);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.7rem;
+    font-weight: 500;
+    /* letter-spacing: 0.2px; */
+}
+
+.type-radio__card:hover {
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.type-radio__card.active {
+    /* border-color: var(--text-link); */
+    /* color: var(--text-link); */
+    /* background: color-mix(in srgb, var(--text-link) 8%, transparent); */
+    background: var(--btn-selected);
+}
+
+.type-radio__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.type-radio__icon svg {
+    width: 2.4rem;
+    height: 2.4rem;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.type-radio__icon svg line,
+.type-radio__icon svg path,
+.type-radio__icon svg polyline,
+.type-radio__icon svg circle {
+    fill: none;
+}
+
+/* Suppress inherited stroke on decorative fills (interlayer rects) */
+.type-radio__icon svg [stroke="none"] {
+    stroke: none;
+}
+
+.type-radio__label {
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* Compact layout for 5-card groups */
+.type-radio__group:has(.type-radio__card:nth-child(5)) {
+    gap: 0.4rem;
+}
+.type-radio__group:has(.type-radio__card:nth-child(5)) .type-radio__card {
+    padding: 0.5rem 0.3rem;
+}
+.type-radio__group:has(.type-radio__card:nth-child(5)) .type-radio__icon svg {
+    width: 1.8rem;
+    height: 1.8rem;
 }
 
 .input__dynamic-list {

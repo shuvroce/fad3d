@@ -9,6 +9,7 @@ import { _alumSections } from './alumSecProp.js';
 import { _steelSections } from './steelSecProp.js';
 import { getSettings } from './settings.js';
 import { getWindInputsCache } from './inputPanel.js';
+import { _computeGlassThk } from './generalInput.js';
 
 // Import result updaters
 import { updateWindResults, updateFacadeResults } from './results.js';
@@ -19,6 +20,31 @@ const CALC_DEBOUNCE_MS = 400;
 const _calcTimers = { wind: null };
 
 // ---- Input Collectors ----
+
+// Reads the 5 General tab inputs and returns base + derived geometry values.
+function _getGeneralInputs(catNum) {
+    const f = id => parseFloat(document.getElementById(id)?.value) || 0;
+    const s = id => document.getElementById(id)?.value || null;
+
+    const floor_height      = f(`cat${catNum}-general-floor_height`);
+    const span_length       = f(`cat${catNum}-general-span_length`);
+    const vertical_spacing  = f(`cat${catNum}-general-vertical_spacing`);
+    const slab_thickness    = f(`cat${catNum}-general-slab_thickness`);
+    const facade_type       = s(`cat${catNum}-general-facade_type`) || 'cont';
+
+    const glass_length   = (span_length > 0 && vertical_spacing > 0) ? Math.max(span_length, vertical_spacing) : null;
+    const glass_width    = (span_length > 0 && vertical_spacing > 0) ? Math.min(span_length, vertical_spacing) : null;
+    const mullion_length = floor_height > 0
+        ? (facade_type === 'sfgp' ? (floor_height - slab_thickness || null) : floor_height)
+        : null;
+    const transom_length = span_length > 0 ? span_length : null;
+    const tran_spacing   = vertical_spacing > 0 ? vertical_spacing : null;
+    const h_a            = slab_thickness > 0 ? slab_thickness : null;
+
+    return { floor_height: floor_height || null, span_length: span_length || null,
+             vertical_spacing: vertical_spacing || null, slab_thickness: slab_thickness || null,
+             facade_type, glass_length, glass_width, mullion_length, transom_length, tran_spacing, h_a };
+}
 
 function collectWindInputs() {
     const cache = getWindInputsCache();
@@ -66,12 +92,13 @@ function collectGlassInputs(catNum) {
     const prefix = `cat${catNum}-glass-${glassType}`;
     const settings = getSettings();
 
+    const gen = _getGeneralInputs(catNum);
     const base = {
         glass_type: glassType,
-        length: g(`${prefix}-length`),
-        width: g(`${prefix}-width`),
+        length: gen.glass_length,
+        width: gen.glass_width,
         wind_load: g(`${prefix}-wind_load`),
-        def_criteria: g(`${prefix}-def_criteria`) || settings.glassDeflRatio,
+        def_criteria: settings.glassDeflRatio,
         support_type: g(`${prefix}-support_type`),
     };
 
@@ -187,7 +214,8 @@ function collectFrameInputs(catNum) {
     };
     const geometry = g(`cat${catNum}-frame-geometry`) || 'regular';
     const mullionType = g(`cat${catNum}-frame-mullion-type`) || 'alu';
-    const frameType = g(`cat${catNum}-frame-frame-type`) || 'cont';
+    const gen = _getGeneralInputs(catNum);
+    const frameType = gen.facade_type;
     const variant = `${geometry}-${mullionType}`;
     const prefix = `cat${catNum}-frame-${variant}`;
     const settings = getSettings();
@@ -196,11 +224,11 @@ function collectFrameInputs(catNum) {
         geometry: geometry,
         mullion_type: mullionType === 'alu-steel' ? 'Aluminum + Steel' : 'Aluminum Only',
         frame_type: frameType === 'sfgp' ? 'Floor-to-floor' : 'Continuous',
-        width: g(`${prefix}-width`),
-        length: g(`${prefix}-length`),
+        width: gen.transom_length,
+        length: gen.mullion_length,
         wind_neg: g(`${prefix}-wind_neg`),
-        glass_thk: g(`${prefix}-glass_thk`),
-        tran_spacing: g(`${prefix}-tran_spacing`),
+        glass_thk: _computeGlassThk(catNum),
+        tran_spacing: gen.tran_spacing,
         mullion: g(`${prefix}-mullion`),
         transom: g(`${prefix}-transom`),
         steel: g(`${prefix}-steel`),
@@ -271,7 +299,7 @@ function collectAnchorInputs(catNum) {
         anchor_dia: g(`${prefix}-anchor_dia`),
         embed_depth: g(`${prefix}-embed_depth`),
         N_p5: g(`${prefix}-N_p5`) || g(`cat${catNum}-anchor-N_p5`),
-        h_a: g(`${prefix}-h_a`),
+        h_a: _getGeneralInputs(catNum).h_a,
         bp_thk: g(`${prefix}-bp_thk`),
         anchor_nos: g(`${prefix}-anchor_nos`),
         C_a1: g(`${prefix}-C_a1`),
@@ -332,7 +360,8 @@ async function runCategoryCalc(catNum) {
         _post('/api/calc/anchorage', { anchor: collectAnchorInputs(catNum), frame: frameForDownstream, alum_profiles: alumProfiles }),
     ]);
 
-    updateFacadeResults(catNum, { glass: glassResult, frame: frameResult, conn: connResult, anchor: anchorResult });
+    const gen = _getGeneralInputs(catNum);
+    updateFacadeResults(catNum, { glass: glassResult, frame: frameResult, conn: connResult, anchor: anchorResult, geometry: { ...gen, glass_thk: _computeGlassThk(catNum) } });
 }
 
 // ---- Debounced triggers ----

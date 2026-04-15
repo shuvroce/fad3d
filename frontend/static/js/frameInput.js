@@ -35,19 +35,14 @@ function initFrameInput() {
 }
 
 function frameInputChangeHandler(e) {
-    const select = e.target;
-    if (!select.matches("select[id$='-frame-geometry'], select[id$='-frame-mullion-type']")) return;
-
-    const match = select.id.match(/^cat(\d+)-frame-(?:geometry|mullion-type)$/);
-    if (!match) return;
-
-    syncFrameVariant(match[1]);
+    const match = e.target.id?.match(/^cat(\d+)-frame-(?:geometry|mullion-type)$/);
+    if (match) syncFrameVariant(match[1]);
 }
 
 // Initialize on load for all existing categories.
 function initFrameVariants() {
-    document.querySelectorAll("select[id$='-frame-geometry']").forEach((sel) => {
-        const match = sel.id.match(/^cat(\d+)-frame-geometry$/);
+    document.querySelectorAll("input[id$='-frame-geometry'], select[id$='-frame-geometry']").forEach((el) => {
+        const match = el.id.match(/^cat(\d+)-frame-geometry$/);
         if (match) syncFrameVariant(match[1]);
     });
     populateFrameSectionDropdowns();
