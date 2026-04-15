@@ -434,8 +434,9 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "length": _num(inputs.get(f"{prefix}-length")),
             "width": _num(inputs.get(f"{prefix}-width")),
             "wind_load": _num(inputs.get(f"{prefix}-wind_load")),
-            "def_criteria": _num(inputs.get(f"{prefix}-def_criteria")),
+            "def_criteria": _num(inputs.get("settings-glass-defl-ratio")) or 60,
             "support_type": inputs.get(f"{prefix}-support_type"),
+            "calc_mode": inputs.get(f"cat{cat_num}-glass-calc-mode", "auto"),
         }
 
         if glass_type == "sgu":

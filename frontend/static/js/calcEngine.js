@@ -91,6 +91,7 @@ function collectGlassInputs(catNum) {
     const glassType = g(`cat${catNum}-glass-type`) || 'sgu';
     const prefix = `cat${catNum}-glass-${glassType}`;
     const settings = getSettings();
+    const calcMode = g(`cat${catNum}-glass-calc-mode`) || 'auto';
 
     const gen = _getGeneralInputs(catNum);
     const base = {
@@ -100,20 +101,27 @@ function collectGlassInputs(catNum) {
         wind_load: g(`${prefix}-wind_load`),
         def_criteria: settings.glassDeflRatio,
         support_type: g(`${prefix}-support_type`),
+        calc_mode: calcMode,
     };
 
+    const manual = calcMode === 'manual';
+
     if (glassType === 'sgu') {
-        return { ...base, grade: g(`${prefix}-grade`), nfl: g(`${prefix}-nfl`), def: g(`${prefix}-def`) };
+        return {
+            ...base,
+            thickness: g(`${prefix}-thickness`),
+            grade: g(`${prefix}-grade`),
+            ...(manual && { nfl: g(`${prefix}-nfl`), def: g(`${prefix}-def`) }),
+        };
     }
     if (glassType === 'lgu') {
         return {
             ...base,
             grade: g(`${prefix}-grade`),
-            nfl: g(`${prefix}-nfl`),
-            def: g(`${prefix}-def`),
             thickness1: g(`${prefix}-thickness1`),
             thickness_inner: g(`${prefix}-thickness_inner`),
             thickness2: g(`${prefix}-thickness2`),
+            ...(manual && { nfl: g(`${prefix}-nfl`), def: g(`${prefix}-def`) }),
         };
     }
     if (glassType === 'dgu') {
@@ -124,10 +132,12 @@ function collectGlassInputs(catNum) {
             thickness1: g(`${prefix}-thickness1`),
             gap: g(`${prefix}-gap`),
             thickness2: g(`${prefix}-thickness2`),
-            nfl1: g(`${prefix}-nfl1`),
-            nfl2: g(`${prefix}-nfl2`),
-            def1: g(`${prefix}-def1`),
-            def2: g(`${prefix}-def2`),
+            ...(manual && {
+                nfl1: g(`${prefix}-nfl1`),
+                nfl2: g(`${prefix}-nfl2`),
+                def1: g(`${prefix}-def1`),
+                def2: g(`${prefix}-def2`),
+            }),
         };
     }
     if (glassType === 'ldgu') {
@@ -140,10 +150,12 @@ function collectGlassInputs(catNum) {
             thickness1_2: g(`${prefix}-thickness1_2`),
             gap: g(`${prefix}-gap`),
             thickness2: g(`${prefix}-thickness2`),
-            nfl1: g(`${prefix}-nfl1`),
-            nfl2: g(`${prefix}-nfl2`),
-            def1: g(`${prefix}-def1`),
-            def2: g(`${prefix}-def2`),
+            ...(manual && {
+                nfl1: g(`${prefix}-nfl1`),
+                nfl2: g(`${prefix}-nfl2`),
+                def1: g(`${prefix}-def1`),
+                def2: g(`${prefix}-def2`),
+            }),
         };
     }
     return base;

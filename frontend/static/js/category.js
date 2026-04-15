@@ -256,6 +256,12 @@ function renumberCategories() {
                 el.getAttribute("data-radio-target").replace(/cat\d+/, `cat${newCategoryNum}`),
             );
         });
+        content.querySelectorAll("[data-calc-mode-target]").forEach((el) => {
+            el.setAttribute(
+                "data-calc-mode-target",
+                el.getAttribute("data-calc-mode-target").replace(/cat\d+/, `cat${newCategoryNum}`),
+            );
+        });
         content.querySelectorAll("input[id], select[id]").forEach((field) => {
             field.setAttribute(
                 "id",
@@ -449,6 +455,12 @@ function duplicateCategory(sourceCategoryNum) {
         el.setAttribute(
             "data-radio-target",
             el.getAttribute("data-radio-target").replace(/cat\d+/, `cat${newNum}`),
+        );
+    });
+    newContent.querySelectorAll("[data-calc-mode-target]").forEach((el) => {
+        el.setAttribute(
+            "data-calc-mode-target",
+            el.getAttribute("data-calc-mode-target").replace(/cat\d+/, `cat${newNum}`),
         );
     });
 

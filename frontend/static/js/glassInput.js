@@ -27,9 +27,16 @@ function syncPointFixedFields(glassSection, isPointFixed) {
     });
 }
 
+// Show/hide manual fields in all glass type sections for a category
+function _syncManualFields(catNum, mode) {
+    document
+        .querySelectorAll(`.glass__type-fields[data-category="${catNum}"] .glass__manual-fields`)
+        .forEach(el => el.classList.toggle('hidden', mode !== 'manual'));
+}
+
 function initGlassInput() {
-    // Delegated listener so it works for dynamically created categories
     document.addEventListener("change", glassInputChangeHandler);
+    document.addEventListener("click", _calcModeClickHandler);
 }
 
 function glassInputChangeHandler(e) {
@@ -46,6 +53,22 @@ function glassInputChangeHandler(e) {
         const glassSection = el.closest('.glass__type-fields');
         if (glassSection) syncPointFixedFields(glassSection, el.value === 'point-fixed');
     }
+}
+
+function _calcModeClickHandler(e) {
+    const btn = e.target.closest('.glass__calc-mode-btn');
+    if (!btn) return;
+    const toggle = btn.closest('.glass__calc-mode-toggle');
+    const mode = btn.dataset.mode;
+    const targetId = toggle.dataset.calcModeTarget;
+    const hidden = document.getElementById(targetId);
+
+    toggle.querySelectorAll('.glass__calc-mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (hidden) hidden.value = mode;
+
+    const catNum = toggle.closest('[data-tab="glass"]')?.dataset.category;
+    _syncManualFields(catNum, mode);
 }
 
 export { initGlassInput, switchGlassType, syncPointFixedFields };

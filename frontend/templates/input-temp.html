@@ -12,27 +12,30 @@
             </div>
             <div class="result__card-body-outer">
                 <div class="result__card-body">
-                    <div class="input__field">
-                        <label for="b_length">Building Length</label>
-                        <div class="input__group">
-                            <input type="number" step="0.1" id="b_length" name="b_length">
-                            <span class="input__unit">m</span>
+                    <div class="input__field-row">
+                        <div class="input__field">
+                            <label for="b_length">Building Length</label>
+                            <div class="input__group">
+                                <input type="number" step="0.1" id="b_length" name="b_length">
+                                <span class="input__unit">m</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="b_width">Building Width</label>
+                            <div class="input__group">
+                                <input type="number" step="0.1" id="b_width" name="b_width">
+                                <span class="input__unit">m</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="b_height">Building Height</label>
+                            <div class="input__group">
+                                <input type="number" step="0.1" id="b_height" name="b_height">
+                                <span class="input__unit">m</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="b_width">Building Width</label>
-                        <div class="input__group">
-                            <input type="number" step="0.1" id="b_width" name="b_width">
-                            <span class="input__unit">m</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="b_height">Building Height</label>
-                        <div class="input__group">
-                            <input type="number" step="0.1" id="b_height" name="b_height">
-                            <span class="input__unit">m</span>
-                        </div>
-                    </div>
+
                     <div class="input__field">
                         <label for="b_floor_heights">Floor Heights (Separated by space)</label>
                         <div class="input__group">
@@ -61,23 +64,27 @@
                         <select id="location" name="location">
                         </select>
                     </div>
-                    <div class="input__field">
-                        <label for="exposure_cat">Exposure Category</label>
-                        <select id="exposure_cat" name="exposure_cat">
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                        </select>
+
+                    <div class="input__field-row">
+                        <div class="input__field">
+                            <label for="exposure_cat">Exposure Category</label>
+                            <select id="exposure_cat" name="exposure_cat">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                            </select>
+                        </div>
+                        <div class="input__field">
+                            <label for="occupancy_cat">Occupancy Category</label>
+                            <select id="occupancy_cat" name="occupancy_cat">
+                                <option value="I">Occupancy I</option>
+                                <option value="II">Occupancy II</option>
+                                <option value="III">Occupancy III</option>
+                                <option value="IV">Occupancy IV</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="input__field">
-                        <label for="occupancy_cat">Occupancy Category</label>
-                        <select id="occupancy_cat" name="occupancy_cat">
-                            <option value="I">Occupancy I</option>
-                            <option value="II">Occupancy II</option>
-                            <option value="III">Occupancy III</option>
-                            <option value="IV">Occupancy IV</option>
-                        </select>
-                    </div>
+
                     <div class="input__field">
                         <label for="K_d">Directionality Factor, K<sub>d</sub></label>
                         <div class="input__group">
@@ -114,17 +121,20 @@
                             <option value="Flexible">Flexible</option>
                         </select>
                     </div>
-                    <div class="input__field">
-                        <label for="b_freq">Building Natural Frequency, f<sub>n</sub></label>
-                        <div class="input__group">
-                            <input type="number" step="0.1" id="b_freq" name="b_freq" value="1.2">
-                            <span class="input__unit">H<sub>z</sub></span>
+
+                    <div class="input__field-row">
+                        <div class="input__field">
+                            <label for="b_freq">Building Natural Frequency, f<sub>n</sub></label>
+                            <div class="input__group">
+                                <input type="number" step="0.1" id="b_freq" name="b_freq" value="1.2">
+                                <span class="input__unit">H<sub>z</sub></span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="damping">Damping Ratio</label>
-                        <div class="input__group">
-                            <input type="number" step="0.1" id="damping" name="damping" value="0.02">
+                        <div class="input__field">
+                            <label for="damping">Damping Ratio</label>
+                            <div class="input__group">
+                                <input type="number" step="0.1" id="damping" name="damping" value="0.02">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,25 +168,28 @@
                             <option value="Downwind">Downwind</option>
                         </select>
                     </div>
-                    <div class="input__field">
-                        <label for="topo_height">Topography Height</label>
-                        <div class="input__group">
-                            <input type="number" id="topo_height" name="topo_height">
-                            <span class="input__unit">m</span>
+
+                    <div class="input__field-row">
+                        <div class="input__field">
+                            <label for="topo_height">Topography Height</label>
+                            <div class="input__group">
+                                <input type="number" id="topo_height" name="topo_height">
+                                <span class="input__unit">m</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="topo_length">Topography Length</label>
-                        <div class="input__group">
-                            <input type="number" id="topo_length" name="topo_length">
-                            <span class="input__unit">m</span>
+                        <div class="input__field">
+                            <label for="topo_length">Topography Length</label>
+                            <div class="input__group">
+                                <input type="number" id="topo_length" name="topo_length">
+                                <span class="input__unit">m</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="topo_distance">Topography Distance</label>
-                        <div class="input__group">
-                            <input type="number" id="topo_distance" name="topo_distance">
-                            <span class="input__unit">m</span>
+                        <div class="input__field">
+                            <label for="topo_distance">Topography Distance</label>
+                            <div class="input__group">
+                                <input type="number" id="topo_distance" name="topo_distance">
+                                <span class="input__unit">m</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -381,6 +394,16 @@
             </div>
         </div>
 
+        <!-- Calc Mode Toggle -->
+        <input type="hidden" id="cat0-glass-calc-mode" value="auto">
+        <div class="glass__calc-mode-toggle" data-calc-mode-target="cat0-glass-calc-mode">
+            <span class="glass__calc-mode-label">Calculation method:</span>
+            <div class="glass__calc-mode-btns">
+                <button type="button" class="glass__calc-mode-btn active" data-mode="auto">Auto</button>
+                <button type="button" class="glass__calc-mode-btn" data-mode="manual">Manual</button>
+            </div>
+        </div>
+
         <!-- SGU -->
         <div class="glass__type-fields" data-category="0" data-glass-type="sgu">
             <div class="input__section">
@@ -482,25 +505,27 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-nfl">Non-factored Load, NFL</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-nfl">
-                        <span class="input__unit">kPa</span>
+                <div class="glass__manual-fields hidden">
+                    <div class="input__field">
+                        <label for="cat0-glass-sgu-nfl">Non-factored Load, NFL</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-sgu-nfl">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-load_x_area2">Load × Area²</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-load_x_area2">
-                        <span class="input__unit">kNm²</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-sgu-load_x_area2">Load × Area²</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-sgu-load_x_area2">
+                            <span class="input__unit">kNm²</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-sgu-def">Deflection</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-sgu-def">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-sgu-def">Deflection</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-sgu-def">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -627,46 +652,48 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-nfl1">NFL<sub>1</sub> (Outer)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-nfl1">
-                        <span class="input__unit">kPa</span>
+                <div class="glass__manual-fields hidden">
+                    <div class="input__field">
+                        <label for="cat0-glass-dgu-nfl1">NFL<sub>1</sub> (Outer)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-dgu-nfl1">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-nfl2">NFL<sub>2</sub> (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-nfl2">
-                        <span class="input__unit">kPa</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-dgu-nfl2">NFL<sub>2</sub> (Inner)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-dgu-nfl2">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-load1_x_area2">Load × Area² (Outer)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-load1_x_area2">
-                        <span class="input__unit">kNm²</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-dgu-load1_x_area2">Load × Area² (Outer)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-dgu-load1_x_area2">
+                            <span class="input__unit">kNm²</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-load2_x_area2">Load × Area² (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-load2_x_area2">
-                        <span class="input__unit">kNm²</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-dgu-load2_x_area2">Load × Area² (Inner)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-dgu-load2_x_area2">
+                            <span class="input__unit">kNm²</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-def1">Deflection (Outer)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-def1">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-dgu-def1">Deflection (Outer)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-dgu-def1">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-dgu-def2">Deflection (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-dgu-def2">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-dgu-def2">Deflection (Inner)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-dgu-def2">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -786,25 +813,27 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-nfl">NFL</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-nfl">
-                        <span class="input__unit">kPa</span>
+                <div class="glass__manual-fields hidden">
+                    <div class="input__field">
+                        <label for="cat0-glass-lgu-nfl">NFL</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-lgu-nfl">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-load_x_area2">Load × Area²</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-load_x_area2">
-                        <span class="input__unit">kNm²</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-lgu-load_x_area2">Load × Area²</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-lgu-load_x_area2">
+                            <span class="input__unit">kNm²</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-lgu-def">Deflection</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-def">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-lgu-def">Deflection</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-lgu-def">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -943,46 +972,48 @@
                         <span class="input__unit">kPa</span>
                     </div>
                 </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-nfl1">NFL<sub>1</sub> (Outer Laminate)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-nfl1" readonly>
-                        <span class="input__unit">kPa</span>
+                <div class="glass__manual-fields hidden">
+                    <div class="input__field">
+                        <label for="cat0-glass-ldgu-nfl1">NFL<sub>1</sub> (Outer Laminate)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-ldgu-nfl1">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-nfl2">NFL<sub>2</sub> (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-nfl2" readonly>
-                        <span class="input__unit">kPa</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-ldgu-nfl2">NFL<sub>2</sub> (Inner)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-ldgu-nfl2">
+                            <span class="input__unit">kPa</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-load1_x_area2">Load × Area²</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-load1_x_area2">
-                        <span class="input__unit">kNm²</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-ldgu-load1_x_area2">Load × Area²</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-ldgu-load1_x_area2">
+                            <span class="input__unit">kNm²</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-load2_x_area2">Load × Area²</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-load2_x_area2" readonly>
-                        <span class="input__unit">kNm²</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-ldgu-load2_x_area2">Load × Area²</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-ldgu-load2_x_area2">
+                            <span class="input__unit">kNm²</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-def1">Deflection (Outer Laminate)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-def1">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-ldgu-def1">Deflection (Outer Laminate)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-ldgu-def1">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
-                </div>
-                <div class="input__field">
-                    <label for="cat0-glass-ldgu-def2">Deflection (Inner)</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-def2">
-                        <span class="input__unit">mm</span>
+                    <div class="input__field">
+                        <label for="cat0-glass-ldgu-def2">Deflection (Inner)</label>
+                        <div class="input__group">
+                            <input type="number" id="cat0-glass-ldgu-def2">
+                            <span class="input__unit">mm</span>
+                        </div>
                     </div>
                 </div>
             </div>
