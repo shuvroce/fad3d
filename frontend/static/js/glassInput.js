@@ -204,7 +204,10 @@ function _calcModeClickHandler(e) {
 
     toggle.querySelectorAll('.glass__calc-mode-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    if (hidden) hidden.value = mode;
+    if (hidden) {
+        hidden.value = mode;
+        hidden.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 
     const catNum = toggle.closest('[data-tab="glass"]')?.dataset.category;
     _syncManualFields(catNum, mode);
