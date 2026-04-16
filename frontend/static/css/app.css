@@ -218,21 +218,31 @@ body.theme__dark {
 }
 
 @keyframes tabFadeSlide {
-    from {
-        opacity: 0;
-        transform: translateY(5px) translateZ(0);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) translateZ(0);
-    }
+    from { opacity: 0; transform: translateX(6px) translateZ(0); }
+    to   { opacity: 1; transform: translateX(0)   translateZ(0); }
+}
+
+@keyframes tabFadeSlideFromLeft {
+    from { opacity: 0; transform: translateX(-6px) translateZ(0); }
+    to   { opacity: 1; transform: translateX(0)    translateZ(0); }
+}
+
+@keyframes catSlideFromBottom {
+    from { opacity: 0; transform: translateY(5px) translateZ(0); }
+    to   { opacity: 1; transform: translateY(0)   translateZ(0); }
+}
+
+@keyframes catSlideFromTop {
+    from { opacity: 0; transform: translateY(-5px) translateZ(0); }
+    to   { opacity: 1; transform: translateY(0)    translateZ(0); }
 }
 
 @keyframes contentFadeOut {
-    to {
-        opacity: 0;
-        transform: translateY(-4px) translateZ(0);
-    }
+    to { opacity: 0; transform: translateX(-6px) translateZ(0); }
+}
+
+@keyframes contentFadeOutRight {
+    to { opacity: 0; transform: translateX(6px) translateZ(0); }
 }
 
 @keyframes resultContentFadeIn {
@@ -2886,7 +2896,14 @@ body.no-animations *::after {
 
 .input__category-content {
     display: block;
-    animation: tabFadeSlide 0.15s ease;
+}
+
+.input__category-content.cat-enter-down {
+    animation: catSlideFromBottom 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.input__category-content.cat-enter-up {
+    animation: catSlideFromTop 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .input__category-content.hidden {
@@ -2899,10 +2916,17 @@ body.no-animations *::after {
     gap: 1rem;
     margin-top: 1.5rem;
     padding: 0 0.5rem 0 0.1rem;
-    animation: tabFadeSlide 0.15s ease;
     overflow-y: auto;
     max-height: calc(100vh - var(--topbar-height) - var(--floating-height) - 9rem);
     margin-bottom: 1rem;
+}
+
+.input__tab-content.tab-enter-right {
+    animation: tabFadeSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.input__tab-content.tab-enter-left {
+    animation: tabFadeSlideFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .input__tab-content.hidden {
@@ -3548,12 +3572,19 @@ body.no-animations *::after {
 /* Result Tab Content */
 .result__tab-content {
     display: block;
-    animation: tabFadeSlide 0.15s ease;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+}
+
+.result__tab-content.tab-enter-right {
+    animation: tabFadeSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.result__tab-content.tab-enter-left {
+    animation: tabFadeSlideFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .result__tab-content.hidden {
@@ -3563,7 +3594,7 @@ body.no-animations *::after {
 .input__tab-content.is-exiting,
 .input__category-content.is-exiting,
 .result__tab-content.is-exiting {
-    animation: contentFadeOut 0.08s ease forwards;
+    animation: contentFadeOut 0.07s ease forwards;
     pointer-events: none;
 }
 

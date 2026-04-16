@@ -7,33 +7,23 @@ import { showFacadeResults, restoreCollapseStateForCategory, persistCollapseStat
 
 // Function to switch between Wind and Facade tabs
 function switchResultTab(tabName) {
-    const current = document.querySelector(".result__tab-content:not(.hidden)");
+    const RESULT_TAB_ORDER = ['facade', 'wind'];
 
-    // Immediately update button states
-    document.querySelectorAll(".result__tab-btn").forEach((btn) => {
-        btn.classList.remove("active");
-    });
-    const activeButton = document.querySelector(
-        `.result__tab-btn[data-result-tab="${tabName}"]`,
-    );
+    const current = document.querySelector(".result__tab-content:not(.hidden)");
+    const currentTab = current ? current.dataset.resultTab : null;
+    const goingRight = RESULT_TAB_ORDER.indexOf(tabName) >= RESULT_TAB_ORDER.indexOf(currentTab);
+
+    document.querySelectorAll(".result__tab-btn").forEach((btn) => btn.classList.remove("active"));
+    const activeButton = document.querySelector(`.result__tab-btn[data-result-tab="${tabName}"]`);
     if (activeButton) activeButton.classList.add("active");
 
-    const showNew = () => {
-        document.querySelectorAll(".result__tab-content").forEach((c) => {
-            c.classList.add("hidden");
-            c.classList.remove("is-exiting");
-        });
-        const target = document.querySelector(
-            `.result__tab-content[data-result-tab="${tabName}"]`,
-        );
-        if (target) target.classList.remove("hidden");
-    };
+    // Hide all instantly, transition new one in
+    document.querySelectorAll(".result__tab-content").forEach((c) => c.classList.add("hidden"));
 
-    if (current) {
-        current.classList.add("is-exiting");
-        setTimeout(showNew, 100);
-    } else {
-        showNew();
+    const target = document.querySelector(`.result__tab-content[data-result-tab="${tabName}"]`);
+    if (target) {
+        target.classList.remove("hidden", "tab-enter-left", "tab-enter-right");
+        target.classList.add(goingRight ? "tab-enter-right" : "tab-enter-left");
     }
 }
 

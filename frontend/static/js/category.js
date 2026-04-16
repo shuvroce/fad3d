@@ -26,37 +26,22 @@ const categoryNames = new Map(); // Store custom category names
 
 function switchCategory(categoryNum) {
     const current = document.querySelector(".input__category-content:not(.hidden)");
+    const currentNum = current ? Number(current.dataset.category) : null;
+    const goingDown = currentNum === null || Number(categoryNum) > currentNum;
 
-    document.querySelectorAll(".category__btn").forEach((btn) => {
-        btn.classList.remove("active");
-    });
-    const activeButton = document.querySelector(
-        `.category__btn[data-category="${categoryNum}"]`,
-    );
+    document.querySelectorAll(".category__btn").forEach((btn) => btn.classList.remove("active"));
+    const activeButton = document.querySelector(`.category__btn[data-category="${categoryNum}"]`);
     if (activeButton) activeButton.classList.add("active");
 
-    window.dispatchEvent(
-        new CustomEvent("category-switched", {
-            detail: { categoryNum: Number(categoryNum) },
-        }),
-    );
+    window.dispatchEvent(new CustomEvent("category-switched", { detail: { categoryNum: Number(categoryNum) } }));
 
-    const showNew = () => {
-        document.querySelectorAll(".input__category-content").forEach((c) => {
-            c.classList.add("hidden");
-            c.classList.remove("is-exiting");
-        });
-        const target = document.querySelector(
-            `.input__category-content[data-category="${categoryNum}"]`,
-        );
-        if (target) target.classList.remove("hidden");
-    };
+    document.querySelectorAll(".input__category-content").forEach((c) => c.classList.add("hidden"));
 
-    if (current) {
-        current.classList.add("is-exiting");
-        setTimeout(showNew, 100);
-    } else {
-        showNew();
+    const target = document.querySelector(`.input__category-content[data-category="${categoryNum}"]`);
+    if (target) {
+        // Remove hidden + add animation class in same sync block so browser uses 'from' keyframe
+        target.classList.remove("hidden", "cat-enter-down", "cat-enter-up");
+        target.classList.add(goingDown ? "cat-enter-down" : "cat-enter-up");
     }
 }
 
@@ -65,9 +50,13 @@ function switchCategory(categoryNum) {
 // ============================
 
 function switchTab(categoryNum, tabName) {
+    const TAB_ORDER = ['general', 'glass', 'frame', 'conn', 'anchor'];
+
     const current = document.querySelector(
         `.input__tab-content[data-category="${categoryNum}"]:not(.hidden)`,
     );
+    const currentTab = current ? current.dataset.tab : null;
+    const goingRight = TAB_ORDER.indexOf(tabName) >= TAB_ORDER.indexOf(currentTab);
 
     document
         .querySelectorAll(`.input__box-nav-btn[data-category="${categoryNum}"]`)
@@ -77,24 +66,17 @@ function switchTab(categoryNum, tabName) {
     );
     if (activeButton) activeButton.classList.add("active");
 
-    const showNew = () => {
-        document
-            .querySelectorAll(`.input__tab-content[data-category="${categoryNum}"]`)
-            .forEach((c) => {
-                c.classList.add("hidden");
-                c.classList.remove("is-exiting");
-            });
-        const target = document.querySelector(
-            `.input__tab-content[data-category="${categoryNum}"][data-tab="${tabName}"]`,
-        );
-        if (target) target.classList.remove("hidden");
-    };
+    document
+        .querySelectorAll(`.input__tab-content[data-category="${categoryNum}"]`)
+        .forEach((c) => c.classList.add("hidden"));
 
-    if (current) {
-        current.classList.add("is-exiting");
-        setTimeout(showNew, 100);
-    } else {
-        showNew();
+    const target = document.querySelector(
+        `.input__tab-content[data-category="${categoryNum}"][data-tab="${tabName}"]`,
+    );
+    if (target) {
+        // Remove hidden + add animation class in same sync block so browser uses 'from' keyframe
+        target.classList.remove("hidden", "tab-enter-left", "tab-enter-right");
+        target.classList.add(goingRight ? "tab-enter-right" : "tab-enter-left");
     }
 }
 

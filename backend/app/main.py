@@ -522,7 +522,7 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "geometry": frame_variant,
             "mullion_type": "Aluminum + Steel" if mullion_type == "alu-steel" else "Aluminum Only",
             "frame_type": "Floor-to-floor" if frame_type == "sfgp" else "Continuous",
-            "zone": _zone_map.get(inputs.get(f"cat{cat_num}-frame-zone", ""), inputs.get(f"cat{cat_num}-frame-zone", "")),
+            "zone": _zone_map.get(inputs.get(f"cat{cat_num}-general-zone", ""), inputs.get(f"cat{cat_num}-general-zone", "")),
             "system_type": _sys_map.get(inputs.get(f"cat{cat_num}-frame-system-type", ""), ""),
             "width": _num(inputs.get(f"{frame_prefix}-width")),
             "length": _num(inputs.get(f"{frame_prefix}-length")),
