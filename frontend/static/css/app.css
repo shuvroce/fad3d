@@ -372,7 +372,7 @@ h4 {
 }
 
 h2 {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     margin-bottom: 1rem;
 }
 
@@ -3548,8 +3548,8 @@ body.no-animations *::after {
 }
 
 .result__heading {
-    /* font-size: 1.25rem; */
-    font-weight: 600;
+    font-size: 1rem;
+    /* font-weight: 600; */
     color: var(--text-primary);
     flex-shrink: 0;
 }
@@ -3675,7 +3675,7 @@ body.no-animations *::after {
 } */
 
 .result__card-title {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: 0;
