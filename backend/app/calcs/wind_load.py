@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 location_wind_speeds = {
         "Angarpota": 47.8, "Bagerhat": 77.5, "Bandarban": 62.5, "Barguna": 80.0,
@@ -401,6 +401,55 @@ def _extract_wind_inputs(wind_dict: Dict[str, Any], _to_float) -> Tuple[str, flo
         topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
         b_rigidity, b_freq, damping
     )
+
+
+def compute_cc_pressure_for_area(eff_area: float, zone: str, wind_dict: Dict[str, Any], _to_float) -> Optional[float]:
+    """Return the governing C&C design wind pressure (kPa) for a given effective area and zone.
+
+    Args:
+        eff_area: Effective tributary area in m².
+        zone: One of 'zone4', 'zone5' (wall) or 'zone1', 'zone2', 'zone3' (roof).
+        wind_dict: Wind input parameters dict (same keys used by the Wind panel).
+        _to_float: Utility converter from calc_utils.
+    Returns:
+        Positive kPa pressure, or None if wind inputs are insufficient.
+    """
+    if not wind_dict or not eff_area:
+        return None
+    try:
+        (exposure_cat, wind_speed, floors, _b_length, _b_width, K_d, occupancy_cat, GC_pi,
+         topography_type, topo_height, topo_length, topo_distance, topo_crest_side,
+         _b_rigidity, _b_freq, _damping) = _extract_wind_inputs(wind_dict, _to_float)
+
+        _, cumu_heights = parse_floor_heights(wind_dict.get("b_floor_heights"))
+        height = cumu_heights[-1]
+
+        K_z = velocity_pressure_coeff(exposure_cat, height, WFRS="C&C")
+        K_zt = topographic_factor(
+            topography_type, topo_height, topo_length, topo_distance,
+            height, exposure_cat, topo_crest_side
+        ) or 1.0
+        q_zk = base_velocity_pressure(wind_speed, K_d, occupancy_cat)
+        q_z = q_zk * K_z * K_zt
+        P_zi = q_z * GC_pi
+
+        zone = (zone or "zone4").strip().lower()
+
+        if zone in ("zone4", "zone5"):
+            GCp_z4_p, GCp_z4_n, GCp_z5_p, GCp_z5_n = ext_pressure_coeff_wall_cladd(eff_area)
+            if zone == "zone4":
+                p = max(abs(q_z * GCp_z4_n - P_zi), q_z * GCp_z4_p + P_zi)
+            else:
+                p = max(abs(q_z * GCp_z5_n - P_zi), q_z * GCp_z5_p + P_zi)
+        else:
+            GCp_z1_n, GCp_z2_n, GCp_z3_n = ext_pressure_coeff_roof_cladd(eff_area)
+            zone_map = {"zone1": GCp_z1_n, "zone2": GCp_z2_n, "zone3": GCp_z3_n}
+            GCp_n = zone_map.get(zone, GCp_z1_n)
+            p = abs(q_z * GCp_n - P_zi)
+
+        return round(p, 3)
+    except Exception:
+        return None
 
 
 def compute_wind_loads(wind_dict: Dict[str, Any], _to_float) -> Dict[str, Any]:

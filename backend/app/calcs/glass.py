@@ -5,6 +5,7 @@ from calcs.glass_plate_theory import (
     nfl_monolithic, deflection_monolithic,
     nfl_laminated, deflection_laminated,
 )
+from calcs.wind_load import compute_cc_pressure_for_area
 
 GTF_TABLE = {
     "AN": {"AN": (0.9, 0.9), "HS": (1.0, 1.9), "FT": (1.0, 3.8)},
@@ -43,7 +44,7 @@ def _bite_glue(wind_load, width):
     }
 
 
-def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
+def calc_glass_unit(gu: Dict[str, Any], wind_inputs: Optional[Dict] = None) -> Optional[Dict[str, float]]:
     glass_type = gu.get("glass_type")
     if not glass_type:
         return None
@@ -63,7 +64,20 @@ def calc_glass_unit(gu: Dict[str, Any]) -> Optional[Dict[str, float]]:
 
     A_eff = max(length * width, length * length / 3) / 1000**2
     aspect_ratio = length / width
+
+    # Auto-resolve C&C wind pressure when in auto mode and no manual value given
+    wind_auto = False
+    if calc_mode == "auto" and not wind_load and wind_inputs:
+        zone = gu.get("zone", "zone4")
+        auto_wind = compute_cc_pressure_for_area(A_eff, zone, wind_inputs, _to_float)
+        if auto_wind:
+            wind_load = auto_wind
+            wind_auto = True
+
     result = _base_result(gu, A_eff, aspect_ratio)
+    if wind_auto:
+        result["wind_load"] = wind_load
+        result["wind_auto"] = True
     result.update(_bite_glue(wind_load, width))
 
     # Helper: resolve a value from user input (manual mode) or auto-calculation

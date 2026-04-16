@@ -76,6 +76,10 @@ function _syncManualFields(catNum, mode) {
         .querySelectorAll(`.glass__type-fields[data-category="${catNum}"] .glass__manual-fields`)
         .forEach(el => el.classList.toggle('hidden', mode !== 'manual'));
 
+    // Wind load field is only needed in manual mode (auto mode computes it from C&C)
+    const windField = document.querySelector(`.input__tab-content[data-tab="glass"][data-category="${catNum}"] .glass__wind-field`);
+    if (windField) windField.classList.toggle('hidden', mode !== 'manual');
+
     if (mode !== 'manual') _updateChartThk(catNum);
 }
 

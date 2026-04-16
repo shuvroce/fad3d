@@ -3,6 +3,7 @@ from calcs.calc_utils import _to_float
 from calcs.alum_profile import calc_alum_profile
 from calcs.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
 from calcs.loading import frame_loads, joint_forces, reaction_forces
+from calcs.wind_load import compute_cc_pressure_for_area
 
 def _profile_props(payload, calc_fn):
     """Return computed section props, preferring modal-cached values over recalculation."""
@@ -21,7 +22,7 @@ def _profile_props(payload, calc_fn):
     return partial if partial else None
 
 
-def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles: list = None) -> Optional[Dict[str, Any]]:
+def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles: list = None, wind_inputs: Optional[Dict] = None) -> Optional[Dict[str, Any]]:
     if not frame or alum_profiles is None:
         return None
 
@@ -65,16 +66,26 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
     if not all([frame_width, frame_length]):
         return None
 
-    # Compute loads via shared loading module
-    mul_w_dead, mul_w_wind, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
-    glass_sw = glass_thk * 0.025
-    acc_sw = glass_sw * 0.3
-
+    # Effective area (needed for auto wind before frame_loads)
     if frame_type == "Floor-to-floor":
         eff_area = max(frame_length * frame_width, frame_length**2 / 3) / 1000**2
     else:  # Continuous
         _frame_length = frame_length * 2
         eff_area = max(_frame_length * frame_width, _frame_length**2 / 3) / 1000**2
+
+    # Auto-resolve C&C wind pressure when in regular geometry and no manual value given
+    wind_auto = False
+    if geometry == "regular" and not wind_neg and wind_inputs:
+        zone = frame.get("zone", "zone4")
+        auto_wind = compute_cc_pressure_for_area(eff_area, zone, wind_inputs, _to_float)
+        if auto_wind:
+            wind_neg = auto_wind
+            wind_auto = True
+
+    # Compute loads via shared loading module
+    mul_w_dead, mul_w_wind, tran_w_dead, tran_w_wind = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
+    glass_sw = glass_thk * 0.025
+    acc_sw = glass_sw * 0.3
 
     # Deflection limits
     defl_ratio = _to_float(frame.get("defl_ratio")) or 175
@@ -158,6 +169,7 @@ def calc_frame(frame: Dict[str, Any], alum_profiles: list = None, steel_profiles
         "glass_sw": round(glass_sw, 2),
         "acc_sw": round(acc_sw, 2),
         "eff_area": round(eff_area, 1),
+        **({"wind_neg": round(wind_neg, 3), "wind_auto": True} if wind_auto else {}),
         "I_xa": round(I_xa, 1) if I_xa is not None else None,
         "I_xs": round(I_xs, 1) if I_xs is not None else None,
         "ls_a": round(ls_a, 2) if ls_a is not None else None,

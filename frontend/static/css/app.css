@@ -2947,6 +2947,11 @@ body.no-animations *::after {
     display: none;
 }
 
+/* Hide wind inputs for regular geometry variants — auto-computed from C&C */
+.frame__variant-fields[data-frame-variant^="regular"] .frame__wind-row {
+    display: none;
+}
+
 /* Smooth field visibility toggling inside modal dialogs */
 .modal__dialog .input__field[data-alum-group],
 .modal__dialog .input__field[data-steel-group] {
@@ -3745,6 +3750,22 @@ body.no-animations *::after {
 .result__label {
     font-size: 0.8rem;
     color: var(--text-secondary);
+}
+
+.result__badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 1px 5px;
+    border-radius: 3px;
+    vertical-align: middle;
+    text-transform: uppercase;
+}
+
+.result__badge--auto {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
 }
 
 .result__value {

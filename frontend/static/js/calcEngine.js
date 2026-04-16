@@ -102,6 +102,7 @@ function collectGlassInputs(catNum) {
         def_criteria: settings.glassDeflRatio,
         support_type: g(`cat${catNum}-glass-support_type`),
         calc_mode: calcMode,
+        zone: g(`cat${catNum}-general-zone`) || 'zone4',
     };
 
     const manual = calcMode === 'manual';
@@ -258,6 +259,7 @@ function collectFrameInputs(catNum) {
         joint_fz: g(`${prefix}-joint_fz`),
         reaction_Ry: g(`${prefix}-reaction_Ry`),
         reaction_Rz: g(`${prefix}-reaction_Rz`),
+        zone: g(`cat${catNum}-general-zone`) || 'zone4',
     };
 
     // Resolve profile payloads from the section stores
@@ -352,11 +354,12 @@ async function runCategoryCalc(catNum) {
     const frameInputs = collectFrameInputs(catNum);
     const alumProfiles = (_alumSections || []).map(_sectionToAlumProfile);
     const steelProfiles = (_steelSections || []).map(_sectionToSteelProfile);
+    const windInputs = collectWindInputs();
 
     // Run glass and frame first (frame results are needed by connection/anchorage)
     const [glassResult, frameResult] = await Promise.all([
-        _post('/api/calc/glass', collectGlassInputs(catNum)),
-        _post('/api/calc/frame', { frame: frameInputs, alum_profiles: alumProfiles, steel_profiles: steelProfiles }),
+        _post('/api/calc/glass', { ...collectGlassInputs(catNum), wind: windInputs }),
+        _post('/api/calc/frame', { frame: frameInputs, alum_profiles: alumProfiles, steel_profiles: steelProfiles, wind: windInputs }),
     ]);
 
     // Merge frame results into the frame payload so connection/anchorage get computed forces

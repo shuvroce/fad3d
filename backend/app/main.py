@@ -110,7 +110,7 @@ async def api_calc_wind(request: Request):
 @app.post("/api/calc/glass")
 async def api_calc_glass(request: Request):
     data = await _json(request)
-    result = calc_glass_unit(data)
+    result = calc_glass_unit(data, wind_inputs=data.get("wind"))
     if result is None:
         return JSONResponse({"error": "Insufficient data"}, status_code=400)
     return result
@@ -122,7 +122,7 @@ async def api_calc_frame(request: Request):
     frame = data.get("frame", {})
     alum_profiles = data.get("alum_profiles", [])
     steel_profiles = data.get("steel_profiles", [])
-    result = calc_frame(frame, alum_profiles, steel_profiles)
+    result = calc_frame(frame, alum_profiles, steel_profiles, wind_inputs=data.get("wind"))
     if result is None:
         return JSONResponse({"error": "Insufficient data"}, status_code=400)
     return result

@@ -66,6 +66,7 @@ function _renderGlass(calc) {
     const isSingle = calc.branch === 'sgu' || calc.branch === 'lgu';
     const isDouble = calc.branch === 'dgu' || calc.branch === 'ldgu';
     const showKeys = [];
+    if (calc.wind_auto) showKeys.push('wind_load');
     if (isSingle) showKeys.push('gtf', 'lr');
     if (isDouble) showKeys.push('gtf1', 'gtf2', 'ls1', 'ls2', 'lr1', 'lr2');
     if (calc.stress_ratio != null) showKeys.push('stress_ratio');
@@ -76,6 +77,7 @@ function _renderGlass(calc) {
     const data = {
         A_eff: calc.A_eff,
         aspect_ratio: calc.aspect_ratio,
+        wind_load: calc.wind_load,
         gtf: calc.gtf,
         lr: calc.lr,
         gtf1: calc.gtf1,
@@ -102,6 +104,7 @@ function _renderFrame(calc) {
     if (!calc || calc.error) return _empty('—');
     const isComposite = calc.mullion_type === 'Aluminum + Steel';
     const showKeys = [];
+    if (calc.wind_auto) showKeys.push('wind_neg');
     if (isComposite) showKeys.push('I_xa', 'I_xs', 'ls_a', 'ls_s', 'mul_phi_Mn_a', 'mul_dc_a', 'mul_phi_Mn_s', 'mul_dc_s');
     else showKeys.push('mul_phi_Mn', 'mul_dc');
     if (calc.mul_def != null) showKeys.push('mul_def');
@@ -110,6 +113,7 @@ function _renderFrame(calc) {
 
     const data = {
         eff_area: calc.eff_area,
+        wind_neg: calc.wind_neg,
         glass_sw: calc.glass_sw,
         I_xa: calc.I_xa,
         I_xs: calc.I_xs,
@@ -210,22 +214,6 @@ function _renderAnchorage(calc) {
     return _fillTemplate('result-anchorage-template', data, passMap, showKeys, showSections);
 }
 
-// ---- Geometry Results ----
-
-function _renderGeometry(gen) {
-    if (!gen || (!gen.glass_length && !gen.mullion_length)) return _empty('Enter general inputs to calculate');
-    const data = {
-        glass_length: gen.glass_length,
-        glass_width: gen.glass_width,
-        mullion_length: gen.mullion_length,
-        transom_length: gen.transom_length,
-        tran_spacing: gen.tran_spacing,
-        glass_thk: gen.glass_thk ?? null,
-        h_a: gen.h_a,
-    };
-    return _fillTemplate('result-geometry-template', data);
-}
-
 // ---- Wind Results ----
 
 function _renderWindGeneral(summary) {
@@ -308,13 +296,12 @@ function updateFacadeResults(catNum, results) {
 function showFacadeResults(catNum) {
     const results = _facadeResultsCache.get(Number(catNum));
     const bodies = [
-        { sel: '#facade-geometry-body', key: 'geometry' },
         { sel: '#facade-glass-body', key: 'glass' },
         { sel: '#facade-frame-body', key: 'frame' },
         { sel: '#facade-conn-body', key: 'conn' },
         { sel: '#facade-anchor-body', key: 'anchor' },
     ];
-    const renderers = { geometry: _renderGeometry, glass: _renderGlass, frame: _renderFrame, conn: _renderConnection, anchor: _renderAnchorage };
+    const renderers = { glass: _renderGlass, frame: _renderFrame, conn: _renderConnection, anchor: _renderAnchorage };
 
     // Exit animation
     bodies.forEach(({ sel }) => {
