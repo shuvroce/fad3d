@@ -13,7 +13,7 @@
     --input-field-width: 25rem;
     --viewport-width: 60rem;
     --figure-panel-width: 20rem;
-    --result-width: 25rem;
+    --result-width: 26rem;
     --modal-width-max: 55rem;
     --modal-width-calculator: 18rem;
     --modal-height: 85vh;
@@ -3691,6 +3691,19 @@ body.no-animations *::after {
     height: 1px;
     background: var(--text-secondary);
     margin-left: 0.5rem;
+}
+
+.result__card-title-icon {
+    width: 14px;
+    height: 14px;
+    stroke: var(--text-secondary);
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    margin-right: 0.4rem;
+    flex-shrink: 0;
+    opacity: 0.75;
 }
 
 .result__card-toggle {
