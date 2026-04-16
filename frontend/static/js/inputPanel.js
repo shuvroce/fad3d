@@ -280,6 +280,22 @@ function toggleWindSection(card) {
     card.classList.toggle("collapsed");
 }
 
+// Show/hide topo detail fields based on topography type
+function _updateTopoDetailVisibility() {
+    const topoType = document.getElementById('topography_type');
+    const detailFields = document.getElementById('topo-detail-fields');
+    if (!topoType || !detailFields) return;
+    detailFields.classList.toggle('hidden', topoType.value === 'Homogeneous');
+}
+
+// Show/hide frequency/damping fields based on building rigidity
+function _updateFlexFieldsVisibility() {
+    const rigidity = document.getElementById('b_rigidity');
+    const flexFields = document.getElementById('flex-fields');
+    if (!rigidity || !flexFields) return;
+    flexFields.classList.toggle('hidden', rigidity.value === 'Rigid');
+}
+
 // Function to initialize wind panel event listeners
 function initializeWindPanel() {
     // Restore cached wind inputs (from .fad load or previous mode switch)
@@ -327,9 +343,17 @@ function initializeWindPanel() {
         }
     });
 
+    // Set initial topo detail visibility
+    _updateTopoDetailVisibility();
+    _updateFlexFieldsVisibility();
+
     // Cache wind inputs on change so they persist across mode switches
     document.addEventListener('change', (e) => {
-        if (e.target.closest('.wind__panel')) cacheWindInputs();
+        if (e.target.closest('.wind__panel')) {
+            if (e.target.id === 'topography_type') _updateTopoDetailVisibility();
+            if (e.target.id === 'b_rigidity') _updateFlexFieldsVisibility();
+            cacheWindInputs();
+        }
     });
     document.addEventListener('input', (e) => {
         if (e.target.closest('.wind__panel')) cacheWindInputs();
