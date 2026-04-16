@@ -1,8 +1,14 @@
-// ============================
-// Glass Type Field Switching
-// ============================
+import { openModal } from './floatingBar.js';
 
 const CHART_THICKNESS_STEPS = [5, 6, 8, 10, 12, 16, 19];
+
+// Support type value → folder name used in chart asset paths
+const SUPPORT_FOLDER = {
+    'four-edges': 'four-edge',
+    'three-edges': 'three-edge',
+    'two-edges': 'two-edge',
+    'one-edge': 'one-edge',
+};
 
 // Return the closest standard chart thickness >= ply sum; clamp to max if sum exceeds all.
 function _findChartThk(sum) {
@@ -70,17 +76,92 @@ function _syncManualFields(catNum, mode) {
         .querySelectorAll(`.glass__type-fields[data-category="${catNum}"] .glass__manual-fields`)
         .forEach(el => el.classList.toggle('hidden', mode !== 'manual'));
 
-    // Chart thickness: visible only in manual mode; auto-computed when auto
-    document
-        .querySelectorAll(`.glass__type-fields[data-category="${catNum}"] .glass__chart-thk-field`)
-        .forEach(el => el.classList.toggle('hidden', mode !== 'manual'));
-
     if (mode !== 'manual') _updateChartThk(catNum);
 }
 
 function initGlassInput() {
     document.addEventListener("change", glassInputChangeHandler);
     document.addEventListener("click", _calcModeClickHandler);
+    document.addEventListener("click", _chartBtnClickHandler);
+}
+
+// Resolve the thickness and glass category (monolithic/laminated) for a chart button
+function _resolveChartParams(btn) {
+    const section = btn.closest('.glass__type-fields');
+    if (!section) return null;
+    const glassType = section.dataset.glassType;
+    const catNum = section.dataset.category;
+    const pane = btn.dataset.pane || '1';
+    const chartType = btn.dataset.chartType; // 'load' or 'deflection'
+
+    const supportTypeRaw = document.getElementById(`cat${catNum}-glass-support_type`)?.value || '';
+    const supportFolder = SUPPORT_FOLDER[supportTypeRaw];
+    if (!supportFolder) return null; // point-fixed has no charts
+
+    let thickness = null;
+    let glassCategory = 'monolithic';
+
+    if (glassType === 'sgu') {
+        thickness = document.getElementById(`cat${catNum}-glass-sgu-thickness`)?.value;
+    } else if (glassType === 'dgu') {
+        const thkId = pane === '2' ? `cat${catNum}-glass-dgu-thickness2` : `cat${catNum}-glass-dgu-thickness1`;
+        thickness = document.getElementById(thkId)?.value;
+    } else if (glassType === 'lgu') {
+        glassCategory = 'laminated';
+        thickness = document.getElementById(`cat${catNum}-glass-lgu-chart_thickness`)?.value;
+    } else if (glassType === 'ldgu') {
+        if (pane === '2') {
+            thickness = document.getElementById(`cat${catNum}-glass-ldgu-thickness2`)?.value;
+        } else {
+            glassCategory = 'laminated';
+            thickness = document.getElementById(`cat${catNum}-glass-ldgu-chart_thickness`)?.value;
+        }
+    }
+
+    const singleThkFolders = ['two-edge', 'one-edge'];
+    const isSingleThk = singleThkFolders.includes(supportFolder);
+
+    if (!isSingleThk && (!thickness || isNaN(parseFloat(thickness)))) return null;
+
+    const chartDir = chartType === 'deflection' ? 'glass-defl-charts' : 'glass-load-charts';
+    const filename = isSingleThk ? 'all-thk.png' : `${parseFloat(thickness)}mm.png`;
+    const url = `/report/assets/glass-charts/${chartDir}/${glassCategory}/${supportFolder}/${filename}`;
+    return { url, chartType, glassType, pane };
+}
+
+function _chartBtnClickHandler(e) {
+    const btn = e.target.closest('.input__chart-btn');
+    if (!btn) return;
+    const params = _resolveChartParams(btn);
+    if (!params) return;
+    _openGlassChart(params);
+}
+
+function _openGlassChart({ url, chartType }) {
+    const modal = document.getElementById('glass-chart-modal');
+    if (!modal) return;
+
+    const titleEl = modal.querySelector('.modal__title');
+    const img = document.getElementById('glass-chart-image');
+    const loading = document.getElementById('glass-chart-loading');
+
+    if (titleEl) {
+        titleEl.textContent = chartType === 'deflection' ? 'Deflection Reference Chart' : 'NFL Reference Chart';
+    }
+
+    img.style.display = 'none';
+    loading.style.display = 'block';
+
+    img.onload = () => {
+        loading.style.display = 'none';
+        img.style.display = 'block';
+    };
+    img.onerror = () => {
+        loading.innerHTML = '<p>Chart not available for this configuration.</p>';
+    };
+    img.src = url;
+
+    openModal('glass-chart-modal');
 }
 
 function glassInputChangeHandler(e) {

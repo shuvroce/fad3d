@@ -497,394 +497,445 @@
             </div>
         </div>
 
-        <!-- Common: Support Type & Wind Load -->
-        <div class="input__section">
-            <div class="input__field">
-                <label>Support Type</label>
-                <input type="hidden" id="cat0-glass-support_type" value="four-edges">
-                <div class="type-radio__group" data-radio-target="cat0-glass-support_type">
-                    <button type="button" class="type-radio__card active" data-value="four-edges">
-                        <span class="type-radio__icon">
-                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
-                                <line x1="8" y1="6" x2="32" y2="6"/>
-                                <line x1="32" y1="6" x2="32" y2="34"/>
-                                <line x1="32" y1="34" x2="8" y2="34"/>
-                                <line x1="8" y1="34" x2="8" y2="6"/>
-                            </svg>
-                        </span>
-                        <span class="type-radio__label">4 Edges</span>
-                    </button>
-                    <button type="button" class="type-radio__card" data-value="three-edges">
-                        <span class="type-radio__icon">
-                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
-                                <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-                                <line x1="32" y1="6" x2="32" y2="34"/>
-                                <line x1="32" y1="34" x2="8" y2="34"/>
-                                <line x1="8" y1="34" x2="8" y2="6"/>
-                            </svg>
-                        </span>
-                        <span class="type-radio__label">3 Edges</span>
-                    </button>
-                    <button type="button" class="type-radio__card" data-value="two-edges">
-                        <span class="type-radio__icon">
-                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
-                                <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-                                <line x1="32" y1="6" x2="32" y2="34"/>
-                                <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-                                <line x1="8" y1="34" x2="8" y2="6"/>
-                            </svg>
-                        </span>
-                        <span class="type-radio__label">2 Edges</span>
-                    </button>
-                    <button type="button" class="type-radio__card" data-value="one-edge">
-                        <span class="type-radio__icon">
-                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
-                                <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-                                <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-                                <line x1="32" y1="34" x2="8" y2="34"/>
-                                <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-                            </svg>
-                        </span>
-                        <span class="type-radio__label">1 Edge</span>
-                    </button>
-                    <button type="button" class="type-radio__card" data-value="point-fixed">
-                        <span class="type-radio__icon">
-                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
-                                <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
-                                <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
-                                <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
-                                <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
-                                <rect x="6" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
-                                <rect x="29" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
-                                <rect x="29" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
-                                <rect x="6" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
-                            </svg>
-                        </span>
-                        <span class="type-radio__label">Point</span>
-                    </button>
-                </div>
-            </div>
-            <div class="input__field">
-                <label for="cat0-glass-wind_load">Wind Load</label>
-                <div class="input__group">
-                    <input type="text" id="cat0-glass-wind_load">
-                    <span class="input__unit">kPa</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- SGU -->
-        <div class="glass__type-fields" data-category="0" data-glass-type="sgu">
+        <div>
+            <!-- Common: Support Type & Wind Load -->
             <div class="input__section">
                 <div class="input__field">
-                    <div class="input__field-header">
-                        <label>Thickness</label>
-                        <button class="input__info-btn" type="button" data-title="Single glass pane, e.g. 12 mm">i</button>
-                    </div>
-                    <div class="glass__thickness-pill">
-                        <div class="glass__thickness-inner-group">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-sgu-thickness" placeholder="">
-                            </div>
-                            <div class="glass__gcell">
-                                <select id="cat0-glass-sgu-grade" data-no-custom-select>
-                                    <option value="FT">FT</option>
-                                    <option value="HS">HS</option>
-                                    <option value="AN">AN</option>
-                                </select>
-                            </div>
-                        </div>
+                    <label>Support Type</label>
+                    <input type="hidden" id="cat0-glass-support_type" value="four-edges">
+                    <div class="type-radio__group" data-radio-target="cat0-glass-support_type">
+                        <button type="button" class="type-radio__card active" data-value="four-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">4 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="three-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">3 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="two-edges">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">2 Edges</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="one-edge">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.25" stroke-dasharray="3,3"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">1 Edge</span>
+                        </button>
+                        <button type="button" class="type-radio__card" data-value="point-fixed">
+                            <span class="type-radio__icon">
+                                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="24" height="28" fill="currentColor" fill-opacity="0.08" stroke="none"/>
+                                    <line x1="8" y1="6" x2="32" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="6" x2="32" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="32" y1="34" x2="8" y2="34" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <line x1="8" y1="34" x2="8" y2="6" stroke-opacity="0.2" stroke-dasharray="3,3"/>
+                                    <rect x="6" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="4" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="29" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                    <rect x="6" y="31" width="5" height="5" rx="1" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </span>
+                            <span class="type-radio__label">Point</span>
+                        </button>
                     </div>
                 </div>
-
-
-                <div class="glass__manual-fields hidden">
-                    <div class="input__field">
-                        <label for="cat0-glass-sgu-nfl">Non-factored Load, NFL</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-sgu-nfl">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-sgu-load_x_area2">Load × Area²</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-sgu-load_x_area2">
-                            <span class="input__unit">kNm²</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-sgu-def">Deflection</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-sgu-def">
-                            <span class="input__unit">mm</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DGU -->
-        <div class="glass__type-fields hidden" data-category="0" data-glass-type="dgu">
-            <div class="input__section">
                 <div class="input__field">
-                    <div class="input__field-header">
-                        <label>Thickness</label>
-                        <button class="input__info-btn" type="button" data-title="Outer glass + air gap + inner glass, e.g. 6 + 12 + 6 mm">i</button>
-                    </div>
-                    <div class="glass__thickness-pill">
-                        <div class="glass__thickness-inner-group">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-dgu-thickness1" placeholder="">
-                            </div>
-                            <div class="glass__gcell">
-                                <select id="cat0-glass-dgu-grade1" data-no-custom-select>
-                                    <option value="FT">FT</option>
-                                    <option value="HS">HS</option>
-                                    <option value="AN">AN</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="glass__thickness-inner-group gap">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-dgu-gap" placeholder="">
-                            </div>
-                        </div>
-
-                        <div class="glass__thickness-inner-group">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-dgu-thickness2" placeholder="">
-                            </div>
-                            <div class="glass__gcell">
-                                <select id="cat0-glass-dgu-grade2" data-no-custom-select>
-                                    <option value="FT">FT</option>
-                                    <option value="HS">HS</option>
-                                    <option value="AN">AN</option>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="glass__manual-fields hidden">
-                    <div class="input__field">
-                        <label for="cat0-glass-dgu-nfl1">NFL<sub>1</sub> (Outer)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-dgu-nfl1">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-dgu-nfl2">NFL<sub>2</sub> (Inner)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-dgu-nfl2">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-dgu-load1_x_area2">Load × Area² (Outer)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-dgu-load1_x_area2">
-                            <span class="input__unit">kNm²</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-dgu-load2_x_area2">Load × Area² (Inner)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-dgu-load2_x_area2">
-                            <span class="input__unit">kNm²</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-dgu-def1">Deflection (Outer)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-dgu-def1">
-                            <span class="input__unit">mm</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-dgu-def2">Deflection (Inner)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-dgu-def2">
-                            <span class="input__unit">mm</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- LGU -->
-        <div class="glass__type-fields hidden" data-category="0" data-glass-type="lgu">
-            <div class="input__section">
-                <div class="input__field">
-                    <div class="input__field-header">
-                        <label>Thickness</label>
-                        <button class="input__info-btn" type="button" data-title="Ply 1 + PVB interlayer + Ply 2, e.g. 6 + 1.52 + 6 mm">i</button>
-                    </div>
-                    <div class="glass__thickness-pill">
-                        <div class="glass__thickness-inner-group">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-lgu-thickness1" placeholder="">
-                            </div>
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-lgu-thickness_inner" placeholder="">
-                            </div>
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-lgu-thickness2" placeholder="">
-                            </div>
-                            <div class="glass__gcell">
-                                <select id="cat0-glass-lgu-grade" data-no-custom-select>
-                                    <option value="FT">FT</option>
-                                    <option value="HS">HS</option>
-                                    <option value="AN">AN</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="input__field glass__chart-thk-field hidden">
-                    <label for="cat0-glass-lgu-chart_thickness">Chart Thickness</label>
+                    <label for="cat0-glass-wind_load">Wind Load</label>
                     <div class="input__group">
-                        <input type="number" id="cat0-glass-lgu-chart_thickness">
-                        <span class="input__unit">mm</span>
+                        <input type="text" id="cat0-glass-wind_load">
+                        <span class="input__unit">kPa</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="glass__manual-fields hidden">
+            <!-- SGU -->
+            <div class="glass__type-fields" data-category="0" data-glass-type="sgu">
+                <div class="input__section">
                     <div class="input__field">
-                        <label for="cat0-glass-lgu-nfl">NFL</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-lgu-nfl">
-                            <span class="input__unit">kPa</span>
+                        <div class="input__field-header">
+                            <label>Thickness</label>
+                            <button class="input__info-btn" type="button" data-title="Single glass pane, e.g. 12 mm">i</button>
+                        </div>
+                        <div class="glass__thickness-pill">
+                            <div class="glass__thickness-inner-group">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-sgu-thickness" placeholder="">
+                                </div>
+                                <div class="glass__gcell">
+                                    <select id="cat0-glass-sgu-grade" data-no-custom-select>
+                                        <option value="FT">FT</option>
+                                        <option value="HS">HS</option>
+                                        <option value="AN">AN</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-lgu-load_x_area2">Load × Area²</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-lgu-load_x_area2">
-                            <span class="input__unit">kNm²</span>
+
+
+                    <div class="glass__manual-fields hidden">
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-sgu-nfl">Non-factored Load, NFL</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="load" data-pane="1" data-title="NFL Reference Chart">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-sgu-nfl">
+                                <span class="input__unit">kPa</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="cat0-glass-sgu-load_x_area2">Load × Area²</label>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-sgu-load_x_area2">
+                                <span class="input__unit">kNm²</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-sgu-def">Deflection</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="deflection" data-pane="1" data-title="Deflection Reference Chart">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-sgu-def">
+                                <span class="input__unit">mm</span>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- DGU -->
+            <div class="glass__type-fields hidden" data-category="0" data-glass-type="dgu">
+                <div class="input__section">
                     <div class="input__field">
-                        <label for="cat0-glass-lgu-def">Deflection</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-lgu-def">
-                            <span class="input__unit">mm</span>
+                        <div class="input__field-header">
+                            <label>Thickness</label>
+                            <button class="input__info-btn" type="button" data-title="Outer glass + air gap + inner glass, e.g. 6 + 12 + 6 mm">i</button>
+                        </div>
+                        <div class="glass__thickness-pill">
+                            <div class="glass__thickness-inner-group">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-dgu-thickness1" placeholder="">
+                                </div>
+                                <div class="glass__gcell">
+                                    <select id="cat0-glass-dgu-grade1" data-no-custom-select>
+                                        <option value="FT">FT</option>
+                                        <option value="HS">HS</option>
+                                        <option value="AN">AN</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="glass__thickness-inner-group gap">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-dgu-gap" placeholder="">
+                                </div>
+                            </div>
+
+                            <div class="glass__thickness-inner-group">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-dgu-thickness2" placeholder="">
+                                </div>
+                                <div class="glass__gcell">
+                                    <select id="cat0-glass-dgu-grade2" data-no-custom-select>
+                                        <option value="FT">FT</option>
+                                        <option value="HS">HS</option>
+                                        <option value="AN">AN</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="glass__manual-fields hidden">
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-dgu-nfl1">NFL<sub>1</sub> (Outer)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="load" data-pane="1" data-title="NFL Reference Chart (Outer)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-dgu-nfl1">
+                                <span class="input__unit">kPa</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-dgu-nfl2">NFL<sub>2</sub> (Inner)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="load" data-pane="2" data-title="NFL Reference Chart (Inner)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-dgu-nfl2">
+                                <span class="input__unit">kPa</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="cat0-glass-dgu-load1_x_area2">Load × Area² (Outer)</label>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-dgu-load1_x_area2">
+                                <span class="input__unit">kNm²</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="cat0-glass-dgu-load2_x_area2">Load × Area² (Inner)</label>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-dgu-load2_x_area2">
+                                <span class="input__unit">kNm²</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-dgu-def1">Deflection (Outer)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="deflection" data-pane="1" data-title="Deflection Reference Chart (Outer)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-dgu-def1">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-dgu-def2">Deflection (Inner)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="deflection" data-pane="2" data-title="Deflection Reference Chart (Inner)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-dgu-def2">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LGU -->
+            <div class="glass__type-fields hidden" data-category="0" data-glass-type="lgu">
+                <div class="input__section">
+                    <div class="input__field">
+                        <div class="input__field-header">
+                            <label>Thickness</label>
+                            <button class="input__info-btn" type="button" data-title="Ply 1 + PVB interlayer + Ply 2, e.g. 6 + 1.52 + 6 mm">i</button>
+                        </div>
+                        <div class="glass__thickness-pill">
+                            <div class="glass__thickness-inner-group">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-lgu-thickness1" placeholder="">
+                                </div>
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-lgu-thickness_inner" placeholder="">
+                                </div>
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-lgu-thickness2" placeholder="">
+                                </div>
+                                <div class="glass__gcell">
+                                    <select id="cat0-glass-lgu-grade" data-no-custom-select>
+                                        <option value="FT">FT</option>
+                                        <option value="HS">HS</option>
+                                        <option value="AN">AN</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="cat0-glass-lgu-chart_thickness">
+
+                    <div class="glass__manual-fields hidden">
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-lgu-nfl">Non-factored Load, NFL</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="load" data-pane="1" data-title="NFL Reference Chart">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-lgu-nfl">
+                                <span class="input__unit">kPa</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="cat0-glass-lgu-load_x_area2">Load × Area²</label>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-lgu-load_x_area2">
+                                <span class="input__unit">kNm²</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-lgu-def">Deflection</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="deflection" data-pane="1" data-title="Deflection Reference Chart">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-lgu-def">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LDGU -->
+            <div class="glass__type-fields hidden" data-category="0" data-glass-type="ldgu">
+                <div class="input__section">
+                    <div class="input__field">
+                        <div class="input__field-header">
+                            <label>Thickness</label>
+                            <button class="input__info-btn" type="button" data-title="[Ply 1 + PVB + Ply 2] + Air Gap + Inner, e.g. 6+1.52+6 + 12 + 6 mm">i</button>
+                        </div>
+                        <div class="glass__thickness-pill">
+                            <div class="glass__thickness-inner-group">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-ldgu-thickness1_1" placeholder="">
+                                </div>
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-ldgu-thickness_inner" placeholder="">
+                                </div>
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-ldgu-thickness1_2" placeholder="">
+                                </div>
+                                <div class="glass__gcell">
+                                    <select id="cat0-glass-ldgu-grade1" data-no-custom-select>
+                                        <option value="FT">FT</option>
+                                        <option value="HS">HS</option>
+                                        <option value="AN">AN</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="glass__thickness-inner-group gap">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-ldgu-gap" placeholder="">
+                                </div>
+                            </div>
+                            
+                            <div class="glass__thickness-inner-group outer">
+                                <div class="glass__tcell">
+                                    <input type="number" id="cat0-glass-ldgu-thickness2" placeholder="">
+                                </div>
+                                <div class="glass__gcell">
+                                    <select id="cat0-glass-ldgu-grade2" data-no-custom-select>
+                                        <option value="FT">FT</option>
+                                        <option value="HS">HS</option>
+                                        <option value="AN">AN</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="cat0-glass-ldgu-chart_thickness">
+
+                    <div class="glass__manual-fields hidden">
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-ldgu-nfl1">NFL<sub>1</sub> (Outer Laminate)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="load" data-pane="1" data-title="NFL Reference Chart (Outer)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-ldgu-nfl1">
+                                <span class="input__unit">kPa</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-ldgu-nfl2">NFL<sub>2</sub> (Inner)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="load" data-pane="2" data-title="NFL Reference Chart (Inner)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-ldgu-nfl2">
+                                <span class="input__unit">kPa</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="cat0-glass-ldgu-load1_x_area2">Load × Area²</label>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-ldgu-load1_x_area2">
+                                <span class="input__unit">kNm²</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <label for="cat0-glass-ldgu-load2_x_area2">Load × Area²</label>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-ldgu-load2_x_area2">
+                                <span class="input__unit">kNm²</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-ldgu-def1">Deflection (Outer Laminate)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="deflection" data-pane="1" data-title="Deflection Reference Chart (Outer)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-ldgu-def1">
+                                <span class="input__unit">mm</span>
+                            </div>
+                        </div>
+                        <div class="input__field">
+                            <div class="input__field-header">
+                                <label for="cat0-glass-ldgu-def2">Deflection (Inner)</label>
+                                <button class="input__chart-btn" type="button" data-chart-type="deflection" data-pane="2" data-title="Deflection Reference Chart (Inner)">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3,17 8,12 12,15 16,10 21,13"/></svg>
+                                </button>
+                            </div>
+                            <div class="input__group">
+                                <input type="number" id="cat0-glass-ldgu-def2">
+                                <span class="input__unit">mm</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- LDGU -->
-        <div class="glass__type-fields hidden" data-category="0" data-glass-type="ldgu">
-            <div class="input__section">
-                <div class="input__field">
-                    <div class="input__field-header">
-                        <label>Thickness</label>
-                        <button class="input__info-btn" type="button" data-title="[Ply 1 + PVB + Ply 2] + Air Gap + Inner, e.g. 6+1.52+6 + 12 + 6 mm">i</button>
-                    </div>
-                    <div class="glass__thickness-pill">
-                        <div class="glass__thickness-inner-group">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-ldgu-thickness1_1" placeholder="">
-                            </div>
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-ldgu-thickness_inner" placeholder="">
-                            </div>
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-ldgu-thickness1_2" placeholder="">
-                            </div>
-                            <div class="glass__gcell">
-                                <select id="cat0-glass-ldgu-grade1" data-no-custom-select>
-                                    <option value="FT">FT</option>
-                                    <option value="HS">HS</option>
-                                    <option value="AN">AN</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="glass__thickness-inner-group gap">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-ldgu-gap" placeholder="">
-                            </div>
-                        </div>
-                        
-                        <div class="glass__thickness-inner-group outer">
-                            <div class="glass__tcell">
-                                <input type="number" id="cat0-glass-ldgu-thickness2" placeholder="">
-                            </div>
-                            <div class="glass__gcell">
-                                <select id="cat0-glass-ldgu-grade2" data-no-custom-select>
-                                    <option value="FT">FT</option>
-                                    <option value="HS">HS</option>
-                                    <option value="AN">AN</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="input__field glass__chart-thk-field hidden">
-                    <label for="cat0-glass-ldgu-chart_thickness">Chart Thickness</label>
-                    <div class="input__group">
-                        <input type="number" id="cat0-glass-ldgu-chart_thickness">
-                        <span class="input__unit">mm</span>
-                    </div>
-                </div>
-
-                <div class="glass__manual-fields hidden">
-                    <div class="input__field">
-                        <label for="cat0-glass-ldgu-nfl1">NFL<sub>1</sub> (Outer Laminate)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-ldgu-nfl1">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-ldgu-nfl2">NFL<sub>2</sub> (Inner)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-ldgu-nfl2">
-                            <span class="input__unit">kPa</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-ldgu-load1_x_area2">Load × Area²</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-ldgu-load1_x_area2">
-                            <span class="input__unit">kNm²</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-ldgu-load2_x_area2">Load × Area²</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-ldgu-load2_x_area2">
-                            <span class="input__unit">kNm²</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-ldgu-def1">Deflection (Outer Laminate)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-ldgu-def1">
-                            <span class="input__unit">mm</span>
-                        </div>
-                    </div>
-                    <div class="input__field">
-                        <label for="cat0-glass-ldgu-def2">Deflection (Inner)</label>
-                        <div class="input__group">
-                            <input type="number" id="cat0-glass-ldgu-def2">
-                            <span class="input__unit">mm</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Frame Tab Content -->

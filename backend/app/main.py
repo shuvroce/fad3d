@@ -157,6 +157,12 @@ async def serve_profile_image(filename: str):
     return FileResponse(path)
 
 
+@app.get("/report/assets/glass-charts/{chart_dir}/{glass_category}/{support_folder}/{filename}")
+async def serve_glass_chart(chart_dir: str, glass_category: str, support_folder: str, filename: str):
+    path = os.path.join(BACKEND_DIR, "app", "report", "assets", chart_dir, glass_category, support_folder, filename)
+    return FileResponse(path)
+
+
 # ---------------------------------------------------------------------------
 # Figure Checking
 # ---------------------------------------------------------------------------

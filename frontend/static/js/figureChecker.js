@@ -52,7 +52,7 @@ function _collectCategoryData() {
 
         const g = id => document.getElementById(id)?.value || "";
         const glassType = g(`cat${catNum}-glass-type`) || "sgu";
-        const supportType = g(`cat${catNum}-glass-${glassType}-support_type`);
+        const supportType = g(`cat${catNum}-glass-support_type`);
 
         const frameGeometry = g(`cat${catNum}-frame-geometry`) || "regular";
         const mullionType = g(`cat${catNum}-frame-mullion-type`) || "alu";

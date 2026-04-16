@@ -43,6 +43,14 @@ function initDraggableModals() {
         const target = header.closest('.modal__dialog, .modal__content-calculator');
         if (target) makeDraggable(header, target);
     });
+
+    // Generic close button handler for all modals
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.modal__close')) {
+            const modal = e.target.closest('.modal');
+            if (modal?.id) closeModal(modal.id);
+        }
+    });
 }
 
 function initSimpleModalClickOutside() {
