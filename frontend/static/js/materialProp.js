@@ -126,9 +126,7 @@ function renderMaterialList() {
 }
 
 function animateDefineForm(form) {
-    form.classList.remove('animate-in');
-    void form.offsetWidth;
-    form.classList.add('animate-in');
+    // No animation — form content switches instantly
 }
 
 function showMaterialForm() {

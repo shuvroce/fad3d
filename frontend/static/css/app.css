@@ -2440,10 +2440,6 @@ body.no-animations *::after {
     gap: 1rem;
 }
 
-.define-modal__form.animate-in {
-    animation: tabFadeSlide 0.15s ease;
-}
-
 .define-modal__form .input__field {
     flex: unset;
     min-width: unset;
@@ -2953,25 +2949,9 @@ body.no-animations *::after {
 }
 
 /* Smooth field visibility toggling inside modal dialogs */
-.modal__dialog .input__field[data-alum-group],
-.modal__dialog .input__field[data-steel-group] {
-    overflow: visible;
-    max-height: 8rem;
-    opacity: 1;
-    margin-block: 0;
-    /* delay overflow→visible until after expand, so dropdown is never clipped */
-    transition: max-height 0.25s ease, opacity 0.2s ease, margin-block 0.25s ease, overflow 0s 0.25s;
-}
-
 .modal__dialog .input__field[data-alum-group].hidden,
 .modal__dialog .input__field[data-steel-group].hidden {
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    pointer-events: none;
-    /* negative margin cancels the parent's 1rem flex gap on both sides */
-    margin-block: -0.5rem;
-    transition: max-height 0.25s ease, opacity 0.2s ease, margin-block 0.25s ease, overflow 0s;
+    display: none;
 }
 
 .input__section {
