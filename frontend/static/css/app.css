@@ -3730,7 +3730,7 @@ body.no-animations *::after {
 }
 
 .result__card-body {
-    padding: 0 1rem 0.2rem 1rem;
+    padding: 0 0 0.25rem 0;
     /* border-top: 1px solid var(--border-primary); */
     display: flex;
     flex-direction: column;
@@ -3741,10 +3741,9 @@ body.no-animations *::after {
 
 .result__item {
     display: flex;
-    /* justify-content: space-between; */
     gap: 0.75rem;
     align-items: center;
-    padding: 0.1rem;
+    padding: 0.1rem 0.75rem;
 }
 
 .result__label {
@@ -3815,7 +3814,7 @@ body.no-animations *::after {
 .result__empty {
     font-size: 0.8rem;
     color: var(--text-secondary);
-    padding: 0.5rem;
+    padding: 0.5rem 0.75rem;
     font-style: italic;
 }
 
@@ -3844,6 +3843,78 @@ body.no-animations *::after {
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-primary);
     white-space: nowrap;
+}
+
+/* ---- Facade result parameter table ---- */
+.result__param-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+    table-layout: fixed;
+}
+
+.result__param-table tr[data-key] {
+    border-bottom: 1px solid color-mix(in srgb, var(--border-primary) 60%, transparent);
+    transition: background 0.12s ease;
+}
+
+.result__param-table tr[data-key]:last-child {
+    border-bottom: none;
+}
+
+.result__param-table tr[data-key]:hover {
+    background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+
+.result__param-label {
+    padding: 0.28rem 0.4rem 0.28rem 0.75rem;
+    color: var(--text-secondary);
+    width: 48%;
+    vertical-align: middle;
+}
+
+.result__param-value {
+    padding: 0.28rem 0.25rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+}
+
+.result__param-value .result__unit {
+    font-size: 0.7em;
+    color: var(--text-secondary);
+    opacity: 0.75;
+}
+
+.result__param-status {
+    padding: 0.28rem 0.5rem 0.28rem 0;
+    text-align: right;
+    width: 1.4rem;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.result__param-table tr[data-key].result__item-pass .result__status {
+    color: var(--color-success);
+}
+
+.result__param-table tr[data-key].result__item-fail .result__status {
+    color: var(--color-danger);
+}
+
+.result__param-table tr.result__divider td {
+    padding: 0.3rem 0.75rem 0.2rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
+    border-top: 1px solid var(--border-primary);
+    border-bottom: none;
+    opacity: 0.85;
 }
 
 /* ================ WIND PANEL STYLES ================ */
