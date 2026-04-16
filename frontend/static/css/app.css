@@ -3666,7 +3666,7 @@ body.no-animations *::after {
     align-items: center;
     /* padding: 0.1rem 1rem; */
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, margin-bottom 0.25s ease;
     margin-bottom: 0.3rem;
 }
 
@@ -3686,11 +3686,14 @@ body.no-animations *::after {
 
 .result__card-title::after {
     content: "";
-    display: block;
     flex: 1;
-    height: 1px;
-    background: var(--text-secondary);
+    height: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-top: 1px solid var(--text-secondary);
     margin-left: 0.5rem;
+    align-self: center;
+    opacity: 0.35;
 }
 
 .result__card-title-icon {
@@ -3720,6 +3723,10 @@ body.no-animations *::after {
 
 .result__card.collapsed .result__card-toggle {
     transform: rotate(0deg);
+}
+
+.result__card.collapsed .result__card-header {
+    margin-bottom: 0;
 }
 
 .result__card-icon {
