@@ -1,35 +1,67 @@
 # AGENTS.md - FAD-3D (Facade Analysis & Design)
 
-## Project Overview
+## Critical Conventions (Agent Must Know)
 
-Single-page web application for facade structural engineering analysis. Vanilla HTML/CSS/JS frontend with FastAPI backend. Dynamic multi-category input system, collapsible 3-panel layout, and design result visualization.
+### CSS Naming
+- **BEM with double underscores**: `.block__element-modifier` (e.g., `.catbar__btn.active`)
+- **Never use single dash** as element separator (use for compound words in modifiers only)
+- **Theming**: All colors/sizes use CSS variables in `:root` and `.theme__dark`
+- **Variables**: `--bg-*` backgrounds, `--text-*` text, `--border-*` borders, `--btn-*` buttons
 
-## Running the Application
+### JavaScript Modules
+- **Pattern**: Each `.js` file exports named functions via ES6 `export { ... }`
+- **Initialization**: Export `init*()` function per module, orchestrated in `main.js`
+- **DOM access**: Use `document.querySelector/querySelectorAll`, `getElementById`
+- **Event delegation**: Prefer `document.addEventListener('change', ...)` with `el.closest()` checks
+- **State**: Module-level variables (e.g., `let categoryCount`, `const categoryNames = new Map()`)
+- **Naming**: `camelCase` functions/variables, `PascalCase` constructors
+- **Private functions**: Prefix with underscore (`_post`, `_getActiveCategoryNum`)
+- **No inline HTML in JS**: Keep HTML in template files, use DOM APIs
+- **Async**: Use `async/await`, handle errors with `.catch(() => null)` patterns
+- **Debouncing**: Use `setTimeout/clearTimeout` pattern for calc triggers
 
+### Dynamic Category System
+- **Sequential numbering**: Never allow gaps, always `renumberCategories()` on deletion
+- **Field ID pattern**: `cat{N}-{tab}-{field}` (e.g., `cat2-glass-thickness`)
+- **Batch ID updates**: Use regex `/cat\d+/` during renumbering
+- **State storage**: `categoryNames` is a `Map`, not object (for migration during renumbering)
+- **Remove buttons**: Always visible (subtle gray), turn red on hover. Last category protected.
+- **Event listener cloning**: Use `.replaceWith(node.cloneNode(true))` + re-attach when updating data attributes
+
+### Panel System
+- **Three-panel layout**: Left (inputs), Center (3D viewport), Right (results)
+- **Collapse mechanism**: Toggle `.collapsed` class, use `white-space: nowrap` to prevent text wrapping
+- **Panel toggle**: Always overlay on 3D viewport (never pushes viewport to resize)
+- **Tooltip pattern**: Use `data-title` attribute (not `title` attribute) for tooltips
+- **Editable headings**: `contenteditable="true"` with click-to-select, Enter-to-blur behavior
+
+### Theme System
+- **Implementation**: Toggle `.theme__dark` class on `<body>`, persist via `localStorage`
+- **Dark theme**: Overrides all CSS vars in `:root`
+- **Icon swap**: Sun visible in dark mode, moon in light mode
+
+### Backend (Python/FastAPI)
+- **Type hints**: Use `typing.Dict`, `typing.Optional`, `typing.Any`
+- **Imports**: Standard library → third-party (`fastapi`) → local (`from calcs.xxx import ...`)
+- **Local imports**: Relative-style `from calcs.calc_utils import _to_float` (run from `backend/` dir)
+- **Naming**: `snake_case` functions/variables, `PascalCase` classes
+- **Private functions**: Prefix with underscore (`_to_float`, `_json`, `_profile_props`)
+- **Error handling**: Return `None` for insufficient data, `JSONResponse({"error": "..."}, status_code=400)` for API errors
+- **Rounding**: Always round output values with `round(value, 2)` or `round(value, 1)` before returning
+- **API pattern**: Async route handlers that parse JSON via `await request.json()`, call calc function, return result or error
+
+### Running the Application
 ```bash
-# Start the backend (from backend/ directory)
+# Start backend (from backend/ directory)
 cd backend
 uvicorn app.main:app --host 0.0.0.0 --port 5001 --reload
 
 # Or run directly
 python app/main.py
 ```
+Serves at `http://localhost:5001`. Static files at `/static/`, templates via Jinja2.
 
-The app serves at `http://localhost:5001`. Static files are at `/static/`, templates via Jinja2.
-
-## Build / Lint / Test Commands
-
-There is **no build step, test framework, or linter configured** for this project. The frontend is vanilla JS (ES modules, no bundler). The backend has no pytest/unittest setup.
-
-- **No `package.json`** — no npm scripts
-- **No `pyproject.toml`** — no Python tooling config
-- **No test files** exist (`test_*.py`, `*.test.js`)
-- **No linter config** (no eslint, ruff, flake8, etc.)
-
-To add tests or linting, ask the user first.
-
-## Architecture
-
+### File Structure
 ```
 backend/
   app/
@@ -59,54 +91,8 @@ frontend/
       ...                # modal, input, and section-specific modules
 ```
 
-## Code Style — Python (Backend)
-
-- **Type hints**: Use `typing.Dict`, `typing.Optional`, `typing.Any` for function signatures
-- **Imports**: Standard library first, then third-party (`fastapi`), then local (`from calcs.xxx import ...`)
-- **Local imports**: Use relative-style `from calcs.calc_utils import _to_float` (run from `backend/` dir)
-- **Naming**: `snake_case` for functions/variables, `PascalCase` for classes
-- **Private functions**: Prefix with underscore (`_to_float`, `_json`, `_profile_props`)
-- **Error handling**: Return `None` for insufficient data, `JSONResponse({"error": "..."}, status_code=400)` for API errors
-- **Rounding**: Always round output values with `round(value, 2)` or `round(value, 1)` before returning
-- **API pattern**: Async route handlers that parse JSON via `await request.json()`, call calc function, return result or error
-
-## Code Style — JavaScript (Frontend)
-
-- **Module pattern**: Each `.js` file is self-contained, exports named functions via ES6 `export { ... }`
-- **Imports**: Named imports only, grouped by concern (see `main.js` for examples)
-- **Initialization**: Export an `init*()` function per module. Orchestrated in `main.js` with phased bootstrap
-- **DOM access**: Use `document.querySelector/querySelectorAll`, `getElementById`
-- **Event delegation**: Prefer `document.addEventListener('change', ...)` with `el.closest()` checks
-- **State**: Module-level variables (`let categoryCount`, `const categoryNames = new Map()`)
-- **Naming**: `camelCase` for functions/variables, `PascalCase` for constructors
-- **Private functions**: Prefix with underscore (`_post`, `_getActiveCategoryNum`, `_resolveProfilePayload`)
-- **No inline HTML in JS**: Keep HTML in template files. Use DOM APIs to manipulate, not `innerHTML` where possible (exceptions: `createCategory` uses template cloning)
-- **Async**: Use `async/await`, handle errors with `.catch(() => null)` patterns
-- **Debouncing**: Use `setTimeout/clearTimeout` pattern for calc triggers (see `calcEngine.js`)
-
-## Code Style — CSS
-
-- **Naming convention**: BEM with double underscores — `.block__element-modifier`
-  - Examples: `.topbar__icon`, `.catbar__btn`, `.input__field`, `.input__box-nav-btn`
-  - Modifiers: `.catbar__btn.active`, `.theme__dark`, `.collapsed`
-  - **Never** use single dash as element separator
-- **Theming**: All colors/sizes use CSS variables defined in `:root` and `.theme__dark`
-- **Variable naming**: `--bg-*` backgrounds, `--text-*` text, `--border-*` borders, `--btn-*` buttons
-- **Organization**: Variables → Animations → Resets → Modals → Layout → Components
-- **Animations**: Smooth transitions everywhere, no abrupt changes. Use `transition` on width/transform
-
-## Conventions to Preserve
-
-1. **Sequential category numbering**: Never allow gaps. Always `renumberCategories()` on deletion
-2. **Event listener cloning**: Use `.replaceWith(node.cloneNode(true))` + re-attach when updating data attributes
-3. **Data-driven tooltips**: `data-title` attribute, not `title` attribute
-4. **Map-based state**: `categoryNames` is a `Map`, not an object (for easy migration during renumbering)
-5. **Panel collapse**: Toggle `.collapsed` class, use `white-space: nowrap` to prevent text wrapping during animation
-6. **Form field IDs**: Pattern `cat{N}-{tab}-{field}` (e.g., `cat2-glass-thickness`). Use regex `/cat\d+/` for batch replacements
-7. **Category remove buttons**: Always visible (subtle gray), turn red on hover. Last category is protected
-
-## Copilot / Cursor Rules
-
-- See `.github/copilot-instructions.md` for detailed project conventions
-- See `.github/instructions/general.instructions.md` for UI/UX requirements and layout specs
-- No `.cursorrules` or `.cursor/rules/` files exist
+### Important Notes
+- **No build step**: Frontend is vanilla JS (ES modules, no bundler)
+- **No test framework**: No pytest/unittest setup for backend
+- **No linter configured**: No eslint, ruff, flake8, etc.
+- **To add tests/linting**: Ask user first
