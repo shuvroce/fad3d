@@ -2,6 +2,43 @@
 // Glass Type Field Switching
 // ============================
 
+const CHART_THICKNESS_STEPS = [5, 6, 8, 10, 12, 16, 19];
+
+// Return the closest standard chart thickness >= ply sum; clamp to max if sum exceeds all.
+function _findChartThk(sum) {
+    if (!sum || sum <= 0) return null;
+    return CHART_THICKNESS_STEPS.find(t => t >= sum) ?? CHART_THICKNESS_STEPS[CHART_THICKNESS_STEPS.length - 1];
+}
+
+// Auto-compute and store chart_thickness for LGU/LDGU based on ply sum.
+function _updateChartThk(catNum) {
+    const glassType = document.getElementById(`cat${catNum}-glass-type`)?.value;
+    let sum = 0;
+    let fieldId = null;
+
+    if (glassType === 'lgu') {
+        const t1 = parseFloat(document.getElementById(`cat${catNum}-glass-lgu-thickness1`)?.value) || 0;
+        const t2 = parseFloat(document.getElementById(`cat${catNum}-glass-lgu-thickness2`)?.value) || 0;
+        sum = t1 + t2;
+        fieldId = `cat${catNum}-glass-lgu-chart_thickness`;
+    } else if (glassType === 'ldgu') {
+        const t1 = parseFloat(document.getElementById(`cat${catNum}-glass-ldgu-thickness1_1`)?.value) || 0;
+        const t2 = parseFloat(document.getElementById(`cat${catNum}-glass-ldgu-thickness1_2`)?.value) || 0;
+        sum = t1 + t2;
+        fieldId = `cat${catNum}-glass-ldgu-chart_thickness`;
+    }
+
+    if (!fieldId) return;
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+
+    const chartThk = _findChartThk(sum);
+    if (chartThk !== null) {
+        field.value = chartThk;
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
 // Show only the field set matching the selected glass type within a category's glass tab.
 function switchGlassType(categoryNum, glassType) {
     document
@@ -32,6 +69,13 @@ function _syncManualFields(catNum, mode) {
     document
         .querySelectorAll(`.glass__type-fields[data-category="${catNum}"] .glass__manual-fields`)
         .forEach(el => el.classList.toggle('hidden', mode !== 'manual'));
+
+    // Chart thickness: visible only in manual mode; auto-computed when auto
+    document
+        .querySelectorAll(`.glass__type-fields[data-category="${catNum}"] .glass__chart-thk-field`)
+        .forEach(el => el.classList.toggle('hidden', mode !== 'manual'));
+
+    if (mode !== 'manual') _updateChartThk(catNum);
 }
 
 function initGlassInput() {
@@ -48,10 +92,20 @@ function glassInputChangeHandler(e) {
         switchGlassType(glassTypeMatch[1], el.value);
     }
 
-    // Support type — hide irrelevant fields when Point Fixed
-    if (el.id?.match(/^cat\d+-glass-(?:sgu|dgu|lgu|ldgu)-support_type$/)) {
-        const glassSection = el.closest('.glass__type-fields');
-        if (glassSection) syncPointFixedFields(glassSection, el.value === 'point-fixed');
+    // Support type — hide point-fixed-irrelevant fields in the active glass type section
+    if (el.id?.match(/^cat(\d+)-glass-support_type$/)) {
+        const catNum = el.id.match(/^cat(\d+)/)[1];
+        const isPointFixed = el.value === 'point-fixed';
+        document
+            .querySelectorAll(`.glass__type-fields[data-category="${catNum}"]`)
+            .forEach(section => syncPointFixedFields(section, isPointFixed));
+    }
+
+    // Auto chart thickness: recompute when laminate ply inputs change in auto mode
+    if (el.id?.match(/^cat(\d+)-glass-(lgu|ldgu)-thickness/)) {
+        const catNum = el.id.match(/^cat(\d+)/)[1];
+        const mode = document.getElementById(`cat${catNum}-glass-calc-mode`)?.value;
+        if (mode !== 'manual') _updateChartThk(catNum);
     }
 }
 

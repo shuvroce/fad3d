@@ -3041,6 +3041,7 @@ body.no-animations *::after {
     border-color: var(--accent);
     color: var(--accent);
 }
+
 /* Glass thickness pill */
 .glass__thickness-pill {
     display: flex;
@@ -3134,6 +3135,12 @@ body.no-animations *::after {
     box-sizing: border-box;
 }
 .glass__gcell select:focus { background: var(--bg-hover); box-shadow: none; }
+
+.glass__manual-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
 .input__field label {
     font-size: 0.73rem;

@@ -98,9 +98,9 @@ function collectGlassInputs(catNum) {
         glass_type: glassType,
         length: gen.glass_length,
         width: gen.glass_width,
-        wind_load: g(`${prefix}-wind_load`),
+        wind_load: g(`cat${catNum}-glass-wind_load`),
         def_criteria: settings.glassDeflRatio,
-        support_type: g(`${prefix}-support_type`),
+        support_type: g(`cat${catNum}-glass-support_type`),
         calc_mode: calcMode,
     };
 
@@ -121,6 +121,7 @@ function collectGlassInputs(catNum) {
             thickness1: g(`${prefix}-thickness1`),
             thickness_inner: g(`${prefix}-thickness_inner`),
             thickness2: g(`${prefix}-thickness2`),
+            chart_thickness: g(`${prefix}-chart_thickness`),
             ...(manual && { nfl: g(`${prefix}-nfl`), def: g(`${prefix}-def`) }),
         };
     }
@@ -150,6 +151,7 @@ function collectGlassInputs(catNum) {
             thickness1_2: g(`${prefix}-thickness1_2`),
             gap: g(`${prefix}-gap`),
             thickness2: g(`${prefix}-thickness2`),
+            chart_thickness: g(`${prefix}-chart_thickness`),
             ...(manual && {
                 nfl1: g(`${prefix}-nfl1`),
                 nfl2: g(`${prefix}-nfl2`),
