@@ -414,6 +414,7 @@ def calc_anchorage(anchor: Dict[str, Any], frame: Dict[str, Any], alum_profiles_
         result.update(_base_plate_bearing(front_bp_length, front_bp_width, bp_d, front_bp_width, design_Ry))
         result.update(_base_plate_tension(front_bp_length, bp_d, 0, front_N_ua))
         result.update({"bp_Tu": round(front_N_ua, 2),
+                        "bp_length": round(front_bp_length, 0), "bp_width": round(front_bp_width, 0),
                         "top_bp_length": front_bp_length, "top_bp_width": round(top_bp_width, 0),
                         "front_bp_length": round(front_bp_length, 0), "front_bp_width": round(front_bp_width, 0)})
         return result

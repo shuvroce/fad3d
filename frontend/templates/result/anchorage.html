@@ -1,0 +1,358 @@
+{% if not r %}
+<div class="result__empty">Enter anchor inputs to calculate</div>
+{% else %}
+
+{# ── Jinja2 macros for reusable sub-sections ── #}
+
+{% macro anchor_shear(pfx) %}
+{# pfx: '' for Box/U, 'top_' or 'front_' for L Clump #}
+{% set V_ua   = r[pfx ~ 'V_ua'] %}
+{% set V_ug   = r[pfx ~ 'V_ug'] %}
+{% set phi_Vsa  = r[pfx ~ 'phi_Vsa'] %}
+{% set phi_Vcbg = r[pfx ~ 'phi_Vcbg'] %}
+{% set phi_Vcp  = r[pfx ~ 'phi_Vcp'] %}
+<div class="result__subsection-label">Shear</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr><td>V<sub>ua</sub>:</td><td>{{ V_ua | fmt }} <span class="result__unit">kN</span></td></tr>
+        <tr><td>V<sub>ug</sub>:</td><td>{{ V_ug | fmt }} <span class="result__unit">kN</span></td></tr>
+        {% if phi_Vsa is not none %}
+        {% set p = phi_Vsa > V_ua %}
+        <tr class="result__ratio-row">
+            <td>φV<sub>sa</sub>:</td>
+            <td><strong>{{ phi_Vsa | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if phi_Vcbg is not none %}
+        {% set p = phi_Vcbg > V_ug %}
+        <tr class="result__ratio-row">
+            <td>φV<sub>cbg</sub>:</td>
+            <td><strong>{{ phi_Vcbg | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if phi_Vcp is not none %}
+        {% set p = phi_Vcp > V_ug %}
+        <tr class="result__ratio-row">
+            <td>φV<sub>cp</sub>:</td>
+            <td><strong>{{ phi_Vcp | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro anchor_tension_shear_interaction(pfx) %}
+{% set N_ua   = r[pfx ~ 'N_ua'] %}
+{% set N_ug   = r[pfx ~ 'N_ug'] %}
+{% set V_ua   = r[pfx ~ 'V_ua'] %}
+{% set V_ug   = r[pfx ~ 'V_ug'] %}
+{% set phi_Nsa  = r[pfx ~ 'phi_Nsa'] %}
+{% set phi_Ncbg = r[pfx ~ 'phi_Ncbg'] %}
+{% set phi_Npn  = r[pfx ~ 'phi_Npn'] %}
+{% set phi_Vsa  = r[pfx ~ 'phi_Vsa'] %}
+{% set phi_Vcbg = r[pfx ~ 'phi_Vcbg'] %}
+{% set phi_Vcp  = r[pfx ~ 'phi_Vcp'] %}
+{% set interaction = r[pfx ~ 'interaction'] %}
+{% set beta_N = r[pfx ~ 'beta_N'] %}
+{% set beta_V = r[pfx ~ 'beta_V'] %}
+
+<div class="result__subsection-label">Tension</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr><td>N<sub>ua</sub>:</td><td>{{ N_ua | fmt }} <span class="result__unit">kN</span></td></tr>
+        <tr><td>N<sub>ug</sub>:</td><td>{{ N_ug | fmt }} <span class="result__unit">kN</span></td></tr>
+        {% if phi_Nsa is not none %}
+        {% set p = phi_Nsa > N_ua %}
+        <tr class="result__ratio-row">
+            <td>φN<sub>sa</sub>:</td>
+            <td><strong>{{ phi_Nsa | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if phi_Ncbg is not none %}
+        {% set p = phi_Ncbg > N_ug %}
+        <tr class="result__ratio-row">
+            <td>φN<sub>cbg</sub>:</td>
+            <td><strong>{{ phi_Ncbg | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if phi_Npn is not none %}
+        {% set p = phi_Npn > N_ua %}
+        <tr class="result__ratio-row">
+            <td>φN<sub>pn</sub>:</td>
+            <td><strong>{{ phi_Npn | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{{ anchor_shear(pfx) }}
+
+{% if interaction is not none %}
+{% set int_limit = 1.0 if (beta_N is not none and beta_V is not none and (beta_N < 0.2 or beta_V < 0.2)) else 1.2 %}
+{% set int_pass = interaction <= int_limit %}
+<div class="result__subsection-label">Combined</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr class="result__ratio-row">
+            <td>β<sub>N+V</sub> <span class="result__unit">≤ {{ int_limit | fmt(1) }}</span>:</td>
+            <td><strong>{{ interaction | fmt }}</strong>
+                <span class="result__status {{ 'result__status-pass' if int_pass else 'result__status-fail' }}">{{ '✓' if int_pass else '✕' }}</span></td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+{% endmacro %}
+
+{% macro through_bolt_section() %}
+<div class="result__subsection-label">Through Bolt</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr><td>V<sub>u</sub>:</td><td>{{ r.bolt_Vu | fmt }} <span class="result__unit">kN</span></td></tr>
+        {% if r.bolt_phi_Rn_shear is not none %}
+        {% set p = r.bolt_phi_Rn_shear > r.bolt_Vu %}
+        <tr class="result__ratio-row">
+            <td>φR<sub>n</sub> (Shear):</td>
+            <td><strong>{{ r.bolt_phi_Rn_shear | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if r.bolt_phi_Rn_bear is not none %}
+        {% set p = r.bolt_phi_Rn_bear > r.bolt_Vu %}
+        <tr class="result__ratio-row">
+            <td>φR<sub>n</sub> (Bearing):</td>
+            <td><strong>{{ r.bolt_phi_Rn_bear | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro fin_plate_section() %}
+<div class="result__subsection-label">Fin Plate</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr><td>V<sub>u</sub>:</td><td>{{ r.fin_Vu | fmt }} <span class="result__unit">kN</span></td></tr>
+        {% if r.fin_t_req is not none %}
+        {% set p = r.fin_t_req < r.fin_thk %}
+        <tr class="result__ratio-row">
+            <td>t<sub>req</sub>:</td>
+            <td><strong>{{ r.fin_t_req | fmt }}</strong> <span class="result__unit">mm</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if r.fin_phi_Rn_yield is not none %}
+        {% set p = r.fin_phi_Rn_yield > r.fin_Vu %}
+        <tr class="result__ratio-row">
+            <td>φR<sub>n</sub> (Yield):</td>
+            <td><strong>{{ r.fin_phi_Rn_yield | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if r.fin_phi_Rn_rupture is not none %}
+        {% set p = r.fin_phi_Rn_rupture > r.fin_Vu %}
+        <tr class="result__ratio-row">
+            <td>φR<sub>n</sub> (Rupture):</td>
+            <td><strong>{{ r.fin_phi_Rn_rupture | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+        {% if r.fin_phi_Rn_block is not none %}
+        {% set p = r.fin_phi_Rn_block > r.fin_Vu %}
+        <tr class="result__ratio-row">
+            <td>φR<sub>n</sub> (Block):</td>
+            <td><strong>{{ r.fin_phi_Rn_block | fmt }}</strong> <span class="result__unit">kN</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro weld_section() %}
+<div class="result__subsection-label">Weld</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr><td>f<sub>R</sub>:</td><td>{{ r.weld_fR | fmt }} <span class="result__unit">N/mm</span></td></tr>
+        {% if r.weld_phi_Rn is not none %}
+        {% set p = r.weld_phi_Rn > r.weld_fR %}
+        <tr class="result__ratio-row">
+            <td>φR<sub>n</sub>:</td>
+            <td><strong>{{ r.weld_phi_Rn | fmt }}</strong> <span class="result__unit">N/mm</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro base_plate_bearing_section() %}
+<div class="result__subsection-label">Bearing</div>
+<table class="result__inner-table">
+    <tbody>
+        {% if r.top_bp_width is defined %}
+        <tr><td>Size:</td><td>{{ r.bp_length | fmt(0) }} × {{ r.bp_width | fmt(0) }} × {{ r.top_bp_width | fmt(0) }} <span class="result__unit">mm</span></td></tr>
+        {% else %}
+        <tr><td>Size:</td><td>{{ r.bp_length | fmt(0) }} × {{ r.bp_width | fmt(0) }} <span class="result__unit">mm</span></td></tr>
+        {% endif %}
+        <tr><td>P<sub>u</sub>:</td><td>{{ r.bp_Pu | fmt }} <span class="result__unit">kN</span></td></tr>
+        {% if r.bp_t_req_bear is not none %}
+        {% set p = r.bp_t_req_bear < r.bp_thk %}
+        <tr class="result__ratio-row">
+            <td>t<sub>req</sub>:</td>
+            <td><strong>{{ r.bp_t_req_bear | fmt }}</strong> <span class="result__unit">mm</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro base_plate_tension_section() %}
+<div class="result__subsection-label">Tension</div>
+<table class="result__inner-table">
+    <tbody>
+        <tr><td>T<sub>u</sub>:</td><td>{{ r.bp_Tu | fmt }} <span class="result__unit">kN</span></td></tr>
+        {% if r.bp_t_req_tension is not none %}
+        {% set p = r.bp_t_req_tension < r.bp_thk %}
+        <tr class="result__ratio-row">
+            <td>t<sub>req</sub>:</td>
+            <td><strong>{{ r.bp_t_req_tension | fmt }}</strong> <span class="result__unit">mm</span>
+                <span class="result__status {{ 'result__status-pass' if p else 'result__status-fail' }}">{{ '✓' if p else '✕' }}</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}
+
+{# ── Main table ── #}
+<table class="result__glass-table">
+    <thead>
+        <tr>
+            <th style="width: 22%;">Type</th>
+            <th>Params</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {# ── Loads ── #}
+        <tr>
+            <td class="result__param-type">Loads</td>
+            <td class="result__param-attrs">
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr><td>R<sub>y</sub>:</td><td>{{ r.reaction_Ry | fmt }} <span class="result__unit">kN</span></td></tr>
+                        <tr><td>R<sub>z</sub>:</td><td>{{ r.reaction_Rz | fmt }} <span class="result__unit">kN</span></td></tr>
+                        <tr><td>R<sub>y</sub> (des.):</td><td>{{ r.design_Ry | fmt }} <span class="result__unit">kN</span></td></tr>
+                        <tr><td>R<sub>z</sub> (des.):</td><td>{{ r.design_Rz | fmt }} <span class="result__unit">kN</span></td></tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        {# ── Box Clump ── #}
+        {% if r.clump_type == 'Box Clump' %}
+
+        <tr class="{{ 'result__item-pass' if (r.phi_Vsa > r.V_ua and r.phi_Vcbg > r.V_ug and r.phi_Vcp > r.V_ug) else 'result__item-fail' }}">
+            <td class="result__param-type">Anchor</td>
+            <td class="result__param-attrs">
+                {{ anchor_shear('') }}
+            </td>
+        </tr>
+        {% set bp_pass = r.bp_t_req_bear is not none and r.bp_t_req_bear < r.bp_thk %}
+        <tr class="{{ 'result__item-pass' if bp_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Base Plate</td>
+            <td class="result__param-attrs">
+                {{ base_plate_bearing_section() }}
+            </td>
+        </tr>
+
+        {# ── U Clump ── #}
+        {% elif r.clump_type == 'U Clump' %}
+        {% set int_limit_u = 1.0 if (r.beta_N is not none and r.beta_V is not none and (r.beta_N < 0.2 or r.beta_V < 0.2)) else 1.2 %}
+        {% set anch_pass = r.phi_Nsa > r.N_ua and r.phi_Ncbg > r.N_ug and r.phi_Npn > r.N_ua and r.phi_Vsa > r.V_ua and r.phi_Vcbg > r.V_ug and r.interaction <= int_limit_u %}
+
+        <tr class="{{ 'result__item-pass' if anch_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Anchor</td>
+            <td class="result__param-attrs">
+                {{ anchor_tension_shear_interaction('') }}
+            </td>
+        </tr>
+        {% set bolt_pass = r.bolt_phi_Rn_shear > r.bolt_Vu and r.bolt_phi_Rn_bear > r.bolt_Vu %}
+        <tr class="{{ 'result__item-pass' if bolt_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Through Bolt</td>
+            <td class="result__param-attrs">
+                {{ through_bolt_section() }}
+            </td>
+        </tr>
+        {% set fin_pass = r.fin_phi_Rn_yield > r.fin_Vu and r.fin_phi_Rn_rupture > r.fin_Vu and r.fin_phi_Rn_block > r.fin_Vu and r.fin_t_req < r.fin_thk %}
+        {% set weld_pass = r.weld_phi_Rn > r.weld_fR %}
+        <tr class="{{ 'result__item-pass' if fin_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Fin Plate</td>
+            <td class="result__param-attrs">
+                {{ fin_plate_section() }}
+                {{ weld_section() }}
+            </td>
+        </tr>
+        {% set bp_pass = r.bp_t_req_bear < r.bp_thk and r.bp_t_req_tension < r.bp_thk %}
+        <tr class="{{ 'result__item-pass' if bp_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Base Plate</td>
+            <td class="result__param-attrs">
+                {{ base_plate_bearing_section() }}
+                {{ base_plate_tension_section() }}
+            </td>
+        </tr>
+
+        {# ── L Clump ── #}
+        {% elif r.clump_type == 'L Clump' %}
+        {% set top_pass = r.top_phi_Vsa > r.top_V_ua and r.top_phi_Vcbg > r.top_V_ug and r.top_phi_Vcp > r.top_V_ug %}
+        <tr class="{{ 'result__item-pass' if top_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Top Anchor</td>
+            <td class="result__param-attrs">
+                {{ anchor_shear('top_') }}
+            </td>
+        </tr>
+        {% set front_int_limit = 1.0 if (r.front_beta_N is not none and r.front_beta_V is not none and (r.front_beta_N < 0.2 or r.front_beta_V < 0.2)) else 1.2 %}
+        {% set front_pass = r.front_phi_Nsa > r.front_N_ua and r.front_phi_Ncbg > r.front_N_ug and r.front_phi_Npn > r.front_N_ua and r.front_phi_Vsa > r.front_V_ua and r.front_phi_Vcbg > r.front_V_ug and r.front_interaction <= front_int_limit %}
+        <tr class="{{ 'result__item-pass' if front_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Front Anchor</td>
+            <td class="result__param-attrs">
+                {{ anchor_tension_shear_interaction('front_') }}
+            </td>
+        </tr>
+        {% set bolt_pass = r.bolt_phi_Rn_shear > r.bolt_Vu and r.bolt_phi_Rn_bear > r.bolt_Vu %}
+        <tr class="{{ 'result__item-pass' if bolt_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Through Bolt</td>
+            <td class="result__param-attrs">
+                {{ through_bolt_section() }}
+            </td>
+        </tr>
+        {% set fin_pass = r.fin_phi_Rn_yield > r.fin_Vu and r.fin_phi_Rn_rupture > r.fin_Vu and r.fin_phi_Rn_block > r.fin_Vu and r.fin_t_req < r.fin_thk %}
+        <tr class="{{ 'result__item-pass' if fin_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Fin Plate</td>
+            <td class="result__param-attrs">
+                {{ fin_plate_section() }}
+                {{ weld_section() }}
+            </td>
+        </tr>
+        {% set bp_pass = r.bp_t_req_bear < r.bp_thk and r.bp_t_req_tension < r.bp_thk %}
+        <tr class="{{ 'result__item-pass' if bp_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Base Plate</td>
+            <td class="result__param-attrs">
+                {{ base_plate_bearing_section() }}
+                {{ base_plate_tension_section() }}
+            </td>
+        </tr>
+
+        {% endif %}
+
+    </tbody>
+</table>
+{% endif %}
+

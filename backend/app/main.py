@@ -31,6 +31,21 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(FRONTEND_DIR, "templates"))
 
+
+def _fmt_filter(v, dp=2):
+    """Jinja2 filter: format a number to dp decimal places, stripping trailing zeros."""
+    if v is None:
+        return '—'
+    try:
+        n = float(v)
+        return f"{n:.{dp}f}".rstrip('0').rstrip('.')
+    except (ValueError, TypeError):
+        s = str(v)
+        return s if s else '—'
+
+
+templates.env.filters['fmt'] = _fmt_filter
+
 # JS field name → Python field name mappings (shared by section calc routes)
 ALUM_FIELD_MAP = {
     "name": "profile_name", "d": "web_length", "b": "flange_length",
@@ -114,6 +129,62 @@ async def api_calc_glass(request: Request):
     if result is None:
         return JSONResponse({"error": "Insufficient data"}, status_code=400)
     return result
+
+
+@app.post("/api/render/glass")
+async def render_glass(request: Request):
+    data = await _json(request)
+    result = calc_glass_unit(data, wind_inputs=data.get("wind"))
+    return templates.TemplateResponse(
+        request=request, name="result/glass.html", context={"r": result}
+    )
+
+
+@app.post("/api/render/frame")
+async def render_frame_html(request: Request):
+    data = await _json(request)
+    frame = data.get("frame", {})
+    alum_profiles = data.get("alum_profiles", [])
+    steel_profiles = data.get("steel_profiles", [])
+    result = calc_frame(frame, alum_profiles, steel_profiles, wind_inputs=data.get("wind"))
+    html = templates.env.get_template("result/frame.html").render(r=result)
+    return {"html": html, "result": result}
+
+
+@app.post("/api/render/connection")
+async def render_connection_html(request: Request):
+    data = await _json(request)
+    conn = data.get("conn", {})
+    frame = data.get("frame", {})
+    result = calc_connection(conn, frame)
+    return templates.TemplateResponse(
+        request=request, name="result/connection.html", context={"r": result}
+    )
+
+
+@app.post("/api/render/anchorage")
+async def render_anchorage_html(request: Request):
+    data = await _json(request)
+    anchor = data.get("anchor", {})
+    frame = data.get("frame", {})
+    alum_profiles = data.get("alum_profiles", [])
+    result = calc_anchorage(anchor, frame, alum_profiles)
+    return templates.TemplateResponse(
+        request=request, name="result/anchorage.html", context={"r": result}
+    )
+
+@app.post("/api/render/wind")
+async def render_wind_html(request: Request):
+    data = await _json(request)
+    data["auto_load"] = True
+    try:
+        result = compute_wind_loads(data, _to_float)
+        auto_calc = result.get("auto_calc") if result else None
+    except Exception:
+        auto_calc = None
+    return templates.TemplateResponse(
+        request=request, name="result/wind.html", context={"r": auto_calc}
+    )
 
 
 @app.post("/api/calc/frame")

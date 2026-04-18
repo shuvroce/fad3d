@@ -344,9 +344,17 @@ function _post(url, body) {
     }).then(r => r.ok ? r.json() : null).catch(() => null);
 }
 
+function _postHtml(url, body) {
+    return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    }).then(r => r.ok ? r.text() : null).catch(() => null);
+}
+
 async function runWindCalc() {
     const inputs = collectWindInputs();
-    const result = await _post('/api/calc/wind', inputs);
+    const result = await _postHtml('/api/render/wind', inputs);
     updateWindResults(result);
 }
 
@@ -356,13 +364,14 @@ async function runCategoryCalc(catNum) {
     const steelProfiles = (_steelSections || []).map(_sectionToSteelProfile);
     const windInputs = collectWindInputs();
 
-    // Run glass and frame first (frame results are needed by connection/anchorage)
-    const [glassResult, frameResult] = await Promise.all([
-        _post('/api/calc/glass', { ...collectGlassInputs(catNum), wind: windInputs }),
-        _post('/api/calc/frame', { frame: frameInputs, alum_profiles: alumProfiles, steel_profiles: steelProfiles, wind: windInputs }),
+    const [glassHtml, frameResponse] = await Promise.all([
+        _postHtml('/api/render/glass', { ...collectGlassInputs(catNum), wind: windInputs }),
+        _post('/api/render/frame', { frame: frameInputs, alum_profiles: alumProfiles, steel_profiles: steelProfiles, wind: windInputs }),
     ]);
 
-    // Merge frame results into the frame payload so connection/anchorage get computed forces
+    const frameHtml = frameResponse?.html ?? null;
+    const frameResult = frameResponse?.result ?? null;
+
     const frameForDownstream = { ...frameInputs };
     if (frameResult) {
         if (frameResult.joint_fy != null) frameForDownstream.joint_fy = frameResult.joint_fy;
@@ -371,14 +380,13 @@ async function runCategoryCalc(catNum) {
         if (frameResult.reaction_Rz != null) frameForDownstream.reaction_Rz = frameResult.reaction_Rz;
     }
 
-    // Run connection and anchorage with frame results
-    const [connResult, anchorResult] = await Promise.all([
-        _post('/api/calc/connection', { conn: collectConnectionInputs(catNum), frame: frameForDownstream }),
-        _post('/api/calc/anchorage', { anchor: collectAnchorInputs(catNum), frame: frameForDownstream, alum_profiles: alumProfiles }),
+    const [connHtml, anchorHtml] = await Promise.all([
+        _postHtml('/api/render/connection', { conn: collectConnectionInputs(catNum), frame: frameForDownstream }),
+        _postHtml('/api/render/anchorage', { anchor: collectAnchorInputs(catNum), frame: frameForDownstream, alum_profiles: alumProfiles }),
     ]);
 
     const gen = _getGeneralInputs(catNum);
-    updateFacadeResults(catNum, { glass: glassResult, frame: frameResult, conn: connResult, anchor: anchorResult, geometry: { ...gen, glass_thk: _computeGlassThk(catNum) } });
+    updateFacadeResults(catNum, { glass: glassHtml, frame: frameHtml, conn: connHtml, anchor: anchorHtml, geometry: { ...gen, glass_thk: _computeGlassThk(catNum) } });
 }
 
 // ---- Debounced triggers ----

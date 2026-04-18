@@ -13,7 +13,7 @@
     --input-field-width: 25rem;
     --viewport-width: 60rem;
     --figure-panel-width: 20rem;
-    --result-width: 26rem;
+    --result-width: 25rem;
     --modal-width-max: 55rem;
     --modal-width-calculator: 18rem;
     --modal-height: 85vh;
@@ -341,7 +341,8 @@ body {
 /* Custom scrollbars that follow light/dark theme */
 * {
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-    scrollbar-width: thin;
+    /* scrollbar-width: thin; */
+    scrollbar-width: none;
 }
 
 *::-webkit-scrollbar {
@@ -1795,7 +1796,7 @@ body.no-animations *::after {
 .floating__bar-left {
     width: calc(var(--catbar-width) + var(--input-field-width));
     background: transparent;
-    left: 0.5rem;
+    left: 0.75rem;
     padding: 0;
     justify-content: space-between;
     z-index: 20;
@@ -2540,9 +2541,9 @@ body.no-animations *::after {
 /* leftbar */
 .left__panel {
     position: fixed;
-    top: calc(var(--topbar-height) + var(--floating-height) + 0.35rem);
-    left: 0.5rem;
-    bottom: 0.5rem;
+    top: calc(var(--topbar-height) + var(--floating-height) + 0.5rem);
+    left: 0.75rem;
+    bottom: 0.75rem;
     display: flex;
     /* justify-content: space-between; */
     border-radius: var(--radius-3);
@@ -3479,8 +3480,8 @@ body.no-animations *::after {
 .right__panel {
     position: fixed;
     top: calc(var(--topbar-height) + 0.5rem);
-    right: 0.5rem;
-    bottom: 0.5rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
     border-radius: var(--radius-3);
     overflow: hidden;
     display: flex;
@@ -3823,6 +3824,22 @@ body.no-animations *::after {
     padding: 0.25rem 0.5rem;
 }
 
+/* Wind result sub-section */
+.result__wind-section + .result__wind-section {
+    border-top: 1px solid var(--border-primary);
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+}
+
+.result__wind-section-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    padding: 0.4rem 0.75rem 0.2rem;
+}
+
 .result__table {
     width: 100%;
     border-collapse: collapse;
@@ -3843,6 +3860,134 @@ body.no-animations *::after {
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-primary);
     white-space: nowrap;
+}
+
+/* ---- Glass result summary table ---- */
+.result__glass-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.73rem;
+    table-layout: fixed;
+    text-align: left;
+}
+
+.result__glass-table th {
+    padding: 0.35rem 0.5rem;
+}
+
+.result__glass-table tr {
+    border-bottom: 1px solid var(--border-primary);
+    vertical-align: top;
+}
+
+.result__glass-table > tbody > tr:last-child {
+    border-bottom: none;
+}
+
+.result__glass-table > tbody > tr:hover {
+    background: color-mix(in srgb, var(--accent) 3%, transparent);
+}
+
+.result__param-type {
+    padding: 0.35rem 0.5rem;
+    width: 18%;
+    font-weight: 600;
+    color: var(--text-secondary);
+    /* vertical-align: middle; */
+}
+
+.result__param-attrs {
+    padding: 0.25rem 0.4rem;
+    color: var(--text-primary);
+}
+
+.result__param-attrs p {
+    margin: 0;
+    line-height: 1.4;
+    font-size: 0.8rem;
+}
+
+.result__param-attrs p + p {
+    margin-top: 0.2rem;
+}
+
+.result__glass-table .result__param-status {
+    padding: 0.35rem 0.5rem;
+    text-align: center;
+    width: 2rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.result__glass-table tr.result__item-pass .result__status {
+    color: var(--color-success);
+}
+
+.result__glass-table tr.result__item-fail .result__status {
+    color: var(--color-danger);
+}
+
+.result__subsection-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    font-weight: 600;
+    margin: 0.45rem 0 0.1rem 0;
+}
+
+.result__subsection-label:first-child {
+    margin-top: 0;
+}
+
+.result__ratio-row td {
+    padding-top: 0.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--border-primary) 50%, transparent);
+}
+
+.result__ratio-row .result__status {
+    margin-left: 0.35rem;
+    font-size: 0.9em;
+}
+
+.result__inner-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: inherit;
+}
+
+.result__inner-table th,
+.result__inner-table td {
+    padding: 0.15rem 0;
+    text-align: left;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-primary) 30%, transparent);
+}
+
+/* .result__inner-table th:last-child,
+.result__inner-table td:last-child {
+    text-align: right;
+} */
+
+.result__inner-table th {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.68em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.result__glass-table .result__value-text {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.result__glass-table .result__unit {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    margin-left: 0.15rem;
 }
 
 /* ---- Facade result parameter table ---- */

@@ -1,0 +1,140 @@
+{% if not r %}
+<div class="result__empty">Enter connection inputs to calculate</div>
+{% else %}
+{% set shear_ratio = (r.Vu / r.phi_Pnv) | round(2) if r.phi_Pnv else none %}
+{% set pnot_ratio  = (r.R_zA / r.phi_Pnot) | round(2) if r.phi_Pnot else none %}
+{% set pnov_ratio  = (r.R_zA / r.phi_Pnov) | round(2) if r.phi_Pnov else none %}
+{% set shear_pass    = r.phi_Pnv > r.Vu %}
+{% set pnot_pass     = r.phi_Pnot > r.R_zA %}
+{% set pnov_pass     = r.phi_Pnov > r.R_zA %}
+{% set pullover_pass = r.beta_pullover <= 0.715 %}
+{% set pullout_pass  = r.beta_pullout <= 0.69 %}
+{% set design_pass   = shear_pass and pnot_pass and pnov_pass and pullover_pass and pullout_pass %}
+<table class="result__glass-table">
+    <thead>
+        <tr>
+            <th style="width: 22%;">Type</th>
+            <th>Params</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {# ── Loads ── #}
+        <tr>
+            <td class="result__param-type">Loads</td>
+            <td class="result__param-attrs">
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr>
+                            <td>Joint f<sub>y</sub>:</td>
+                            <td>{{ r.joint_fy | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr>
+                            <td>Joint f<sub>z</sub>:</td>
+                            <td>{{ r.joint_fz | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr>
+                            <td>R<sub>yA</sub>:</td>
+                            <td>{{ r.R_yA | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr>
+                            <td>R<sub>zA</sub>:</td>
+                            <td>{{ r.R_zA | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr>
+                            <td>V<sub>u</sub>:</td>
+                            <td><strong>{{ r.Vu | fmt }}</strong> <span class="result__unit">kN</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        {# ── Design ── #}
+        <tr class="{{ 'result__item-pass' if design_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Design</td>
+            <td class="result__param-attrs">
+
+                {# Shear subsection #}
+                <div class="result__subsection-label">Shear</div>
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr>
+                            <td>Demand V<sub>u</sub>:</td>
+                            <td>{{ r.Vu | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr>
+                            <td>φP<sub>nv</sub>:</td>
+                            <td>{{ r.phi_Pnv | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        {% if shear_ratio is not none %}
+                        <tr class="result__ratio-row">
+                            <td>Ratio:</td>
+                            <td>
+                                <strong>{{ shear_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if shear_pass else 'result__status-fail' }}">{{ '✓' if shear_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+                {# Tension subsection — Pull-out | Pull-over as paired columns #}
+                <div class="result__subsection-label">Tension</div>
+                <table class="result__inner-table">
+                    <thead>
+                        <tr><th></th><th>Pull-out</th><th>Pull-over</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Demand:</td>
+                            <td>{{ r.R_zA | fmt }} <span class="result__unit">kN</span></td>
+                            <td>{{ r.R_zA | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr>
+                            <td>Capacity:</td>
+                            <td>{{ r.phi_Pnot | fmt }} <span class="result__unit">kN</span></td>
+                            <td>{{ r.phi_Pnov | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
+                        <tr class="result__ratio-row">
+                            <td>Ratio:</td>
+                            <td>
+                                <strong>{{ pnot_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if pnot_pass else 'result__status-fail' }}">{{ '✓' if pnot_pass else '✕' }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ pnov_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if pnov_pass else 'result__status-fail' }}">{{ '✓' if pnov_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                {# Combined subsection #}
+                <div class="result__subsection-label">Combined</div>
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr class="result__ratio-row">
+                            <td>β<sub>pullover</sub> <span class="result__unit">≤ 0.715</span>:</td>
+                            <td>
+                                <strong>{{ r.beta_pullover | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if pullover_pass else 'result__status-fail' }}">{{ '✓' if pullover_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        <tr class="result__ratio-row">
+                            <td>β<sub>pullout</sub> <span class="result__unit">≤ 0.690</span>:</td>
+                            <td>
+                                <strong>{{ r.beta_pullout | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if pullout_pass else 'result__status-fail' }}">{{ '✓' if pullout_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+{% endif %}
+

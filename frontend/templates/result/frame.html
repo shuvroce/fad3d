@@ -1,0 +1,237 @@
+{% if not r %}
+<div class="result__empty">Enter frame inputs to calculate</div>
+{% else %}
+{% set is_composite = r.mullion_type == 'Aluminum + Steel' %}
+<table class="result__glass-table">
+    <thead>
+        <tr>
+            <th style="width: 22%;">Type</th>
+            <th>Params</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {# ── General ── #}
+        <tr>
+            <td class="result__param-type">General</td>
+            <td class="result__param-attrs">
+                <p>Eff. Area: <span class="result__value-text">{{ r.eff_area | fmt }}</span><span class="result__unit"> m²</span></p>
+                {% if r.wind_auto is defined and r.wind_auto %}
+                <p>Design Wind: <span class="result__value-text">{{ r.wind_neg | fmt }}</span><span class="result__unit"> kPa <span class="result__badge result__badge--auto">auto</span></span></p>
+                {% endif %}
+                <p>Glass DL: <span class="result__value-text">{{ r.glass_sw | fmt }}</span><span class="result__unit"> kPa</span></p>
+            </td>
+        </tr>
+
+        {# ── Mullion ── #}
+        {% set mul_dc_pass = (r.mul_dc is defined and r.mul_dc is not none and r.mul_dc <= 1) or
+                             (r.mul_dc_a is defined and r.mul_dc_a is not none and r.mul_dc_a <= 1 and
+                              r.mul_dc_s is defined and r.mul_dc_s is not none and r.mul_dc_s <= 1) %}
+        {% set mul_def_pass = r.mul_def is defined and r.mul_def is not none and r.mul_allow_def is not none and r.mul_def <= r.mul_allow_def %}
+        {% set mul_row_pass = mul_dc_pass and mul_def_pass %}
+        <tr class="{{ 'result__item-pass' if mul_row_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Mullion</td>
+            <td class="result__param-attrs">
+
+                {# General subsection #}
+                <div class="result__subsection-label">General</div>
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr>
+                            <td>w<sub>wind</sub>:</td>
+                            <td>{{ r.mul_w_wind | fmt }} <span class="result__unit">kN/m</span></td>
+                        </tr>
+                        <tr>
+                            <td>M<sub>u</sub>:</td>
+                            <td>{{ r.mul_mu | fmt }} <span class="result__unit">kN·m</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                {# Stress subsection #}
+                <div class="result__subsection-label">Stress</div>
+                <table class="result__inner-table">
+                    {% if is_composite %}
+                    <thead>
+                        <tr><th></th><th>Alum</th><th>Steel</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>I<sub>xx</sub>:</td>
+                            <td>{{ r.I_xa | fmt }} <span class="result__unit">mm⁴</span></td>
+                            <td>{{ r.I_xs | fmt }} <span class="result__unit">mm⁴</span></td>
+                        </tr>
+                        <tr>
+                            <td>LS:</td>
+                            <td>{{ r.ls_a | fmt }}</td>
+                            <td>{{ r.ls_s | fmt }}</td>
+                        </tr>
+                        <tr>
+                            <td>M<sub>u</sub>:</td>
+                            <td>{{ r.mul_mu_a | fmt }} <span class="result__unit">kN·m</span></td>
+                            <td>{{ r.mul_mu_s | fmt }} <span class="result__unit">kN·m</span></td>
+                        </tr>
+                        <tr>
+                            <td>φM<sub>n</sub>:</td>
+                            <td>{{ r.mul_phi_Mn_a | fmt }} <span class="result__unit">kN·m</span></td>
+                            <td>{{ r.mul_phi_Mn_s | fmt }} <span class="result__unit">kN·m</span></td>
+                        </tr>
+                        {% if r.mul_dc_a is defined and r.mul_dc_a is not none %}
+                        {% set dc_a_pass = r.mul_dc_a <= 1 %}
+                        {% set dc_s_pass = r.mul_dc_s is defined and r.mul_dc_s is not none and r.mul_dc_s <= 1 %}
+                        <tr class="result__ratio-row">
+                            <td>D/C:</td>
+                            <td>
+                                <strong>{{ r.mul_dc_a | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if dc_a_pass else 'result__status-fail' }}">{{ '✓' if dc_a_pass else '✕' }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ r.mul_dc_s | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if dc_s_pass else 'result__status-fail' }}">{{ '✓' if dc_s_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td>I<sub>xx</sub>:</td>
+                            <td colspan="2">{{ (r.I_xa if r.I_xa is defined and r.I_xa is not none else (r.mullion.computed_I_xx if r.mullion and r.mullion.computed_I_xx is defined else '—')) | fmt }} <span class="result__unit">mm⁴</span></td>
+                        </tr>
+                        <tr>
+                            <td>φM<sub>n</sub>:</td>
+                            <td colspan="2">{{ r.mul_phi_Mn | fmt }} <span class="result__unit">kN·m</span></td>
+                        </tr>
+                        {% if r.mul_dc is defined and r.mul_dc is not none %}
+                        {% set dc_pass = r.mul_dc <= 1 %}
+                        <tr class="result__ratio-row">
+                            <td>D/C:</td>
+                            <td colspan="2">
+                                <strong>{{ r.mul_dc | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if dc_pass else 'result__status-fail' }}">{{ '✓' if dc_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    {% endif %}
+                </table>
+
+                {# Deflection subsection #}
+                {% if r.mul_def is defined and r.mul_def is not none %}
+                {% set def_pass = r.mul_allow_def is not none and r.mul_def <= r.mul_allow_def %}
+                {% set def_ratio = (r.mul_def / r.mul_allow_def) | round(2) if r.mul_allow_def else none %}
+                <div class="result__subsection-label">Deflection</div>
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr>
+                            <td>Induced:</td>
+                            <td>{{ r.mul_def | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        <tr>
+                            <td>Allowable:</td>
+                            <td>{{ r.mul_allow_def | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% if def_ratio is not none %}
+                        <tr class="result__ratio-row">
+                            <td>Ratio:</td>
+                            <td>
+                                <strong>{{ def_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if def_pass else 'result__status-fail' }}">{{ '✓' if def_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+            </td>
+        </tr>
+
+        {# ── Transom ── #}
+        {% set tran_dc_pass = r.tran_dc is defined and r.tran_dc is not none and r.tran_dc <= 1 %}
+        {% set tran_wind_pass = r.tran_def_wind is defined and r.tran_def_wind is not none and r.tran_allow_def is not none and r.tran_def_wind <= r.tran_allow_def %}
+        {% set tran_dead_pass = r.tran_def_dead is defined and r.tran_def_dead is not none and r.tran_def_dead <= 3.0 %}
+        {% set tran_row_pass = tran_dc_pass and tran_wind_pass and tran_dead_pass %}
+        <tr class="{{ 'result__item-pass' if tran_row_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Transom</td>
+            <td class="result__param-attrs">
+
+                {# Stress subsection #}
+                <div class="result__subsection-label">Stress</div>
+                <table class="result__inner-table">
+                    <tbody>
+                        <tr>
+                            <td>M<sub>u</sub>:</td>
+                            <td>{{ r.tran_mu | fmt }} <span class="result__unit">kN·m</span></td>
+                        </tr>
+                        <tr>
+                            <td>φM<sub>n</sub>:</td>
+                            <td>{{ r.tran_phi_Mn | fmt }} <span class="result__unit">kN·m</span></td>
+                        </tr>
+                        {% if r.tran_dc is defined and r.tran_dc is not none %}
+                        {% set tran_dc_p = r.tran_dc <= 1 %}
+                        <tr class="result__ratio-row">
+                            <td>D/C:</td>
+                            <td>
+                                <strong>{{ r.tran_dc | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if tran_dc_p else 'result__status-fail' }}">{{ '✓' if tran_dc_p else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+                {# Deflection subsection #}
+                <div class="result__subsection-label">Deflection</div>
+                <table class="result__inner-table">
+                    <tbody>
+                        {% if r.tran_def_wind is defined and r.tran_def_wind is not none %}
+                        {% set wd_pass = r.tran_allow_def is not none and r.tran_def_wind <= r.tran_allow_def %}
+                        {% set wd_ratio = (r.tran_def_wind / r.tran_allow_def) | round(2) if r.tran_allow_def else none %}
+                        <tr>
+                            <td>Wind:</td>
+                            <td>{{ r.tran_def_wind | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% endif %}
+                        {% if r.tran_def_dead is defined and r.tran_def_dead is not none %}
+                        {% set dd_pass = r.tran_def_dead <= 3.0 %}
+                        {% set dd_ratio = (r.tran_def_dead / 3.0) | round(2) %}
+                        <tr>
+                            <td>Dead:</td>
+                            <td>{{ r.tran_def_dead | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% endif %}
+                        {% if r.tran_allow_def is not none %}
+                        <tr>
+                            <td>Allow. (wind):</td>
+                            <td>{{ r.tran_allow_def | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% endif %}
+                        {% if r.tran_def_wind is defined and r.tran_def_wind is not none and wd_ratio is not none %}
+                        <tr class="result__ratio-row">
+                            <td>Wind Ratio:</td>
+                            <td>
+                                <strong>{{ wd_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if wd_pass else 'result__status-fail' }}">{{ '✓' if wd_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if r.tran_def_dead is defined and r.tran_def_dead is not none %}
+                        <tr class="result__ratio-row">
+                            <td>Dead Ratio:</td>
+                            <td>
+                                <strong>{{ dd_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if dd_pass else 'result__status-fail' }}">{{ '✓' if dd_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+{% endif %}
+

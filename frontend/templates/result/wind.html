@@ -1,0 +1,170 @@
+{% if not r %}
+<div class="result__item result__empty">Enter wind inputs to calculate</div>
+{% else %}
+{% set s = r.summary %}
+{% set mwfrs = r.mwfrs_levels %}
+{% set wall = r.wall_results %}
+{% set roof = r.roof_results %}
+
+{# ── General ── #}
+<div class="result__wind-section">
+    <div class="result__wind-section-header">General</div>
+    {% if s %}
+    <div class="result__item">
+        <span class="result__label">Wind Speed</span>
+        <span class="result__value"><span class="result__value-text">{{ s.wind_speed | fmt }}</span><span class="result__unit"> m/s</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">Bldg. Height</span>
+        <span class="result__value"><span class="result__value-text">{{ s.b_height | fmt(1) }}</span><span class="result__unit"> m</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">Imp. Factor</span>
+        <span class="result__value"><span class="result__value-text">{{ s.Imp_factor | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">Gust Factor</span>
+        <span class="result__value"><span class="result__value-text">{{ s.gust_factor | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">K<sub>h</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.K_h | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">K<sub>ht</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.K_ht | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">q<sub>h</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.q_h | fmt }}</span><span class="result__unit"> kPa</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">C<sub>pw</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.C_pw | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">C<sub>pl</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.C_pl | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">C<sub>ps</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.C_ps | fmt }}</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">P<sub>hi</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.P_hi | fmt }}</span><span class="result__unit"> kPa</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">P<sub>hl</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.P_hl | fmt }}</span><span class="result__unit"> kPa</span></span>
+    </div>
+    <div class="result__item">
+        <span class="result__label">P<sub>hs</sub></span>
+        <span class="result__value"><span class="result__value-text">{{ s.P_hs | fmt }}</span><span class="result__unit"> kPa</span></span>
+    </div>
+    {% else %}
+    <div class="result__item result__empty">—</div>
+    {% endif %}
+</div>
+
+{# ── MWFRS ── #}
+<div class="result__wind-section">
+    <div class="result__wind-section-header">MWFRS Pressures at height z</div>
+    {% if mwfrs and mwfrs | length %}
+    <div class="result__table-wrap">
+        <table class="result__table">
+            <thead>
+                <tr>
+                    <th>Lvl</th>
+                    <th>Cumu. (m)</th>
+                    <th>K<sub>z</sub></th>
+                    <th>K<sub>zt</sub></th>
+                    <th>q<sub>z</sub> (kPa)</th>
+                    <th>P<sub>z</sub> (kPa)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in mwfrs %}
+                <tr>
+                    <td>{{ row.level }}</td>
+                    <td>{{ row.cumu_height | fmt(1) }}</td>
+                    <td>{{ row.K_z | fmt }}</td>
+                    <td>{{ row.K_zt | fmt }}</td>
+                    <td>{{ row.q_z | fmt }}</td>
+                    <td>{{ row.P_zw | fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="result__item result__empty">—</div>
+    {% endif %}
+</div>
+
+{# ── C&C Wall ── #}
+<div class="result__wind-section">
+    <div class="result__wind-section-header">C&amp;C — Wall Pressure at height h</div>
+    {% if wall and wall.keys() | list | length %}
+    <div class="result__table-wrap">
+        <table class="result__table">
+            <thead>
+                <tr>
+                    <th>A<sub>eff</sub> (m²)</th>
+                    <th>P<sub>z4+</sub> (kPa)</th>
+                    <th>P<sub>z4−</sub> (kPa)</th>
+                    <th>P<sub>z5+</sub> (kPa)</th>
+                    <th>P<sub>z5−</sub> (kPa)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for area, rows in wall.items() %}
+                {% set row = rows[0] %}
+                <tr>
+                    <td>{{ area }}</td>
+                    <td>{{ row.P_z4_pos | fmt }}</td>
+                    <td>{{ row.P_z4_neg | fmt }}</td>
+                    <td>{{ row.P_z5_pos | fmt }}</td>
+                    <td>{{ row.P_z5_neg | fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="result__item result__empty">—</div>
+    {% endif %}
+</div>
+
+{# ── C&C Roof ── #}
+<div class="result__wind-section">
+    <div class="result__wind-section-header">C&amp;C — Roof Pressure at height h</div>
+    {% if roof and roof.keys() | list | length %}
+    <div class="result__table-wrap">
+        <table class="result__table">
+            <thead>
+                <tr>
+                    <th>A<sub>eff</sub> (m²)</th>
+                    <th>P<sub>z1−</sub> (kPa)</th>
+                    <th>P<sub>z2−</sub> (kPa)</th>
+                    <th>P<sub>z3−</sub> (kPa)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for area, rows in roof.items() %}
+                {% set row = rows[0] %}
+                <tr>
+                    <td>{{ area }}</td>
+                    <td>{{ row.P_z1_neg | fmt }}</td>
+                    <td>{{ row.P_z2_neg | fmt }}</td>
+                    <td>{{ row.P_z3_neg | fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="result__item result__empty">—</div>
+    {% endif %}
+</div>
+{% endif %}

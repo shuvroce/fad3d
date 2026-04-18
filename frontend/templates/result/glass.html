@@ -1,0 +1,145 @@
+{% if not r or r.branch is not defined %}
+<div class="result__empty">{{ r.note if r and r.note else 'Enter glass inputs to calculate' }}</div>
+{% else %}
+{% set is_single = r.branch in ('sgu', 'lgu') %}
+{% set is_double = r.branch in ('dgu', 'ldgu') %}
+<table class="result__glass-table">
+    <thead>
+        <tr>
+            <th style="width: 25%;">Type</th>
+            <th>Params</th>
+        </tr>
+    </thead>
+    <tbody>
+        {# ── General ── #}
+        <tr>
+            <td class="result__param-type">General</td>
+            <td class="result__param-attrs">
+                <p>Size: <span class="result__value-text">{{ r.length | fmt }} × {{ r.width | fmt }}</span><span class="result__unit"> mm</span></p>
+                <p>Eff. Area: <span class="result__value-text">{{ r.A_eff | fmt }}</span><span class="result__unit"> m²</span></p>
+                {% if r.wind_auto %}
+                <p>Wind Load: <span class="result__value-text">{{ r.wind_load | fmt }}</span><span class="result__unit"> kPa <span class="result__badge result__badge--auto">auto</span></span></p>
+                {% endif %}
+            </td>
+        </tr>
+
+        {# ── Stress ── #}
+        {% if r.stress_ratio is defined and r.stress_ratio is not none %}
+        {% set s_pass = r.stress_ratio <= 1 %}
+        <tr class="{{ 'result__item-pass' if s_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Stress</td>
+            <td class="result__param-attrs">
+                <table class="result__inner-table">
+                    {% if is_double %}
+                    <thead>
+                        <tr><th></th><th>Lite 1</th><th>Lite 2</th></tr>
+                    </thead>
+                    {% endif %}
+                    <tbody>
+                        {% if is_single %}
+                        <tr>
+                            <td>NFL:</td>
+                            <td colspan="2">{{ r.nfl | fmt(3) }} <span class="result__unit">kPa</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td>NFL:</td>
+                            <td>{{ r.nfl1 | fmt(3) }} <span class="result__unit">kPa</span></td>
+                            <td>{{ r.nfl2 | fmt(3) }} <span class="result__unit">kPa</span></td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td>GTF:</td>
+                            {% if is_single %}
+                            <td colspan="2">{{ r.gtf | fmt }}</td>
+                            {% else %}
+                            <td>{{ r.gtf1 | fmt }}</td>
+                            <td>{{ r.gtf2 | fmt }}</td>
+                            {% endif %}
+                        </tr>
+                        {% if is_double %}
+                        <tr>
+                            <td>LS:</td>
+                            <td>{{ r.ls1 | fmt }}</td>
+                            <td>{{ r.ls2 | fmt }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td>LR:</td>
+                            {% if is_single %}
+                            <td colspan="2">{{ r.lr | fmt(2) }} <span class="result__unit">kPa</span></td>
+                            {% else %}
+                            <td>{{ r.lr1 | fmt(2) }} <span class="result__unit">kPa</span></td>
+                            <td>{{ r.lr2 | fmt(2) }} <span class="result__unit">kPa</span></td>
+                            {% endif %}
+                        </tr>
+                        <tr class="result__ratio-row">
+                            <td>Ratio:</td>
+                            <td colspan="2">
+                                <strong>{{ r.stress_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if s_pass else 'result__status-fail' }}">{{ '✓' if s_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endif %}
+
+        {# ── Deflection ── #}
+        {% if r.deflection is defined and r.deflection is not none %}
+        {% set d_pass = r.def_ratio is defined and r.def_ratio is not none and r.def_ratio <= 1 %}
+        <tr class="{{ 'result__item-pass' if d_pass else 'result__item-fail' }}">
+            <td class="result__param-type">Deflection</td>
+            <td class="result__param-attrs">
+                <table class="result__inner-table">
+                    {% if is_double %}
+                    <thead>
+                        <tr><th></th><th>Lite 1</th><th>Lite 2</th></tr>
+                    </thead>
+                    {% endif %}
+                    <tbody>
+                        {% if is_double and r.deflection1 is defined and r.deflection1 is not none %}
+                        <tr>
+                            <td>Induced:</td>
+                            <td>{{ r.deflection1 | fmt }} <span class="result__unit">mm</span></td>
+                            <td>{{ r.deflection2 | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td>Induced:</td>
+                            <td colspan="2">{{ r.deflection | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% endif %}
+                        {% if r.allow_def is defined and r.allow_def is not none %}
+                        <tr>
+                            <td>Allowable:</td>
+                            <td colspan="2">{{ r.allow_def | fmt }} <span class="result__unit">mm</span></td>
+                        </tr>
+                        {% endif %}
+                        {% if r.def_ratio is defined and r.def_ratio is not none %}
+                        <tr class="result__ratio-row">
+                            <td>Ratio:</td>
+                            <td colspan="2">
+                                <strong>{{ r.def_ratio | fmt }}</strong>
+                                <span class="result__status {{ 'result__status-pass' if d_pass else 'result__status-fail' }}">{{ '✓' if d_pass else '✕' }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endif %}
+
+        {# ── Silicone ── #}
+        {% if r.bite_pro is defined and r.bite_pro is not none and r.glue_pro is not none %}
+        <tr>
+            <td class="result__param-type">Silicone</td>
+            <td class="result__param-attrs">Required Size: <span class="result__value-text">{{ r.bite_pro | fmt(1) }}×{{ r.glue_pro | fmt(1) }}</span><span class="result__unit"> mm</span></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endif %}
+
