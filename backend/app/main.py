@@ -217,6 +217,10 @@ async def api_open_folder_picker(request: Request):
         root = Tk()  # type: ignore[name-defined]
         root.withdraw()
         root.attributes("-topmost", True)
+        icon_path = os.path.join(BASE_DIR, "..", "..", "frontend", "static", "assets", "fav.png")
+        if os.path.exists(icon_path):
+            icon = PhotoImage(file=icon_path)  # type: ignore[name-defined]
+            root.iconphoto(True, icon)  # type: ignore[name-defined]
         selected_dir = askdirectory(title="Select Figures Directory", mustexist=True)  # type: ignore[name-defined]
         root.destroy()
 
@@ -794,7 +798,7 @@ def _generate_pdf(data: dict, template_name: str) -> str:
         "A_VC": 0.0, "A_VCO": 0.0, "psi_edV": 0.0, "psi_hV": 0.0, "l_e": 0.0, "V_b": 0.0,
         "bp_d": 0.0, "bp_b": 0.0, "bp_m": 0.0, "bp_n": 0.0, "bp_lambda_n": 0.0, "bp_l": 0.0,
         "bp_q": 0.0, "bp_bearing_Mu": 0.0, "bp_A1": 0.0,
-        "bolt_phi_Rn_bear": 0.0, "thr_Vh": 0.0, "thr_Vv": 0.0, "thr_Ab": 0.0,
+        "thr_Vh": 0.0, "thr_Vv": 0.0, "thr_Ab": 0.0,
         "thr_bearing_lc": 0.0, "thr_bearing_phi_Rn1": 0.0, "thr_bearing_phi_Rn2": 0.0,
         "thr_bolt_nos": 0.0, "thr_bolt_length": 0.0,
         "fin_Vu": 0.0, "fin_Vh": 0.0, "fin_Vv": 0.0, "fin_t_req": 0.0, "fin_thk": 0.0,
