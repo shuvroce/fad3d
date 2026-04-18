@@ -6,11 +6,32 @@ import { openModal, closeModal } from './floatingBar.js';
 import { _materials, populateSecGradeOptions, animateDefineForm } from './materialProp.js';
 
 const ALUMINUM_PREDEFINED = {
-    'M 125x60x2.5': { grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', mnYield: '6.5' },
+    'M 125x60x2.5': { grade: '', d: '125', b: '60', tw: '2.5', tf: '4.66', j: '1583468.5',  a: '1143.6', ix: '2304351.5',  iy: '617307.5',  y: '69.3',  x: '30',   plasticX: '27.9', plasticY: '52',   phiMn: '6.5' },
+    'M 125x60x3':   { grade: '', d: '125', b: '60', tw: '3',   tf: '4.66', j: '1797727.0',  a: '1267.6', ix: '2462171.3',  iy: '707902.2',  y: '68.8',  x: '30',   plasticX: '29.5', plasticY: '49',   phiMn: '7.2' },
+    'M 140x60x2.5': { grade: '', d: '140', b: '60', tw: '2.5', tf: '4.67', j: '1822610.8',  a: '1218.6', ix: '3065620.3',  iy: '679338.9',  y: '77.6',  x: '30',   plasticX: '33.5', plasticY: '56.1', phiMn: '7.6' },
+    'M 135x67x4':   { grade: '', d: '135', b: '67', tw: '4',   tf: '6',    j: '3089970.9',  a: '1792',   ix: '4248985.4',  iy: '1236954.6', y: '69.1',  x: '33.5', plasticX: '42.4', plasticY: '46.1', phiMn: '12.2' },
+    'M 145x67x2.5': { grade: '', d: '145', b: '67', tw: '2.5', tf: '4.49', j: '2327814.4',  a: '1284.3', ix: '3558480.9',  iy: '889366.9',  y: '80',    x: '33.5', plasticX: '35.9', plasticY: '58.4', phiMn: '8.4' },
+    'M 145x67x3':   { grade: '', d: '145', b: '67', tw: '3',   tf: '4.49', j: '2647465.3',  a: '1420.7', ix: '3779820.3',  iy: '1018434.5', y: '79.1',  x: '33.5', plasticX: '37.4', plasticY: '54.9', phiMn: '9.3' },
+    'M 145x67x3.5': { grade: '', d: '145', b: '67', tw: '3.5', tf: '4.74', j: '2967068.3',  a: '1587.3', ix: '4165937.5',  iy: '1152338.9', y: '77',    x: '33.5', plasticX: '39.6', plasticY: '52.3', phiMn: '10.7' },
+    'M 145x80x3':   { grade: '', d: '145', b: '80', tw: '3.5', tf: '5.3',  j: '3781852.7',  a: '1642.1', ix: '4895650.5',  iy: '1588961.6', y: '74.9',  x: '40',   plasticX: '43.4', plasticY: '56.3', phiMn: '12.7' },
+    'M 150x80x3':   { grade: '', d: '150', b: '80', tw: '3',   tf: '5.3',  j: '3949810.6',  a: '1672.1', ix: '5316279.5',  iy: '1633451.6', y: '77.5',  x: '40',   plasticX: '45.1', plasticY: '57.7', phiMn: '12.8' },
+    'M 160x80x8':   { grade: '', d: '160', b: '80', tw: '8',   tf: '9.1',  j: '8817605.7',  a: '3761.4', ix: '11621446.9', iy: '3666724.2', y: '82.1',  x: '40',   plasticX: '46.4', plasticY: '53.3', phiMn: '29.1' },
+    'M 240x80x12':  { grade: '', d: '240', b: '80', tw: '12',  tf: '12.5', j: '19617807.2', a: '7245.4', ix: '45475752.2', iy: '7057463.3', y: '121.3', x: '40',   plasticX: '68.4', plasticY: '71.8', phiMn: '78.8' },
+    'M 145x90x3':   { grade: '', d: '145', b: '90', tw: '3',   tf: '5.1',  j: '4649742.2',  a: '1717.1', ix: '5273615.7',  iy: '2071663.7', y: '74.2',  x: '45',   plasticX: '44.9', plasticY: '56.7', phiMn: '13.2' },
+    'M 185x90x3':   { grade: '', d: '185', b: '90', tw: '3',   tf: '5.1',  j: '6358240.2',  a: '1957.1', ix: '9489004.3',  iy: '2525983.9', y: '94.9',  x: '45',   plasticX: '58.2', plasticY: '68.5', phiMn: '17.9' },
+    'M 200x72x3':   { grade: '', d: '200', b: '72', tw: '3',   tf: '4.65', j: '4544722.1',  a: '1989.3', ix: '10486070.6', iy: '1680299.9', y: '110.3', x: '36',   plasticX: '53.7', plasticY: '76.4', phiMn: '17.1' },
+    'T 125x60x2.5': { grade: '', d: '125', b: '60', tw: '2.5', tf: '5.2',  j: '1609131.5',  a: '1230.5', ix: '2323239.2',  iy: '400621.3',  y: '70.4',  x: '36.3', plasticX: '27.6', plasticY: '48.8', phiMn: '4.41' },
+    'T 135x67x2.5': { grade: '', d: '135', b: '67', tw: '2.5', tf: '5.2',  j: '2179349.1',  a: '1362.9', ix: '3092183.6',  iy: '587849.0',  y: '75.7',  x: '39.4', plasticX: '30.9', plasticY: '53.4', phiMn: '5.36' },
+    'T 145x67x2':   { grade: '', d: '145', b: '67', tw: '2',   tf: '4.1',  j: '1942368.4',  a: '1153.7', ix: '3062951.0',  iy: '515834.0',  y: '80.6',  x: '39.4', plasticX: '34.4', plasticY: '57.1', phiMn: '4.71', },
+    'T 125x80x2.5': { grade: '', d: '125', b: '80', tw: '2.5', tf: '4.94', j: '2717734.8',  a: '1397.8', ix: '2829989.6',  iy: '833830.2',  y: '71.8',  x: '46.5', plasticX: '23.9', plasticY: '55',   phiMn: '4.82' },
+    'T 125x90x2.5': { grade: '', d: '125', b: '90', tw: '2.5', tf: '4.77', j: '3331727.9',  a: '1465.3', ix: '3045461.6',  iy: '1137399.5', y: '72',    x: '49.6', plasticX: '22.7', plasticY: '57.2', phiMn: '5.17' },
+    'T 65x72x3':    { grade: '', d: '65',  b: '72', tw: '3',   tf: '4.1',  j: '947821.1',   a: '914.1',  ix: '569517.1',   iy: '362347.5',  y: '34.2',  x: '44.1', plasticX: '16.9', plasticY: '28.7', phiMn: '1.95' },
 };
 
 const DEFAULT_ALUM_SECTIONS = [
-    { name: 'M 125x60x2.5', profileType: 'predefined', shape: 'M 125x60x2.5', grade: '', d: '125',  b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30', plasticX: '27.9', plasticY: '52', mnYield: '6.5' },
+    { name: 'M 125x60x2.5', profileType: 'predefined', shape: 'M 125x60x2.5', grade: '6063-T6', d: '125', b: '60', tw: '2.5', tf: '4.66', j: '1583468.5', a: '1143.6', ix: '2304351.5', iy: '617307.5', y: '69.3', x: '30',   plasticX: '27.9', plasticY: '52',   phiMn: '6.5' },
+    { name: 'T 125x60x2.5', profileType: 'predefined', shape: 'T 125x60x2.5', grade: '6063-T5', d: '125', b: '60', tw: '2.5', tf: '5.2',  j: '1609131.5', a: '1230.5', ix: '2323239.2', iy: '400621.3', y: '70.4', x: '36.3', plasticX: '27.6', plasticY: '48.8', phiMn: '4.41' },
+    // { name: 'T 125x60x2.5', profileType: 'predefined', shape: 'T 125x60x2.5', grade: '', d: '125', b: '60', tw: '2.5', tf: '5.2',  j: '1609131.5', a: '1230.5', ix: '2323239.2', iy: '400621.3', y: '70.4', x: '36.3', plasticX: '27.6', plasticY: '48.8', mnYield: '5.17', mnLb: '4.9', phiMn: '4.41' },
 ];
 
 let _alumSections = DEFAULT_ALUM_SECTIONS.map(s => ({ ...s }));
@@ -39,9 +60,15 @@ function populateAlumSecShapeOptions(selectedShape = null) {
 function fillPredefinedShape(shape) {
     const props = ALUMINUM_PREDEFINED[shape];
     if (!props) return;
-    ['d', 'b', 'tw', 'tf', 'j', 'a', 'ix', 'iy', 'y', 'x', 'plasticX', 'plasticY', 'mnYield'].forEach(p => {
-        const el = document.getElementById(`alum-sec-${p}`);
-        if (el) el.value = props[p] || '';
+    const fieldMap = {
+        d: 'd', b: 'b', tw: 'tw', tf: 'tf', j: 'j', a: 'a',
+        ix: 'ix', iy: 'iy', y: 'y', x: 'x',
+        plasticX: 'plastic-x', plasticY: 'plastic-y',
+        phiMn: 'phi-mn', mnYield: 'mn-yield', mnLb: 'mn-lb'
+    };
+    Object.entries(fieldMap).forEach(([key, id]) => {
+        const el = document.getElementById(`alum-sec-${id}`);
+        if (el && props[key] != null) el.value = props[key];
     });
     updateAlumCalcPanel();
 }
@@ -233,6 +260,7 @@ function showAlumSectionForm() {
     document.getElementById('alum-sec-plastic-y').value  = sec.plasticY || '';
     document.getElementById('alum-sec-mn-yield').value   = sec.mnYield  || '';
     document.getElementById('alum-sec-mn-lb').value      = sec.mnLb     || '';
+    document.getElementById('alum-sec-phi-mn').value  = sec.phiMn   || '';
 
     applyAlumSecVisibility(profileType);
     animateDefineForm(form);
@@ -257,6 +285,7 @@ function syncAlumSectionFromForm() {
     sec.x        = document.getElementById('alum-sec-x')?.value               || '';
     sec.plasticX = document.getElementById('alum-sec-plastic-x')?.value       || '';
     sec.plasticY = document.getElementById('alum-sec-plastic-y')?.value       || '';
+    sec.phiMn   = document.getElementById('alum-sec-phi-mn')?.value          || '';
     sec.mnYield  = document.getElementById('alum-sec-mn-yield')?.value        || '';
     sec.mnLb     = document.getElementById('alum-sec-mn-lb')?.value           || '';
 }
