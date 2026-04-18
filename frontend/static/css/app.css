@@ -670,10 +670,10 @@ summary {
 /* custom warning modal */
 
 #glass-chart-image {
-    width: 45rem;
+    width: 40rem;
     height: auto;
     border-radius: var(--radius-2);
-    margin: 1.5rem;
+    margin: 1rem;
 }
 .modal__warning {
     border: none;

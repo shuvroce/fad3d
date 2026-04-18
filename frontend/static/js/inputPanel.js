@@ -49,7 +49,18 @@ function restoreCachedWindInputs() {
     WIND_INPUT_IDS.forEach(id => {
         if (cachedWindInputs[id] != null) {
             const el = document.getElementById(id);
-            if (el) el.value = cachedWindInputs[id];
+            if (el) {
+                el.value = cachedWindInputs[id];
+                // Sync radio card active state
+                const group = document.querySelector(`[data-radio-target="${id}"]`);
+                if (group) {
+                    group.querySelectorAll('.type-radio__card').forEach(card => {
+                        card.classList.toggle('active', card.dataset.value === cachedWindInputs[id]);
+                    });
+                }
+                // Dispatch change event for dependent handlers
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
         }
     });
 }

@@ -14,6 +14,7 @@ import {
 
 import { populateFrameSectionDropdowns, syncFrameVariant } from './frameInput.js';
 import { syncAnchorVariant } from './anchorInput.js';
+import { switchGlassType } from './glassInput.js';
 import { clearFacadeCache, showFacadeResults, clearCollapseStateForCategory, renumberCollapseState } from './results.js';
 import { clearAllCategoryTimers, renumberCategoryTimers } from './calcEngine.js';
 
@@ -340,6 +341,7 @@ function createCategory(categoryNum) {
 
     syncFrameVariant(categoryNum);
     syncAnchorVariant(categoryNum);
+    switchGlassType(categoryNum, 'dgu');
 
     // Heading edit listeners
     _attachHeadingListeners(categoryContent, categoryNum);

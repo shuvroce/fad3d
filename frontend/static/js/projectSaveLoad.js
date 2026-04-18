@@ -21,9 +21,16 @@ function _setVal(id, value) {
         group.querySelectorAll('.type-radio__card').forEach(card => {
             card.classList.toggle('active', card.dataset.value === value);
         });
-        // Dispatch change so dependent handlers (e.g. glass type switch, point-fixed fields) run
-        el.dispatchEvent(new Event('change', { bubbles: true }));
     }
+    // Sync calc-mode buttons (glass calculation method toggle)
+    const calcModeToggle = document.querySelector(`[data-calc-mode-target="${id}"]`);
+    if (calcModeToggle) {
+        calcModeToggle.querySelectorAll('.glass__calc-mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === value);
+        });
+    }
+    // Dispatch change so dependent handlers (e.g. glass type switch, point-fixed fields) run
+    el.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 function _getLogoDataUrl() {
