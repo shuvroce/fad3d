@@ -324,6 +324,9 @@ function createCategory(categoryNum) {
     clone.querySelectorAll("[data-radio-target]").forEach((el) => {
         el.setAttribute("data-radio-target", el.getAttribute("data-radio-target").replace("cat0", `cat${categoryNum}`));
     });
+    clone.querySelectorAll("[data-calc-mode-target]").forEach((el) => {
+        el.setAttribute("data-calc-mode-target", el.getAttribute("data-calc-mode-target").replace("cat0", `cat${categoryNum}`));
+    });
     clone.querySelector(".input__category-heading").textContent = `Category ${categoryNum}`;
 
     categoryContent.appendChild(clone);
