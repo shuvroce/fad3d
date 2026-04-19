@@ -26,24 +26,16 @@
                 <table class="result__inner-table">
                     <tbody>
                         <tr>
-                            <td>Joint f<sub>y</sub>:</td>
-                            <td>{{ r.joint_fy | fmt }} <span class="result__unit">kN</span></td>
+                            <td>Joint f<sub>y</sub>: {{ r.joint_fy | fmt }} <span class="result__unit">kN</span></td>
+                            <td>Joint f<sub>z</sub>: {{ r.joint_fz | fmt }} <span class="result__unit">kN</span></td>
                         </tr>
                         <tr>
-                            <td>Joint f<sub>z</sub>:</td>
-                            <td>{{ r.joint_fz | fmt }} <span class="result__unit">kN</span></td>
+                            <td>R<sub>yA</sub>: {{ r.R_yA | fmt }} <span class="result__unit">kN</span></td>
+                            <td>R<sub>zA</sub>: {{ r.R_zA | fmt }} <span class="result__unit">kN</span></td>
                         </tr>
                         <tr>
-                            <td>R<sub>yA</sub>:</td>
-                            <td>{{ r.R_yA | fmt }} <span class="result__unit">kN</span></td>
-                        </tr>
-                        <tr>
-                            <td>R<sub>zA</sub>:</td>
-                            <td>{{ r.R_zA | fmt }} <span class="result__unit">kN</span></td>
-                        </tr>
-                        <tr>
-                            <td>V<sub>u</sub>:</td>
-                            <td><strong>{{ r.Vu | fmt }}</strong> <span class="result__unit">kN</span></td>
+                            <td>V<sub>u</sub>: <strong>{{ r.Vu | fmt }}</strong> <span class="result__unit">kN</span></td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>
@@ -60,7 +52,7 @@
                 <table class="result__inner-table">
                     <tbody>
                         <tr>
-                            <td>Demand V<sub>u</sub>:</td>
+                            <td>V<sub>u</sub>:</td>
                             <td>{{ r.Vu | fmt }} <span class="result__unit">kN</span></td>
                         </tr>
                         <tr>

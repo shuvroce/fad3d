@@ -34,15 +34,7 @@
             <td class="result__param-attrs">
 
                 {# General subsection #}
-                <div class="result__subsection-label">General</div>
-                <table class="result__inner-table">
-                    <tbody>
-                        <tr>
-                            <td>M<sub>u</sub>:</td>
-                            <td>{{ r.mul_mu | fmt }} <span class="result__unit">kN·m</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <p>M<sub>u</sub>: <span class="result__value-text">{{ r.mul_mu | fmt }}</span><span class="result__unit"> kN·m</span></p>
 
                 {# Stress subsection #}
                 <div class="result__subsection-label">Stress</div>

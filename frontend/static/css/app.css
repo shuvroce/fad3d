@@ -3954,16 +3954,22 @@ body.no-animations *::after {
 }
 
 .result__inner-table {
-    width: 100%;
+    width: fit-content;
     border-collapse: collapse;
     font-size: inherit;
 }
 
 .result__inner-table th,
 .result__inner-table td {
+    width: fit-content;
     padding: 0.1rem 0;
     text-align: left;
     border-bottom: 1px solid color-mix(in srgb, var(--border-primary) 30%, transparent);
+}
+
+.result__inner-table th:not(:last-child),
+.result__inner-table td:not(:last-child) {
+    padding-right: 0.65rem;
 }
 
 /* .result__inner-table th:last-child,

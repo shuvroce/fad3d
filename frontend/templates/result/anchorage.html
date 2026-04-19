@@ -11,6 +11,7 @@
 {% set phi_Vsa  = r[pfx ~ 'phi_Vsa'] %}
 {% set phi_Vcbg = r[pfx ~ 'phi_Vcbg'] %}
 {% set phi_Vcp  = r[pfx ~ 'phi_Vcp'] %}
+
 <div class="result__subsection-label">Shear</div>
 <table class="result__inner-table">
     <tbody>
@@ -110,7 +111,7 @@
 {% endmacro %}
 
 {% macro through_bolt_section() %}
-<div class="result__subsection-label">Through Bolt</div>
+{# <div class="result__subsection-label">Through Bolt</div> #}
 <table class="result__inner-table">
     <tbody>
         <tr><td>V<sub>u</sub>:</td><td>{{ r.bolt_Vu | fmt }} <span class="result__unit">kN</span></td></tr>
@@ -135,7 +136,7 @@
 {% endmacro %}
 
 {% macro fin_plate_section() %}
-<div class="result__subsection-label">Fin Plate</div>
+{# <div class="result__subsection-label">Fin Plate</div> #}
 <table class="result__inner-table">
     <tbody>
         <tr><td>V<sub>u</sub>:</td><td>{{ r.fin_Vu | fmt }} <span class="result__unit">kN</span></td></tr>
@@ -231,6 +232,7 @@
 </table>
 {% endmacro %}
 
+
 {# ── Main table ── #}
 <table class="result__glass-table">
     <thead>
@@ -247,10 +249,15 @@
             <td class="result__param-attrs">
                 <table class="result__inner-table">
                     <tbody>
-                        <tr><td>R<sub>y</sub>:</td><td>{{ r.reaction_Ry | fmt }} <span class="result__unit">kN</span></td></tr>
-                        <tr><td>R<sub>z</sub>:</td><td>{{ r.reaction_Rz | fmt }} <span class="result__unit">kN</span></td></tr>
-                        <tr><td>R<sub>y</sub> (des.):</td><td>{{ r.design_Ry | fmt }} <span class="result__unit">kN</span></td></tr>
-                        <tr><td>R<sub>z</sub> (des.):</td><td>{{ r.design_Rz | fmt }} <span class="result__unit">kN</span></td></tr>
+                        <tr>
+                            <td>R<sub>y</sub>: {{ r.reaction_Ry | fmt }} <span class="result__unit">kN</span></td>
+                            <td>R<sub>y</sub> (des.): {{ r.design_Ry | fmt }} <span class="result__unit">kN</span></td>
+                            
+                        </tr>
+                        <tr>
+                            <td>R<sub>z</sub>: {{ r.reaction_Rz | fmt }} <span class="result__unit">kN</span></td>
+                            <td>R<sub>z</sub> (des.): {{ r.design_Rz | fmt }} <span class="result__unit">kN</span></td>
+                        </tr>
                     </tbody>
                 </table>
             </td>
