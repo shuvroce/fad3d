@@ -6,7 +6,7 @@
 <table class="result__glass-table">
     <thead>
         <tr>
-            <th style="width: 23%;">Type</th>
+            <th style="width: 22%;">Type</th>
             <th>Params</th>
         </tr>
     </thead>
@@ -17,6 +17,7 @@
             <td class="result__param-attrs">
                 <p>Size: <span class="result__value-text">{{ r.length | fmt }} × {{ r.width | fmt }}</span><span class="result__unit"> mm</span></p>
                 <p>Eff. Area: <span class="result__value-text">{{ r.A_eff | fmt }}</span><span class="result__unit"> m²</span></p>
+                <p>Aspect Ratio: <span class="result__value-text">{{ r.aspect_ratio | fmt }}</span></p>
                 {% if r.wind_auto %}
                 <p>Wind Load: <span class="result__value-text">{{ r.wind_load | fmt }}</span><span class="result__unit"> kPa <span class="result__badge result__badge--auto">auto</span></span></p>
                 {% endif %}

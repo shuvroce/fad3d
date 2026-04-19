@@ -32,7 +32,7 @@ function createSkyDome() {
     const ctx = canvas.getContext('2d');
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#82a9ed');
+    gradient.addColorStop(0, '#6a97e5');
     gradient.addColorStop(0.4, '#c5d6e8');
     gradient.addColorStop(1, '#e2e2e2');
 
@@ -128,6 +128,7 @@ function _initScene(container) {
     buildingGroup = new THREE.Group();
     createBuildingWireframe();
     scene.add(buildingGroup);
+    _fitCameraToBuilding();
 
     initNavCube();
 
@@ -528,6 +529,25 @@ function updateNavCubeOrientation() {
     navCubeCamera.lookAt(0, 0, 0);
 }
 
+// Auto-fit camera to current building extents, preserving viewing angle
+function _fitCameraToBuilding() {
+    const { width, depth, totalHeight } = currentConfig;
+    const centerZ = totalHeight / 2;
+    const diagonal = Math.sqrt(width * width + depth * depth + totalHeight * totalHeight);
+    const fovRad = (camera.fov * Math.PI) / 180;
+    // Distance needed to fit the diagonal within vertical FOV, with padding
+    const distance = (diagonal / 2 / Math.tan(fovRad / 2)) * 1.5;
+
+    // Maintain current viewing direction, just move back along it
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    const newTarget = new THREE.Vector3(0, 0, centerZ);
+    camera.position.copy(newTarget).addScaledVector(dir, distance);
+    controls.target.copy(newTarget);
+    controls.maxDistance = distance * 3;
+    controls.minDistance = Math.max(2, diagonal * 0.1);
+    controls.update();
+}
+
 function updateBuilding(config = {}) {
     let changed = false;
 
@@ -550,12 +570,11 @@ function updateBuilding(config = {}) {
 
     if (config.numFloors !== undefined || config.floorHeight !== undefined) {
         currentConfig.totalHeight = currentConfig.numFloors * currentConfig.floorHeight;
-        const centerZ = currentConfig.totalHeight / 2;
-        controls.target.set(0, 0, centerZ);
     }
 
     if (changed) {
         createBuildingWireframe();
+        _fitCameraToBuilding();
     }
 }
 
@@ -609,7 +628,7 @@ function setupDynamicInputListeners() {
             if (heights.length > 0) {
                 newConfig.numFloors = heights.length;
                 const avgFloorHeight = heights.reduce((a, b) => a + b, 0) / heights.length;
-                newConfig.floorHeight = avgFloorHeight / 1000;
+                newConfig.floorHeight = avgFloorHeight;
             }
         } else {
             const height = safeParseFloat(bHeight?.value);
