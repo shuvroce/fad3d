@@ -32,7 +32,7 @@
         <div class="summary__cat-name">Category {{ loop_index }} | {{ cat.category_name }} 
             {% if cat.frames %}
             {% for frame in cat.frames %}
-                | {{ frame.zone }}
+                | {{ frame.zone_display or frame.zone }}
             {% endfor %}
             {% endif %}
         </div>
@@ -157,7 +157,7 @@
                         <div>{{ frame.transom_name }} (6063-T5)</div>
                     </div>
                 </td>
-                <td>{{ frame.wind_neg_str if frame.wind_neg_str else (frame.wind_neg if frame.wind_neg is not none else '–') }} kPa</td>
+                <td>{{ frame.wind_neg_str if frame.wind_neg_str else (frame.wind_neg if frame.wind_neg is not none else (calc.wind_neg if calc and calc.wind_neg is not none else '–')) }} kPa</td>
                 <td style="padding: 0;">
                     <table class="borderless align__center width__100 summary__inside-table">
                         <tbody>
@@ -203,7 +203,7 @@
             {% for anchor in cat.anchorage %}
             {% set calc = anchor.calc %}
             <tr>
-                <td>Anchorage <span class="summary__side-heading">{% if calc.clump_type == "Box Clump" %}(Box Clump) {% elif calc.clump_type == "U Clump" %}(U Clump) {% else %}(L Clump) {% endif %}</span></td>
+                <td>Anchorage <span class="summary__side-heading">{% if anchor.clump_type == "Box Clump" %}(Box Clump) {% elif anchor.clump_type == "U Clump" %}(U Clump) {% else %}(L Clump) {% endif %}</span></td>
                 <td>
                     <div class="summary__td-list">
                         {% if anchor.clump_type == "Box Clump" %}

@@ -13,7 +13,7 @@ def calc_connection(conn: Dict[str, Any], frame: Dict[str, Any]) -> Optional[Dic
     joint_fy = _to_float(frame.get("joint_fy"))
     joint_fz = _to_float(frame.get("joint_fz"))
 
-    if not joint_fy or not joint_fz:
+    if joint_fy is None or joint_fz is None:
         return None
 
     design_fy = joint_fy * 1.6

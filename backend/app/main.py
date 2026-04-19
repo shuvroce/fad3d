@@ -15,6 +15,12 @@ from calcs.wind_load import compute_wind_loads, location_wind_speeds
 from calcs.calc_utils import _to_float
 from calcs.calc_helpers import precompute_data
 
+_DEBUG_LOG = Path(__file__).parent.parent / "debug_report.log"
+
+def _dlog(msg: str):
+    with open(_DEBUG_LOG, "a", encoding="utf-8") as f:
+        f.write(msg + "\n")
+
 try:
     from tkinter import Tk, PhotoImage
     from tkinter.filedialog import askdirectory
@@ -510,18 +516,37 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
         cat_name = cat.get("name", f"Category {cat_num}")
         inputs = cat.get("inputs", {})
 
+        # Derive geometry from general tab inputs (these are computed values, not DOM fields)
+        _span = _num(inputs.get(f"cat{cat_num}-general-span_length"))
+        _vert = _num(inputs.get(f"cat{cat_num}-general-vertical_spacing"))
+        _floor = _num(inputs.get(f"cat{cat_num}-general-floor_height"))
+        _slab = _num(inputs.get(f"cat{cat_num}-general-slab_thickness"))
+        _ftype = inputs.get(f"cat{cat_num}-general-facade_type") or "cont"
+        _dlog(f"cat{cat_num} general: span={_span} vert={_vert} floor={_floor} slab={_slab} ftype={_ftype}")
+        _dlog(f"cat{cat_num} anchor-type raw: {inputs.get(f'cat{cat_num}-anchor-type')!r}")
+        _dlog(f"cat{cat_num} frame-geometry raw: {inputs.get(f'cat{cat_num}-frame-geometry')!r}")
+        _dlog(f"cat{cat_num} all input keys: {sorted(inputs.keys())}")
+
+        glass_length = ((_floor - _slab) if _slab else _floor) if _ftype == "sfgp" and _floor else _floor
+        glass_width = _span
+        mullion_length = glass_length
+        transom_length = _span
+        tran_spacing = _vert
+        h_a = _slab
+
         glass_units = []
         glass_type = inputs.get(f"cat{cat_num}-glass-type", "sgu")
         prefix = f"cat{cat_num}-glass-{glass_type}"
 
         gu = {
             "glass_type": glass_type,
-            "length": _num(inputs.get(f"{prefix}-length")),
-            "width": _num(inputs.get(f"{prefix}-width")),
-            "wind_load": _num(inputs.get(f"{prefix}-wind_load")),
+            "length": glass_length,
+            "width": glass_width,
+            "wind_load": _num(inputs.get(f"cat{cat_num}-glass-wind_load")),
             "def_criteria": _num(inputs.get("settings-glass-defl-ratio")) or 60,
-            "support_type": inputs.get(f"{prefix}-support_type"),
+            "support_type": inputs.get(f"cat{cat_num}-glass-support_type"),
             "calc_mode": inputs.get(f"cat{cat_num}-glass-calc-mode", "auto"),
+            "zone": inputs.get(f"cat{cat_num}-general-zone") or "zone4",
         }
 
         if glass_type == "sgu":
@@ -584,9 +609,32 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
 
         glass_units.append(gu)
 
+        # Derive glass_thk from glass inputs — not available as a frame DOM field
+        if glass_type == "sgu":
+            _glass_thk = _num(inputs.get(f"cat{cat_num}-glass-sgu-thickness")) or 0
+        elif glass_type == "dgu":
+            _glass_thk = (
+                (_num(inputs.get(f"cat{cat_num}-glass-dgu-thickness1")) or 0)
+                + (_num(inputs.get(f"cat{cat_num}-glass-dgu-gap")) or 0)
+                + (_num(inputs.get(f"cat{cat_num}-glass-dgu-thickness2")) or 0)
+            )
+        elif glass_type == "lgu":
+            _glass_thk = (
+                (_num(inputs.get(f"cat{cat_num}-glass-lgu-thickness1")) or 0)
+                + (_num(inputs.get(f"cat{cat_num}-glass-lgu-thickness2")) or 0)
+            )
+        elif glass_type == "ldgu":
+            _glass_thk = (
+                (_num(inputs.get(f"cat{cat_num}-glass-ldgu-thickness1_1")) or 0)
+                + (_num(inputs.get(f"cat{cat_num}-glass-ldgu-thickness1_2")) or 0)
+                + (_num(inputs.get(f"cat{cat_num}-glass-ldgu-gap")) or 0)
+                + (_num(inputs.get(f"cat{cat_num}-glass-ldgu-thickness2")) or 0)
+            )
+        else:
+            _glass_thk = 0
+
         frame_variant = inputs.get(f"cat{cat_num}-frame-geometry", "regular")
         mullion_type = inputs.get(f"cat{cat_num}-frame-mullion-type", "alu")
-        frame_type = inputs.get(f"cat{cat_num}-frame-frame-type", "cont")
         frame_prefix = f"cat{cat_num}-frame-{frame_variant}-{mullion_type}"
 
         mullion_name = inputs.get(f"{frame_prefix}-mullion") or ""
@@ -603,20 +651,22 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "zone3": "Zone 3 (Roof Corner Zone)",
         }
         _sys_map = {"semi-uni": "Semi-unitized", "uni": "Unitized", "stick": "Stick"}
+        _zone_key = inputs.get(f"cat{cat_num}-general-zone") or "zone4"
         frame = {
             "geometry": frame_variant,
             "mullion_type": "Aluminum + Steel" if mullion_type == "alu-steel" else "Aluminum Only",
-            "frame_type": "Floor-to-floor" if frame_type == "sfgp" else "Continuous",
-            "zone": _zone_map.get(inputs.get(f"cat{cat_num}-general-zone", ""), inputs.get(f"cat{cat_num}-general-zone", "")),
+            "frame_type": "Floor-to-floor" if _ftype == "sfgp" else "Continuous",
+            "zone": _zone_key,
+            "zone_display": _zone_map.get(_zone_key, _zone_key),
             "system_type": _sys_map.get(inputs.get(f"cat{cat_num}-frame-system-type", ""), ""),
-            "width": _num(inputs.get(f"{frame_prefix}-width")),
-            "length": _num(inputs.get(f"{frame_prefix}-length")),
+            "width": transom_length,
+            "length": mullion_length,
             "wind_neg": _num(inputs.get(f"{frame_prefix}-wind_neg")),
             "wind_neg_str": inputs.get(f"{frame_prefix}-wind_neg") or "",
             "wind_pos": _num(inputs.get(f"{frame_prefix}-wind_pos")),
             "wind_pos_str": inputs.get(f"{frame_prefix}-wind_pos") or "",
-            "glass_thk": _num(inputs.get(f"{frame_prefix}-glass_thk")),
-            "tran_spacing": _num(inputs.get(f"{frame_prefix}-tran_spacing")),
+            "glass_thk": _glass_thk or _num(inputs.get(f"{frame_prefix}-glass_thk")) or 0,
+            "tran_spacing": tran_spacing,
             "mullion": mullion_profile,
             "transom": transom_profile,
             "steel": steel_profile,
@@ -659,7 +709,7 @@ def _build_report_data(raw_data: dict, include_summary: bool = False) -> dict:
             "anchor_dia": _num(inputs.get(f"{anchor_prefix}-anchor_dia")),
             "embed_depth": _num(inputs.get(f"{anchor_prefix}-embed_depth")),
             "N_p5": _num(inputs.get(f"{anchor_prefix}-N_p5")),
-            "h_a": _num(inputs.get(f"{anchor_prefix}-h_a")),
+            "h_a": h_a,
             "bp_thk": _num(inputs.get(f"{anchor_prefix}-bp_thk")),
             "anchor_nos": _num(inputs.get(f"{anchor_prefix}-anchor_nos")),
             "C_a1": _num(inputs.get(f"{anchor_prefix}-C_a1")),
@@ -1024,9 +1074,31 @@ async def api_generate_report(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
+@app.post("/api/report/debug/inputs")
+async def api_debug_inputs(request: Request):
+    """Debug endpoint: returns the raw + built report data as JSON."""
+    import json
+    data = await _json(request)
+    try:
+        report_data = _build_report_data(data, include_summary=True)
+        # Redact profile objects (too large), keep keys
+        def _slim(obj, depth=0):
+            if depth > 4: return "..."
+            if isinstance(obj, dict):
+                return {k: _slim(v, depth+1) for k, v in obj.items() if k not in ("mullion", "transom", "steel")}
+            if isinstance(obj, list):
+                return [_slim(i, depth+1) for i in obj]
+            return obj
+        return JSONResponse(_slim(report_data))
+    except Exception as e:
+        import traceback
+        return JSONResponse({"error": str(e), "trace": traceback.format_exc()}, status_code=500)
+
+
 @app.post("/api/report/generate/summary")
 async def api_generate_summary_report(request: Request):
     data = await _json(request)
+    _DEBUG_LOG.write_text("=== SUMMARY REPORT DEBUG ===\n", encoding="utf-8")
     try:
         report_data = _build_report_data(data, include_summary=True)
         pdf_path = _generate_pdf(report_data, "summary-report.html")

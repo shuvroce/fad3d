@@ -22,7 +22,7 @@
             </tr>
             <tr>
                 <td>Façade zone</td>
-                <td>{{ frame.zone }}</td>
+                <td>{{ frame.zone_display or frame.zone }}</td>
             </tr>
             <tr>
                 <td>Façade system type</td>
@@ -78,13 +78,13 @@
             <tr>
                 <td>Therefore, Max. +Ve Wind Pressure</td>
                 <td><i>P<sub>z(+ve)</sub></i></td>
-                <td>{{ frame.wind_pos_str if frame.wind_pos_str else (frame.wind_pos if frame.wind_pos is not none else '–') }} <i>kN/m<sup>2</sup></i></td>
+                <td>{{ frame.wind_pos_str if frame.wind_pos_str else (frame.wind_pos if frame.wind_pos is not none else (calc.wind_pos if calc and calc.wind_pos is not none else '–')) }} <i>kN/m<sup>2</sup></i></td>
                 <td rowspan="2"><i>; from wind load table</i></td>
             </tr>
             <tr>
                 <td style="padding-left: 4rem;">Max. -Ve Wind Pressure</td>
                 <td><i>P<sub>z(-ve)</sub></i></td>
-                <td>{{ frame.wind_neg_str if frame.wind_neg_str else (frame.wind_neg if frame.wind_neg is not none else '–') }} <i>kN/m<sup>2</sup></i></td>
+                <td>{{ frame.wind_neg_str if frame.wind_neg_str else (frame.wind_neg if frame.wind_neg is not none else (calc.wind_neg if calc and calc.wind_neg is not none else '–')) }} <i>kN/m<sup>2</sup></i></td>
             </tr>
         </tbody>
     </table>

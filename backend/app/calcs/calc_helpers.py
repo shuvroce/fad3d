@@ -1,4 +1,5 @@
 from typing import Any, Dict, Optional, Tuple
+from pathlib import Path
 from calcs.calc_utils import _to_float
 from calcs.alum_profile import calc_alum_profile
 from calcs.steel_profile import calc_steel_rhs_profile, calc_steel_iw_profile
@@ -8,6 +9,12 @@ from calcs.connection import calc_connection
 from calcs.anchorage import calc_anchorage
 
 from calcs.wind_load import compute_wind_loads
+
+_DEBUG_LOG = Path(__file__).parent.parent.parent / "debug_report.log"
+
+def _dlog(msg: str):
+    with open(_DEBUG_LOG, "a", encoding="utf-8") as f:
+        f.write(msg + "\n")
 
 def _set_calc(target: Dict[str, Any], calc_data: Optional[Dict[str, Any]]) -> None:
     if calc_data:
@@ -39,20 +46,24 @@ def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
     for cat in data.get("categories", []):
         for gu in cat.get("glass_units", []) or []:
             try:
-                calc_result = calc_glass_unit(gu)
+                calc_result = calc_glass_unit(gu, wind_inputs=computed_wind)
                 _set_calc(gu, calc_result)
                 if calc_result:
-                    for key in ("load_x_area2", "load1_x_area2", "load2_x_area2"):
+                    for key in ("load_x_area2", "load1_x_area2", "load2_x_area2", "wind_load"):
                         if key in calc_result:
                             gu[key] = calc_result[key]
-            except (ValueError, TypeError, ZeroDivisionError):
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                print(f"[DEBUG] calc_glass_unit error: {e}")
                 pass
 
         for frame in cat.get("frames", []) or []:
             try:
-                calc_result = calc_frame(frame, alum_profiles_data, steel_profiles_data)
+                _dlog(f"frame input: geometry={frame.get('geometry')} length={frame.get('length')} width={frame.get('width')} wind_neg={frame.get('wind_neg')} zone={frame.get('zone')} tran_spacing={frame.get('tran_spacing')}")
+                calc_result = calc_frame(frame, alum_profiles_data, steel_profiles_data, wind_inputs=computed_wind)
+                _dlog(f"calc_frame result: {calc_result}")
                 _set_calc(frame, calc_result)
-            except (ValueError, TypeError, ZeroDivisionError):
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                _dlog(f"calc_frame error: {e}")
                 pass
 
         frames = cat.get("frames", []) or []
@@ -65,19 +76,25 @@ def precompute_data(data: Dict[str, Any]) -> Dict[str, Any]:
             for key in ("joint_fy", "joint_fz", "reaction_Ry", "reaction_Rz"):
                 if fc.get(key) is not None:
                     frame_for_downstream[key] = fc[key]
+        _dlog(f"frame_for_downstream forces: joint_fy={frame_for_downstream.get('joint_fy')} joint_fz={frame_for_downstream.get('joint_fz')} reaction_Ry={frame_for_downstream.get('reaction_Ry')} reaction_Rz={frame_for_downstream.get('reaction_Rz')}")
 
         for conn in cat.get("connections", []) or []:
             try:
                 calc_result = calc_connection(conn, frame_for_downstream)
+                _dlog(f"calc_connection result: {calc_result}")
                 _set_calc(conn, calc_result)
-            except (ValueError, TypeError, ZeroDivisionError):
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                _dlog(f"calc_connection error: {e}")
                 pass
 
         for anchor in cat.get("anchorage", []) or []:
             try:
+                _dlog(f"anchor input: clump_type={anchor.get('clump_type')} anchor_dia={anchor.get('anchor_dia')} embed_depth={anchor.get('embed_depth')} h_a={anchor.get('h_a')}")
                 calc_result = calc_anchorage(anchor, frame_for_downstream, alum_profiles_data)
+                _dlog(f"calc_anchorage result keys: {list(calc_result.keys()) if calc_result else None}")
                 _set_calc(anchor, calc_result)
-            except (ValueError, TypeError, ZeroDivisionError):
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                _dlog(f"calc_anchorage error: {e}")
                 pass
 
     return data

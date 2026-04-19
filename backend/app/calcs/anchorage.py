@@ -266,14 +266,17 @@ def calc_anchorage(anchor: Dict[str, Any], frame: Dict[str, Any], alum_profiles_
     if not web_length or not flange_length:
         return None
 
-    # Recalculate reactions if not pre-computed
-    if not reaction_Ry or not reaction_Rz:
+    # Recalculate reactions if not pre-computed (only when values are None, not zero)
+    if reaction_Ry is None or reaction_Rz is None:
         if geometry == "regular":
             mul_w_dead, mul_w_wind, _, _ = frame_loads(glass_thk, frame_type, frame_length, frame_width, tran_spacing, wind_neg)
             reaction_Ry, reaction_Rz = reaction_forces(geometry, frame_type, frame_length, mul_w_dead, mul_w_wind, reaction_Ry, reaction_Rz)
 
-    if not reaction_Ry or not reaction_Rz:
+    # Require at least wind reaction; dead reaction (Rz) can be zero
+    if not reaction_Ry:
         return None
+    if reaction_Rz is None:
+        reaction_Rz = 0.0
 
     design_Ry = reaction_Ry * 1.6
     design_Rz = reaction_Rz * 1.4
