@@ -14,10 +14,7 @@
         <span class="result__label">Wind Speed</span>
         <span class="result__value"><span class="result__value-text">{{ s.wind_speed | fmt }}</span><span class="result__unit"> m/s</span></span>
     </div>
-    <div class="result__item">
-        <span class="result__label">Bldg. Height</span>
-        <span class="result__value"><span class="result__value-text">{{ s.b_height | fmt(1) }}</span><span class="result__unit"> m</span></span>
-    </div>
+
     <div class="result__item">
         <span class="result__label">Imp. Factor</span>
         <span class="result__value"><span class="result__value-text">{{ s.Imp_factor | fmt }}</span></span>
@@ -76,11 +73,11 @@
             <thead>
                 <tr>
                     <th>Lvl</th>
-                    <th>Cumu. (m)</th>
+                    <th>Cm. Ht.</th>
                     <th>K<sub>z</sub></th>
                     <th>K<sub>zt</sub></th>
-                    <th>q<sub>z</sub> (kPa)</th>
-                    <th>P<sub>z</sub> (kPa)</th>
+                    <th>q<sub>z</sub></th>
+                    <th>P<sub>z</sub></th>
                 </tr>
             </thead>
             <tbody>
@@ -110,11 +107,10 @@
         <table class="result__table">
             <thead>
                 <tr>
-                    <th>A<sub>eff</sub> (m²)</th>
-                    <th>P<sub>z4+</sub> (kPa)</th>
-                    <th>P<sub>z4−</sub> (kPa)</th>
-                    <th>P<sub>z5+</sub> (kPa)</th>
-                    <th>P<sub>z5−</sub> (kPa)</th>
+                    <th>A<sub>eff</sub></th>
+                    <th>P<sub>z+</sub></th>
+                    <th>P<sub>z4−</sub></th>
+                    <th>P<sub>z5−</sub></th>
                 </tr>
             </thead>
             <tbody>
@@ -124,7 +120,6 @@
                     <td>{{ area }}</td>
                     <td>{{ row.P_z4_pos | fmt }}</td>
                     <td>{{ row.P_z4_neg | fmt }}</td>
-                    <td>{{ row.P_z5_pos | fmt }}</td>
                     <td>{{ row.P_z5_neg | fmt }}</td>
                 </tr>
                 {% endfor %}
@@ -144,10 +139,10 @@
         <table class="result__table">
             <thead>
                 <tr>
-                    <th>A<sub>eff</sub> (m²)</th>
-                    <th>P<sub>z1−</sub> (kPa)</th>
-                    <th>P<sub>z2−</sub> (kPa)</th>
-                    <th>P<sub>z3−</sub> (kPa)</th>
+                    <th>A<sub>eff</sub></th>
+                    <th>P<sub>z1−</sub></th>
+                    <th>P<sub>z2−</sub></th>
+                    <th>P<sub>z3−</sub></th>
                 </tr>
             </thead>
             <tbody>

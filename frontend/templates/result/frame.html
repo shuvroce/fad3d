@@ -84,7 +84,7 @@
                     <tbody>
                         <tr>
                             <td>I<sub>xx</sub>:</td>
-                            <td colspan="2">{{ (r.I_xa if r.I_xa is defined and r.I_xa is not none else (r.mullion.computed_I_xx if r.mullion and r.mullion.computed_I_xx is defined else '—')) | fmt }} <span class="result__unit">mm⁴</span></td>
+                            <td colspan="2">{{ r.I_xa | fmt }} <span class="result__unit">mm⁴</span></td>
                         </tr>
                         <tr>
                             <td>φM<sub>n</sub>:</td>

@@ -453,6 +453,12 @@ async function _restoreCategories(categories) {
         document.getElementById('cat-add')?.click();
     }
 
+    // Re-populate section dropdowns on freshly created category DOM elements
+    // (initializeCategories above recreates the DOM, clearing any previously populated options)
+    if (frameMod?.populateFrameSectionDropdowns) {
+        frameMod.populateFrameSectionDropdowns();
+    }
+
     // Populate each category
     categories.forEach((catData, index) => {
         const catNum = index + 1;
