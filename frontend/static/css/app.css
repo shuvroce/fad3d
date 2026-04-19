@@ -3827,7 +3827,7 @@ body.no-animations *::after {
 
 /* Wind result sub-section */
 .result__wind-section + .result__wind-section {
-    border-top: 1px solid var(--border-primary);
+    /* border-top: 1px solid var(--border-primary); */
     margin-top: 0.25rem;
     padding-top: 0.25rem;
 }
@@ -4001,12 +4001,12 @@ body.no-animations *::after {
     letter-spacing: 0.04em;
 }
 
-.result__glass-table .result__value-text {
+.result__value-text {
     font-weight: 500;
     font-variant-numeric: tabular-nums;
 }
 
-.result__glass-table .result__unit {
+.result__unit {
     font-size: 0.75em;
     color: var(--text-secondary);
     opacity: 0.8;

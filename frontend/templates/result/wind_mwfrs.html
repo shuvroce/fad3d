@@ -1,0 +1,36 @@
+{% if not r %}
+<div class="result__item result__empty">—</div>
+{% else %}
+{% set mwfrs = r.mwfrs_levels %}
+<div class="result__wind-section-header">MWFRS Pressures at height z</div>
+{% if mwfrs and mwfrs | length %}
+<div class="result__table-wrap">
+    <table class="result__table">
+        <thead>
+            <tr>
+                <th>Lvl</th>
+                <th>Cm. Ht.</th>
+                <th>K<sub>z</sub></th>
+                <th>K<sub>zt</sub></th>
+                <th>q<sub>z</sub></th>
+                <th>P<sub>z</sub><span class="result__unit"> kPa</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in mwfrs %}
+            <tr>
+                <td>{{ row.level }}</td>
+                <td>{{ row.cumu_height | fmt(1) }}</td>
+                <td>{{ row.K_z | fmt }}</td>
+                <td>{{ row.K_zt | fmt }}</td>
+                <td>{{ row.q_z | fmt }}</td>
+                <td>{{ row.P_zw | fmt }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="result__item result__empty">—</div>
+{% endif %}
+{% endif %}

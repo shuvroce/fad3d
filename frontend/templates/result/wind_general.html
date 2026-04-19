@@ -1,0 +1,37 @@
+{% if not r %}
+<div class="result__item result__empty">Enter wind inputs to calculate</div>
+{% else %}
+{% set s = r.summary %}
+{% if s %}
+<div class="result__item">
+    <span class="result__label">Wind Speed:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.wind_speed | fmt }}</span><span class="result__unit"> m/s</span></span>
+</div>
+<div class="result__item">
+    <span class="result__label">Importance Factor:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.Imp_factor | fmt }}</span></span>
+</div>
+<div class="result__item">
+    <span class="result__label">Gust Factor:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.gust_factor | fmt }}</span></span>
+</div>
+<div class="result__item">
+    <span class="result__label">Leeward Ext. Coeffi:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.C_pl | fmt }}</span></span>
+</div>
+<div class="result__item">
+    <span class="result__label">Internal Pressure:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.P_hi | fmt }}</span><span class="result__unit"> kPa</span></span>
+</div>
+<div class="result__item">
+    <span class="result__label">Leeward Pressure:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.P_hl | fmt }}</span><span class="result__unit"> kPa</span></span>
+</div>
+<div class="result__item">
+    <span class="result__label">Sidewall Pressure:</span>
+    <span class="result__value"><span class="result__value-text">{{ s.P_hs | fmt }}</span><span class="result__unit"> kPa</span></span>
+</div>
+{% else %}
+<div class="result__item result__empty">—</div>
+{% endif %}
+{% endif %}

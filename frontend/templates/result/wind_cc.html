@@ -1,0 +1,68 @@
+{% if not r %}
+<div class="result__item result__empty">—</div>
+{% else %}
+{% set wall = r.wall_results %}
+{% set roof = r.roof_results %}
+
+<div class="result__wind-section">
+    <div class="result__wind-section-header">C&amp;C — Wall Pressure at height h</div>
+    {% if wall and wall.keys() | list | length %}
+    <div class="result__table-wrap">
+        <table class="result__table">
+            <thead>
+                <tr>
+                    <th>A<sub>Eff</sub><span class="result__unit"> m²</span></th>
+                    <th>P<sub>z+</sub><span class="result__unit"> kPa</span></th>
+                    <th>P<sub>z4−</sub><span class="result__unit"> kPa</span></th>
+                    <th>P<sub>z5−</sub><span class="result__unit"> kPa</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for area, rows in wall.items() %}
+                {% set row = rows[0] %}
+                <tr>
+                    <td>{{ area }}</td>
+                    <td>{{ row.P_z4_pos | fmt }}</td>
+                    <td>{{ row.P_z4_neg | fmt }}</td>
+                    <td>{{ row.P_z5_neg | fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="result__item result__empty">—</div>
+    {% endif %}
+</div>
+
+<div class="result__wind-section">
+    <div class="result__wind-section-header">C&amp;C — Roof Pressure at height h</div>
+    {% if roof and roof.keys() | list | length %}
+    <div class="result__table-wrap">
+        <table class="result__table">
+            <thead>
+                <tr>
+                    <th>A<sub>Eff</sub><span class="result__unit"> m²</span></th>
+                    <th>P<sub>z1−</sub><span class="result__unit"> kPa</span></th>
+                    <th>P<sub>z2−</sub><span class="result__unit"> kPa</span></th>
+                    <th>P<sub>z3−</sub><span class="result__unit"> kPa</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for area, rows in roof.items() %}
+                {% set row = rows[0] %}
+                <tr>
+                    <td>{{ area }}</td>
+                    <td>{{ row.P_z1_neg | fmt }}</td>
+                    <td>{{ row.P_z2_neg | fmt }}</td>
+                    <td>{{ row.P_z3_neg | fmt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="result__item result__empty">—</div>
+    {% endif %}
+</div>
+{% endif %}

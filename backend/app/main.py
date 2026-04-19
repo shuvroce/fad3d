@@ -182,9 +182,13 @@ async def render_wind_html(request: Request):
         auto_calc = result.get("auto_calc") if result else None
     except Exception:
         auto_calc = None
-    return templates.TemplateResponse(
-        request=request, name="result/wind.html", context={"r": auto_calc}
-    )
+    ctx = {"r": auto_calc}
+    env = templates.env
+    return JSONResponse({
+        "general": env.get_template("result/wind_general.html").render(**ctx),
+        "mwfrs":   env.get_template("result/wind_mwfrs.html").render(**ctx),
+        "cc":      env.get_template("result/wind_cc.html").render(**ctx),
+    })
 
 
 @app.post("/api/calc/frame")

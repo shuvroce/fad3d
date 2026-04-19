@@ -58,9 +58,17 @@ function _renderAnchorage(html) {
 
 // ---- Wind Results ----
 
-function updateWindResults(html) {
-    const frag = html ? document.createRange().createContextualFragment(html) : _empty('—');
-    _setBody('#wind-body', frag);
+function updateWindResults(data) {
+    const sections = [
+        { sel: '#wind-general-body', key: 'general', empty: 'Enter wind inputs to calculate' },
+        { sel: '#wind-mwfrs-body',   key: 'mwfrs',   empty: '—' },
+        { sel: '#wind-cc-body',      key: 'cc',       empty: '—' },
+    ];
+    sections.forEach(({ sel, key, empty }) => {
+        const html = data?.[key] ?? null;
+        const frag = html ? document.createRange().createContextualFragment(html) : _empty(empty);
+        _setBody(sel, frag);
+    });
 }
 
 const _facadeResultsCache = new Map();

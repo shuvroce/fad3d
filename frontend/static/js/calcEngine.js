@@ -354,7 +354,7 @@ function _postHtml(url, body) {
 
 async function runWindCalc() {
     const inputs = collectWindInputs();
-    const result = await _postHtml('/api/render/wind', inputs);
+    const result = await _post('/api/render/wind', inputs);
     updateWindResults(result);
 }
 
