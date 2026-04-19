@@ -65,14 +65,16 @@ def calc_glass_unit(gu: Dict[str, Any], wind_inputs: Optional[Dict] = None) -> O
     A_eff = max(length * width, length * length / 3) / 1000**2
     aspect_ratio = length / width
 
-    # Auto-resolve C&C wind pressure when in auto mode and no manual value given
+    # Auto-resolve C&C wind pressure when in auto mode (always ignores manual wind_load)
     wind_auto = False
-    if calc_mode == "auto" and not wind_load and wind_inputs:
-        zone = gu.get("zone", "zone4")
-        auto_wind = compute_cc_pressure_for_area(A_eff, zone, wind_inputs, _to_float)
-        if auto_wind:
-            wind_load = auto_wind
-            wind_auto = True
+    if calc_mode == "auto":
+        wind_load = None
+        if wind_inputs:
+            zone = gu.get("zone", "zone4")
+            auto_wind = compute_cc_pressure_for_area(A_eff, zone, wind_inputs, _to_float)
+            if auto_wind:
+                wind_load = auto_wind
+                wind_auto = True
 
     result = _base_result(gu, A_eff, aspect_ratio)
     if wind_auto:

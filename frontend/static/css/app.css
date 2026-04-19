@@ -13,7 +13,7 @@
     --input-field-width: 25rem;
     --viewport-width: 60rem;
     --figure-panel-width: 20rem;
-    --result-width: 25rem;
+    --result-width: 26.5rem;
     --modal-width-max: 55rem;
     --modal-width-calculator: 18rem;
     --modal-height: 85vh;
@@ -3140,7 +3140,7 @@ body.no-animations *::after {
 .input__field label {
     font-size: 0.73rem;
     font-weight: 500;
-    margin-bottom: 4px;
+    margin-bottom: 1px;
     color: var(--text-label);
     letter-spacing: 0.3px;
     text-transform: none;
@@ -3941,6 +3941,22 @@ body.no-animations *::after {
 
 .result__subsection-label:first-child {
     margin-top: 0;
+}
+
+.result__side-by-side {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.result__side-by-side .result__inner-table th:not(:last-child),
+.result__side-by-side .result__inner-table td:not(:last-child) {
+    padding-right: 4px;
+}
+
+.result__side-by-side > div {
+    flex: 1;
+    min-width: 0;
 }
 
 .result__ratio-row td {

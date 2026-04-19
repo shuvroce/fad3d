@@ -60,6 +60,8 @@
 {% set beta_N = r[pfx ~ 'beta_N'] %}
 {% set beta_V = r[pfx ~ 'beta_V'] %}
 
+<div class="result__side-by-side">
+<div>
 <div class="result__subsection-label">Tension</div>
 <table class="result__inner-table">
     <tbody>
@@ -91,8 +93,11 @@
         {% endif %}
     </tbody>
 </table>
-
+</div>
+<div>
 {{ anchor_shear(pfx) }}
+</div>
+</div>
 
 {% if interaction is not none %}
 {% set int_limit = 1.0 if (beta_N is not none and beta_V is not none and (beta_N < 0.2 or beta_V < 0.2)) else 1.2 %}
@@ -237,7 +242,7 @@
 <table class="result__glass-table">
     <thead>
         <tr>
-            <th style="width: 22%;">Type</th>
+            <th style="width: 20%;">Type</th>
             <th>Params</th>
         </tr>
     </thead>
@@ -311,8 +316,10 @@
         <tr class="{{ 'result__item-pass' if bp_pass else 'result__item-fail' }}">
             <td class="result__param-type">Base Plate</td>
             <td class="result__param-attrs">
-                {{ base_plate_bearing_section() }}
-                {{ base_plate_tension_section() }}
+                <div class="result__side-by-side">
+                    <div>{{ base_plate_bearing_section() }}</div>
+                    <div>{{ base_plate_tension_section() }}</div>
+                </div>
             </td>
         </tr>
 
@@ -352,8 +359,10 @@
         <tr class="{{ 'result__item-pass' if bp_pass else 'result__item-fail' }}">
             <td class="result__param-type">Base Plate</td>
             <td class="result__param-attrs">
-                {{ base_plate_bearing_section() }}
-                {{ base_plate_tension_section() }}
+                <div class="result__side-by-side">
+                    <div>{{ base_plate_bearing_section() }}</div>
+                    <div>{{ base_plate_tension_section() }}</div>
+                </div>
             </td>
         </tr>
 
