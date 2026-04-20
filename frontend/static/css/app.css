@@ -1349,7 +1349,12 @@ body.no-animations *::after {
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
-    padding: 0.15rem;
+    padding: 0.2rem;
+}
+
+.topbar__icon:hover {
+    background: var(--bg-bullet);
+    border-radius: var(--radius-5);
 }
 
 .topbar__icon-svg {

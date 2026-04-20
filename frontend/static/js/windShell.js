@@ -8,11 +8,11 @@ import * as THREE from 'three';
 
 // ---- Zone config (black/white/gray: lighter = interior, darker = corner) ----
 const ZONE = {
-    z4: { color: 0xc4c1c0, label: 'Zone 4', opacity: 0.5 },  // wall interior
-    z5: { color: 0xa4bbe0, label: 'Zone 5', opacity: 0.5 },  // wall corner
-    z1: { color: 0xc4c1c0, label: 'Zone 1', opacity: 0.85 },  // roof interior
-    z2: { color: 0xeab8ff, label: 'Zone 2', opacity: 0.5 },  // roof edge
-    z3: { color: 0xf59099, label: 'Zone 3', opacity: 0.5 },  // roof corner
+    z4: { color: 0xf3f5d5, label: 'Zone 4', opacity: 0.4 },  // wall interior
+    z5: { color: 0xa4bbe0, label: 'Zone 5', opacity: 0.7 },  // wall corner
+    z1: { color: 0xc4c1c0, label: 'Zone 1', opacity: 0.75 },  // roof interior
+    z2: { color: 0xeab8ff, label: 'Zone 2', opacity: 0.7 },  // roof edge
+    z3: { color: 0xf59099, label: 'Zone 3', opacity: 0.8 },  // roof corner
 };
 
 // ---- Wind direction helpers ----
@@ -42,6 +42,7 @@ let _config = { width: 15, depth: 10, totalHeight: 12.8, numFloors: 4, floorHeig
 let _ccData = null;
 let _windDir = null; // null | '+X' | '-X' | '+Y' | '-Y'
 let _windArrow = null;
+let _pressurePerimeterGroup = null; // Holds perimeter line + arrows
 
 // ---- Public API ----
 
@@ -73,17 +74,20 @@ function initWindShell(scene, renderer, camera) {
             _updateFaceAppearance();
             _updateLabels();
             _updateWindArrow();
+            _updatePressurePerimeterAndLabels();
         } else {
             _windDir = null;
             _syncDirButtons();
             _updateFaceAppearance();
             _updateWindArrow();
+            _updatePressurePerimeterAndLabels();
         }
     });
 
     window.addEventListener('wind-cc-updated', (e) => {
         _ccData = e.detail;
         _updateLabels();
+        _updatePressurePerimeterAndLabels();
     });
 
     // Wind direction radio listeners
@@ -94,6 +98,7 @@ function initWindShell(scene, renderer, camera) {
                 _updateFaceAppearance();
                 _updateLabels();
                 _updateWindArrow();
+                _updatePressurePerimeterAndLabels();
             }
         });
     });
@@ -107,6 +112,7 @@ function setWindDirection(dir) {
     _updateFaceAppearance();
     _updateLabels();
     _updateWindArrow();
+    _updatePressurePerimeterAndLabels();
 }
 
 function updateWindShellGeometry(config) {
@@ -164,6 +170,7 @@ function _rebuild() {
     _updateWindArrow();
     _updateFaceAppearance();
     _updateLabels();
+    _updatePressurePerimeterAndLabels();
 }
 
 function _buildWalls(halfW, halfD, H, ax, ay) {
@@ -459,13 +466,13 @@ function _addDimAnnotation(start, end, leaders, labelText, scaleMult) {
 }
 
 function _makeDimLabel(text, scaleMult = 1) {
-    const fontSize = 22;
+    const fontSize = 20;
     const tmpCanvas = document.createElement('canvas');
     const tmpCtx = tmpCanvas.getContext('2d');
     tmpCtx.font = `600 ${fontSize}px Arial`;
     const textW = tmpCtx.measureText(text).width;
-    const W = Math.ceil(textW) + 15;
-    const H = 28;
+    const W = Math.ceil(textW) + 12;
+    const H = 24;
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
@@ -478,7 +485,33 @@ function _makeDimLabel(text, scaleMult = 1) {
     const texture = new THREE.CanvasTexture(canvas);
     const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set((W / 60) * scaleMult, (H / 60) * scaleMult, 1);
+    sprite.scale.set((W / 65) * scaleMult, (H / 65) * scaleMult, 1);
+    sprite.renderOrder = 10;
+    return sprite;
+}
+
+// ---- Pressure label helper (similar to _makeDimLabel but for pressure values) ----
+function _makePressureLabel(text, scaleMult = 1) {
+    const fontSize = 18;
+    const tmpCanvas = document.createElement('canvas');
+    const tmpCtx = tmpCanvas.getContext('2d');
+    tmpCtx.font = `600 ${fontSize}px Arial`;
+    const textW = tmpCtx.measureText(text).width;
+    const W = Math.ceil(textW) + 12;
+    const H = 24;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(8,8,8,0.72)';
+    ctx.beginPath(); ctx.roundRect(1, 1, W - 2, H - 2, 4); ctx.fill();
+    ctx.font = `600 ${fontSize}px Arial`;
+    ctx.fillStyle = 'rgba(208, 208, 208, 0.88)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, W / 2, H / 2);
+    const texture = new THREE.CanvasTexture(canvas);
+    const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set((W / 65) * scaleMult, (H / 65) * scaleMult, 1);
     sprite.renderOrder = 10;
     return sprite;
 }
@@ -527,7 +560,7 @@ function _isWindward(faceId, isRoof) {
     const wallKey = Object.keys(_WALL_NORMALS).find(k => faceId.startsWith(k));
     if (!wallKey) return null;
     const dot = _WALL_NORMALS[wallKey].dot(_WIND_VECTORS[_windDir]);
-    return dot < -0.5; // front-facing into wind → windward
+    return dot < -0.5; // front-facing into wind → windward (dot < 0 means opposing wind)
 }
 
 // ---- Face appearance (opacity) based on wind direction ----
@@ -537,8 +570,8 @@ function _updateFaceAppearance() {
         const { zoneId, faceId, isRoof, baseOpacity } = mesh.userData;
         const windward = _isWindward(faceId, isRoof);
         let opacity = baseOpacity;
-        if (windward === true)  opacity = Math.min(1, baseOpacity * 1.35); // windward pops
-        if (windward === false) opacity = baseOpacity * 0.70;             // leeward/side dims
+        if (windward === true)  opacity = Math.min(1, baseOpacity * 1.15); // windward pops
+        if (windward === false) opacity = baseOpacity * 1.0;             // leeward/side dims
         mesh.material.opacity = opacity;
     });
 }
@@ -670,6 +703,212 @@ function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     sprite.scale.set((W / 70) * scaleMult, (H / 70) * scaleMult, 1);
     sprite.renderOrder = 10;
     return sprite;
+}
+
+// ---- Pressure value parser ----
+function _getPressureValue(zoneId, windward) {
+    if (!_ccData) return 0;
+    const refArea = '5.0';
+    const wall = _ccData.wall?.[refArea];
+    const roof = _ccData.roof?.[refArea];
+
+    if (windward === null) {
+        // No wind dir — show both +/- but we need a single magnitude? We'll use average of abs? 
+        // For simplicity, return 0 when no direction (could also show zero arrow).
+        return 0;
+    } else if (windward) {
+        // Windward face: positive pressure
+        if (zoneId === 'z4' && wall) return wall.P_z4_pos ?? 0;
+        if (zoneId === 'z5' && wall) return wall.P_z5_pos ?? wall.P_z4_pos ?? 0;
+    } else {
+        // Leeward / side / roof: negative pressure (suction)
+        if (zoneId === 'z4' && wall) return -(wall.P_z4_neg ?? 0); // negative value
+        if (zoneId === 'z5' && wall) return -(wall.P_z5_neg ?? 0);
+        if (zoneId === 'z1' && roof) return -(roof.P_z1_neg ?? 0);
+        if (zoneId === 'z2' && roof) return -(roof.P_z2_neg ?? 0);
+        if (zoneId === 'z3' && roof) return -(roof.P_z3_neg ?? 0);
+    }
+    return 0;
+}
+
+// ---- Pressure perimeter arrows and labels ----
+function _updatePressurePerimeterAndLabels() {
+    // Visibility guard
+    if (!_windShellGroup?.visible) return;
+
+    // Cleanup previous groups
+    if (_pressurePerimeterGroup) {
+        _windShellGroup.remove(_pressurePerimeterGroup);
+        _disposeObject(_pressurePerimeterGroup);
+        _pressurePerimeterGroup = null;
+    }
+
+    // Early exit if no wind direction or no pressure data
+    if (!_windDir || !_ccData) return;
+
+    // Create new groups
+    _pressurePerimeterGroup = new THREE.Group();
+    _pressurePerimeterGroup.name = 'pressurePerimeter';
+    _windShellGroup.add(_pressurePerimeterGroup);
+
+    // Tunable constants
+    const ARROW_SPACING = _config.floorHeight || 3; // floor heights spacing along perimeter
+    const BASE_ARROW_LEN = 1.5;  // meters, minimum visible arrow
+    const PRESSURE_LEN_SCALE = 1.0; // meters per kPa
+    const PERIMETER_OFFSET_INSET = 0.5; // meters, how far inside the face the perimeter line runs
+    const LINE_COLOR = 0xffffff;
+    const LINE_OPACITY = 0.5;
+    const ARROW_COLOR_POS = 0x0000ff; // blue for + pressure
+    const ARROW_COLOR_NEG = 0xff0000; // red for – pressure
+    const ARROW_OPACITY = 0.7;
+    const ARROW_HEAD_SIZE = 1.0; // fixed head size regardless of arrow length
+    const ARROW_HEAD_WIDTH = 0.5; // fixed head width
+
+    // Group zones by faceId to avoid overlapping arrows on shared edges
+    const faces = {};
+    _zoneMeshes.forEach(mesh => {
+        const { zoneId, faceId, isRoof } = mesh.userData;
+        if (!faces[faceId]) {
+            faces[faceId] = { meshes: [], isRoof };
+        }
+        faces[faceId].meshes.push(mesh);
+    });
+
+    // Process each face (not per-zone)
+    Object.entries(faces).forEach(([faceId, { meshes, isRoof }]) => {
+        // Compute outward normal
+        let outward;
+        if (isRoof) {
+            outward = new THREE.Vector3(0, 0, 1);
+        } else {
+            const wallKey = Object.keys(_WALL_NORMALS).find(k => faceId.startsWith(k));
+            outward = wallKey ? _WALL_NORMALS[wallKey].clone() : new THREE.Vector3(0, 0, 1);
+        }
+
+        // Determine windward boolean
+        const windward = _isWindward(faceId, isRoof);
+
+        // Get zone info from first mesh on this face
+        const firstMesh = meshes[0];
+        const { zoneId, w, d } = firstMesh.userData;
+        if (w === undefined || d === undefined) return;
+
+        // Get signed pressure
+        const pressure = _getPressureValue(zoneId, windward);
+
+        // Compute arrow length
+        const arrowLen = BASE_ARROW_LEN + PRESSURE_LEN_SCALE * Math.abs(pressure);
+
+        // Determine arrow direction
+        let arrowDir;
+        if (isRoof) {
+            arrowDir = new THREE.Vector3(0, 0, 1);
+        } else if (windward) {
+            arrowDir = outward.clone().negate();
+        } else {
+            arrowDir = outward.clone();
+        }
+        arrowDir.normalize();
+
+        // Compute outer boundary of all zones on this face in local 2D coordinates
+        // Use first mesh as reference for orientation
+        const refMesh = meshes[0];
+        const refMatrix = refMesh.matrixWorld;
+        const invMatrix = refMatrix.clone().invert();
+        let minU = Infinity, maxU = -Infinity;
+        let minV = Infinity, maxV = -Infinity;
+        meshes.forEach(mesh => {
+            const { w: fw, d: fd } = mesh.userData;
+            const hw = fw / 2, hd = fd / 2;
+            const localCorners = [
+                new THREE.Vector3(-hw, -hd, 0),
+                new THREE.Vector3( hw, -hd, 0),
+                new THREE.Vector3( hw,  hd, 0),
+                new THREE.Vector3(-hw,  hd, 0)
+            ];
+            localCorners.forEach(c => {
+                const worldPos = c.clone().applyMatrix4(mesh.matrixWorld);
+                const localPos = worldPos.clone().applyMatrix4(invMatrix);
+                minU = Math.min(minU, localPos.x);
+                maxU = Math.max(maxU, localPos.x);
+                minV = Math.min(minV, localPos.y);
+                maxV = Math.max(maxV, localPos.y);
+            });
+        });
+
+        // Build outer perimeter points in local coords, then transform to world
+        const offset = PERIMETER_OFFSET_INSET;
+        const localPerimeter = [
+            new THREE.Vector3(minU + offset, minV + offset, 0),
+            new THREE.Vector3(maxU - offset, minV + offset, 0),
+            new THREE.Vector3(maxU - offset, maxV - offset, 0),
+            new THREE.Vector3(minU + offset, maxV - offset, 0)
+        ];
+        const perimeterPoints = localPerimeter.map(p => p.clone().applyMatrix4(refMatrix));
+
+        // Create the perimeter line (closed loop)
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+            ...perimeterPoints,
+            perimeterPoints[0]
+        ]);
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: LINE_COLOR,
+            transparent: true,
+            opacity: LINE_OPACITY
+        });
+        const perimeterLine = new THREE.Line(lineGeometry, lineMaterial);
+        _pressurePerimeterGroup.add(perimeterLine);
+
+        // Place arrows at uniform intervals along the perimeter
+        let perimeterLength = 0;
+        const segments = [];
+        for (let i = 0; i < perimeterPoints.length; i++) {
+            const next = (i + 1) % perimeterPoints.length;
+            const segStart = perimeterPoints[i];
+            const segEnd = perimeterPoints[next];
+            const segLength = segStart.distanceTo(segEnd);
+            segments.push({ start: segStart, end: segEnd, length: segLength });
+            perimeterLength += segLength;
+        }
+
+        if (perimeterLength > 0) {
+            segments.forEach(segment => {
+                const segStart = segment.start;
+                const segEnd = segment.end;
+                const segLen = segment.length;
+                const nArrowsOnSeg = Math.max(1, Math.ceil(segLen / ARROW_SPACING));
+                for (let i = 0; i < nArrowsOnSeg; i++) {
+                    const t = i / Math.max(nArrowsOnSeg - 1, 1);
+                    const point = segStart.clone().lerp(segEnd, t);
+
+                    let arrowOrigin;
+                    if (isRoof) {
+                        arrowOrigin = point.clone();
+                    } else if (windward) {
+                        arrowOrigin = point.clone().add(outward.clone().multiplyScalar(arrowLen));
+                    } else {
+                        arrowOrigin = point.clone();
+                    }
+
+                    // Arrow color: use zone's color
+                    const arrowColor = ZONE[zoneId].color;
+                    const arrowHelper = new THREE.ArrowHelper(
+                        arrowDir,
+                        arrowOrigin,
+                        arrowLen,
+                        arrowColor,
+                        ARROW_HEAD_SIZE,
+                        ARROW_HEAD_WIDTH
+                    );
+                    arrowHelper.line.material.transparent = true;
+                    arrowHelper.line.material.opacity = ARROW_OPACITY;
+                    arrowHelper.cone.material.transparent = true;
+                    arrowHelper.cone.material.opacity = ARROW_OPACITY;
+                    _pressurePerimeterGroup.add(arrowHelper);
+                }
+            });
+        }
+    });
 }
 
 // ---- Per-frame label visibility (back-facing labels fade out) ----
