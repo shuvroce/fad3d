@@ -190,10 +190,21 @@ async def render_wind_html(request: Request):
         auto_calc = None
     ctx = {"r": auto_calc}
     env = templates.env
+
+    # Extract raw C&C data for 3D zone visualization
+    wall_r = auto_calc.get("wall_results", {}) if auto_calc else {}
+    roof_r = auto_calc.get("roof_results", {}) if auto_calc else {}
+    # Serialize with string keys (JSON only supports string keys)
+    cc_data = {
+        "wall": {str(k): v[0] for k, v in wall_r.items() if v},
+        "roof": {str(k): v[0] for k, v in roof_r.items() if v},
+    }
+
     return JSONResponse({
         "general": env.get_template("result/wind_general.html").render(**ctx),
         "mwfrs":   env.get_template("result/wind_mwfrs.html").render(**ctx),
         "cc":      env.get_template("result/wind_cc.html").render(**ctx),
+        "cc_data": cc_data,
     })
 
 

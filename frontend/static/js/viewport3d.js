@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { initWindShell, updateWindShellGeometry, tickWindShell } from './windShell.js';
 
 let scene, camera, renderer, controls;
 let buildingGroup, navCubeScene, navCubeCamera, navCubeRenderer, navCube;
@@ -129,6 +130,15 @@ function _initScene(container) {
     createBuildingWireframe();
     scene.add(buildingGroup);
     _fitCameraToBuilding();
+
+    // Initialize wind shell (hidden by default, shown in wind mode)
+    initWindShell(scene, renderer, camera);
+    updateWindShellGeometry({ width: currentConfig.width, depth: currentConfig.depth, totalHeight: currentConfig.totalHeight });
+
+    // Hide wireframe when in wind mode, restore when switching back
+    window.addEventListener('panel-mode-changed', (e) => {
+        buildingGroup.visible = e.detail.mode !== 'wind';
+    });
 
     initNavCube();
 
@@ -505,6 +515,7 @@ function animate() {
 
     controls.update();
     renderer.render(scene, camera);
+    tickWindShell(camera);
 
     if (navCubeScene && navCubeCamera && navCubeRenderer && navCube) {
         updateNavCubeOrientation();
@@ -567,6 +578,11 @@ function updateBuilding(config = {}) {
         currentConfig.numFloors = config.numFloors;
         changed = true;
     }
+    // Allow direct totalHeight override (e.g. from b_height input)
+    if (config.totalHeight !== undefined && config.totalHeight > 0) {
+        currentConfig.totalHeight = config.totalHeight;
+        changed = true;
+    }
 
     if (config.numFloors !== undefined || config.floorHeight !== undefined) {
         currentConfig.totalHeight = currentConfig.numFloors * currentConfig.floorHeight;
@@ -575,6 +591,11 @@ function updateBuilding(config = {}) {
     if (changed) {
         createBuildingWireframe();
         _fitCameraToBuilding();
+        updateWindShellGeometry({
+            width: currentConfig.width,
+            depth: currentConfig.depth,
+            totalHeight: currentConfig.totalHeight,
+        });
     }
 }
 

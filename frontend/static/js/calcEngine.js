@@ -356,6 +356,13 @@ async function runWindCalc() {
     const inputs = collectWindInputs();
     const result = await _post('/api/render/wind', inputs);
     updateWindResults(result);
+
+    // Dispatch raw CC data for wind 3D shell visualization
+    if (result?.cc_data) {
+        window.dispatchEvent(new CustomEvent('wind-cc-updated', {
+            detail: { ...result.cc_data, inputs },
+        }));
+    }
 }
 
 async function runCategoryCalc(catNum) {

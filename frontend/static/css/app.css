@@ -3428,6 +3428,54 @@ body.no-animations *::after {
     display: block;
 }
 
+/* ---- Wind Zone Legend ---- */
+.wind-zone-legend {
+    position: absolute;
+    bottom: 1.5rem;
+    left: calc(var(--catbar-width) + var(--input-field-width) + 1.5rem);
+    background: var(--bg-primary);
+    border-radius: var(--radius-2);
+    padding: 0.8rem;
+    display: none;
+    gap: 0.4rem;
+    z-index: 10;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: var(--shadow-box);
+}
+
+.wind-zone-legend.visible {
+    display: flex;
+    flex-direction: column;
+}
+
+.wind-zone-legend__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted, #3a4149);
+    margin-bottom: 0.3rem;
+    text-align: center;
+}
+
+.wind-zone-legend__item {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary, #b0bec5);
+}
+
+.wind-zone-legend__swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+
+
 #nav-cube-container {
     position: fixed;
     bottom: 1rem;
