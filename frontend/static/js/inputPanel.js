@@ -24,6 +24,7 @@ let savedFacadeContent = ""; // Store facade panel content when switching to win
 let savedCatbarContent = ""; // Store catbar content when switching to wind
 let cachedWindInputs = {}; // Cache wind inputs when panel is not in DOM
 let cachedCategoryData = []; // Cache category data when switching to wind mode
+let _isRestoringWindInputs = false; // Flag to skip caching during restore
 
 const WIND_INPUT_IDS = [
     'b_length', 'b_width', 'b_height', 'b_floor_heights',
@@ -35,10 +36,19 @@ const WIND_INPUT_IDS = [
 ];
 
 function cacheWindInputs() {
+    if (_isRestoringWindInputs) {
+        console.log('[cacheWindInputs] Skipping during restore');
+        return;
+    }
+    console.log('[cacheWindInputs] Caching wind inputs...');
     WIND_INPUT_IDS.forEach(id => {
         const el = document.getElementById(id);
-        if (el) cachedWindInputs[id] = el.value;
+        if (el) {
+            cachedWindInputs[id] = el.value;
+            console.log(`[cacheWindInputs] ${id} = ${el.value}`);
+        }
     });
+    console.log('[cacheWindInputs] Cached:', cachedWindInputs);
 }
 
 function setWindInputsCache(data) {
@@ -46,11 +56,17 @@ function setWindInputsCache(data) {
 }
 
 function restoreCachedWindInputs() {
+    console.log('[restoreCachedWindInputs] Starting restore');
+    _isRestoringWindInputs = true;
+    console.log('[restoreCachedWindInputs] b_length in cache:', cachedWindInputs['b_length']);
+    console.log('[restoreCachedWindInputs] b_width in cache:', cachedWindInputs['b_width']);
+    console.log('[restoreCachedWindInputs] Full cache:', cachedWindInputs);
     WIND_INPUT_IDS.forEach(id => {
         if (cachedWindInputs[id] != null) {
             const el = document.getElementById(id);
             if (el) {
                 el.value = cachedWindInputs[id];
+                console.log(`[restoreCachedWindInputs] Restored ${id} = ${el.value}`);
                 // Sync radio card active state
                 const group = document.querySelector(`[data-radio-target="${id}"]`);
                 if (group) {
@@ -61,8 +77,12 @@ function restoreCachedWindInputs() {
                 // Dispatch change event for dependent handlers
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             }
+        } else {
+            console.log(`[restoreCachedWindInputs] Skipping ${id}, no cached value`);
         }
     });
+    _isRestoringWindInputs = false;
+    console.log('[restoreCachedWindInputs] Done, cache preserved:', cachedWindInputs);
 }
 
 function getWindInputsForSave() {
@@ -122,6 +142,8 @@ function switchPanelMode(mode) {
     catbar.classList.add(exitClass);
     if (toggleBtn) toggleBtn.classList.add(exitClass);
 
+    console.log(`[switchPanelMode] Switching from ${currentPanelMode} to ${mode}, will cache:`, mode === 'facade');
+
     setTimeout(() => {
         inputContainer.classList.remove(exitClass);
         catbar.classList.remove(exitClass);
@@ -170,6 +192,11 @@ function switchPanelMode(mode) {
 
             initializeWindPanel();
         } else {
+            // Cache wind inputs before switching to facade
+            console.log('[switchPanelMode] About to cache for facade switch');
+            cacheWindInputs();
+            console.log('[switchPanelMode] After caching, cached:', cachedWindInputs);
+
             // Restore saved facade categories
             if (savedFacadeContent) {
                 inputContainer.innerHTML = savedFacadeContent;
@@ -309,6 +336,7 @@ function _updateFlexFieldsVisibility() {
 
 // Function to initialize wind panel event listeners
 function initializeWindPanel() {
+    console.log('[initializeWindPanel] Called');
     // Restore cached wind inputs (from .fad load or previous mode switch)
     restoreCachedWindInputs();
 
