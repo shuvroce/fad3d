@@ -320,11 +320,35 @@ function _buildFloorLines(halfW, halfD, H) {
             [[-halfW, -halfD, z], [halfW, -halfD, z]], // front
             [[-halfW,  halfD, z], [halfW,  halfD, z]], // back
             [[-halfW, -halfD, z], [-halfW, halfD, z]], // left
-            [[ halfW, -halfD, z], [ halfW, halfD, z]], // right
+            [[ halfW, -halfD, z], [ halfW,  halfD, z]], // right
         ].forEach(([a, b]) => {
             const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
             _windShellGroup.add(new THREE.Line(geo, mat.clone()));
         });
+    }
+    _buildFloorSlabs(halfW, halfD, H);
+}
+
+function _buildFloorSlabs(halfW, halfD, H) {
+    const { numFloors, floorHeight } = _config;
+    if (!numFloors || numFloors <= 1 || !floorHeight) return;
+
+    const slabGeo = new THREE.PlaneGeometry(2 * halfW, 2 * halfD);
+    const slabMat = new THREE.MeshPhongMaterial({
+        color: 0xa0a0a0,
+        transparent: true,
+        opacity: 0.08,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+    });
+
+    for (let f = 1; f < numFloors; f++) {
+        const z = f * floorHeight;
+        if (z >= H - 0.01) continue;
+        const slab = new THREE.Mesh(slabGeo, slabMat.clone());
+        slab.position.set(0, 0, z);
+        slab.renderOrder = 0;
+        _windShellGroup.add(slab);
     }
 }
 
