@@ -872,6 +872,7 @@ function _updatePressurePerimeterAndLabels() {
         }
 
         if (perimeterLength > 0) {
+            const arrowPositions = [];
             segments.forEach(segment => {
                 const segStart = segment.start;
                 const segEnd = segment.end;
@@ -890,7 +891,10 @@ function _updatePressurePerimeterAndLabels() {
                         arrowOrigin = point.clone();
                     }
 
-                    // Arrow color: use zone's color
+                    const arrowHead = arrowOrigin.clone().add(arrowDir.clone().multiplyScalar(arrowLen));
+
+                    arrowPositions.push({ origin: arrowOrigin, head: arrowHead });
+
                     const arrowColor = ZONE[zoneId].color;
                     const arrowHelper = new THREE.ArrowHelper(
                         arrowDir,
@@ -907,6 +911,27 @@ function _updatePressurePerimeterAndLabels() {
                     _pressurePerimeterGroup.add(arrowHelper);
                 }
             });
+
+            if (arrowPositions.length > 1) {
+                const tailPoints = arrowPositions.map(a => a.origin);
+                const headPoints = arrowPositions.map(a => a.head);
+
+                const tailLineGeo = new THREE.BufferGeometry().setFromPoints([...tailPoints, tailPoints[0]]);
+                const tailLineMat = new THREE.LineBasicMaterial({
+                    color: ZONE[zoneId].color,
+                    transparent: true,
+                    opacity: LINE_OPACITY
+                });
+                _pressurePerimeterGroup.add(new THREE.Line(tailLineGeo, tailLineMat));
+
+                const headLineGeo = new THREE.BufferGeometry().setFromPoints([...headPoints, headPoints[0]]);
+                const headLineMat = new THREE.LineBasicMaterial({
+                    color: ZONE[zoneId].color,
+                    transparent: true,
+                    opacity: LINE_OPACITY
+                });
+                _pressurePerimeterGroup.add(new THREE.Line(headLineGeo, headLineMat));
+            }
         }
     });
 }
