@@ -459,13 +459,13 @@ function _addDimAnnotation(start, end, leaders, labelText, scaleMult) {
 }
 
 function _makeDimLabel(text, scaleMult = 1) {
-    const fontSize = 14;
+    const fontSize = 22;
     const tmpCanvas = document.createElement('canvas');
     const tmpCtx = tmpCanvas.getContext('2d');
     tmpCtx.font = `600 ${fontSize}px Arial`;
     const textW = tmpCtx.measureText(text).width;
-    const W = Math.ceil(textW) + 12;
-    const H = 24;
+    const W = Math.ceil(textW) + 15;
+    const H = 28;
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
@@ -478,7 +478,7 @@ function _makeDimLabel(text, scaleMult = 1) {
     const texture = new THREE.CanvasTexture(canvas);
     const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set((W / 70) * scaleMult, (H / 70) * scaleMult, 1);
+    sprite.scale.set((W / 60) * scaleMult, (H / 60) * scaleMult, 1);
     sprite.renderOrder = 10;
     return sprite;
 }
