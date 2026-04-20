@@ -2744,7 +2744,7 @@ body.no-animations *::after {
 }
 
 .left__panel.wind-mode:has(.input__slide-unit.collapsed) {
-    transform: translateX(calc(-1 * (var(--catbar-width) + var(--input-field-width) + 0.5rem)));
+    transform: translateX(calc(-1 * (var(--catbar-width) + var(--input-field-width) + 0.75rem)));
 }
 
 .panel__toggle-icon {
@@ -3589,6 +3589,12 @@ body.no-animations *::after {
     pointer-events: none;
     white-space: nowrap;
     box-shadow: var(--shadow-box);
+    transition: left 0.2s ease;
+}
+
+/* Move wind zone legend when left panel is collapsed */
+.left__panel:has(.input__slide-unit.collapsed) ~ .viewport__container .wind-zone-legend {
+    left: 0.75rem;
 }
 
 .wind-zone-legend.visible {
