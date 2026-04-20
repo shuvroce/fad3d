@@ -1327,8 +1327,8 @@ body.no-animations *::after {
 }
 
 .topbar__icon-btn {
-    width: 26px;
-    height: 26px;
+    /* width: 26px; */
+    /* height: 26px; */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1349,6 +1349,7 @@ body.no-animations *::after {
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
+    padding: 0.15rem;
 }
 
 .topbar__icon-svg {
