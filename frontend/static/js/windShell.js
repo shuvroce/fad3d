@@ -8,11 +8,27 @@ import * as THREE from 'three';
 
 // ---- Zone config (black/white/gray: lighter = interior, darker = corner) ----
 const ZONE = {
-    z4: { color: 0xc3dbc7, label: 'Zone 4', opacity: 0.5 },  // wall interior
+    z4: { color: 0xc4c1c0, label: 'Zone 4', opacity: 0.5 },  // wall interior
     z5: { color: 0xa4bbe0, label: 'Zone 5', opacity: 0.5 },  // wall corner
-    z1: { color: 0xfaffb0, label: 'Zone 1', opacity: 0.5 },  // roof interior
+    z1: { color: 0xc4c1c0, label: 'Zone 1', opacity: 0.85 },  // roof interior
     z2: { color: 0xeab8ff, label: 'Zone 2', opacity: 0.5 },  // roof edge
     z3: { color: 0xf59099, label: 'Zone 3', opacity: 0.5 },  // roof corner
+};
+
+// ---- Wind direction helpers ----
+const _WIND_VECTORS = {
+    '+X': new THREE.Vector3( 1, 0, 0),
+    '-X': new THREE.Vector3(-1, 0, 0),
+    '+Y': new THREE.Vector3( 0, 1, 0),
+    '-Y': new THREE.Vector3( 0,-1, 0),
+};
+
+// Outward normals for each wall face (from faceId prefix)
+const _WALL_NORMALS = {
+    front: new THREE.Vector3( 0,-1, 0),
+    back:  new THREE.Vector3( 0, 1, 0),
+    left:  new THREE.Vector3(-1, 0, 0),
+    right: new THREE.Vector3( 1, 0, 0),
 };
 
 // ---- Module state ----
@@ -22,8 +38,10 @@ let _camera = null;
 let _windShellGroup = null;
 let _labelsGroup = null;
 let _zoneMeshes = [];
-let _config = { width: 15, depth: 10, totalHeight: 12.8 };
+let _config = { width: 15, depth: 10, totalHeight: 12.8, numFloors: 4, floorHeight: 3.2 };
 let _ccData = null;
+let _windDir = null; // null | '+X' | '-X' | '+Y' | '-Y'
+let _windArrow = null;
 
 // ---- Public API ----
 
@@ -43,9 +61,24 @@ function initWindShell(scene, renderer, camera) {
     scene.add(_windShellGroup);
 
     window.addEventListener('panel-mode-changed', (e) => {
-        _windShellGroup.visible = e.detail.mode === 'wind';
+        const isWind = e.detail.mode === 'wind';
+        _windShellGroup.visible = isWind;
         const legend = document.getElementById('wind-zone-legend');
-        if (legend) legend.classList.toggle('visible', e.detail.mode === 'wind');
+        if (legend) legend.classList.toggle('visible', isWind);
+        const windSection = document.getElementById('filter-wind-section');
+        if (windSection) windSection.classList.toggle('visible', isWind);
+        if (isWind) {
+            _windDir = '+X';
+            _syncDirButtons();
+            _updateFaceAppearance();
+            _updateLabels();
+            _updateWindArrow();
+        } else {
+            _windDir = null;
+            _syncDirButtons();
+            _updateFaceAppearance();
+            _updateWindArrow();
+        }
     });
 
     window.addEventListener('wind-cc-updated', (e) => {
@@ -53,7 +86,27 @@ function initWindShell(scene, renderer, camera) {
         _updateLabels();
     });
 
+    // Wind direction radio listeners
+    document.querySelectorAll('.wind-dir-radio').forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.checked) {
+                _windDir = radio.value;
+                _updateFaceAppearance();
+                _updateLabels();
+                _updateWindArrow();
+            }
+        });
+    });
+
     console.log('[WindShell] Initialized');
+}
+
+function setWindDirection(dir) {
+    _windDir = dir;
+    _syncDirButtons();
+    _updateFaceAppearance();
+    _updateLabels();
+    _updateWindArrow();
 }
 
 function updateWindShellGeometry(config) {
@@ -61,7 +114,17 @@ function updateWindShellGeometry(config) {
     if (config.width !== undefined && config.width > 0) _config.width = config.width;
     if (config.depth !== undefined && config.depth > 0) _config.depth = config.depth;
     if (config.totalHeight !== undefined && config.totalHeight > 0) _config.totalHeight = config.totalHeight;
+    if (config.numFloors !== undefined && config.numFloors > 0) _config.numFloors = config.numFloors;
+    if (config.floorHeight !== undefined && config.floorHeight > 0) _config.floorHeight = config.floorHeight;
     _rebuild();
+}
+
+// ---- Wind direction button sync ----
+
+function _syncDirButtons() {
+    document.querySelectorAll('.wind-dir-radio').forEach(radio => {
+        radio.checked = radio.value === _windDir;
+    });
 }
 
 // ---- Zone width (ASCE 7-16 §26.2) ----
@@ -76,6 +139,7 @@ function _zoneA(L, B, H) {
 
 function _rebuild() {
     _zoneMeshes = [];
+    _windArrow = null; // will be re-created by _updateWindArrow below
 
     // Remove all non-labels children and rebuild
     const toRemove = [];
@@ -94,6 +158,11 @@ function _rebuild() {
     _buildWalls(halfW, halfD, H, ax, ay);
     _buildRoof(halfW, halfD, H, ax, ay);
     _buildZoneEdgeLines(halfW, halfD, H, ax, ay);
+    _buildFloorLines(halfW, halfD, H);
+    _buildGroundShadow(halfW, halfD, H);
+    _buildDimensionLines(halfW, halfD, H);
+    _updateWindArrow();
+    _updateFaceAppearance();
     _updateLabels();
 }
 
@@ -175,8 +244,7 @@ function _addZone(zoneId, w, d, pos, rot, faceId, isRoof = false) {
 }
 
 function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
-    const lineColor = 0xcccccc;
-    const lineMat = new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: 0.25 });
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x999999 });
 
     // Vertical boundary lines on walls at ±ax from wall ends
     const wallLineSegs = [
@@ -232,6 +300,249 @@ function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
     });
 }
 
+// ---- Floor division lines ----
+
+function _buildFloorLines(halfW, halfD, H) {
+    const { numFloors, floorHeight } = _config;
+    if (!numFloors || numFloors <= 1 || !floorHeight) return;
+    const mat = new THREE.LineBasicMaterial({ color: 0x999999 });
+    for (let f = 1; f < numFloors; f++) {
+        const z = f * floorHeight;
+        if (z >= H - 0.01) continue;
+        [
+            [[-halfW, -halfD, z], [halfW, -halfD, z]], // front
+            [[-halfW,  halfD, z], [halfW,  halfD, z]], // back
+            [[-halfW, -halfD, z], [-halfW, halfD, z]], // left
+            [[ halfW, -halfD, z], [ halfW, halfD, z]], // right
+        ].forEach(([a, b]) => {
+            const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
+            _windShellGroup.add(new THREE.Line(geo, mat.clone()));
+        });
+    }
+}
+
+// ---- Ground shadow (projected from directional light at (20, -15, 30)) ----
+// Shadow ratio per unit of height derived from lightDir = normalize(-20, 15, -30):
+//   shadow_x_shift = -0.3 * z,  shadow_y_shift = +0.25 * z
+
+function _buildGroundShadow(halfW, halfD, H) {
+    const px = 0.3 * H;
+    const py = 0.25 * H;
+
+    // 6-point shadow polygon vertices (world XY)
+    const verts = [
+        [-halfW,        -halfD      ],
+        [ halfW,        -halfD      ],
+        [ halfW,         halfD      ],
+        [ halfW - px,    halfD + py ],
+        [-halfW - px,    halfD + py ],
+        [-halfW - px,   -halfD + py ],
+    ];
+
+    // Bounding box of shadow polygon
+    const minX = -halfW - px, maxX =  halfW;
+    const minY = -halfD,      maxY =  halfD + py;
+    const worldW = maxX - minX;
+    const worldD = maxY - minY;
+
+    // Canvas with margin so blur doesn't get clipped at edges
+    const CANVAS = 512;
+    const margin = 0.45; // fraction of longest side (increased for shadow projection)
+    const mX = worldW * margin, mY = worldD * margin;
+    const totalW = worldW + 2 * mX;
+    const totalD = worldD + 2 * mY;
+    const maxDim = Math.max(totalW, totalD);
+    const ppu = CANVAS / maxDim;
+
+    const cw = Math.ceil(totalW * ppu);
+    const ch = Math.ceil(totalD * ppu);
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+
+    // World → canvas pixel (canvas Y is flipped)
+    const cx = (x) => (x - minX + mX) * ppu;
+    const cy = (y) => ch - (y - minY + mY) * ppu;
+
+    // Blur radius ~8% of canvas short side
+    const blurPx = Math.max(6, Math.min(cw, ch) * 0.10);
+    ctx.filter = `blur(${blurPx}px)`;
+    ctx.fillStyle = 'rgba(24, 24, 24, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(cx(verts[0][0]), cy(verts[0][1]));
+    for (let i = 1; i < verts.length; i++) ctx.lineTo(cx(verts[i][0]), cy(verts[i][1]));
+    ctx.closePath();
+    ctx.fill();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const geo = new THREE.PlaneGeometry(totalW, totalD);
+    const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set((minX + maxX) / 2, (minY + maxY) / 2, -0.02);
+    mesh.renderOrder = 0;
+    _windShellGroup.add(mesh);
+}
+
+// ---- Dimension annotation lines ----
+
+function _buildDimensionLines(halfW, halfD, H) {
+    const { width: L, depth: B, totalHeight: Ht } = _config;
+    const refDim = Math.min(L, B, Ht);
+    const scaleMult = Math.max(0.6, refDim / 10);
+    const off = Math.max(1.2, Math.min(L, B) * 0.12); // leader offset from building face
+
+    // Length (X): in front of front wall at z=0
+    _addDimAnnotation(
+        new THREE.Vector3(-halfW, -halfD - off, 0),
+        new THREE.Vector3( halfW, -halfD - off, 0),
+        [ [new THREE.Vector3(-halfW, -halfD, 0), new THREE.Vector3(-halfW, -halfD - off, 0)],
+          [new THREE.Vector3( halfW, -halfD, 0), new THREE.Vector3( halfW, -halfD - off, 0)] ],
+        `${L.toFixed(1)} m`, scaleMult
+    );
+
+    // Depth (Y): to the right of right wall at z=0
+    _addDimAnnotation(
+        new THREE.Vector3(halfW + off, -halfD, 0),
+        new THREE.Vector3(halfW + off,  halfD, 0),
+        [ [new THREE.Vector3(halfW, -halfD, 0), new THREE.Vector3(halfW + off, -halfD, 0)],
+          [new THREE.Vector3(halfW,  halfD, 0), new THREE.Vector3(halfW + off,  halfD, 0)] ],
+        `${B.toFixed(1)} m`, scaleMult
+    );
+
+    // Height (Z): 45° diagonal from front-left corner (offset in -X/-Y direction)
+    const diagOff = off / Math.SQRT2;
+    _addDimAnnotation(
+        new THREE.Vector3(-halfW - diagOff, -halfD - diagOff, 0),
+        new THREE.Vector3(-halfW - diagOff, -halfD - diagOff, H),
+        [ [new THREE.Vector3(-halfW, -halfD, 0), new THREE.Vector3(-halfW - diagOff, -halfD - diagOff, 0)],
+          [new THREE.Vector3(-halfW, -halfD, H), new THREE.Vector3(-halfW - diagOff, -halfD - diagOff, H)] ],
+        `${Ht.toFixed(1)} m`, scaleMult
+    );
+}
+
+function _addDimAnnotation(start, end, leaders, labelText, scaleMult) {
+    const mat = new THREE.LineBasicMaterial({ color: 0xa1a1a1 });
+
+    // Extension length for dimension line beyond endpoints
+    const extLen = 0.2 * scaleMult;
+    const dir = end.clone().sub(start).normalize();
+    const extStart = start.clone().sub(dir.clone().multiplyScalar(extLen));
+    const extEnd = end.clone().add(dir.clone().multiplyScalar(extLen));
+
+    const mainGeo = new THREE.BufferGeometry().setFromPoints([extStart, extEnd]);
+    _windShellGroup.add(new THREE.Line(mainGeo, mat.clone()));
+
+    leaders.forEach(([a, b]) => {
+        const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
+        _windShellGroup.add(new THREE.Line(geo, mat.clone()));
+    });
+
+    // Architectural cross ticks (45° marks at dimension line endpoints)
+    const tickSize = 0.25 * scaleMult;
+    const perp = new THREE.Vector3(-dir.y, dir.x, 0).normalize();
+    const diag = new THREE.Vector3(dir.y, -dir.x, 0).normalize().multiplyScalar(tickSize);
+
+    // All dimensions use 45° cross tick (architectural style)
+    const tickStart1 = start.clone().add(diag);
+    const tickStart2 = start.clone().sub(diag);
+    const tickEnd1 = end.clone().add(diag);
+    const tickEnd2 = end.clone().sub(diag);
+    _windShellGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickStart1, tickStart2]), mat.clone()));
+    _windShellGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickEnd1, tickEnd2]), mat.clone()));
+
+    const mid = start.clone().add(end).multiplyScalar(0.5);
+    const sprite = _makeDimLabel(labelText, scaleMult);
+    sprite.position.copy(mid);
+    _windShellGroup.add(sprite);
+}
+
+function _makeDimLabel(text, scaleMult = 1) {
+    const fontSize = 14;
+    const tmpCanvas = document.createElement('canvas');
+    const tmpCtx = tmpCanvas.getContext('2d');
+    tmpCtx.font = `600 ${fontSize}px Arial`;
+    const textW = tmpCtx.measureText(text).width;
+    const W = Math.ceil(textW) + 12;
+    const H = 24;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(8,8,8,0.72)';
+    ctx.beginPath(); ctx.roundRect(1, 1, W - 2, H - 2, 4); ctx.fill();
+    ctx.font = `600 ${fontSize}px Arial`;
+    ctx.fillStyle = 'rgba(208, 208, 208, 0.88)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, W / 2, H / 2);
+    const texture = new THREE.CanvasTexture(canvas);
+    const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set((W / 70) * scaleMult, (H / 70) * scaleMult, 1);
+    sprite.renderOrder = 10;
+    return sprite;
+}
+
+// ---- Wind direction arrow ----
+
+function _updateWindArrow() {
+    if (_windArrow) {
+        _windShellGroup.remove(_windArrow);
+        _windArrow = null;
+    }
+    if (!_windDir || !_windShellGroup?.visible) return;
+
+    const { width: L, depth: B, totalHeight: Ht } = _config;
+    const halfW = L / 2; const halfD = B / 2;
+    const arrowLen = Math.max(2, Math.min(L, B) * 0.35);
+    const gap = Math.max(1.0, Math.min(L, B) * 0.12);
+    const midZ = Ht / 2;
+
+    const windVec = _WIND_VECTORS[_windDir].clone();
+    let origin;
+    switch (_windDir) {
+        case '+X': origin = new THREE.Vector3(-halfW - arrowLen - gap, 0, midZ); break;
+        case '-X': origin = new THREE.Vector3( halfW + arrowLen + gap, 0, midZ); break;
+        case '+Y': origin = new THREE.Vector3(0, -halfD - arrowLen - gap, midZ); break;
+        case '-Y': origin = new THREE.Vector3(0,  halfD + arrowLen + gap, midZ); break;
+    }
+
+    _windArrow = new THREE.ArrowHelper(windVec, origin, arrowLen, 0x5676b0, arrowLen * 0.28, arrowLen * 0.14);
+    _windArrow.line.material.transparent = true; _windArrow.line.material.opacity = 0.70;
+    _windArrow.cone.material.transparent = true; _windArrow.cone.material.opacity = 0.70;
+    _windShellGroup.add(_windArrow);
+}
+
+// ---- Wind direction classification ----
+
+/**
+ * Returns true (windward / + pressure), false (leeward or side / − pressure),
+ * or null (no wind dir selected — show both).
+ * Roof faces are always leeward (negative) per ASCE 7 flat-roof C&C.
+ */
+function _isWindward(faceId, isRoof) {
+    if (_windDir === null) return null;
+    if (isRoof) return false; // flat roof always suction
+
+    const wallKey = Object.keys(_WALL_NORMALS).find(k => faceId.startsWith(k));
+    if (!wallKey) return null;
+    const dot = _WALL_NORMALS[wallKey].dot(_WIND_VECTORS[_windDir]);
+    return dot < -0.5; // front-facing into wind → windward
+}
+
+// ---- Face appearance (opacity) based on wind direction ----
+
+function _updateFaceAppearance() {
+    _zoneMeshes.forEach(mesh => {
+        const { zoneId, faceId, isRoof, baseOpacity } = mesh.userData;
+        const windward = _isWindward(faceId, isRoof);
+        let opacity = baseOpacity;
+        if (windward === true)  opacity = Math.min(1, baseOpacity * 1.35); // windward pops
+        if (windward === false) opacity = baseOpacity * 0.70;             // leeward/side dims
+        mesh.material.opacity = opacity;
+    });
+}
+
 // ---- Zone labels (sprites, scaled to building size) ----
 
 function _updateLabels() {
@@ -250,12 +561,9 @@ function _updateLabels() {
     _zoneMeshes.forEach(mesh => {
         const { zoneId, isRoof, faceId } = mesh.userData;
 
-        // At each corner two z5 faces meet (front/back wall + side wall).
-        // Only label the front/back wall faces to get one label per corner (4 total).
-        if (zoneId === 'z5' && !faceId.startsWith('front') && !faceId.startsWith('back')) return;
-
-        const pressureText = _getPressureLabel(zoneId);
-        const sprite = _makeLabel(zoneId, pressureText, scaleMult);
+        const windward = _isWindward(faceId, isRoof);
+        const pressureText = _getPressureLabel(zoneId, windward);
+        const sprite = _makeLabel(zoneId, pressureText, scaleMult, windward);
         if (!sprite) return;
 
         const pos = mesh.position.clone();
@@ -280,21 +588,35 @@ function _updateLabels() {
     });
 }
 
-function _getPressureLabel(zoneId) {
+function _getPressureLabel(zoneId, windward) {
     if (!_ccData) return null;
     const refArea = '5.0';
     const wall = _ccData.wall?.[refArea];
     const roof = _ccData.roof?.[refArea];
 
-    if (zoneId === 'z4' && wall) return `+${wall.P_z4_pos ?? '—'} / ${wall.P_z4_neg ?? '—'} kPa`;
-    if (zoneId === 'z5' && wall) return `+${wall.P_z5_pos ?? wall.P_z4_pos ?? '—'} / ${wall.P_z5_neg ?? '—'} kPa`;
-    if (zoneId === 'z1' && roof) return `${roof.P_z1_neg ?? '—'} kPa`;
-    if (zoneId === 'z2' && roof) return `${roof.P_z2_neg ?? '—'} kPa`;
-    if (zoneId === 'z3' && roof) return `${roof.P_z3_neg ?? '—'} kPa`;
+    if (windward === null) {
+        // No wind dir — show both +/-
+        if (zoneId === 'z4' && wall) return `+${wall.P_z4_pos ?? '—'} / ${wall.P_z4_neg ?? '—'} kPa`;
+        if (zoneId === 'z5' && wall) return `+${wall.P_z5_pos ?? wall.P_z4_pos ?? '—'} / ${wall.P_z5_neg ?? '—'} kPa`;
+        if (zoneId === 'z1' && roof) return `${roof.P_z1_neg ?? '—'} kPa`;
+        if (zoneId === 'z2' && roof) return `${roof.P_z2_neg ?? '—'} kPa`;
+        if (zoneId === 'z3' && roof) return `${roof.P_z3_neg ?? '—'} kPa`;
+    } else if (windward) {
+        // Windward face: positive pressure
+        if (zoneId === 'z4' && wall) return `+${wall.P_z4_pos ?? '—'} kPa`;
+        if (zoneId === 'z5' && wall) return `+${wall.P_z5_pos ?? wall.P_z4_pos ?? '—'} kPa`;
+    } else {
+        // Leeward / side / roof: negative pressure (suction)
+        if (zoneId === 'z4' && wall) return `${wall.P_z4_neg ?? '—'} kPa`;
+        if (zoneId === 'z5' && wall) return `${wall.P_z5_neg ?? '—'} kPa`;
+        if (zoneId === 'z1' && roof) return `${roof.P_z1_neg ?? '—'} kPa`;
+        if (zoneId === 'z2' && roof) return `${roof.P_z2_neg ?? '—'} kPa`;
+        if (zoneId === 'z3' && roof) return `${roof.P_z3_neg ?? '—'} kPa`;
+    }
     return null;
 }
 
-function _makeLabel(zoneId, pressureLine, scaleMult = 1) {
+function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     if (!pressureLine) return null;
 
     // Measure text width and fit canvas tightly
@@ -325,8 +647,13 @@ function _makeLabel(zoneId, pressureLine, scaleMult = 1) {
     ctx.roundRect(2, 2, W - 4, H - 4, 7);
     ctx.stroke();
 
-    const swatchGray = '#' + ZONE[zoneId].color.toString(16).padStart(6, '0');
-    ctx.fillStyle = swatchGray;
+    // Swatch color: warm for windward (+), cool for leeward (−), zone color for unfiltered
+    let swatchColor;
+    if (windward === true)       swatchColor = '#d4d4d4'; // positive pressure — light
+    else if (windward === false) swatchColor = '#555555'; // negative/suction — dark
+    else                         swatchColor = '#' + ZONE[zoneId].color.toString(16).padStart(6, '0');
+
+    ctx.fillStyle = swatchColor;
     ctx.beginPath();
     ctx.roundRect(2, 2, swatchW, H - 4, [7, 0, 0, 7]);
     ctx.fill();
@@ -375,4 +702,4 @@ function _disposeObject(obj) {
     obj.children?.forEach(_disposeObject);
 }
 
-export { initWindShell, updateWindShellGeometry, tickWindShell };
+export { initWindShell, updateWindShellGeometry, tickWindShell, setWindDirection };

@@ -398,8 +398,8 @@ function initializeLeftPanelToggle() {
 }
 
 function initPanelMode() {
-    const windBtn = document.querySelector('.floating__bar-left-button .floating__bar-btn:first-child');
-    const facadeBtn = document.querySelector('.floating__bar-left-button .floating__bar-btn:last-child');
+    const windBtn = document.querySelector('.topbar__panel-btn .topbar__btn-mode:first-child');
+    const facadeBtn = document.querySelector('.topbar__panel-btn .topbar__btn-mode:last-child');
 
     if (windBtn) windBtn.addEventListener('click', () => switchPanelMode('wind'));
     if (facadeBtn) facadeBtn.addEventListener('click', () => switchPanelMode('facade'));
@@ -411,27 +411,11 @@ function getCurrentPanelMode() {
 
 // Function to update floating bar button states
 function updateFloatingBarButtons(mode) {
-    const windBtn = document.querySelector(
-        '.floating__bar-btn[data-mode="wind"]',
-    );
-    const facadeBtn = document.querySelector(
-        '.floating__bar-btn[data-mode="facade"]',
-    );
-
-    if (!windBtn || !facadeBtn) {
-        // Fallback: find buttons by text content if data attributes not set
-        const floatingButtons = document.querySelectorAll(".floating__bar-btn");
-        floatingButtons.forEach((btn) => {
-            if (btn.textContent.trim() === "Wind") {
-                btn.classList.toggle("active", mode === "wind");
-            } else if (btn.textContent.trim() === "Facade") {
-                btn.classList.toggle("active", mode === "facade");
-            }
-        });
-    } else {
-        windBtn.classList.toggle("active", mode === "wind");
-        facadeBtn.classList.toggle("active", mode === "facade");
-    }
+    document.querySelectorAll('.topbar__btn-mode').forEach(btn => {
+        const text = btn.textContent.trim();
+        if (text === 'Wind') btn.classList.toggle('active', mode === 'wind');
+        else if (text === 'Facade') btn.classList.toggle('active', mode === 'facade');
+    });
 }
 
 function getCachedCategoryData() {

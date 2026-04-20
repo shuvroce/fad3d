@@ -1775,6 +1775,38 @@ body.no-animations *::after {
     color: var(--text-primary);
 }
 
+.topbar__panel-btn {
+    padding: 4px 5px;
+    background-color: var(--bg-bullet);
+    border-radius: var(--radius-5);
+    /* box-shadow: var(--shadow-box); */
+}
+
+.topbar__btn-mode {
+    padding: 0.3rem 0.6rem;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    transition: color 0.3s;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.topbar__btn-mode:hover {
+    background-color: var(--bg-body);
+    border-radius: var(--radius-5);
+    /* color: var(--btn-primary-hover); */
+}
+
+.topbar__btn-mode.active {
+    background-color: var(--text-link);
+    color: var(--bg-primary);
+    border-radius: var(--radius-5);
+}
+
 /* top floating bars */
 .floating__bar-left,
 .floating__bar-middle,
@@ -1795,9 +1827,8 @@ body.no-animations *::after {
 }
 
 .floating__bar-left {
-    width: calc(var(--catbar-width) + var(--input-field-width));
+    left: calc(var(--catbar-width) + var(--input-field-width) + 4rem);
     background: transparent;
-    left: 0.75rem;
     padding: 0;
     justify-content: space-between;
     z-index: 20;
@@ -1811,7 +1842,7 @@ body.no-animations *::after {
 }
 
 .floating__bar-right {
-    right: calc(var(--result-width) + 5rem);
+    right: calc(var(--result-width) + 4rem);
     background-color: transparent;
     /* transition: right 0.3s ease; */
     justify-content: space-between;
@@ -1986,7 +2017,7 @@ body.no-animations *::after {
     width: var(--figure-panel-width);
     position: fixed;
     top: calc(var(--topbar-height) + var(--floating-height) + 0.5rem);
-    right: calc(var(--result-width) + 5rem);
+    right: calc(var(--result-width) + 4rem);
     padding: 1rem;
     border-radius: var(--radius-3);
     box-shadow: var(--shadow-md);
@@ -2002,6 +2033,122 @@ body.no-animations *::after {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
+}
+
+/* Filter wrap + panel (opens on filter-btn click) */
+.filter__wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.filter__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 160px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-3);
+    box-shadow: var(--shadow-md);
+    padding: 0.75rem;
+    z-index: 600;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.filter__panel.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.filter__panel-section {
+    display: none;
+}
+
+.filter__panel-section.visible {
+    display: block;
+}
+
+.filter__panel-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted, #888);
+    margin-bottom: 0.5rem;
+}
+
+.filter__panel-dir-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.filter__panel-radio {
+    display: flex;
+    cursor: pointer;
+}
+
+/* Visually hide the native radio input */
+.filter__panel-radio input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.filter__panel-radio span {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--radius-5);
+    gap: 0.5rem;
+    transition: background 0.12s, color 0.12s;
+}
+
+/* Custom radio dot */
+.filter__panel-radio span::before {
+    content: '';
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-primary);
+    flex-shrink: 0;
+    transition: border-color 0.12s, background 0.12s;
+}
+
+.filter__panel-radio:hover span {
+    background: var(--bg-body);
+    color: var(--text-primary);
+}
+
+.filter__panel-radio input[type="radio"]:checked + span {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.filter__panel-radio input[type="radio"]:checked + span::before {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: inset 0 0 0 3px var(--bg-primary);
+}
+
+/* Disabled state for view mode buttons */
+.floating__bar-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Figures button */
@@ -2548,7 +2695,7 @@ body.no-animations *::after {
 /* leftbar */
 .left__panel {
     position: fixed;
-    top: calc(var(--topbar-height) + var(--floating-height) + 0.5rem);
+    top: calc(var(--topbar-height) + 0.5rem);
     left: 0.75rem;
     bottom: 0.75rem;
     display: flex;

@@ -33,9 +33,13 @@ function createSkyDome() {
     const ctx = canvas.getContext('2d');
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#6a97e5');
-    gradient.addColorStop(0.4, '#c5d6e8');
-    gradient.addColorStop(1, '#e2e2e2');
+    gradient.addColorStop(0, '#86a4df');
+    gradient.addColorStop(0.3, '#adc2ed');
+    gradient.addColorStop(0.45, '#adc0e7');
+    gradient.addColorStop(0.5, '#adb3c0');
+    gradient.addColorStop(0.55, '#abb3bc');
+    gradient.addColorStop(0.7, '#b0b6bc');
+    gradient.addColorStop(1, '#bababa');
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 2, 512);
@@ -89,7 +93,6 @@ function _initScene(container) {
     isInitialized = true;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a2e);
 
     const skyDome = createSkyDome();
     // Rotate sky sphere so north pole (+Y) aligns with world +Z (up)
@@ -145,8 +148,7 @@ function _initScene(container) {
     window.addEventListener('resize', onWindowResize);
 
     document.addEventListener('theme-changed', () => {
-        const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-body').trim();
-        if (bg) scene.background = new THREE.Color(bg);
+        // Keep sky dome, don't override background
     });
 
     setupDynamicInputListeners();
@@ -254,9 +256,9 @@ function createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const halfD = depth / 2;
 
     const transparentMaterial = new THREE.MeshPhongMaterial({
-        color: 0xcccccc,
+        color: 0xdddddd,
         transparent: true,
-        opacity: 0.04,
+        opacity: 0.12,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
@@ -595,6 +597,8 @@ function updateBuilding(config = {}) {
             width: currentConfig.width,
             depth: currentConfig.depth,
             totalHeight: currentConfig.totalHeight,
+            numFloors: currentConfig.numFloors,
+            floorHeight: currentConfig.floorHeight,
         });
     }
 }

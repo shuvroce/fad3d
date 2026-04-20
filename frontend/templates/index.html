@@ -45,8 +45,26 @@
                     </svg>
                 </button>
             </div>
-
             <input type="file" id="yaml-file-input" accept=".fad,application/json" hidden />
+
+            <div class="topbar__panel-btn">
+                <button class="topbar__btn-mode">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
+                    </svg>
+                    Wind
+                </button>
+                <button class="topbar__btn-mode active">
+                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="1" />
+                        <path d="M9 22V12h6v10" />
+                        <path d="M3 9h18" />
+                    </svg>
+                    Facade
+                </button>
+            </div>
+
             <div class="topbar__projct-name" id="header-project-name">
                 Project Name
             </div>
@@ -170,24 +188,6 @@
     <section class="floating__bar">
         <div class="floating__bar-left">
             <div class="floating__bar-left-button">
-                <button class="floating__bar-btn">
-                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                            d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
-                    </svg>
-                    Wind
-                </button>
-                <button class="floating__bar-btn active">
-                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <rect x="3" y="3" width="18" height="18" rx="1" />
-                        <path d="M9 22V12h6v10" />
-                        <path d="M3 9h18" />
-                    </svg>
-                    Facade
-                </button>
-            </div>
-
-            <div class="floating__bar-left-button">
                 <button class="floating__bar-btn" id="general-modal-btn">
                     <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <line x1="4" y1="21" x2="4" y2="14" />
@@ -263,17 +263,44 @@
         </div>
 
         <div class="floating__bar-right">
-            <div class="floating__bar-right-view">
-                <button class="floating__bar-btn floating__bar-btn--filter" id="filter-btn">
-                    <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path
-                            d="M19 12a7 7 0 0 0-.09-1.11l2.03-1.58-2-3.46-2.44.86a7.1 7.1 0 0 0-1.92-1.11L14.2 3h-4.4l-.38 2.6a7.1 7.1 0 0 0-1.92 1.11l-2.44-.86-2 3.46 2.03 1.58A7 7 0 0 0 5 12c0 .38.03.75.09 1.11l-2.03 1.58 2 3.46 2.44-.86c.58.47 1.22.84 1.92 1.11l.38 2.6h4.4l.38-2.6c.7-.27 1.34-.64 1.92-1.11l2.44.86 2-3.46-2.03-1.58c.06-.36.09-.73.09-1.11Z">
-                        </path>
-                    </svg>
-                </button>
+            <!-- Filter wrap: button + dropdown panel -->
+            <div class="filter__wrap" id="filter-wrap">
+                <div class="floating__bar-right-view">
+                    <button class="floating__bar-btn floating__bar-btn--filter" id="filter-btn" data-title="Filter">
+                        <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19 12a7 7 0 0 0-.09-1.11l2.03-1.58-2-3.46-2.44.86a7.1 7.1 0 0 0-1.92-1.11L14.2 3h-4.4l-.38 2.6a7.1 7.1 0 0 0-1.92 1.11l-2.44-.86-2 3.46 2.03 1.58A7 7 0 0 0 5 12c0 .38.03.75.09 1.11l-2.03 1.58 2 3.46 2.44-.86c.58.47 1.22.84 1.92 1.11l.38 2.6h4.4l.38-2.6c.7-.27 1.34-.64 1.92-1.11l2.44.86 2-3.46-2.03-1.58c.06-.36.09-.73.09-1.11Z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="filter__panel" id="filter-panel">
+                    <!-- Wind direction — shown only in wind mode -->
+                    <div class="filter__panel-section" id="filter-wind-section">
+                        <div class="filter__panel-label">Wind Direction</div>
+                        <fieldset class="filter__panel-dir-grid">
+                            <label class="filter__panel-radio">
+                                <input type="radio" name="wind-dir" class="wind-dir-radio" value="+X" checked>
+                                <span>Wind +X</span>
+                            </label>
+                            <label class="filter__panel-radio">
+                                <input type="radio" name="wind-dir" class="wind-dir-radio" value="-X">
+                                <span>Wind −X</span>
+                            </label>
+                            <label class="filter__panel-radio">
+                                <input type="radio" name="wind-dir" class="wind-dir-radio" value="+Y">
+                                <span>Wind +Y</span>
+                            </label>
+                            <label class="filter__panel-radio">
+                                <input type="radio" name="wind-dir" class="wind-dir-radio" value="-Y">
+                                <span>Wind −Y</span>
+                            </label>
+                        </fieldset>
+                    </div>
+                </div>
             </div>
-            <div class="floating__bar-right-view">
+            <div class="floating__bar-right-view" id="view-mode-controls">
                 <button class="floating__bar-btn active">
                     <svg class="floating__bar-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path

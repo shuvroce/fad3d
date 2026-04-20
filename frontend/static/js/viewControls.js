@@ -98,6 +98,14 @@ function initViewControls() {
         });
     });
 
+    // Disable view buttons in wind mode (they're facade-only controls)
+    window.addEventListener('panel-mode-changed', (e) => {
+        const isWind = e.detail.mode === 'wind';
+        document.querySelectorAll('#view-mode-controls .floating__bar-btn').forEach(btn => {
+            btn.disabled = isWind;
+        });
+    });
+
     // Start with model view (default)
     switchViewMode("model");
 }
@@ -135,10 +143,35 @@ function updateFiguresIndicator(status) {
     if (dot) dot.dataset.status = status;
 }
 
+// ============================
+// Filter Panel Toggle
+// ============================
+
+function initFilterPanel() {
+    const btn = document.getElementById('filter-btn');
+    const panel = document.getElementById('filter-panel');
+    if (!btn || !panel) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = !btn.classList.contains('open');
+        btn.classList.toggle('open', opening);
+        panel.classList.toggle('open', opening);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!btn.contains(e.target) && !panel.contains(e.target)) {
+            btn.classList.remove('open');
+            panel.classList.remove('open');
+        }
+    });
+}
+
 // Export functions
 export {
     initViewControls,
     initFiguresPanel,
+    initFilterPanel,
     getCurrentViewMode,
     switchViewMode,
     updateFiguresIndicator

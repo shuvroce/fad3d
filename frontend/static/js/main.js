@@ -8,7 +8,7 @@ import { initTheme, initTooltips } from './theme.js';
 
 // Import UI controls
 import { initPanelMode, initializeLeftPanelToggle } from './inputPanel.js';
-import { initViewControls, initFiguresPanel } from './viewControls.js';
+import { initViewControls, initFiguresPanel, initFilterPanel } from './viewControls.js';
 import { initFigureChecker } from './figureChecker.js';
 import { initViewport3D } from './viewport3d.js';
 
@@ -72,6 +72,7 @@ async function initPhase2() {
     _safe('View controls', initViewControls);
     _safe('Project save/load', initProjectSaveLoad);
     _safe('Figures panel', initFiguresPanel);
+    _safe('Filter panel', initFilterPanel);
     _safe('Keybinds', initKeybinds);
     _safe('3D Viewport', initViewport3D);
     await _safeAsync('Figure checker', initFigureChecker);
