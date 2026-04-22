@@ -431,6 +431,9 @@ function initPanelMode() {
 
     if (windBtn) windBtn.addEventListener('click', () => switchPanelMode('wind'));
     if (facadeBtn) facadeBtn.addEventListener('click', () => switchPanelMode('facade'));
+
+    // Dispatch initial mode event so listeners (like facadeView) know the current mode
+    window.dispatchEvent(new CustomEvent("panel-mode-changed", { detail: { mode: currentPanelMode } }));
 }
 
 function getCurrentPanelMode() {

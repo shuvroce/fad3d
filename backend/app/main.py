@@ -141,9 +141,8 @@ async def api_calc_glass(request: Request):
 async def render_glass(request: Request):
     data = await _json(request)
     result = calc_glass_unit(data, wind_inputs=data.get("wind"))
-    return templates.TemplateResponse(
-        request=request, name="result/glass.html", context={"r": result}
-    )
+    html = templates.env.get_template("result/glass.html").render(r=result)
+    return {"html": html, "result": result}
 
 
 @app.post("/api/render/frame")

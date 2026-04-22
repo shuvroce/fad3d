@@ -371,11 +371,13 @@ async function runCategoryCalc(catNum) {
     const steelProfiles = (_steelSections || []).map(_sectionToSteelProfile);
     const windInputs = collectWindInputs();
 
-    const [glassHtml, frameResponse] = await Promise.all([
-        _postHtml('/api/render/glass', { ...collectGlassInputs(catNum), wind: windInputs }),
+    const [glassResponse, frameResponse] = await Promise.all([
+        _post('/api/render/glass', { ...collectGlassInputs(catNum), wind: windInputs }),
         _post('/api/render/frame', { frame: frameInputs, alum_profiles: alumProfiles, steel_profiles: steelProfiles, wind: windInputs }),
     ]);
 
+    const glassHtml = glassResponse?.html ?? null;
+    const glassResult = glassResponse?.result ?? null;
     const frameHtml = frameResponse?.html ?? null;
     const frameResult = frameResponse?.result ?? null;
 
@@ -393,7 +395,15 @@ async function runCategoryCalc(catNum) {
     ]);
 
     const gen = _getGeneralInputs(catNum);
-    updateFacadeResults(catNum, { glass: glassHtml, frame: frameHtml, conn: connHtml, anchor: anchorHtml, geometry: { ...gen, glass_thk: _computeGlassThk(catNum) } });
+    updateFacadeResults(catNum, {
+        glass: glassHtml,
+        frame: frameHtml,
+        conn: connHtml,
+        anchor: anchorHtml,
+        geometry: { ...gen, glass_thk: _computeGlassThk(catNum) },
+        glassResult: glassResult,
+        frameResult: frameResult,
+    });
 }
 
 // ---- Debounced triggers ----

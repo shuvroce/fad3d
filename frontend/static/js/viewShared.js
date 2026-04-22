@@ -16,6 +16,7 @@ let animationCallback = null;
 let currentViewMode = 'facade';
 let windCameraSaved = null;
 let facadeCameraSaved = null;
+let categoryCameraStates = new Map();
 
 const DEFAULT_BUILDING_WIDTH = 15;
 const DEFAULT_BUILDING_DEPTH = 10;
@@ -503,6 +504,22 @@ function saveCurrentCameraState() {
         };
     }
 }
+
+function saveCategoryCameraState(catNum) {
+    categoryCameraStates.set(Number(catNum), {
+        pos: facadeCamera.position.clone(),
+        target: facadeControls.target.clone(),
+    });
+}
+
+function restoreCategoryCameraState(catNum) {
+    const state = categoryCameraStates.get(Number(catNum));
+    if (state) {
+        facadeCamera.position.copy(state.pos);
+        facadeControls.target.copy(state.target);
+        facadeControls.update();
+    }
+}
 function getConfig() { return currentConfig; }
 
 function getWindConfig() {
@@ -531,4 +548,6 @@ export {
     fitCameraToBuilding,
     setAnimationCallback,
     moveToView,
+    saveCategoryCameraState,
+    restoreCategoryCameraState,
 };

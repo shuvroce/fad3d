@@ -182,4 +182,8 @@ function persistCollapseStateForCard(card) {
     _facadeCollapseState.set(catNum, state);
 }
 
-export { updateWindResults, updateFacadeResults, showFacadeResults, clearFacadeCache, getFacadeCollapseState, setFacadeCollapseState, clearCollapseStateForCategory, renumberCollapseState, restoreCollapseStateForCategory, persistCollapseStateForCard };
+function getFacadeResultData(catNum) {
+    return _facadeResultsCache.get(Number(catNum));
+}
+
+export { updateWindResults, updateFacadeResults, showFacadeResults, clearFacadeCache, getFacadeCollapseState, setFacadeCollapseState, clearCollapseStateForCategory, renumberCollapseState, restoreCollapseStateForCategory, persistCollapseStateForCard, getFacadeResultData };

@@ -1,6 +1,7 @@
 // ============================
 // Facade View - 3D Facade Visualization
-// Static building wireframe + dynamic glass/frame/anchor per category
+// Static building wireframe (floor height only) + dynamic glass/frame/anchor per category
+// X = front (mullion spacing), Y = depth (facade normal), Z = up (floor height)
 // ============================
 
 import * as THREE from 'three';
@@ -14,70 +15,96 @@ import {
     fitCameraToBuilding,
     setViewMode,
     saveCurrentCameraState,
+    saveCategoryCameraState,
+    restoreCategoryCameraState,
 } from './viewShared.js';
+import { getCurrentPanelMode } from './inputPanel.js';
+import { getFacadeResultData } from './results.js';
+import { getCurrentViewMode } from './viewControls.js';
 
 const VIEW_MODE = 'facade';
 
 let buildingGroup, facadeElementsGroup;
 let _initialized = false;
+let _lastFloorHeight = null;
+
+const FRAME_COLOR = 0x505050;
+const FRAME_DEPTH_M = 0.03;
+const FRAME_HEIGHT_M = 0.06;
+const GLASS_THICK_M = 0.006;
+
+function _getGlassMaterial(glassType) {
+    const colorMap = {
+        'dgu': { color: 0x88ccff, opacity: 0.35 },
+        'sgu': { color: 0x88ccff, opacity: 0.35 },
+        'laminated': { color: 0x77bbee, opacity: 0.4 },
+        'tempered': { color: 0x99ddff, opacity: 0.3 },
+    };
+    const style = colorMap[glassType] || colorMap['dgu'];
+    return new THREE.MeshPhongMaterial({
+        color: style.color,
+        transparent: true,
+        opacity: style.opacity,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        shininess: 100,
+    });
+}
+
+function _getFrameMaterial() {
+    return new THREE.MeshPhongMaterial({
+        color: FRAME_COLOR,
+        transparent: false,
+        opacity: 1.0,
+        shininess: 30,
+    });
+}
+
+function _getGlassThicknessMM(catNum, glassType) {
+    if (glassType === 'sgu') return _getInputValue(`cat${catNum}-glass-sgu-thickness`);
+    if (glassType === 'dgu') return _getInputValue(`cat${catNum}-glass-dgu-thickness1`);
+    if (glassType === 'lgu') return _getInputValue(`cat${catNum}-glass-lgu-thickness1`);
+    if (glassType === 'ldgu') return _getInputValue(`cat${catNum}-glass-ldgu-thickness1_1`);
+    return null;
+}
 
 // ============================
 // Public API
 // ============================
 
 async function initFacadeView() {
-    console.log('[FacadeView] initFacadeView called, _initialized:', _initialized);
-    if (_initialized) {
-        console.log('[FacadeView] Already initialized, skipping');
-        return;
-    }
+    if (_initialized) return;
 
-    try {
-        console.log('[FacadeView] Calling initSharedView...');
-        const shared = await initSharedView();
-        console.log('[FacadeView] initSharedView returned:', !!shared);
-        if (!shared) {
-            console.warn('[FacadeView] Shared view not ready');
-            return;
-        }
+    const shared = await initSharedView();
+    if (!shared) return;
 
-        const { scene } = shared;
-        console.log('[FacadeView] Got scene:', !!scene);
+    const { scene } = shared;
+    setViewMode(VIEW_MODE, true);
+    fitCameraToBuilding(VIEW_MODE);
+    saveCurrentCameraState();
 
-        setViewMode(VIEW_MODE, true);
-        fitCameraToBuilding(VIEW_MODE);
-        saveCurrentCameraState();
+    buildingGroup = new THREE.Group();
+    buildingGroup.visible = false;
+    scene.add(buildingGroup);
 
-        buildingGroup = new THREE.Group();
-        buildingGroup.visible = false;
-        scene.add(buildingGroup);
+    facadeElementsGroup = new THREE.Group();
+    facadeElementsGroup.name = 'facadeElements';
+    facadeElementsGroup.visible = false;
+    scene.add(facadeElementsGroup);
 
-        facadeElementsGroup = new THREE.Group();
-        facadeElementsGroup.name = 'facadeElements';
-        facadeElementsGroup.visible = false;
-        scene.add(facadeElementsGroup);
+    _rebuildBuildingWireframe();
+    _setupEventListeners();
+    _handleInitialState();
 
-        _rebuildBuildingWireframe();
-
-        _setupEventListeners();
-        _handleInitialState();
-
-        _initialized = true;
-        console.log('[FacadeView] Initialized successfully');
-    } catch (e) {
-        console.error('[FacadeView] Initialization error:', e);
-        console.error(e.stack);
-    }
+    _initialized = true;
 }
 
 function updateFacadeBuilding(config = {}) {
     const currentConfig = getConfig();
-
     if (config.floorHeight !== undefined && config.floorHeight > 0) {
         currentConfig.floorHeight = config.floorHeight;
         currentConfig.numFloors = Math.max(1, Math.round(currentConfig.height / currentConfig.floorHeight));
     }
-
     _rebuildBuildingWireframe();
     fitCameraToBuilding();
 }
@@ -93,7 +120,6 @@ function refreshFacadeElements() {
 function _handleInitialState() {
     const currentModeEl = document.querySelector('.topbar__btn-mode.active');
     const currentMode = currentModeEl?.textContent?.trim().toLowerCase();
-
     if (currentMode === 'facade' || !currentMode) {
         buildingGroup.visible = true;
         facadeElementsGroup.visible = true;
@@ -103,19 +129,27 @@ function _handleInitialState() {
 
 function _setupEventListeners() {
     window.addEventListener('panel-mode-changed', (e) => {
-        if (e.detail.mode !== 'facade') {
+        const mode = e.detail?.mode;
+        if (mode !== 'facade') {
             buildingGroup.visible = false;
             facadeElementsGroup.visible = false;
             return;
         }
-
         setViewMode(VIEW_MODE);
         buildingGroup.visible = true;
         facadeElementsGroup.visible = true;
         _updateFacadeElements();
     });
 
-    document.addEventListener('category-changed', () => {
+    window.addEventListener('viewport-mode-changed', (e) => {
+        _updateResultOverlay(e.detail.mode);
+    });
+
+    document.addEventListener('category-switched', (e) => {
+        const prevCatNum = _getActiveCategoryNum();
+        const newCatNum = e.detail?.categoryNum || prevCatNum;
+        saveCategoryCameraState(prevCatNum);
+        restoreCategoryCameraState(newCatNum);
         _updateFacadeElements();
     });
 
@@ -130,14 +164,43 @@ function _setupEventListeners() {
     document.addEventListener('input', _handleInputChange);
     document.addEventListener('change', _handleInputChange);
 
-    _setupFloorHeightListener();
+    const activeCat = document.querySelector('.category__btn.active');
+    const catNum = activeCat ? parseInt(activeCat.dataset.category) : 1;
+    const floorHeightInput = document.getElementById(`cat${catNum}-general-floor_height`);
+    if (floorHeightInput && floorHeightInput.value) {
+        const fh = parseFloat(floorHeightInput.value);
+        if (!isNaN(fh) && fh > 0) _lastFloorHeight = fh;
+    }
+
+    const currentMode = getCurrentPanelMode();
+    if (currentMode === 'facade') {
+        buildingGroup.visible = true;
+        facadeElementsGroup.visible = true;
+        _updateFacadeElements();
+    }
 }
 
 function _handleInputChange(e) {
     const target = e.target;
-    if (!target.id) return;
+    if (!target?.id) return;
+    const id = target.id;
 
-    if (target.id.includes('glass') || target.id.includes('frame') || target.id.includes('anchor')) {
+    if (id.includes('general-floor_height')) {
+        const newFH = parseFloat(target.value);
+        if (isNaN(newFH) || newFH <= 0) return;
+        if (newFH !== _lastFloorHeight) {
+            _lastFloorHeight = newFH;
+            _rebuildBuildingWireframe();
+            _updateFacadeElements();
+            _reapplyResultOverlay();
+            fitCameraToBuilding();
+        }
+    } else if (
+        id.includes('general-') ||
+        id.includes('glass-') ||
+        id.includes('frame-') ||
+        id.includes('anchor-')
+    ) {
         _debouncedUpdateFacadeElements();
     }
 }
@@ -147,10 +210,16 @@ function _debouncedUpdateFacadeElements() {
     clearTimeout(facadeUpdateTimer);
     facadeUpdateTimer = setTimeout(() => {
         const panelMode = document.querySelector('.panel-mode-btn.active')?.dataset.mode;
-        if (panelMode === 'facade' || (!panelMode)) {
+        if (panelMode === 'facade' || !panelMode) {
             _updateFacadeElements();
+            _reapplyResultOverlay();
         }
-    }, 300);
+    }, 150);
+}
+
+function _reapplyResultOverlay() {
+    const mode = getCurrentViewMode ? getCurrentViewMode() : 'model';
+    _updateResultOverlay(mode);
 }
 
 // ============================
@@ -161,6 +230,7 @@ function _rebuildBuildingWireframe() {
     if (!buildingGroup) return;
 
     while (buildingGroup.children.length > 0) {
+        _disposeObject(buildingGroup.children[0]);
         buildingGroup.remove(buildingGroup.children[0]);
     }
 
@@ -172,30 +242,21 @@ function _rebuildBuildingWireframe() {
     const halfW = width / 2;
     const halfD = depth / 2;
 
-    const cornerPositions = [
-        [-halfW, -halfD],
-        [halfW, -halfD],
-        [halfW, halfD],
-        [-halfW, halfD],
-    ];
-
-    for (const [x, y] of cornerPositions) {
+    for (const [cx, cy] of [[-halfW, -halfD], [halfW, -halfD], [halfW, halfD], [-halfW, halfD]]) {
         const colTop = totalHeight + 1.2;
         const points = [
-            new THREE.Vector3(x, y, 0),
-            new THREE.Vector3(x, y, colTop),
+            new THREE.Vector3(cx, cy, 0),
+            new THREE.Vector3(cx, cy, colTop),
         ];
-
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.5 });
         buildingGroup.add(new THREE.Line(geometry, material));
 
         for (let floor = 1; floor <= numFloors; floor++) {
             const z = floor * floorHeight;
-            const extLen = 1.2;
             const extPoints = [
-                new THREE.Vector3(x, y, z),
-                new THREE.Vector3(x, y, z + extLen),
+                new THREE.Vector3(cx, cy, z),
+                new THREE.Vector3(cx, cy, z + 1.2),
             ];
             const extGeom = new THREE.BufferGeometry().setFromPoints(extPoints);
             const extMat = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.5 });
@@ -208,7 +269,6 @@ function _rebuildBuildingWireframe() {
 
     for (let floor = 1; floor <= numFloors; floor++) {
         const z = floor * floorHeight;
-
         const floorPoints = [
             new THREE.Vector3(-halfW, -halfD, z),
             new THREE.Vector3(halfW, -halfD, z),
@@ -216,19 +276,15 @@ function _rebuildBuildingWireframe() {
             new THREE.Vector3(-halfW, halfD, z),
             new THREE.Vector3(-halfW, -halfD, z),
         ];
-
         const floorGeometry = new THREE.BufferGeometry().setFromPoints(floorPoints);
         const floorMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.3 });
         buildingGroup.add(new THREE.Line(floorGeometry, floorMaterial));
     }
-
-    console.log(`[FacadeView] Wireframe rebuilt: ${width}m x ${depth}m x ${totalHeight}m (${numFloors} floors)`);
 }
 
 function _createTransparentWalls(width, depth, height) {
     const halfW = width / 2;
     const halfD = depth / 2;
-
     const wallMaterial = new THREE.MeshPhongMaterial({
         color: 0xcccccc,
         transparent: true,
@@ -236,14 +292,12 @@ function _createTransparentWalls(width, depth, height) {
         side: THREE.DoubleSide,
         depthWrite: false,
     });
-
     const walls = [
         { pos: [0, halfD, height / 2], rot: [Math.PI / 2, 0, 0], size: [width, height] },
         { pos: [0, -halfD, height / 2], rot: [Math.PI / 2, 0, 0], size: [width, height] },
         { pos: [halfW, 0, height / 2], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, height] },
         { pos: [-halfW, 0, height / 2], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, height] },
     ];
-
     walls.forEach(wall => {
         const geometry = new THREE.PlaneGeometry(wall.size[0], wall.size[1]);
         const mesh = new THREE.Mesh(geometry, wallMaterial);
@@ -257,7 +311,6 @@ function _createTransparentWalls(width, depth, height) {
 function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const halfW = width / 2;
     const halfD = depth / 2;
-
     const transparentMaterial = new THREE.MeshPhongMaterial({
         color: 0xdddddd,
         transparent: true,
@@ -265,7 +318,6 @@ function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
         side: THREE.DoubleSide,
         depthWrite: false,
     });
-
     const solidMaterial = new THREE.MeshPhongMaterial({
         color: 0x1f211e,
         transparent: true,
@@ -297,36 +349,6 @@ function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
 }
 
 // ============================
-// Floor Height Listener
-// ============================
-
-function _setupFloorHeightListener() {
-    const updateFloorHeight = () => {
-        const floorHeightInput = document.getElementById('floor_height');
-        if (floorHeightInput && floorHeightInput.value) {
-            const fh = parseFloat(floorHeightInput.value);
-            if (!isNaN(fh) && fh > 0) {
-                updateFacadeBuilding({ floorHeight: fh });
-            }
-        }
-    };
-
-    document.addEventListener('change', (e) => {
-        if (e.target.id === 'floor_height') {
-            updateFloorHeight();
-        }
-    });
-
-    document.addEventListener('input', (e) => {
-        if (e.target.id === 'floor_height') {
-            updateFloorHeight();
-        }
-    });
-
-    updateFloorHeight();
-}
-
-// ============================
 // Facade Elements (Glass, Frame, Anchors)
 // ============================
 
@@ -334,149 +356,290 @@ function _updateFacadeElements() {
     if (!facadeElementsGroup) return;
 
     while (facadeElementsGroup.children.length > 0) {
-        const child = facadeElementsGroup.children[0];
-        _disposeObject(child);
-        facadeElementsGroup.remove(child);
+        _disposeObject(facadeElementsGroup.children[0]);
+        facadeElementsGroup.remove(facadeElementsGroup.children[0]);
     }
 
-    const categoryBtns = document.querySelectorAll('.category__btn');
-    categoryBtns.forEach(btn => {
-        const catNum = parseInt(btn.dataset.category);
-        if (isNaN(catNum)) return;
+    const activeCat = document.querySelector('.category__btn.active');
+    if (!activeCat) return;
+    const catNum = parseInt(activeCat.dataset.category);
+    if (isNaN(catNum)) return;
 
-        _buildCategoryFacade(catNum);
-    });
+    _buildCategoryFacade(catNum);
 }
 
 function _buildCategoryFacade(catNum) {
-    const glassType = document.getElementById(`cat${catNum}-glass-type`) || 'sgu';
-    const glassWidth = _getInputValue(`cat${catNum}-glass-width`);
-    const glassHeight = _getInputValue(`cat${catNum}-glass-height`);
+    const glassTypeEl = document.getElementById(`cat${catNum}-glass-type`);
+    const glassType = glassTypeEl ? glassTypeEl.value : 'dgu';
 
-    if (!glassWidth || !glassHeight) return;
+    const zoneEl = document.getElementById(`cat${catNum}-general-zone`);
+    const zone = zoneEl ? zoneEl.value : 'zone4';
+
+    const facadeTypeEl = document.getElementById(`cat${catNum}-general-facade_type`);
+    const facadeType = facadeTypeEl ? facadeTypeEl.value : 'cont';
+
+    const spanLength = _getInputValue(`cat${catNum}-general-span_length`);
+    const floorHeightMM = _getInputValue(`cat${catNum}-general-floor_height`);
+    const verticalSpacingMM = _getInputValue(`cat${catNum}-general-vertical_spacing`);
+
+    if (!spanLength || !verticalSpacingMM || spanLength <= 0) return;
 
     const config = getConfig();
-    const { width, depth, floorHeight, numFloors } = config;
-    const totalHeight = numFloors * floorHeight;
+    const { width, depth, numFloors } = config;
+    const floorHeight = floorHeightMM / 1000;
+    const verticalSpacing = verticalSpacingMM / 1000;
     const halfW = width / 2;
     const halfD = depth / 2;
 
-    const faceConfigs = [
-        { dir: 'front', normal: [0, -1, 0], rot: [Math.PI / 2, 0, 0], size: [width, totalHeight], offset: [-halfD] },
-        { dir: 'back', normal: [0, 1, 0], rot: [Math.PI / 2, 0, 0], size: [width, totalHeight], offset: [halfD] },
-        { dir: 'left', normal: [-1, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, totalHeight], offset: [-halfW] },
-        { dir: 'right', normal: [1, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, totalHeight], offset: [halfW] },
-    ];
+    const spanMeters = spanLength / 1000;
+    const facadeWidth = spanMeters * 5;
 
-    faceConfigs.forEach(face => {
-        const faceWidth = face.dir === 'front' || face.dir === 'back' ? width : depth;
-        const faceHeight = totalHeight;
+    if (facadeWidth <= 0 || facadeWidth > width * 2) return;
 
-        const cols = Math.max(1, Math.floor(faceWidth / glassWidth));
-        const rows = numFloors;
-
-        const panelW = faceWidth / cols;
-        const panelH = floorHeight;
-
-        for (let col = 0; col < cols; col++) {
-            for (let row = 0; row < rows; row++) {
-                const x = face.dir === 'front' || face.dir === 'back'
-                    ? -faceWidth / 2 + panelW / 2 + col * panelW
-                    : 0;
-                const y = face.dir === 'left' || face.dir === 'right'
-                    ? -faceWidth / 2 + panelW / 2 + col * panelW
-                    : face.offset[0];
-                const z = panelH / 2 + row * panelH;
-
-                _createGlassPane(x, y, z, panelW, panelH, face.rot, glassType, catNum);
-                _createFrameLines(x, y, z, panelW, panelH, face.rot, catNum);
-                _createAnchors(x, y, z, panelW, panelH, face.rot, catNum);
-            }
-        }
-    });
-}
-
-function _createGlassPane(x, y, z, w, h, rot, glassType, catNum) {
-    const geometry = new THREE.PlaneGeometry(w * 0.95, h * 0.95);
-
-    let color = 0x88ccff;
-    let opacity = 0.3;
-    let metalness = 0.9;
-    let roughness = 0.1;
-
-    if (glassType === 'laminated') {
-        color = 0x77bbee;
-        opacity = 0.4;
-    } else if (glassType === 'tempered') {
-        color = 0x99ddff;
-        opacity = 0.25;
-    } else if (glassType === 'sgu') {
-        color = 0x88ccff;
-        opacity = 0.3;
+    let xOffset;
+    if (zone === 'zone5') {
+        xOffset = -halfW;
+    } else {
+        xOffset = -halfW + (width - facadeWidth) / 2;
     }
 
-    const material = new THREE.MeshPhongMaterial({
-        color: color,
-        transparent: true,
-        opacity: opacity,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        shininess: 100,
-        metalness: metalness,
-        roughness: roughness,
-    });
+    let rows = [];
+    if (zone === 'zone1' || zone === 'zone2' || zone === 'zone3') {
+        rows = [{ start: numFloors, end: numFloors }];
+    } else if (facadeType === 'cont') {
+        rows = [{ start: 1, end: 2 }, { start: 2, end: 3 }];
+    } else {
+        rows = [{ start: 2, end: 3 }];
+    }
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    mesh.rotation.set(...rot);
-    mesh.userData = { type: 'glass', category: catNum };
-    facadeElementsGroup.add(mesh);
+    const y = -halfD;
+
+    for (const row of rows) {
+        const z = row.start * floorHeight;
+        const nextZ = row.end * floorHeight;
+        const panelHeight = nextZ - z;
+
+        _createGlassPanelGrid(xOffset, y, z, facadeWidth, panelHeight, spanMeters, verticalSpacing, glassType, catNum);
+        _createMullionsSlabToSlab(xOffset, y, z, nextZ, facadeWidth, spanMeters, catNum);
+        _createTransomsAtLevels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum);
+        _createAnchorsAtLevel(xOffset, y, z, facadeWidth, panelHeight, spanMeters, catNum);
+    }
 }
 
-function _createFrameLines(x, y, z, w, h, rot, catNum) {
-    const frameColor = 0x606060;
-    const lineMaterial = new THREE.LineBasicMaterial({ color: frameColor, transparent: true, opacity: 0.7 });
+function _createGlassPanelGrid(x, y, z, w, h, spanMeters, verticalSpacing, glassType, catNum) {
+    const glassThickMM = _getGlassThicknessMM(catNum, glassType);
+    const glassThickM = glassThickMM ? glassThickMM / 1000 : GLASS_THICK_M;
+    const glassMaterial = _getGlassMaterial(glassType);
 
-    const halfW = w / 2;
-    const halfH = h / 2;
+    const numMullions = 5;
 
-    const corners = [
-        [-halfW, -halfH],
-        [halfW, -halfH],
-        [halfW, halfH],
-        [-halfW, halfH],
-        [-halfW, -halfH],
-    ];
+    const transomZ = [z];
+    const numMiddle = Math.floor((h - 0.01) / verticalSpacing);
+    for (let i = 1; i <= numMiddle; i++) {
+        transomZ.push(z + i * verticalSpacing);
+    }
+    transomZ.push(z + h);
+    transomZ.sort((a, b) => a - b);
 
-    const points = corners.map(([u, v]) => new THREE.Vector3(u, v, 0));
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    for (let i = 0; i < numMullions; i++) {
+        for (let j = 0; j < transomZ.length - 1; j++) {
+            const panelW = spanMeters;
+            const panelH = transomZ[j + 1] - transomZ[j];
+            const panelCX = (i + 0.5) * spanMeters;
+            const panelCZ = (transomZ[j] + transomZ[j + 1]) / 2;
 
-    const line = new THREE.Line(geometry, lineMaterial);
-    line.position.set(x, y, z);
-    line.rotation.set(...rot);
-    line.userData = { type: 'frame', category: catNum };
-    facadeElementsGroup.add(line);
+            const panelGeom = new THREE.BoxGeometry(panelW * 0.95, glassThickM, panelH * 0.95);
+            const panel = new THREE.Mesh(panelGeom, glassMaterial);
+            panel.position.set(x + panelCX, y, panelCZ);
+            panel.userData = { type: 'glass', category: catNum };
+            facadeElementsGroup.add(panel);
+        }
+    }
 }
 
-function _createAnchors(x, y, z, w, h, rot, catNum) {
-    const anchorPositions = [
-        [w / 2 * 0.9, -h / 2 * 0.9],
-        [-w / 2 * 0.9, -h / 2 * 0.9],
-        [w / 2 * 0.9, h / 2 * 0.9],
-        [-w / 2 * 0.9, h / 2 * 0.9],
-    ];
+function _createMullionsSlabToSlab(x, y, zStart, zEnd, w, spanMeters, catNum) {
+    const frameMaterial = _getFrameMaterial();
+    const numMullions = 5;
+    const mullionLen = zEnd - zStart;
 
-    const anchorGeometry = new THREE.SphereGeometry(0.08, 8, 8);
-    const anchorMaterial = new THREE.MeshPhongMaterial({ color: 0xff6600 });
+    for (let i = 0; i <= numMullions; i++) {
+        const mx = i * spanMeters;
+        const mGeom = new THREE.BoxGeometry(FRAME_HEIGHT_M, FRAME_DEPTH_M, mullionLen);
+        const mMesh = new THREE.Mesh(mGeom, frameMaterial);
+        mMesh.position.set(x + mx, y, zStart + mullionLen / 2);
+        mMesh.userData = { type: 'mullion', category: catNum };
+        facadeElementsGroup.add(mMesh);
+    }
+}
 
-    anchorPositions.forEach(([u, v]) => {
+function _createTransomsAtLevels(x, y, zStart, zEnd, w, spanMeters, verticalSpacing, catNum) {
+    const frameMaterial = _getFrameMaterial();
+    const panelHeight = zEnd - zStart;
+
+    const transomZ = [zStart, zEnd];
+    const numMiddle = Math.floor((panelHeight - 0.01) / verticalSpacing);
+    for (let i = 1; i <= numMiddle; i++) {
+        transomZ.push(zStart + i * verticalSpacing);
+    }
+    transomZ.sort((a, b) => a - b);
+
+    for (const tz of transomZ) {
+        const tGeom = new THREE.BoxGeometry(w, FRAME_DEPTH_M, FRAME_HEIGHT_M);
+        const tMesh = new THREE.Mesh(tGeom, frameMaterial);
+        tMesh.position.set(x + w / 2, y, tz);
+        tMesh.userData = { type: 'transom', category: catNum };
+        facadeElementsGroup.add(tMesh);
+    }
+}
+
+function _createAnchorsAtLevel(x, y, z, w, h, spanMeters, catNum) {
+    const anchorTypeEl = document.getElementById(`cat${catNum}-anchor-type`);
+    const anchorType = anchorTypeEl ? anchorTypeEl.value : 'box-clump';
+
+    let anchorColor = 0xff6600;
+    if (anchorType === 'u-clump') anchorColor = 0xffaa00;
+    else if (anchorType === 'l-clump') anchorColor = 0xff4400;
+
+    const anchorMaterial = new THREE.MeshPhongMaterial({ color: anchorColor });
+    const anchorGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+
+    for (let i = 0; i < 5; i++) {
+        const mx = (i + 0.5) * spanMeters;
         const anchor = new THREE.Mesh(anchorGeometry, anchorMaterial);
-        anchor.position.set(x + u, y + v, z);
-        anchor.rotation.set(...rot);
-        anchor.userData = { type: 'anchor', category: catNum };
+        anchor.position.set(x + mx, y, z);
+        anchor.userData = { type: 'anchor', category: catNum, anchorType: anchorType };
         facadeElementsGroup.add(anchor);
-    });
+    }
 }
+
+// ============================
+// Result Overlay (DC Ratio / Deflection)
+// ============================
+
+function _updateResultOverlay(mode) {
+    const existing = facadeElementsGroup.children.filter(c => c.userData?.isResultOverlay);
+    existing.forEach(child => {
+        _disposeObject(child);
+        facadeElementsGroup.remove(child);
+    });
+
+    if (mode !== 'dc-ratio' && mode !== 'deflection') return;
+
+    const catNum = _getActiveCategoryNum();
+    if (!catNum) return;
+
+    const resultData = getFacadeResultData(catNum);
+    if (!resultData) return;
+
+    const { glassResult, frameResult } = resultData;
+    const config = getConfig();
+    const floorHeightMM = _getInputValue(`cat${catNum}-general-floor_height`) || 3200;
+    const floorHeight = floorHeightMM / 1000;
+    const numFloors = config.numFloors;
+
+    const zoneEl = document.getElementById(`cat${catNum}-general-zone`);
+    const zone = zoneEl ? zoneEl.value : 'zone4';
+    const facadeTypeEl = document.getElementById(`cat${catNum}-general-facade_type`);
+    const facadeType = facadeTypeEl ? facadeTypeEl.value : 'cont';
+    const spanLength = _getInputValue(`cat${catNum}-general-span_length`) || 2400;
+    const spanMeters = spanLength / 1000;
+    const facadeWidth = spanMeters * 5;
+
+    const halfW = config.width / 2;
+    const halfD = config.depth / 2;
+
+    let xOffset;
+    if (zone === 'zone5') {
+        xOffset = -halfW;
+    } else {
+        xOffset = -halfW + (config.width - facadeWidth) / 2;
+    }
+
+    let startFloor, endFloor;
+    if (zone === 'zone1' || zone === 'zone2' || zone === 'zone3') {
+        startFloor = numFloors;
+        endFloor = numFloors;
+    } else if (facadeType === 'cont') {
+        startFloor = 2;
+        endFloor = 3;
+    } else {
+        startFloor = 3;
+        endFloor = 3;
+    }
+
+    const y = -halfD;
+
+    if (mode === 'dc-ratio') {
+        const glassDc = glassResult?.stress_ratio ?? null;
+        const frameDcMul = frameResult?.mul_dc ?? null;
+        const frameDcTran = frameResult?.tran_dc ?? null;
+
+        if (glassDc !== null) {
+            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
+            const labelColor = glassDc <= 1.0 ? 0x00aa00 : 0xff0000;
+            _createTextSprite(`DC: ${glassDc.toFixed(2)}`, xOffset + facadeWidth / 2, y - 0.8, centerZ, 0.5, labelColor, catNum, true);
+        }
+        if (frameDcMul !== null) {
+            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
+            const labelColor = frameDcMul <= 1.0 ? 0x00aa00 : 0xff0000;
+            _createTextSprite(`FM: ${frameDcMul.toFixed(2)}`, xOffset + facadeWidth / 2, y - 1.3, centerZ, 0.4, labelColor, catNum, true);
+        }
+        if (frameDcTran !== null) {
+            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
+            const labelColor = frameDcTran <= 1.0 ? 0x00aa00 : 0xff0000;
+            _createTextSprite(`FT: ${frameDcTran.toFixed(2)}`, xOffset + facadeWidth / 2, y - 1.8, centerZ, 0.4, labelColor, catNum, true);
+        }
+    } else if (mode === 'deflection') {
+        const glassDef = glassResult?.deflection ?? null;
+        const glassDefRatio = glassResult?.def_ratio ?? null;
+        const frameDefMul = frameResult?.mul_def ?? null;
+        const frameDefTran = frameResult?.tran_def_wind ?? null;
+
+        if (glassDef !== null) {
+            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
+            const labelColor = (glassDefRatio !== null && glassDefRatio <= 1.0) ? 0x00aa00 : 0xff8800;
+            _createTextSprite(`d: ${glassDef.toFixed(1)}mm`, xOffset + facadeWidth / 2, y - 0.8, centerZ, 0.45, labelColor, catNum, true);
+        }
+        if (frameDefMul !== null) {
+            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
+            _createTextSprite(`FM: ${frameDefMul.toFixed(1)}mm`, xOffset + facadeWidth / 2, y - 1.3, centerZ, 0.4, 0xff8800, catNum, true);
+        }
+        if (frameDefTran !== null) {
+            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
+            _createTextSprite(`FT: ${frameDefTran.toFixed(1)}mm`, xOffset + facadeWidth / 2, y - 1.8, centerZ, 0.4, 0xff8800, catNum, true);
+        }
+    }
+}
+
+function _createTextSprite(text, x, y, z, scale, color, catNum, isResultOverlay = false) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 256;
+    canvas.height = 64;
+
+    ctx.fillStyle = 'transparent';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = 'bold 28px Arial';
+    ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+
+    const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+    const sprite = new THREE.Sprite(material);
+    sprite.position.set(x, y, z);
+    sprite.scale.set(scale * 4, scale, 1);
+    sprite.userData = { type: isResultOverlay ? 'result-overlay' : 'label', category: catNum, isResultOverlay };
+    facadeElementsGroup.add(sprite);
+}
+
+// ============================
+// Helpers
+// ============================
 
 function _getInputValue(id) {
     const el = document.getElementById(id);
@@ -485,9 +648,10 @@ function _getInputValue(id) {
     return isNaN(val) || val <= 0 ? null : val;
 }
 
-// ============================
-// Helpers
-// ============================
+function _getActiveCategoryNum() {
+    const activeCat = document.querySelector('.category__btn.active');
+    return activeCat ? parseInt(activeCat.dataset.category) : 1;
+}
 
 function _disposeObject(obj) {
     if (obj.geometry) obj.geometry.dispose();
