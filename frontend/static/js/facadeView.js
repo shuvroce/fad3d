@@ -165,7 +165,8 @@ function _rebuildBuildingWireframe() {
     }
 
     const config = getConfig();
-    const { width, depth, height, floorHeight, numFloors } = config;
+    const { width, depth, floorHeight, numFloors } = config;
+    const totalHeight = numFloors * floorHeight;
     const wireframeColor = 0x757575;
     const floorColor = 0x999999;
     const halfW = width / 2;
@@ -181,7 +182,7 @@ function _rebuildBuildingWireframe() {
     for (const [x, y] of cornerPositions) {
         const points = [
             new THREE.Vector3(x, y, 0),
-            new THREE.Vector3(x, y, height),
+            new THREE.Vector3(x, y, totalHeight),
         ];
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -189,7 +190,7 @@ function _rebuildBuildingWireframe() {
         buildingGroup.add(new THREE.Line(geometry, material));
     }
 
-    _createTransparentWalls(width, depth, height);
+    _createTransparentWalls(width, depth, totalHeight);
     _createTransparentSlabs(width, depth, numFloors, floorHeight);
 
     for (let floor = 1; floor <= numFloors; floor++) {
@@ -208,7 +209,7 @@ function _rebuildBuildingWireframe() {
         buildingGroup.add(new THREE.Line(floorGeometry, floorMaterial));
     }
 
-    console.log(`[FacadeView] Wireframe rebuilt: ${width}m x ${depth}m x ${height}m (${numFloors} floors)`);
+    console.log(`[FacadeView] Wireframe rebuilt: ${width}m x ${depth}m x ${totalHeight}m (${numFloors} floors)`);
 }
 
 function _createTransparentWalls(width, depth, height) {
@@ -342,20 +343,21 @@ function _buildCategoryFacade(catNum) {
     if (!glassWidth || !glassHeight) return;
 
     const config = getConfig();
-    const { width, depth, height, floorHeight, numFloors } = config;
+    const { width, depth, floorHeight, numFloors } = config;
+    const totalHeight = numFloors * floorHeight;
     const halfW = width / 2;
     const halfD = depth / 2;
 
     const faceConfigs = [
-        { dir: 'front', normal: [0, -1, 0], rot: [Math.PI / 2, 0, 0], size: [width, height], offset: [-halfD] },
-        { dir: 'back', normal: [0, 1, 0], rot: [Math.PI / 2, 0, 0], size: [width, height], offset: [halfD] },
-        { dir: 'left', normal: [-1, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, height], offset: [-halfW] },
-        { dir: 'right', normal: [1, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, height], offset: [halfW] },
+        { dir: 'front', normal: [0, -1, 0], rot: [Math.PI / 2, 0, 0], size: [width, totalHeight], offset: [-halfD] },
+        { dir: 'back', normal: [0, 1, 0], rot: [Math.PI / 2, 0, 0], size: [width, totalHeight], offset: [halfD] },
+        { dir: 'left', normal: [-1, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, totalHeight], offset: [-halfW] },
+        { dir: 'right', normal: [1, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0], size: [depth, totalHeight], offset: [halfW] },
     ];
 
     faceConfigs.forEach(face => {
         const faceWidth = face.dir === 'front' || face.dir === 'back' ? width : depth;
-        const faceHeight = height;
+        const faceHeight = totalHeight;
 
         const cols = Math.max(1, Math.floor(faceWidth / glassWidth));
         const rows = numFloors;
