@@ -190,10 +190,9 @@ function _handleInputChange(e) {
         if (isNaN(newFH) || newFH <= 0) return;
         if (newFH !== _lastFloorHeight) {
             _lastFloorHeight = newFH;
-            _rebuildBuildingWireframe();
+            updateFacadeBuilding({ floorHeight: newFH / 1000 });
             _updateFacadeElements();
             _reapplyResultOverlay();
-            fitCameraToBuilding();
         }
     } else if (
         id.includes('general-') ||
@@ -235,7 +234,8 @@ function _rebuildBuildingWireframe() {
     }
 
     const config = getConfig();
-    const { width, depth, floorHeight, numFloors } = config;
+    const { width, depth, floorHeight } = config;
+    const numFloors = 4;
     const totalHeight = numFloors * floorHeight;
     const wireframeColor = 0x757575;
     const floorColor = 0x999999;
@@ -502,13 +502,19 @@ function _createAnchorsAtLevel(x, y, z, w, h, spanMeters, catNum) {
 
     const anchorMaterial = new THREE.MeshPhongMaterial({ color: anchorColor });
     const anchorGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+    const numMullions = 5;
 
-    for (let i = 0; i < 5; i++) {
-        const mx = (i + 0.5) * spanMeters;
-        const anchor = new THREE.Mesh(anchorGeometry, anchorMaterial);
-        anchor.position.set(x + mx, y, z);
-        anchor.userData = { type: 'anchor', category: catNum, anchorType: anchorType };
-        facadeElementsGroup.add(anchor);
+    for (let i = 0; i <= numMullions; i++) {
+        const mx = i * spanMeters;
+        const anchorBot = new THREE.Mesh(anchorGeometry, anchorMaterial);
+        anchorBot.position.set(x + mx, y, z);
+        anchorBot.userData = { type: 'anchor', category: catNum, anchorType: anchorType };
+        facadeElementsGroup.add(anchorBot);
+
+        const anchorTop = new THREE.Mesh(anchorGeometry, anchorMaterial);
+        anchorTop.position.set(x + mx, y, z + h);
+        anchorTop.userData = { type: 'anchor', category: catNum, anchorType: anchorType };
+        facadeElementsGroup.add(anchorTop);
     }
 }
 
