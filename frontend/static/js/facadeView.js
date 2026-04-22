@@ -180,14 +180,27 @@ function _rebuildBuildingWireframe() {
     ];
 
     for (const [x, y] of cornerPositions) {
+        const colTop = totalHeight + 1.2;
         const points = [
             new THREE.Vector3(x, y, 0),
-            new THREE.Vector3(x, y, totalHeight),
+            new THREE.Vector3(x, y, colTop),
         ];
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.3 });
+        const material = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.5 });
         buildingGroup.add(new THREE.Line(geometry, material));
+
+        for (let floor = 1; floor <= numFloors; floor++) {
+            const z = floor * floorHeight;
+            const extLen = 1.2;
+            const extPoints = [
+                new THREE.Vector3(x, y, z),
+                new THREE.Vector3(x, y, z + extLen),
+            ];
+            const extGeom = new THREE.BufferGeometry().setFromPoints(extPoints);
+            const extMat = new THREE.LineBasicMaterial({ color: wireframeColor, transparent: true, opacity: 0.5 });
+            buildingGroup.add(new THREE.Line(extGeom, extMat));
+        }
     }
 
     _createTransparentWalls(width, depth, totalHeight);
