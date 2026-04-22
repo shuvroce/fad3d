@@ -3,6 +3,8 @@
 // ES6 Module Orchestrator
 // ============================
 
+console.log('%c[FAD3D] main.js loaded - version 2.0', 'color: green; font-weight: bold; font-size: 14px;');
+
 // Import theme system
 import { initTheme, initTooltips } from './theme.js';
 
@@ -10,7 +12,8 @@ import { initTheme, initTooltips } from './theme.js';
 import { initPanelMode, initializeLeftPanelToggle } from './inputPanel.js';
 import { initViewControls, initFiguresPanel, initFilterPanel } from './viewControls.js';
 import { initFigureChecker } from './figureChecker.js';
-import { initViewport3D } from './viewport3d.js';
+import { initWindView } from './windView.js';
+import { initFacadeView } from './facadeView.js';
 
 // Import category system
 import { initCategories } from './category.js';
@@ -65,6 +68,15 @@ function initPhase1() {
 // Phase 2: DOM-dependent initialization
 async function initPhase2() {
     console.log('[Main] Phase 2: Core UI initialization');
+
+    // Check if viewport container exists
+    const viewport3d = document.getElementById('viewport-3d');
+    if (viewport3d) {
+        console.log('[Main] viewport-3d container found, size:', viewport3d.clientWidth, 'x', viewport3d.clientHeight);
+    } else {
+        console.error('[Main] viewport-3d container NOT FOUND');
+    }
+
     _safe('Tooltips', initTooltips);
     _safe('Left panel toggle', initializeLeftPanelToggle);
     _safe('Right panel toggle', initializeRightPanelToggle);
@@ -74,7 +86,19 @@ async function initPhase2() {
     _safe('Figures panel', initFiguresPanel);
     _safe('Filter panel', initFilterPanel);
     _safe('Keybinds', initKeybinds);
-    _safe('3D Viewport', initViewport3D);
+
+    try {
+        await initWindView();
+    } catch (e) {
+        console.error('[Main] initWindView failed:', e);
+    }
+
+    try {
+        await initFacadeView();
+    } catch (e) {
+        console.error('[Main] initFacadeView failed:', e);
+    }
+
     await _safeAsync('Figure checker', initFigureChecker);
 }
 

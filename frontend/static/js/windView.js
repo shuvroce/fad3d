@@ -1,21 +1,41 @@
 // ============================
-// Wind Shell - ASCE 7 C&C Zone Visualization
-// Builds a solid building shell with zone-subdivided walls and roof.
-// Zones: Z4/Z5 (walls), Z1/Z2/Z3 (roof)
+// Wind View - 3D Wind Visualization
+// Building dimensions from wind inputs + ASCE 7 C&C Zone visualization
 // ============================
 
 import * as THREE from 'three';
+import {
+    initSharedView,
+    getScene,
+    getCamera,
+    getRenderer,
+    getControls,
+    getConfig,
+    getWindConfig,
+    fitCameraToBuilding,
+    setAnimationCallback,
+    setViewMode,
+} from './viewShared.js';
 
-// ---- Zone config (black/white/gray: lighter = interior, darker = corner) ----
+const VIEW_MODE = 'wind';
+
+let windShellGroup, labelsGroup;
+let _zoneMeshes = [];
+let _ccData = null;
+let _windDir = null;
+let _windArrow = null;
+let _pressurePerimeterGroup = null;
+let _initialized = false;
+
+// ---- Wind Shell Zone Config ----
 const ZONE = {
-    z4: { color: 0xf3f5d5, label: 'Zone 4', opacity: 0.4 },  // wall interior
-    z5: { color: 0xa4bbe0, label: 'Zone 5', opacity: 0.7 },  // wall corner
-    z1: { color: 0xc4c1c0, label: 'Zone 1', opacity: 0.75 },  // roof interior
-    z2: { color: 0xeab8ff, label: 'Zone 2', opacity: 0.7 },  // roof edge
-    z3: { color: 0xf59099, label: 'Zone 3', opacity: 0.8 },  // roof corner
+    z4: { color: 0xf3f5d5, label: 'Zone 4', opacity: 0.4 },
+    z5: { color: 0xa4bbe0, label: 'Zone 5', opacity: 0.7 },
+    z1: { color: 0xc4c1c0, label: 'Zone 1', opacity: 0.75 },
+    z2: { color: 0xeab8ff, label: 'Zone 2', opacity: 0.7 },
+    z3: { color: 0xf59099, label: 'Zone 3', opacity: 0.8 },
 };
 
-// ---- Wind direction helpers ----
 const _WIND_VECTORS = {
     '+X': new THREE.Vector3( 1, 0, 0),
     '-X': new THREE.Vector3(-1, 0, 0),
@@ -23,7 +43,6 @@ const _WIND_VECTORS = {
     '-Y': new THREE.Vector3( 0,-1, 0),
 };
 
-// Outward normals for each wall face (from faceId prefix)
 const _WALL_NORMALS = {
     front: new THREE.Vector3( 0,-1, 0),
     back:  new THREE.Vector3( 0, 1, 0),
@@ -31,57 +50,142 @@ const _WALL_NORMALS = {
     right: new THREE.Vector3( 1, 0, 0),
 };
 
-// ---- Module state ----
-let _scene = null;
-let _renderer = null;
-let _camera = null;
-let _windShellGroup = null;
-let _labelsGroup = null;
-let _zoneMeshes = [];
-let _config = { width: 15, depth: 10, totalHeight: 12.8, numFloors: 4, floorHeight: 3.2 };
-let _ccData = null;
-let _windDir = null; // null | '+X' | '-X' | '+Y' | '-Y'
-let _windArrow = null;
-let _pressurePerimeterGroup = null; // Holds perimeter line + arrows
+// ============================
+// Public API
+// ============================
 
-// ---- Public API ----
+async function initWindView() {
+    console.log('[WindView] initWindView called, _initialized:', _initialized);
+    if (_initialized) {
+        console.log('[WindView] Already initialized, skipping');
+        return;
+    }
 
-function initWindShell(scene, renderer, camera) {
-    _scene = scene;
-    _renderer = renderer;
-    _camera = camera;
+    try {
+        console.log('[WindView] Calling initSharedView...');
+        const shared = await initSharedView();
+        console.log('[WindView] initSharedView returned:', !!shared);
+        if (!shared) {
+            console.warn('[WindView] Shared view not ready');
+            return;
+        }
 
-    _windShellGroup = new THREE.Group();
-    _windShellGroup.name = 'windShell';
-    _windShellGroup.visible = false;
+        const { scene } = shared;
+        console.log('[WindView] Got scene:', !!scene);
 
-    _labelsGroup = new THREE.Group();
-    _labelsGroup.name = 'windShellLabels';
-    _windShellGroup.add(_labelsGroup);
+        setViewMode(VIEW_MODE);
+        fitCameraToBuilding(VIEW_MODE);
 
-    scene.add(_windShellGroup);
+        windShellGroup = new THREE.Group();
+        windShellGroup.name = 'windShell';
+        windShellGroup.visible = false;
+
+        labelsGroup = new THREE.Group();
+        labelsGroup.name = 'windShellLabels';
+        windShellGroup.add(labelsGroup);
+
+        scene.add(windShellGroup);
+
+        _rebuildWindShell();
+        fitCameraToBuilding(VIEW_MODE);
+
+        _setupEventListeners();
+        _handleInitialState();
+
+        _initialized = true;
+        console.log('[WindView] Initialized successfully');
+    } catch (e) {
+        console.error('[WindView] Initialization error:', e);
+        console.error(e.stack);
+    }
+}
+
+function updateWindBuilding(config = {}) {
+    const currentConfig = getConfig();
+    let changed = false;
+
+    if (config.width !== undefined && config.width > 0) {
+        currentConfig.width = config.width;
+        changed = true;
+    }
+    if (config.depth !== undefined && config.depth > 0) {
+        currentConfig.depth = config.depth;
+        changed = true;
+    }
+    if (config.floorHeight !== undefined && config.floorHeight > 0) {
+        currentConfig.floorHeight = config.floorHeight;
+        changed = true;
+    }
+    if (config.numFloors !== undefined && config.numFloors > 0) {
+        currentConfig.numFloors = config.numFloors;
+        changed = true;
+    }
+    if (config.totalHeight !== undefined && config.totalHeight > 0) {
+        currentConfig.height = config.totalHeight;
+        changed = true;
+    }
+
+    if (config.numFloors !== undefined || config.floorHeight !== undefined) {
+        currentConfig.height = currentConfig.numFloors * currentConfig.floorHeight;
+    }
+
+    if (changed) {
+        _rebuildWindShell();
+        fitCameraToBuilding(VIEW_MODE);
+    }
+}
+
+// ============================
+// Event Listeners
+// ============================
+
+function _handleInitialState() {
+    const currentModeEl = document.querySelector('.topbar__btn-mode.active');
+    const currentMode = currentModeEl?.textContent?.trim().toLowerCase();
+
+    if (currentMode === 'wind') {
+        windShellGroup.visible = true;
+        _windDir = '+X';
+        _syncDirButtons();
+        _updateFaceAppearance();
+        _updateLabels();
+        _updateWindArrow();
+        _updatePressurePerimeterAndLabels();
+
+        const legend = document.getElementById('wind-zone-legend');
+        if (legend) legend.classList.add('visible');
+        const windSection = document.getElementById('filter-wind-section');
+        if (windSection) windSection.classList.add('visible');
+    }
+}
+
+function _setupEventListeners() {
+    setAnimationCallback(_tickWindShell);
 
     window.addEventListener('panel-mode-changed', (e) => {
-        const isWind = e.detail.mode === 'wind';
-        _windShellGroup.visible = isWind;
-        const legend = document.getElementById('wind-zone-legend');
-        if (legend) legend.classList.toggle('visible', isWind);
-        const windSection = document.getElementById('filter-wind-section');
-        if (windSection) windSection.classList.toggle('visible', isWind);
-        if (isWind) {
-            _windDir = '+X';
-            _syncDirButtons();
-            _updateFaceAppearance();
-            _updateLabels();
-            _updateWindArrow();
-            _updatePressurePerimeterAndLabels();
-        } else {
+        if (e.detail.mode !== 'wind') {
+            windShellGroup.visible = false;
             _windDir = null;
             _syncDirButtons();
             _updateFaceAppearance();
             _updateWindArrow();
             _updatePressurePerimeterAndLabels();
+            return;
         }
+
+        setViewMode(VIEW_MODE);
+        windShellGroup.visible = true;
+        const legend = document.getElementById('wind-zone-legend');
+        if (legend) legend.classList.add('visible');
+        const windSection = document.getElementById('filter-wind-section');
+        if (windSection) windSection.classList.add('visible');
+
+        _windDir = '+X';
+        _syncDirButtons();
+        _updateFaceAppearance();
+        _updateLabels();
+        _updateWindArrow();
+        _updatePressurePerimeterAndLabels();
     });
 
     window.addEventListener('wind-cc-updated', (e) => {
@@ -90,7 +194,6 @@ function initWindShell(scene, renderer, camera) {
         _updatePressurePerimeterAndLabels();
     });
 
-    // Wind direction radio listeners
     document.querySelectorAll('.wind-dir-radio').forEach(radio => {
         radio.addEventListener('change', () => {
             if (radio.checked) {
@@ -103,56 +206,95 @@ function initWindShell(scene, renderer, camera) {
         });
     });
 
-    console.log('[WindShell] Initialized');
+    _setupDynamicInputListeners();
 }
 
-function setWindDirection(dir) {
-    _windDir = dir;
-    _syncDirButtons();
-    _updateFaceAppearance();
-    _updateLabels();
-    _updateWindArrow();
-    _updatePressurePerimeterAndLabels();
-}
+// ============================
+// Dynamic Input Listeners
+// ============================
 
-function updateWindShellGeometry(config) {
-    if (!_windShellGroup) return;
-    if (config.width !== undefined && config.width > 0) _config.width = config.width;
-    if (config.depth !== undefined && config.depth > 0) _config.depth = config.depth;
-    if (config.totalHeight !== undefined && config.totalHeight > 0) _config.totalHeight = config.totalHeight;
-    if (config.numFloors !== undefined && config.numFloors > 0) _config.numFloors = config.numFloors;
-    if (config.floorHeight !== undefined && config.floorHeight > 0) _config.floorHeight = config.floorHeight;
-    _rebuild();
-}
+function _setupDynamicInputListeners() {
+    let debounceTimer = null;
 
-// ---- Wind direction button sync ----
+    const updateFromInputs = () => {
+        const bLength = document.getElementById('b_length');
+        const bWidth = document.getElementById('b_width');
+        const bHeight = document.getElementById('b_height');
+        const bFloorHeights = document.getElementById('b_floor_heights');
 
-function _syncDirButtons() {
-    document.querySelectorAll('.wind-dir-radio').forEach(radio => {
-        radio.checked = radio.value === _windDir;
+        const safeParseFloat = (val) => {
+            if (!val) return null;
+            const n = parseFloat(val);
+            return isNaN(n) || n <= 0 ? null : n;
+        };
+
+        const newConfig = {};
+        const config = getWindConfig();
+
+        const length = safeParseFloat(bLength?.value);
+        if (length) newConfig.width = length;
+
+        const width = safeParseFloat(bWidth?.value);
+        if (width) newConfig.depth = width;
+
+        if (bFloorHeights?.value?.trim()) {
+            const heights = bFloorHeights.value.trim().split(/\s+/).map(safeParseFloat).filter(h => h !== null);
+            if (heights.length > 0) {
+                newConfig.numFloors = heights.length;
+                const avgFloorHeight = heights.reduce((a, b) => a + b, 0) / heights.length;
+                newConfig.floorHeight = avgFloorHeight;
+            }
+        } else {
+            const height = safeParseFloat(bHeight?.value);
+            if (height) {
+                newConfig.totalHeight = height;
+                newConfig.numFloors = Math.max(1, Math.round(height / config.floorHeight));
+                newConfig.floorHeight = height / newConfig.numFloors;
+            }
+        }
+
+        if (Object.keys(newConfig).length > 0) {
+            updateWindBuilding(newConfig);
+        }
+    };
+
+    const debouncedUpdate = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateFromInputs, 300);
+    };
+
+    document.addEventListener('change', (e) => {
+        if (e.target.closest('.wind__panel')) {
+            debouncedUpdate();
+        }
     });
+
+    document.addEventListener('input', (e) => {
+        if (e.target.closest('.wind__panel')) {
+            debouncedUpdate();
+        }
+    });
+
+    updateFromInputs();
 }
 
-// ---- Zone width (ASCE 7-16 §26.2) ----
+// ============================
+// Wind Shell Rebuild
+// ============================
 
-function _zoneA(L, B, H) {
-    const minDim = Math.min(L, B);
-    const candidate = Math.min(0.1 * minDim, 0.6 * H);
-    return Math.max(candidate, Math.max(0.06 * minDim, 0.91));
-}
-
-// ---- Geometry build ----
-
-function _rebuild() {
+function _rebuildWindShell() {
     _zoneMeshes = [];
-    _windArrow = null; // will be re-created by _updateWindArrow below
+    _windArrow = null;
 
-    // Remove all non-labels children and rebuild
+    if (!windShellGroup) return;
+
+    const scene = getScene();
     const toRemove = [];
-    _windShellGroup.children.forEach(c => { if (c !== _labelsGroup) toRemove.push(c); });
-    toRemove.forEach(c => { _disposeObject(c); _windShellGroup.remove(c); });
+    windShellGroup.children.forEach(c => { if (c !== labelsGroup) toRemove.push(c); });
+    toRemove.forEach(c => { _disposeObject(c); windShellGroup.remove(c); });
 
-    const { width: L, depth: B, totalHeight: H } = _config;
+    const config = getWindConfig();
+    const { width: L, depth: B, totalHeight: H } = config;
     if (L <= 0.1 || B <= 0.1 || H <= 0.1) return;
 
     const a = _zoneA(L, B, H);
@@ -173,48 +315,50 @@ function _rebuild() {
     _updatePressurePerimeterAndLabels();
 }
 
+function _zoneA(L, B, H) {
+    const minDim = Math.min(L, B);
+    const candidate = Math.min(0.1 * minDim, 0.6 * H);
+    return Math.max(candidate, Math.max(0.06 * minDim, 0.91));
+}
+
+// ============================
+// Wind Shell Geometry
+// ============================
+
 function _buildWalls(halfW, halfD, H, ax, ay) {
-    // Rotation for front/back walls (y = ±halfD): lies in XZ plane
     const rotFB = [Math.PI / 2, 0, 0];
-    // Rotation for left/right walls (x = ±halfW): lies in YZ plane
     const rotLR = [Math.PI / 2, Math.PI / 2, 0];
 
     const innerX = 2 * halfW - 2 * ax;
     const innerY = 2 * halfD - 2 * ay;
 
-    // Front wall (y = -halfD)
     _addZone('z5', ax, H, [-halfW + ax / 2, -halfD, H / 2], rotFB, 'front-left');
     if (innerX > 0.01) _addZone('z4', innerX, H, [0, -halfD, H / 2], rotFB, 'front-mid');
     _addZone('z5', ax, H, [halfW - ax / 2, -halfD, H / 2], rotFB, 'front-right');
 
-    // Back wall (y = +halfD)
     _addZone('z5', ax, H, [-halfW + ax / 2, halfD, H / 2], rotFB, 'back-left');
     if (innerX > 0.01) _addZone('z4', innerX, H, [0, halfD, H / 2], rotFB, 'back-mid');
     _addZone('z5', ax, H, [halfW - ax / 2, halfD, H / 2], rotFB, 'back-right');
 
-    // Left wall (x = -halfW)
     _addZone('z5', ay, H, [-halfW, -halfD + ay / 2, H / 2], rotLR, 'left-front');
-    if (innerY > 0.01) _addZone('z4', innerY, H, [-halfW, 0, H / 2], rotLR, 'left-mid');
+    if (innerY > 0.01) _addZone('z4', ay, H, [-halfW, 0, H / 2], rotLR, 'left-mid');
     _addZone('z5', ay, H, [-halfW, halfD - ay / 2, H / 2], rotLR, 'left-back');
 
-    // Right wall (x = +halfW)
     _addZone('z5', ay, H, [halfW, -halfD + ay / 2, H / 2], rotLR, 'right-front');
-    if (innerY > 0.01) _addZone('z4', innerY, H, [halfW, 0, H / 2], rotLR, 'right-mid');
+    if (innerY > 0.01) _addZone('z4', ay, H, [halfW, 0, H / 2], rotLR, 'right-mid');
     _addZone('z5', ay, H, [halfW, halfD - ay / 2, H / 2], rotLR, 'right-back');
 }
 
 function _buildRoof(halfW, halfD, H, ax, ay) {
     const innerX = 2 * halfW - 2 * ax;
     const innerY = 2 * halfD - 2 * ay;
-    const zRoof = H + 0.02; // slight offset above slab
+    const zRoof = H + 0.02;
     const rot = [0, 0, 0];
 
-    // Interior Zone 1
     if (innerX > 0.01 && innerY > 0.01) {
         _addZone('z1', innerX, innerY, [0, 0, zRoof], rot, 'roof-interior', true);
     }
 
-    // Edge Zone 2
     if (innerX > 0.01) {
         _addZone('z2', innerX, ay, [0, -halfD + ay / 2, zRoof], rot, 'roof-edge-front', true);
         _addZone('z2', innerX, ay, [0, halfD - ay / 2, zRoof], rot, 'roof-edge-back', true);
@@ -224,7 +368,6 @@ function _buildRoof(halfW, halfD, H, ax, ay) {
         _addZone('z2', ax, innerY, [halfW - ax / 2, 0, zRoof], rot, 'roof-edge-right', true);
     }
 
-    // Corner Zone 3
     _addZone('z3', ax, ay, [-halfW + ax / 2, -halfD + ay / 2, zRoof], rot, 'roof-corner-fl', true);
     _addZone('z3', ax, ay, [halfW - ax / 2, -halfD + ay / 2, zRoof], rot, 'roof-corner-fr', true);
     _addZone('z3', ax, ay, [-halfW + ax / 2, halfD - ay / 2, zRoof], rot, 'roof-corner-bl', true);
@@ -246,25 +389,20 @@ function _addZone(zoneId, w, d, pos, rot, faceId, isRoof = false) {
     mesh.rotation.set(...rot);
     mesh.userData = { zoneId, faceId, isRoof, w, d, baseOpacity: cfg.opacity };
     mesh.renderOrder = 1;
-    _windShellGroup.add(mesh);
+    windShellGroup.add(mesh);
     _zoneMeshes.push(mesh);
 }
 
 function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
     const lineMat = new THREE.LineBasicMaterial({ color: 0x999999 });
 
-    // Vertical boundary lines on walls at ±ax from wall ends
     const wallLineSegs = [
-        // Front wall zone boundaries (x positions at ±(halfW - ax))
         [[-halfW + ax, -halfD, 0], [-halfW + ax, -halfD, H]],
         [[halfW - ax, -halfD, 0], [halfW - ax, -halfD, H]],
-        // Back wall
         [[-halfW + ax, halfD, 0], [-halfW + ax, halfD, H]],
         [[halfW - ax, halfD, 0], [halfW - ax, halfD, H]],
-        // Left wall zone boundaries (y positions at ±(halfD - ay))
         [[-halfW, -halfD + ay, 0], [-halfW, -halfD + ay, H]],
         [[-halfW, halfD - ay, 0], [-halfW, halfD - ay, H]],
-        // Right wall
         [[halfW, -halfD + ay, 0], [halfW, -halfD + ay, H]],
         [[halfW, halfD - ay, 0], [halfW, halfD - ay, H]],
     ];
@@ -274,25 +412,20 @@ function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
             new THREE.Vector3(...a),
             new THREE.Vector3(...b),
         ]);
-        _windShellGroup.add(new THREE.Line(geo, lineMat.clone()));
+        windShellGroup.add(new THREE.Line(geo, lineMat.clone()));
     });
 
-    // Roof zone boundary lines at z = H + 0.03
     const z = H + 0.03;
     const roofLines = [
-        // Front edge
         [[-halfW + ax, -halfD + ay, z], [halfW - ax, -halfD + ay, z]],
         [[-halfW, -halfD + ay, z], [-halfW + ax, -halfD + ay, z]],
         [[halfW - ax, -halfD + ay, z], [halfW, -halfD + ay, z]],
-        // Back edge
         [[-halfW + ax, halfD - ay, z], [halfW - ax, halfD - ay, z]],
         [[-halfW, halfD - ay, z], [-halfW + ax, halfD - ay, z]],
         [[halfW - ax, halfD - ay, z], [halfW, halfD - ay, z]],
-        // Left edge
         [[-halfW + ax, -halfD + ay, z], [-halfW + ax, halfD - ay, z]],
         [[-halfW + ax, -halfD, z], [-halfW + ax, -halfD + ay, z]],
         [[-halfW + ax, halfD - ay, z], [-halfW + ax, halfD, z]],
-        // Right edge
         [[halfW - ax, -halfD + ay, z], [halfW - ax, halfD - ay, z]],
         [[halfW - ax, -halfD, z], [halfW - ax, -halfD + ay, z]],
         [[halfW - ax, halfD - ay, z], [halfW - ax, halfD, z]],
@@ -303,34 +436,34 @@ function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
             new THREE.Vector3(...a),
             new THREE.Vector3(...b),
         ]);
-        _windShellGroup.add(new THREE.Line(geo, lineMat.clone()));
+        windShellGroup.add(new THREE.Line(geo, lineMat.clone()));
     });
 }
 
-// ---- Floor division lines ----
-
 function _buildFloorLines(halfW, halfD, H) {
-    const { numFloors, floorHeight } = _config;
+    const config = getWindConfig();
+    const { numFloors, floorHeight } = config;
     if (!numFloors || numFloors <= 1 || !floorHeight) return;
     const mat = new THREE.LineBasicMaterial({ color: 0x999999 });
     for (let f = 1; f < numFloors; f++) {
         const z = f * floorHeight;
         if (z >= H - 0.01) continue;
         [
-            [[-halfW, -halfD, z], [halfW, -halfD, z]], // front
-            [[-halfW,  halfD, z], [halfW,  halfD, z]], // back
-            [[-halfW, -halfD, z], [-halfW, halfD, z]], // left
-            [[ halfW, -halfD, z], [ halfW,  halfD, z]], // right
+            [[-halfW, -halfD, z], [halfW, -halfD, z]],
+            [[-halfW,  halfD, z], [halfW,  halfD, z]],
+            [[-halfW, -halfD, z], [-halfW, halfD, z]],
+            [[ halfW, -halfD, z], [ halfW, halfD, z]],
         ].forEach(([a, b]) => {
             const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
-            _windShellGroup.add(new THREE.Line(geo, mat.clone()));
+            windShellGroup.add(new THREE.Line(geo, mat.clone()));
         });
     }
     _buildFloorSlabs(halfW, halfD, H);
 }
 
 function _buildFloorSlabs(halfW, halfD, H) {
-    const { numFloors, floorHeight } = _config;
+    const config = getWindConfig();
+    const { numFloors, floorHeight } = config;
     if (!numFloors || numFloors <= 1 || !floorHeight) return;
 
     const slabGeo = new THREE.PlaneGeometry(2 * halfW, 2 * halfD);
@@ -348,19 +481,14 @@ function _buildFloorSlabs(halfW, halfD, H) {
         const slab = new THREE.Mesh(slabGeo, slabMat.clone());
         slab.position.set(0, 0, z);
         slab.renderOrder = 0;
-        _windShellGroup.add(slab);
+        windShellGroup.add(slab);
     }
 }
-
-// ---- Ground shadow (projected from directional light at (20, -15, 30)) ----
-// Shadow ratio per unit of height derived from lightDir = normalize(-20, 15, -30):
-//   shadow_x_shift = -0.3 * z,  shadow_y_shift = +0.25 * z
 
 function _buildGroundShadow(halfW, halfD, H) {
     const px = 0.3 * H;
     const py = 0.25 * H;
 
-    // 6-point shadow polygon vertices (world XY)
     const verts = [
         [-halfW,        -halfD      ],
         [ halfW,        -halfD      ],
@@ -370,15 +498,13 @@ function _buildGroundShadow(halfW, halfD, H) {
         [-halfW - px,   -halfD + py ],
     ];
 
-    // Bounding box of shadow polygon
     const minX = -halfW - px, maxX =  halfW;
     const minY = -halfD,      maxY =  halfD + py;
     const worldW = maxX - minX;
     const worldD = maxY - minY;
 
-    // Canvas with margin so blur doesn't get clipped at edges
     const CANVAS = 512;
-    const margin = 0.45; // fraction of longest side (increased for shadow projection)
+    const margin = 0.45;
     const mX = worldW * margin, mY = worldD * margin;
     const totalW = worldW + 2 * mX;
     const totalD = worldD + 2 * mY;
@@ -393,11 +519,9 @@ function _buildGroundShadow(halfW, halfD, H) {
     canvas.height = ch;
     const ctx = canvas.getContext('2d');
 
-    // World → canvas pixel (canvas Y is flipped)
     const cx = (x) => (x - minX + mX) * ppu;
     const cy = (y) => ch - (y - minY + mY) * ppu;
 
-    // Blur radius ~8% of canvas short side
     const blurPx = Math.max(6, Math.min(cw, ch) * 0.10);
     ctx.filter = `blur(${blurPx}px)`;
     ctx.fillStyle = 'rgba(24, 24, 24, 0.35)';
@@ -413,18 +537,16 @@ function _buildGroundShadow(halfW, halfD, H) {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set((minX + maxX) / 2, (minY + maxY) / 2, -0.02);
     mesh.renderOrder = 0;
-    _windShellGroup.add(mesh);
+    windShellGroup.add(mesh);
 }
 
-// ---- Dimension annotation lines ----
-
 function _buildDimensionLines(halfW, halfD, H) {
-    const { width: L, depth: B, totalHeight: Ht } = _config;
+    const config = getWindConfig();
+    const { width: L, depth: B, totalHeight: Ht } = config;
     const refDim = Math.min(L, B, Ht);
     const scaleMult = Math.max(0.6, refDim / 10);
-    const off = Math.max(1.2, Math.min(L, B) * 0.12); // leader offset from building face
+    const off = Math.max(1.2, Math.min(L, B) * 0.12);
 
-    // Length (X): in front of front wall at z=0
     _addDimAnnotation(
         new THREE.Vector3(-halfW, -halfD - off, 0),
         new THREE.Vector3( halfW, -halfD - off, 0),
@@ -433,7 +555,6 @@ function _buildDimensionLines(halfW, halfD, H) {
         `${L.toFixed(1)} m`, scaleMult
     );
 
-    // Depth (Y): to the right of right wall at z=0
     _addDimAnnotation(
         new THREE.Vector3(halfW + off, -halfD, 0),
         new THREE.Vector3(halfW + off,  halfD, 0),
@@ -442,7 +563,6 @@ function _buildDimensionLines(halfW, halfD, H) {
         `${B.toFixed(1)} m`, scaleMult
     );
 
-    // Height (Z): 45° diagonal from front-left corner (offset in -X/-Y direction)
     const diagOff = off / Math.SQRT2;
     _addDimAnnotation(
         new THREE.Vector3(-halfW - diagOff, -halfD - diagOff, 0),
@@ -456,37 +576,33 @@ function _buildDimensionLines(halfW, halfD, H) {
 function _addDimAnnotation(start, end, leaders, labelText, scaleMult) {
     const mat = new THREE.LineBasicMaterial({ color: 0xa1a1a1 });
 
-    // Extension length for dimension line beyond endpoints
     const extLen = 0.2 * scaleMult;
     const dir = end.clone().sub(start).normalize();
     const extStart = start.clone().sub(dir.clone().multiplyScalar(extLen));
     const extEnd = end.clone().add(dir.clone().multiplyScalar(extLen));
 
     const mainGeo = new THREE.BufferGeometry().setFromPoints([extStart, extEnd]);
-    _windShellGroup.add(new THREE.Line(mainGeo, mat.clone()));
+    windShellGroup.add(new THREE.Line(mainGeo, mat.clone()));
 
     leaders.forEach(([a, b]) => {
         const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
-        _windShellGroup.add(new THREE.Line(geo, mat.clone()));
+        windShellGroup.add(new THREE.Line(geo, mat.clone()));
     });
 
-    // Architectural cross ticks (45° marks at dimension line endpoints)
     const tickSize = 0.25 * scaleMult;
-    const perp = new THREE.Vector3(-dir.y, dir.x, 0).normalize();
     const diag = new THREE.Vector3(dir.y, -dir.x, 0).normalize().multiplyScalar(tickSize);
 
-    // All dimensions use 45° cross tick (architectural style)
     const tickStart1 = start.clone().add(diag);
     const tickStart2 = start.clone().sub(diag);
     const tickEnd1 = end.clone().add(diag);
     const tickEnd2 = end.clone().sub(diag);
-    _windShellGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickStart1, tickStart2]), mat.clone()));
-    _windShellGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickEnd1, tickEnd2]), mat.clone()));
+    windShellGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickStart1, tickStart2]), mat.clone()));
+    windShellGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickEnd1, tickEnd2]), mat.clone()));
 
     const mid = start.clone().add(end).multiplyScalar(0.5);
     const sprite = _makeDimLabel(labelText, scaleMult);
     sprite.position.copy(mid);
-    _windShellGroup.add(sprite);
+    windShellGroup.add(sprite);
 }
 
 function _makeDimLabel(text, scaleMult = 1) {
@@ -514,42 +630,25 @@ function _makeDimLabel(text, scaleMult = 1) {
     return sprite;
 }
 
-// ---- Pressure label helper (similar to _makeDimLabel but for pressure values) ----
-function _makePressureLabel(text, scaleMult = 1) {
-    const fontSize = 18;
-    const tmpCanvas = document.createElement('canvas');
-    const tmpCtx = tmpCanvas.getContext('2d');
-    tmpCtx.font = `600 ${fontSize}px Arial`;
-    const textW = tmpCtx.measureText(text).width;
-    const W = Math.ceil(textW) + 12;
-    const H = 24;
-    const canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'rgba(8,8,8,0.72)';
-    ctx.beginPath(); ctx.roundRect(1, 1, W - 2, H - 2, 4); ctx.fill();
-    ctx.font = `600 ${fontSize}px Arial`;
-    ctx.fillStyle = 'rgba(208, 208, 208, 0.88)';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(text, W / 2, H / 2);
-    const texture = new THREE.CanvasTexture(canvas);
-    const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
-    const sprite = new THREE.Sprite(mat);
-    sprite.scale.set((W / 65) * scaleMult, (H / 65) * scaleMult, 1);
-    sprite.renderOrder = 10;
-    return sprite;
-}
+// ============================
+// Wind Direction
+// ============================
 
-// ---- Wind direction arrow ----
+function _syncDirButtons() {
+    document.querySelectorAll('.wind-dir-radio').forEach(radio => {
+        radio.checked = radio.value === _windDir;
+    });
+}
 
 function _updateWindArrow() {
     if (_windArrow) {
-        _windShellGroup.remove(_windArrow);
+        windShellGroup.remove(_windArrow);
         _windArrow = null;
     }
-    if (!_windDir || !_windShellGroup?.visible) return;
+    if (!_windDir || !windShellGroup?.visible) return;
 
-    const { width: L, depth: B, totalHeight: Ht } = _config;
+    const config = getWindConfig();
+    const { width: L, depth: B, totalHeight: Ht } = config;
     const halfW = L / 2; const halfD = B / 2;
     const arrowLen = Math.max(2, Math.min(L, B) * 0.35);
     const gap = Math.max(1.0, Math.min(L, B) * 0.12);
@@ -567,51 +666,46 @@ function _updateWindArrow() {
     _windArrow = new THREE.ArrowHelper(windVec, origin, arrowLen, 0x5676b0, arrowLen * 0.28, arrowLen * 0.14);
     _windArrow.line.material.transparent = true; _windArrow.line.material.opacity = 0.70;
     _windArrow.cone.material.transparent = true; _windArrow.cone.material.opacity = 0.70;
-    _windShellGroup.add(_windArrow);
+    windShellGroup.add(_windArrow);
 }
 
-// ---- Wind direction classification ----
-
-/**
- * Returns true (windward / + pressure), false (leeward or side / − pressure),
- * or null (no wind dir selected — show both).
- * Roof faces are always leeward (negative) per ASCE 7 flat-roof C&C.
- */
 function _isWindward(faceId, isRoof) {
     if (_windDir === null) return null;
-    if (isRoof) return false; // flat roof always suction
+    if (isRoof) return false;
 
     const wallKey = Object.keys(_WALL_NORMALS).find(k => faceId.startsWith(k));
     if (!wallKey) return null;
     const dot = _WALL_NORMALS[wallKey].dot(_WIND_VECTORS[_windDir]);
-    return dot < -0.5; // front-facing into wind → windward (dot < 0 means opposing wind)
+    return dot < -0.5;
 }
-
-// ---- Face appearance (opacity) based on wind direction ----
 
 function _updateFaceAppearance() {
     _zoneMeshes.forEach(mesh => {
         const { zoneId, faceId, isRoof, baseOpacity } = mesh.userData;
         const windward = _isWindward(faceId, isRoof);
         let opacity = baseOpacity;
-        if (windward === true)  opacity = Math.min(1, baseOpacity * 1.15); // windward pops
-        if (windward === false) opacity = baseOpacity * 1.0;             // leeward/side dims
+        if (windward === true)  opacity = Math.min(1, baseOpacity * 1.15);
+        if (windward === false) opacity = baseOpacity * 1.0;
         mesh.material.opacity = opacity;
     });
 }
 
-// ---- Zone labels (sprites, scaled to building size) ----
+// ============================
+// Labels
+// ============================
 
 function _updateLabels() {
-    while (_labelsGroup.children.length > 0) {
-        const s = _labelsGroup.children[0];
+    if (!labelsGroup) return;
+
+    while (labelsGroup.children.length > 0) {
+        const s = labelsGroup.children[0];
         if (s.material?.map) s.material.map.dispose();
         if (s.material) s.material.dispose();
-        _labelsGroup.remove(s);
+        labelsGroup.remove(s);
     }
 
-    // Scale sprites proportionally to building dimensions
-    const { width: L, depth: B, totalHeight: H } = _config;
+    const config = getWindConfig();
+    const { width: L, depth: B, totalHeight: H } = config;
     const refDim = Math.min(L, B, H);
     const scaleMult = refDim / 10;
 
@@ -624,7 +718,6 @@ function _updateLabels() {
         if (!sprite) return;
 
         const pos = mesh.position.clone();
-        // Compute outward face normal: for walls use XY direction, for roof use +Z
         const normal = isRoof
             ? new THREE.Vector3(0, 0, 1)
             : new THREE.Vector3(pos.x, pos.y, 0).normalize();
@@ -641,7 +734,7 @@ function _updateLabels() {
             pos.z += 0.4 * scaleMult;
         }
         sprite.position.copy(pos);
-        _labelsGroup.add(sprite);
+        labelsGroup.add(sprite);
     });
 }
 
@@ -652,18 +745,15 @@ function _getPressureLabel(zoneId, windward) {
     const roof = _ccData.roof?.[refArea];
 
     if (windward === null) {
-        // No wind dir — show both +/-
         if (zoneId === 'z4' && wall) return `+${wall.P_z4_pos ?? '—'} / ${wall.P_z4_neg ?? '—'} kPa`;
         if (zoneId === 'z5' && wall) return `+${wall.P_z5_pos ?? wall.P_z4_pos ?? '—'} / ${wall.P_z5_neg ?? '—'} kPa`;
         if (zoneId === 'z1' && roof) return `${roof.P_z1_neg ?? '—'} kPa`;
         if (zoneId === 'z2' && roof) return `${roof.P_z2_neg ?? '—'} kPa`;
         if (zoneId === 'z3' && roof) return `${roof.P_z3_neg ?? '—'} kPa`;
     } else if (windward) {
-        // Windward face: positive pressure
         if (zoneId === 'z4' && wall) return `+${wall.P_z4_pos ?? '—'} kPa`;
         if (zoneId === 'z5' && wall) return `+${wall.P_z5_pos ?? wall.P_z4_pos ?? '—'} kPa`;
     } else {
-        // Leeward / side / roof: negative pressure (suction)
         if (zoneId === 'z4' && wall) return `${wall.P_z4_neg ?? '—'} kPa`;
         if (zoneId === 'z5' && wall) return `${wall.P_z5_neg ?? '—'} kPa`;
         if (zoneId === 'z1' && roof) return `${roof.P_z1_neg ?? '—'} kPa`;
@@ -676,14 +766,13 @@ function _getPressureLabel(zoneId, windward) {
 function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     if (!pressureLine) return null;
 
-    // Measure text width and fit canvas tightly
     const fontSize = 15;
     const tmpCanvas = document.createElement('canvas');
     const tmpCtx = tmpCanvas.getContext('2d');
     tmpCtx.font = `600 ${fontSize}px Arial`;
     const textW = tmpCtx.measureText(pressureLine).width;
 
-    const padH = 14; // total horizontal padding (7px each side)
+    const padH = 14;
     const swatchW = 5;
     const W = Math.ceil(textW + padH + swatchW);
     const H = 34;
@@ -704,10 +793,9 @@ function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     ctx.roundRect(2, 2, W - 4, H - 4, 7);
     ctx.stroke();
 
-    // Swatch color: warm for windward (+), cool for leeward (−), zone color for unfiltered
     let swatchColor;
-    if (windward === true)       swatchColor = '#d4d4d4'; // positive pressure — light
-    else if (windward === false) swatchColor = '#555555'; // negative/suction — dark
+    if (windward === true)       swatchColor = '#d4d4d4';
+    else if (windward === false) swatchColor = '#555555';
     else                         swatchColor = '#' + ZONE[zoneId].color.toString(16).padStart(6, '0');
 
     ctx.fillStyle = swatchColor;
@@ -729,7 +817,6 @@ function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     return sprite;
 }
 
-// ---- Pressure value parser ----
 function _getPressureValue(zoneId, windward) {
     if (!_ccData) return 0;
     const refArea = '5.0';
@@ -737,16 +824,12 @@ function _getPressureValue(zoneId, windward) {
     const roof = _ccData.roof?.[refArea];
 
     if (windward === null) {
-        // No wind dir — show both +/- but we need a single magnitude? We'll use average of abs? 
-        // For simplicity, return 0 when no direction (could also show zero arrow).
         return 0;
     } else if (windward) {
-        // Windward face: positive pressure
         if (zoneId === 'z4' && wall) return wall.P_z4_pos ?? 0;
         if (zoneId === 'z5' && wall) return wall.P_z5_pos ?? wall.P_z4_pos ?? 0;
     } else {
-        // Leeward / side / roof: negative pressure (suction)
-        if (zoneId === 'z4' && wall) return -(wall.P_z4_neg ?? 0); // negative value
+        if (zoneId === 'z4' && wall) return -(wall.P_z4_neg ?? 0);
         if (zoneId === 'z5' && wall) return -(wall.P_z5_neg ?? 0);
         if (zoneId === 'z1' && roof) return -(roof.P_z1_neg ?? 0);
         if (zoneId === 'z2' && roof) return -(roof.P_z2_neg ?? 0);
@@ -755,40 +838,36 @@ function _getPressureValue(zoneId, windward) {
     return 0;
 }
 
-// ---- Pressure perimeter arrows and labels ----
-function _updatePressurePerimeterAndLabels() {
-    // Visibility guard
-    if (!_windShellGroup?.visible) return;
+// ============================
+// Pressure Perimeter
+// ============================
 
-    // Cleanup previous groups
+function _updatePressurePerimeterAndLabels() {
+    if (!windShellGroup?.visible) return;
+
     if (_pressurePerimeterGroup) {
-        _windShellGroup.remove(_pressurePerimeterGroup);
+        windShellGroup.remove(_pressurePerimeterGroup);
         _disposeObject(_pressurePerimeterGroup);
         _pressurePerimeterGroup = null;
     }
 
-    // Early exit if no wind direction or no pressure data
     if (!_windDir || !_ccData) return;
 
-    // Create new groups
     _pressurePerimeterGroup = new THREE.Group();
     _pressurePerimeterGroup.name = 'pressurePerimeter';
-    _windShellGroup.add(_pressurePerimeterGroup);
+    windShellGroup.add(_pressurePerimeterGroup);
 
-    // Tunable constants
-    const ARROW_SPACING = _config.floorHeight || 3; // floor heights spacing along perimeter
-    const BASE_ARROW_LEN = 1.5;  // meters, minimum visible arrow
-    const PRESSURE_LEN_SCALE = 1.0; // meters per kPa
-    const PERIMETER_OFFSET_INSET = 0.5; // meters, how far inside the face the perimeter line runs
+    const config = getWindConfig();
+    const ARROW_SPACING = config.floorHeight || 3;
+    const BASE_ARROW_LEN = 1.5;
+    const PRESSURE_LEN_SCALE = 1.0;
+    const PERIMETER_OFFSET_INSET = 0.5;
     const LINE_COLOR = 0xffffff;
     const LINE_OPACITY = 0.5;
-    const ARROW_COLOR_POS = 0x0000ff; // blue for + pressure
-    const ARROW_COLOR_NEG = 0xff0000; // red for – pressure
+    const ARROW_HEAD_SIZE = 1.0;
+    const ARROW_HEAD_WIDTH = 0.5;
     const ARROW_OPACITY = 0.7;
-    const ARROW_HEAD_SIZE = 1.0; // fixed head size regardless of arrow length
-    const ARROW_HEAD_WIDTH = 0.5; // fixed head width
 
-    // Group zones by faceId to avoid overlapping arrows on shared edges
     const faces = {};
     _zoneMeshes.forEach(mesh => {
         const { zoneId, faceId, isRoof } = mesh.userData;
@@ -798,9 +877,7 @@ function _updatePressurePerimeterAndLabels() {
         faces[faceId].meshes.push(mesh);
     });
 
-    // Process each face (not per-zone)
     Object.entries(faces).forEach(([faceId, { meshes, isRoof }]) => {
-        // Compute outward normal
         let outward;
         if (isRoof) {
             outward = new THREE.Vector3(0, 0, 1);
@@ -809,21 +886,16 @@ function _updatePressurePerimeterAndLabels() {
             outward = wallKey ? _WALL_NORMALS[wallKey].clone() : new THREE.Vector3(0, 0, 1);
         }
 
-        // Determine windward boolean
         const windward = _isWindward(faceId, isRoof);
 
-        // Get zone info from first mesh on this face
         const firstMesh = meshes[0];
         const { zoneId, w, d } = firstMesh.userData;
         if (w === undefined || d === undefined) return;
 
-        // Get signed pressure
         const pressure = _getPressureValue(zoneId, windward);
 
-        // Compute arrow length
         const arrowLen = BASE_ARROW_LEN + PRESSURE_LEN_SCALE * Math.abs(pressure);
 
-        // Determine arrow direction
         let arrowDir;
         if (isRoof) {
             arrowDir = new THREE.Vector3(0, 0, 1);
@@ -834,8 +906,6 @@ function _updatePressurePerimeterAndLabels() {
         }
         arrowDir.normalize();
 
-        // Compute outer boundary of all zones on this face in local 2D coordinates
-        // Use first mesh as reference for orientation
         const refMesh = meshes[0];
         const refMatrix = refMesh.matrixWorld;
         const invMatrix = refMatrix.clone().invert();
@@ -860,7 +930,6 @@ function _updatePressurePerimeterAndLabels() {
             });
         });
 
-        // Build outer perimeter points in local coords, then transform to world
         const offset = PERIMETER_OFFSET_INSET;
         const localPerimeter = [
             new THREE.Vector3(minU + offset, minV + offset, 0),
@@ -870,7 +939,6 @@ function _updatePressurePerimeterAndLabels() {
         ];
         const perimeterPoints = localPerimeter.map(p => p.clone().applyMatrix4(refMatrix));
 
-        // Create the perimeter line (closed loop)
         const lineGeometry = new THREE.BufferGeometry().setFromPoints([
             ...perimeterPoints,
             perimeterPoints[0]
@@ -883,7 +951,6 @@ function _updatePressurePerimeterAndLabels() {
         const perimeterLine = new THREE.Line(lineGeometry, lineMaterial);
         _pressurePerimeterGroup.add(perimeterLine);
 
-        // Place arrows at uniform intervals along the perimeter
         let perimeterLength = 0;
         const segments = [];
         for (let i = 0; i < perimeterPoints.length; i++) {
@@ -960,26 +1027,32 @@ function _updatePressurePerimeterAndLabels() {
     });
 }
 
-// ---- Per-frame label visibility (back-facing labels fade out) ----
+// ============================
+// Tick (Per-frame updates)
+// ============================
 
 const _camDir = new THREE.Vector3();
 
-function tickWindShell(camera) {
-    if (!_windShellGroup?.visible || !_labelsGroup) return;
+function _tickWindShell() {
+    if (!windShellGroup?.visible || !labelsGroup) return;
+
+    const camera = getCamera(VIEW_MODE);
+    if (!camera) return;
+
     camera.getWorldDirection(_camDir);
 
-    _labelsGroup.children.forEach(sprite => {
+    labelsGroup.children.forEach(sprite => {
         const normal = sprite.userData.faceNormal;
         if (!normal) return;
-        // dot > 0: face pointing same dir as camera (back-facing), < 0: front-facing
         const dot = normal.dot(_camDir);
-        // Map: front-facing (dot ≤ -0.1) → full opacity, back-facing (dot ≥ 0.3) → dim
         const t = Math.max(0, Math.min(1, (dot + 0.1) / 0.4));
-        sprite.material.opacity = 1 - t * 0.82; // fades from 1.0 → 0.18
+        sprite.material.opacity = 1 - t * 0.82;
     });
 }
 
-// ---- Helpers ----
+// ============================
+// Helpers
+// ============================
 
 function _disposeObject(obj) {
     if (obj.geometry) obj.geometry.dispose();
@@ -990,4 +1063,4 @@ function _disposeObject(obj) {
     obj.children?.forEach(_disposeObject);
 }
 
-export { initWindShell, updateWindShellGeometry, tickWindShell, setWindDirection };
+export { initWindView, updateWindBuilding };
