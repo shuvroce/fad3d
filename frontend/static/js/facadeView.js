@@ -442,7 +442,7 @@ function _buildCategoryFacade(catNum) {
     } else if (facadeType === 'cont') {
         rows = [{ start: 1, end: 2 }, { start: 2, end: 3 }];
     } else {
-        rows = [{ start: 2, end: 3 }];
+        rows = [{ start: 1, end: 2 }];
     }
 
     const y = -halfD;
@@ -456,6 +456,7 @@ function _buildCategoryFacade(catNum) {
         _createMullionsSlabToSlab(xOffset, y, z, nextZ, facadeWidth, spanMeters, catNum);
         _createTransomsAtLevels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum);
         _createAnchorsAtLevel(xOffset, y, z, facadeWidth, panelHeight, spanMeters, catNum);
+        _createDimensionLabels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum);
     }
 }
 
@@ -552,6 +553,133 @@ function _createAnchorsAtLevel(x, y, z, w, h, spanMeters, catNum) {
 }
 
 // ============================
+// Dimension Labels (Architectural Style)
+// ============================
+
+function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, verticalSpacing, catNum) {
+    const scaleMult = 0.8;
+    const dimColor = 0xa1a1a1;
+    const mat = new THREE.LineBasicMaterial({ color: dimColor });
+
+    const leftX = x;
+    const rightX = x + facadeWidth;
+    const bottomZ = zStart;
+    const topZ = zEnd;
+    const centerZ = (zStart + zEnd) / 2;
+
+    const _addDimLine = (start, end, label) => {
+        const dir = end.clone().sub(start).normalize();
+        const extLen = 0.15 * scaleMult;
+        const extStart = start.clone().sub(dir.clone().multiplyScalar(extLen));
+        const extEnd = end.clone().add(dir.clone().multiplyScalar(extLen));
+
+        const geo = new THREE.BufferGeometry().setFromPoints([extStart, extEnd]);
+        facadeElementsGroup.add(new THREE.Line(geo, mat.clone()));
+
+        const tickSize = 0.12 * scaleMult;
+        const horizDir = new THREE.Vector3(-dir.y, dir.x, 0).normalize();
+        const tickStart1 = start.clone().add(horizDir.clone().multiplyScalar(tickSize));
+        const tickStart2 = start.clone().sub(horizDir.clone().multiplyScalar(tickSize));
+        const tickEnd1 = end.clone().add(horizDir.clone().multiplyScalar(tickSize));
+        const tickEnd2 = end.clone().sub(horizDir.clone().multiplyScalar(tickSize));
+
+        facadeElementsGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickStart1, tickStart2]), mat.clone()));
+        facadeElementsGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickEnd1, tickEnd2]), mat.clone()));
+
+        const mid = start.clone().add(end).multiplyScalar(0.5);
+        const offsetDir = horizDir.clone().multiplyScalar(-0.25 * scaleMult);
+        mid.add(offsetDir);
+        _createDimLabelSprite(label, mid, scaleMult);
+    };
+
+const mullionLen = zEnd - zStart;
+    const mullionLenMM = Math.round(mullionLen * 1000);
+    _addDimLine(
+        new THREE.Vector3(leftX - 0.6, y, bottomZ),
+        new THREE.Vector3(leftX - 0.6, y, topZ),
+        `${mullionLenMM}mm`
+    );
+
+    const midZ = bottomZ + verticalSpacing;
+    const glassLen1 = midZ - bottomZ;
+    const glassLen2 = topZ - midZ;
+    _addDimLine(
+        new THREE.Vector3(rightX + 0.6, y, bottomZ),
+        new THREE.Vector3(rightX + 0.6, y, midZ),
+        `${Math.round(glassLen1 * 1000)}mm`
+    );
+    _addDimLine(
+        new THREE.Vector3(rightX + 0.6, y, midZ),
+        new THREE.Vector3(rightX + 0.6, y, topZ),
+        `${Math.round(glassLen2 * 1000)}mm`
+    );
+
+    const numMullions = 5;
+    const spacingY = y;
+    const _addHorizDimLine = (start, end, label) => {
+        const dir = end.clone().sub(start).normalize();
+        const extLen = 0.15 * scaleMult;
+        const extStart = start.clone().sub(dir.clone().multiplyScalar(extLen));
+        const extEnd = end.clone().add(dir.clone().multiplyScalar(extLen));
+
+        const geo = new THREE.BufferGeometry().setFromPoints([extStart, extEnd]);
+        facadeElementsGroup.add(new THREE.Line(geo, mat.clone()));
+
+        const tickSize = 0.12 * scaleMult;
+        const tickDir = new THREE.Vector3(0, 0, -1).normalize();
+        const tickStart1 = start.clone().add(tickDir.clone().multiplyScalar(tickSize));
+        const tickStart2 = start.clone().sub(tickDir.clone().multiplyScalar(tickSize));
+        const tickEnd1 = end.clone().add(tickDir.clone().multiplyScalar(tickSize));
+        const tickEnd2 = end.clone().sub(tickDir.clone().multiplyScalar(tickSize));
+
+        facadeElementsGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickStart1, tickStart2]), mat.clone()));
+        facadeElementsGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickEnd1, tickEnd2]), mat.clone()));
+
+        const mid = start.clone().add(end).multiplyScalar(0.5);
+        const offsetDir = new THREE.Vector3(0, 0, -0.35 * scaleMult);
+        mid.add(offsetDir);
+        _createDimLabelSprite(label, mid, scaleMult);
+    };
+
+    for (let i = 0; i < numMullions; i++) {
+        const m1 = leftX + i * spanMeters;
+        const m2 = leftX + (i + 1) * spanMeters;
+        const spacingMM = Math.round(spanMeters * 1000);
+        _addHorizDimLine(
+            new THREE.Vector3(m1, spacingY, bottomZ - 0.5),
+            new THREE.Vector3(m2, spacingY, bottomZ - 0.5),
+            `${spacingMM}mm`
+        );
+    }
+}
+
+function _createDimLabelSprite(text, position, scaleMult = 1) {
+    const fontSize = 13;
+    const tmpCanvas = document.createElement('canvas');
+    const tmpCtx = tmpCanvas.getContext('2d');
+    tmpCtx.font = `600 ${fontSize}px Arial`;
+    const textW = tmpCtx.measureText(text).width;
+    const W = Math.ceil(textW) + 6;
+    const H = 18;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.font = `600 ${fontSize}px Arial`;
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, W / 2, H / 2);
+    const texture = new THREE.CanvasTexture(canvas);
+    const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set((W / 65) * scaleMult, (H / 65) * scaleMult, 1);
+    sprite.renderOrder = 10;
+    facadeElementsGroup.add(sprite);
+    sprite.position.copy(position);
+}
+
+// ============================
 // Result Overlay (DC Ratio / Deflection)
 // ============================
 
@@ -599,8 +727,8 @@ function _updateResultOverlay(mode) {
         startFloor = numFloors;
         endFloor = numFloors;
     } else if (facadeType === 'cont') {
-        startFloor = 2;
-        endFloor = 3;
+        startFloor = 1;
+        endFloor = 2;
     } else {
         startFloor = 3;
         endFloor = 3;
