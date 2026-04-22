@@ -341,11 +341,11 @@ function _buildWalls(halfW, halfD, H, ax, ay) {
     _addZone('z5', ax, H, [halfW - ax / 2, halfD, H / 2], rotFB, 'back-right');
 
     _addZone('z5', ay, H, [-halfW, -halfD + ay / 2, H / 2], rotLR, 'left-front');
-    if (innerY > 0.01) _addZone('z4', ay, H, [-halfW, 0, H / 2], rotLR, 'left-mid');
+    if (innerY > 0.01) _addZone('z4', innerY, H, [-halfW, 0, H / 2], rotLR, 'left-mid');
     _addZone('z5', ay, H, [-halfW, halfD - ay / 2, H / 2], rotLR, 'left-back');
 
     _addZone('z5', ay, H, [halfW, -halfD + ay / 2, H / 2], rotLR, 'right-front');
-    if (innerY > 0.01) _addZone('z4', ay, H, [halfW, 0, H / 2], rotLR, 'right-mid');
+    if (innerY > 0.01) _addZone('z4', innerY, H, [halfW, 0, H / 2], rotLR, 'right-mid');
     _addZone('z5', ay, H, [halfW, halfD - ay / 2, H / 2], rotLR, 'right-back');
 }
 
