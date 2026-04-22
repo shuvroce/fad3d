@@ -15,6 +15,7 @@ import {
     fitCameraToBuilding,
     setAnimationCallback,
     setViewMode,
+    saveCurrentCameraState,
 } from './viewShared.js';
 
 const VIEW_MODE = 'wind';
@@ -73,8 +74,9 @@ async function initWindView() {
         const { scene } = shared;
         console.log('[WindView] Got scene:', !!scene);
 
-        setViewMode(VIEW_MODE);
+        setViewMode(VIEW_MODE, true);
         fitCameraToBuilding(VIEW_MODE);
+        saveCurrentCameraState();
 
         windShellGroup = new THREE.Group();
         windShellGroup.name = 'windShell';
@@ -87,7 +89,6 @@ async function initWindView() {
         scene.add(windShellGroup);
 
         _rebuildWindShell();
-        fitCameraToBuilding(VIEW_MODE);
 
         _setupEventListeners();
         _handleInitialState();

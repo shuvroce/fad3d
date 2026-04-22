@@ -14,6 +14,8 @@ let _instance = null;
 let _initPromise = null;
 let animationCallback = null;
 let currentViewMode = 'facade';
+let windCameraSaved = null;
+let facadeCameraSaved = null;
 
 const DEFAULT_BUILDING_WIDTH = 15;
 const DEFAULT_BUILDING_DEPTH = 10;
@@ -457,11 +459,49 @@ function getActiveCamera() {
 function getActiveControls() {
     return currentViewMode === 'wind' ? windControls : facadeControls;
 }
-function setViewMode(mode) {
+function setViewMode(mode, skipRestore = false) {
+    const oldMode = currentViewMode;
+    if (mode === oldMode) return;
+
+    if (oldMode === 'wind') {
+        windCameraSaved = {
+            pos: windCamera.position.clone(),
+            target: windControls.target.clone(),
+        };
+    } else if (oldMode === 'facade') {
+        facadeCameraSaved = {
+            pos: facadeCamera.position.clone(),
+            target: facadeControls.target.clone(),
+        };
+    }
+
     currentViewMode = mode;
+
+    if (skipRestore) return;
+
+    if (mode === 'wind' && windCameraSaved) {
+        windCamera.position.copy(windCameraSaved.pos);
+        windControls.target.copy(windCameraSaved.target);
+    } else if (mode === 'facade' && facadeCameraSaved) {
+        facadeCamera.position.copy(facadeCameraSaved.pos);
+        facadeControls.target.copy(facadeCameraSaved.target);
+    }
 }
 function getViewMode() {
     return currentViewMode;
+}
+function saveCurrentCameraState() {
+    if (currentViewMode === 'wind') {
+        windCameraSaved = {
+            pos: windCamera.position.clone(),
+            target: windControls.target.clone(),
+        };
+    } else if (currentViewMode === 'facade') {
+        facadeCameraSaved = {
+            pos: facadeCamera.position.clone(),
+            target: facadeControls.target.clone(),
+        };
+    }
 }
 function getConfig() { return currentConfig; }
 
@@ -484,6 +524,7 @@ export {
     getActiveCamera,
     getActiveControls,
     setViewMode,
+    saveCurrentCameraState,
     getViewMode,
     getConfig,
     getWindConfig,

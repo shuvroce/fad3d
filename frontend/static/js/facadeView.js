@@ -13,6 +13,7 @@ import {
     getConfig,
     fitCameraToBuilding,
     setViewMode,
+    saveCurrentCameraState,
 } from './viewShared.js';
 
 const VIEW_MODE = 'facade';
@@ -43,8 +44,9 @@ async function initFacadeView() {
         const { scene } = shared;
         console.log('[FacadeView] Got scene:', !!scene);
 
-        setViewMode(VIEW_MODE);
+        setViewMode(VIEW_MODE, true);
         fitCameraToBuilding(VIEW_MODE);
+        saveCurrentCameraState();
 
         buildingGroup = new THREE.Group();
         buildingGroup.visible = false;
@@ -56,7 +58,6 @@ async function initFacadeView() {
         scene.add(facadeElementsGroup);
 
         _rebuildBuildingWireframe();
-        fitCameraToBuilding(VIEW_MODE);
 
         _setupEventListeners();
         _handleInitialState();
