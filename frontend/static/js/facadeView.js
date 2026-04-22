@@ -267,6 +267,7 @@ function _rebuildBuildingWireframe() {
     _createTransparentWalls(width, depth, totalHeight);
     _createTransparentSlabs(width, depth, numFloors, floorHeight);
 
+    const frontExtension = 1.2;
     for (let floor = 1; floor <= numFloors; floor++) {
         const z = floor * floorHeight;
         const floorPoints = [
@@ -279,6 +280,38 @@ function _rebuildBuildingWireframe() {
         const floorGeometry = new THREE.BufferGeometry().setFromPoints(floorPoints);
         const floorMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.3 });
         buildingGroup.add(new THREE.Line(floorGeometry, floorMaterial));
+
+        const frontLinePoints = [
+            new THREE.Vector3(-halfW - frontExtension, -halfD, z),
+            new THREE.Vector3(halfW + frontExtension, -halfD, z),
+        ];
+        const frontLineGeometry = new THREE.BufferGeometry().setFromPoints(frontLinePoints);
+        const frontLineMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.5 });
+        buildingGroup.add(new THREE.Line(frontLineGeometry, frontLineMaterial));
+
+        const backLinePoints = [
+            new THREE.Vector3(-halfW - frontExtension, halfD, z),
+            new THREE.Vector3(halfW + frontExtension, halfD, z),
+        ];
+        const backLineGeometry = new THREE.BufferGeometry().setFromPoints(backLinePoints);
+        const backLineMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.5 });
+        buildingGroup.add(new THREE.Line(backLineGeometry, backLineMaterial));
+
+        const leftSideLinePoints = [
+            new THREE.Vector3(-halfW, halfD, z),
+            new THREE.Vector3(-halfW, halfD + frontExtension, z),
+        ];
+        const leftSideLineGeometry = new THREE.BufferGeometry().setFromPoints(leftSideLinePoints);
+        const leftSideLineMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.5 });
+        buildingGroup.add(new THREE.Line(leftSideLineGeometry, leftSideLineMaterial));
+
+        const rightSideLinePoints = [
+            new THREE.Vector3(halfW, halfD, z),
+            new THREE.Vector3(halfW, halfD + frontExtension, z),
+        ];
+        const rightSideLineGeometry = new THREE.BufferGeometry().setFromPoints(rightSideLinePoints);
+        const rightSideLineMaterial = new THREE.LineBasicMaterial({ color: floorColor, transparent: true, opacity: 0.5 });
+        buildingGroup.add(new THREE.Line(rightSideLineGeometry, rightSideLineMaterial));
     }
 }
 
