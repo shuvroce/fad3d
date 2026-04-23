@@ -3842,21 +3842,21 @@ body.no-animations *::after {
 }
 
 .panel-mode-exiting-left {
-    animation: panelSlideOutLeft 0.1s ease forwards;
+    animation: panelSlideOutLeft 0.08s ease forwards;
     pointer-events: none;
 }
 
 .panel-mode-exiting-right {
-    animation: panelSlideOutLeft 0.1s ease forwards;
+    animation: panelSlideOutLeft 0.08s ease forwards;
     pointer-events: none;
 }
 
 .panel-mode-entering-left {
-    animation: panelSlideFromLeft 0.15s ease;
+    animation: panelSlideFromLeft 0.1s ease;
 }
 
 .panel-mode-entering-right {
-    animation: panelSlideFromLeft 0.15s ease;
+    animation: panelSlideFromLeft 0.1s ease;
 }
 
 .result__category-label {
