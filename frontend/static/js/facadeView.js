@@ -475,7 +475,7 @@ function _buildCategoryFacade(catNum) {
         _createMullionsSlabToSlab(xOffset, y, z, nextZ, facadeWidth, spanMeters, catNum);
         _createTransomsAtLevels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum);
         _createAnchorsAtLevel(xOffset, y, z, facadeWidth, panelHeight, spanMeters, catNum);
-        _createDimensionLabels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum);
+        _createDimensionLabels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row);
     }
 }
 
@@ -575,7 +575,7 @@ function _createAnchorsAtLevel(x, y, z, w, h, spanMeters, catNum) {
 // Dimension Labels (Architectural Style)
 // ============================
 
-function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, verticalSpacing, catNum) {
+function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row) {
     const scaleMult = 0.8;
     const dimColor = 0xa1a1a1;
     const mat = new THREE.LineBasicMaterial({ color: dimColor });
@@ -595,17 +595,19 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
         facadeElementsGroup.add(new THREE.Line(geo, mat.clone()));
 
         const tickSize = 0.12 * scaleMult;
-        const horizDir = new THREE.Vector3(-dir.y, dir.x, 0).normalize();
-        const tickStart1 = start.clone().add(horizDir.clone().multiplyScalar(tickSize));
-        const tickStart2 = start.clone().sub(horizDir.clone().multiplyScalar(tickSize));
-        const tickEnd1 = end.clone().add(horizDir.clone().multiplyScalar(tickSize));
-        const tickEnd2 = end.clone().sub(horizDir.clone().multiplyScalar(tickSize));
+        const perpDir = Math.abs(dir.z) > 0.9
+            ? new THREE.Vector3(1, 0, 0).normalize()
+            : new THREE.Vector3(-dir.y, dir.x, 0).normalize();
+        const tickStart1 = start.clone().add(perpDir.clone().multiplyScalar(tickSize));
+        const tickStart2 = start.clone().sub(perpDir.clone().multiplyScalar(tickSize));
+        const tickEnd1 = end.clone().add(perpDir.clone().multiplyScalar(tickSize));
+        const tickEnd2 = end.clone().sub(perpDir.clone().multiplyScalar(tickSize));
 
         facadeElementsGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickStart1, tickStart2]), mat.clone()));
         facadeElementsGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([tickEnd1, tickEnd2]), mat.clone()));
 
         const mid = start.clone().add(end).multiplyScalar(0.5);
-        const offsetDir = horizDir.clone().multiplyScalar(-0.25 * scaleMult);
+        const offsetDir = perpDir.clone().multiplyScalar(-0.25 * scaleMult);
         mid.add(offsetDir);
         _createDimLabelSprite(label, mid, scaleMult);
     };
@@ -657,6 +659,8 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
         mid.add(offsetDir);
         _createDimLabelSprite(label, mid, scaleMult);
     };
+
+    if (facadeType === 'cont' && row.start > 1) return;
 
     for (let i = 0; i < numMullions; i++) {
         const m1 = leftX + i * spanMeters;
