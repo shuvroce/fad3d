@@ -141,7 +141,11 @@ function createViewBase(viewId, containerSelector, navCubeContainerSelector = '#
             renderer.domElement.style.display = visible ? 'block' : 'none';
         }
         if (navContainer) {
-            navContainer.classList.toggle('visible', visible);
+            if (visible) {
+                navContainer.classList.add('visible');
+            } else {
+                navContainer.classList.remove('visible');
+            }
         }
         if (visible) {
             _viewInstances.forEach((otherView, otherId) => {
@@ -298,21 +302,21 @@ function _createNavCube(container, navContainer, camera, controls) {
     navCube.userData.lastMouse = { x: 0, y: 0 };
     navCube.userData.dragStartTime = 0;
 
-    container.addEventListener('mousedown', (event) => {
+    navContainer.style.cursor = 'pointer';
+    navCubeRenderer.domElement.style.cursor = 'pointer';
+
+    const navCubeWrapper = { scene: navCubeScene, camera: navCubeCamera, renderer: navCubeRenderer, mesh: navCube };
+
+    navContainer.addEventListener('click', (event) => {
+        _handleNavCubeClick(event, camera, controls, navCubeWrapper);
+    });
+
+    navContainer.addEventListener('mousedown', (event) => {
         navCube.userData.isDragging = true;
         navCube.userData.lastMouse = { x: event.clientX, y: event.clientY };
-        navCube.userData.dragStartTime = Date.now();
     });
 
-    container.addEventListener('mouseup', (event) => {
-        const dragDuration = Date.now() - navCube.userData.dragStartTime;
-        navCube.userData.isDragging = false;
-        if (dragDuration < 200) {
-            _handleNavCubeClick(event, camera, controls, navCube);
-        }
-    });
-
-    container.addEventListener('mousemove', (event) => {
+    navContainer.addEventListener('mousemove', (event) => {
         if (event.buttons === 1 && navCube.userData.isDragging) {
             event.preventDefault();
             const deltaX = event.clientX - navCube.userData.lastMouse.x;
@@ -339,16 +343,22 @@ function _createNavCube(container, navContainer, camera, controls) {
         }
     });
 
-    container.style.cursor = 'grab';
+    navContainer.addEventListener('mouseup', () => {
+        navCube.userData.isDragging = false;
+    });
 
-    return { scene: navCubeScene, camera: navCubeCamera, renderer: navCubeRenderer, mesh: navCube };
+    return navCubeWrapper;
 }
 
 function _handleNavCubeClick(event, camera, controls, navCube) {
-    if (!navCube || !navCube.mesh) return;
+    if (!navCube || !navCube.mesh) {
+        return;
+    }
 
     const navRenderer = navCube.renderer;
-    if (!navRenderer) return;
+    if (!navRenderer) {
+        return;
+    }
 
     const canvas = navRenderer.domElement;
     const rect = canvas.getBoundingClientRect();
@@ -357,19 +367,32 @@ function _handleNavCubeClick(event, camera, controls, navCube) {
 
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera({ x, y }, navCube.camera);
-    const intersects = raycaster.intersectObject(navCube.mesh);
+    const intersects = raycaster.intersectObject(navCube.mesh, false);
+
     if (intersects.length > 0) {
-        const views = ['right', 'left', 'top', 'bottom', 'front', 'back'];
-        const view = views[intersects[0].face.materialIndex];
-        if (view) {
-            _animateCameraToView(view, camera, controls);
+        const face = intersects[0].face;
+        if (face && face.materialIndex !== undefined) {
+            const faceIdx = face.materialIndex;
+            const viewMap = {
+                0: 'right',
+                1: 'left',
+                2: 'top',
+                3: 'bottom',
+                4: 'front',
+                5: 'back'
+            };
+            const view = viewMap[faceIdx];
+            if (view) {
+                _animateCameraToView(view, camera, controls);
+            }
         }
     }
 }
 
 function _animateCameraToView(view, camera, controls) {
     const config = getConfig();
-    const distance = 50;
+    const buildingDiag = Math.sqrt(config.width * config.width + config.depth * config.depth + config.height * config.height);
+    const distance = Math.max(50, buildingDiag * 1.5);
     const centerZ = config.height / 2;
 
     const viewMap = {
@@ -384,35 +407,32 @@ function _animateCameraToView(view, camera, controls) {
     const targetView = viewMap[view];
     if (!targetView) return;
 
-    const startPos = camera.position.toArray();
-    const startTarget = controls.target.toArray();
-    const duration = 500;
+    const startPos = camera.position.clone();
+    const startTarget = controls.target.clone();
+    const targetPos = new THREE.Vector3(...targetView.pos);
+    const targetCenter = new THREE.Vector3(...targetView.target);
+
+    const duration = 800;
     const startTime = Date.now();
+
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
 
     function update() {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 1, 2) / 2;
+        const eased = easeInOutCubic(progress);
 
-        camera.position.set(
-            startPos[0] + (targetView.pos[0] - startPos[0]) * ease,
-            startPos[1] + (targetView.pos[1] - startPos[1]) * ease,
-            startPos[2] + (targetView.pos[2] - startPos[2]) * ease,
-        );
-
-        controls.target.set(
-            startTarget[0] + (targetView.target[0] - startTarget[0]) * ease,
-            startTarget[1] + (targetView.target[1] - startTarget[1]) * ease,
-            startTarget[2] + (targetView.target[2] - startTarget[2]) * ease,
-        );
-
+        camera.position.lerpVectors(startPos, targetPos, eased);
+        controls.target.lerpVectors(startTarget, targetCenter, eased);
         controls.update();
 
         if (progress < 1) {
             requestAnimationFrame(update);
         } else {
-            camera.position.set(...targetView.pos);
-            controls.target.set(...targetView.target);
+            camera.position.copy(targetPos);
+            controls.target.copy(targetCenter);
             camera.lookAt(controls.target);
             controls.update();
         }

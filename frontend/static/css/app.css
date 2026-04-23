@@ -3663,16 +3663,20 @@ body.no-animations *::after {
     transition: right 0.2s ease;
     background: rgba(255,255,255,0.06);
     border-radius: var(--radius-2);
+    cursor: pointer;
 }
 
 .nav-cube-view.visible {
     display: flex;
+    cursor: pointer;
 }
 
 .nav-cube-view canvas {
     display: block;
     width: 100px !important;
     height: 100px !important;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 #nav-cube-axis {
