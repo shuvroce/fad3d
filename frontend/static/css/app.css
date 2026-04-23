@@ -3085,7 +3085,7 @@ body.no-animations *::after {
     padding: 0 0.5rem 0 0.1rem;
     overflow-y: auto;
     max-height: calc(100vh - var(--topbar-height) - var(--floating-height) - 9rem);
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
 }
 
 .input__tab-content.tab-enter-right {
@@ -3974,7 +3974,7 @@ body.no-animations *::after {
 }
 
 .result__card-body {
-    padding: 0 0 0.25rem 0;
+    /* padding: 0 0 0.25rem 0; */
     /* border-top: 1px solid var(--border-primary); */
     display: flex;
     flex-direction: column;
