@@ -475,7 +475,7 @@ function _buildCategoryFacade(catNum) {
         _createMullionsSlabToSlab(xOffset, y, z, nextZ, facadeWidth, spanMeters, catNum);
         _createTransomsAtLevels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum);
         _createAnchorsAtLevel(xOffset, y, z, facadeWidth, panelHeight, spanMeters, catNum);
-        _createDimensionLabels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row);
+        _createDimensionLabels(xOffset, y, z, nextZ, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row, glassType);
     }
 }
 
@@ -575,10 +575,19 @@ function _createAnchorsAtLevel(x, y, z, w, h, spanMeters, catNum) {
 // Dimension Labels (Architectural Style)
 // ============================
 
-function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row) {
+function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row, glassType) {
     const scaleMult = 0.8;
     const dimColor = 0xa1a1a1;
     const mat = new THREE.LineBasicMaterial({ color: dimColor });
+
+    const glassLabel = glassType ? glassType.toUpperCase() : 'Glass';
+    const geoEl = document.getElementById(`cat${catNum}-frame-geometry`);
+    const mullTypeEl = document.getElementById(`cat${catNum}-frame-mullion-type`);
+    const variant = `${geoEl?.value || 'regular'}-${mullTypeEl?.value || 'alu'}`;
+    const mullionEl = document.getElementById(`cat${catNum}-frame-${variant}-mullion`);
+    const mullionLabel = mullionEl?.value || 'Mullion';
+    const transomEl = document.getElementById(`cat${catNum}-frame-${variant}-transom`);
+    const transomLabel = transomEl?.value || 'Transom';
 
     const leftX = x;
     const rightX = x + facadeWidth;
@@ -659,6 +668,40 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
         mid.add(offsetDir);
         _createDimLabelSprite(label, mid, scaleMult);
     };
+
+    if (row.start === 1) {
+        const arrowColor = 0x666666;
+        const arrowMat = new THREE.LineBasicMaterial({ color: arrowColor });
+
+        const _addLeader = (toPos, label, labelOffsetX = 1.2, labelOffsetZ = 0) => {
+            const fromPos = new THREE.Vector3(toPos.x + labelOffsetX, toPos.y - 0.15, toPos.z + labelOffsetZ);
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([fromPos, toPos]);
+            facadeElementsGroup.add(new THREE.Line(lineGeo, arrowMat.clone()));
+
+            const dir = toPos.clone().sub(fromPos).normalize();
+            const arrowLen = 0.15;
+            const perpX = new THREE.Vector3(0, 1, 0).normalize();
+            const arrowPt1 = toPos.clone().sub(dir.clone().multiplyScalar(arrowLen)).add(perpX.clone().multiplyScalar(arrowLen * 0.4));
+            const arrowPt2 = toPos.clone().sub(dir.clone().multiplyScalar(arrowLen)).sub(perpX.clone().multiplyScalar(arrowLen * 0.4));
+            const arrowGeo1 = new THREE.BufferGeometry().setFromPoints([toPos.clone(), arrowPt1]);
+            const arrowGeo2 = new THREE.BufferGeometry().setFromPoints([toPos.clone(), arrowPt2]);
+            facadeElementsGroup.add(new THREE.Line(arrowGeo1, arrowMat.clone()));
+            facadeElementsGroup.add(new THREE.Line(arrowGeo2, arrowMat.clone()));
+
+            _createDimLabelSprite(label, fromPos, scaleMult);
+        };
+
+        const firstMullionX = leftX;
+        const lastMullionX = leftX + 5 * spanMeters;
+        const bottomTransomZ = bottomZ;
+        const bottomTransomCX = leftX + facadeWidth / 2;
+        const lastGlassCX = leftX + 5 * spanMeters - spanMeters * 0.5;
+        const glass1CZ = (bottomZ + midZ) / 2 - 0.3;
+
+_addLeader(new THREE.Vector3(lastMullionX, y, zStart + (zEnd - zStart) / 2), mullionLabel, 1.0, 0.4);
+        _addLeader(new THREE.Vector3(bottomTransomCX, y, bottomTransomZ), transomLabel, 1.0, -0.4);
+        _addLeader(new THREE.Vector3(lastGlassCX, y, glass1CZ), glassLabel, 1.8, -0.4);
+    }
 
     if (facadeType === 'cont' && row.start > 1) return;
 
