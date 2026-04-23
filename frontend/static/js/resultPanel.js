@@ -5,7 +5,10 @@
 import { categoryNames } from './category.js';
 import { showFacadeResults, restoreCollapseStateForCategory, persistCollapseStateForCard } from './results.js';
 
-// Function to switch between Wind and Facade tabs
+// ============================
+// Switch between Wind and Facade tabs
+// ============================
+
 function switchResultTab(tabName) {
     const RESULT_TAB_ORDER = ['facade', 'wind'];
 
@@ -94,16 +97,6 @@ export function initializeResultPanel() {
             restoreCollapseStateForCategory(Number(activeCategory));
         }
     }
-
-    // Keep Design Summary category label, results, and collapse state synced on category switch
-    window.addEventListener("category-switched", (event) => {
-        const categoryNum = event?.detail?.categoryNum;
-        if (categoryNum != null) {
-            updateFacadeResultCategory(categoryNum);
-            showFacadeResults(categoryNum);
-            restoreCollapseStateForCategory(categoryNum);
-        }
-    });
 }
 
 function initializeRightPanelToggle() {

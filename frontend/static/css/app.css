@@ -3643,12 +3643,33 @@ body.no-animations *::after {
     height: 130px;
     z-index: 9;
     overflow: hidden;
-    display: flex;
+    display: none; /* Hidden - using separate view-specific containers */
+}
+
+.nav-cube-view {
+    position: fixed;
+    bottom: 1rem;
+    right: calc(var(--result-width) + 1rem);
+    width: 100px;
+    height: 130px;
+    z-index: 9;
+    overflow: hidden;
+    display: none;
     flex-direction: column;
     align-items: center;
     transition: right 0.2s ease;
     background: rgba(255,255,255,0.06);
     border-radius: var(--radius-2);
+}
+
+.nav-cube-view.visible {
+    display: flex;
+}
+
+.nav-cube-view canvas {
+    display: block;
+    width: 100px !important;
+    height: 100px !important;
 }
 
 #nav-cube-axis {

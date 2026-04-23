@@ -65,7 +65,7 @@ function initPhase1() {
     _safe('Theme', initTheme);
 }
 
-// Phase 2: DOM-dependent initialization
+// Phase 2: Core UI initialization (order matters for dependencies)
 async function initPhase2() {
     console.log('[Main] Phase 2: Core UI initialization');
 
@@ -80,13 +80,16 @@ async function initPhase2() {
     _safe('Tooltips', initTooltips);
     _safe('Left panel toggle', initializeLeftPanelToggle);
     _safe('Right panel toggle', initializeRightPanelToggle);
-    _safe('Panel mode', initPanelMode);
     _safe('View controls', initViewControls);
     _safe('Project save/load', initProjectSaveLoad);
     _safe('Figures panel', initFiguresPanel);
     _safe('Filter panel', initFilterPanel);
     _safe('Keybinds', initKeybinds);
 
+    // Initialize categories BEFORE views (views depend on category DOM elements)
+    await _safeAsync('Categories', initCategories);
+
+    // Initialize both views (they get shown/hidden by initPanelMode based on current mode)
     try {
         await initWindView();
     } catch (e) {
@@ -99,13 +102,15 @@ async function initPhase2() {
         console.error('[Main] initFacadeView failed:', e);
     }
 
+    // Panel mode init AFTER views (triggers show/hide based on current mode)
+    _safe('Panel mode', initPanelMode);
+
     await _safeAsync('Figure checker', initFigureChecker);
 }
 
-// Phase 3: Category system and input handlers
+// Phase 3: Input handlers (categories already initialized)
 async function initPhase3() {
-    console.log('[Main] Phase 3: Category system and input handlers');
-    await _safeAsync('Categories', initCategories);
+    console.log('[Main] Phase 3: Input handlers');
     _safe('Glass input', initGlassInput);
     _safe('Frame input', initFrameInput);
     _safe('Anchor input', initAnchorInput);

@@ -15,8 +15,12 @@ import {
 import { populateFrameSectionDropdowns, syncFrameVariant } from './frameInput.js';
 import { syncAnchorVariant } from './anchorInput.js';
 import { switchGlassType } from './glassInput.js';
-import { clearFacadeCache, showFacadeResults, clearCollapseStateForCategory, renumberCollapseState } from './results.js';
+import { clearFacadeCache, showFacadeResults, clearCollapseStateForCategory, renumberCollapseState, restoreCollapseStateForCategory } from './results.js';
+import { updateFacadeResultCategory } from './resultPanel.js';
 import { clearAllCategoryTimers, renumberCategoryTimers } from './calcEngine.js';
+import { refreshWindShell, saveWindCameraState } from './windView.js';
+import { refreshFacadeElements, _saveCameraState } from './facadeView.js';
+import { triggerFigureCheck } from './figureChecker.js';
 
 let categoryCount = 0;
 const categoryNames = new Map(); // Store custom category names
@@ -30,20 +34,31 @@ function switchCategory(categoryNum) {
     const currentNum = current ? Number(current.dataset.category) : null;
     const goingDown = currentNum === null || Number(categoryNum) > currentNum;
 
+    if (currentNum !== null) {
+        saveWindCameraState(currentNum);
+        _saveCameraState(currentNum);
+    }
+
     document.querySelectorAll(".category__btn").forEach((btn) => btn.classList.remove("active"));
     const activeButton = document.querySelector(`.category__btn[data-category="${categoryNum}"]`);
     if (activeButton) activeButton.classList.add("active");
-
-    window.dispatchEvent(new CustomEvent("category-switched", { detail: { categoryNum: Number(categoryNum) } }));
 
     document.querySelectorAll(".input__category-content").forEach((c) => c.classList.add("hidden"));
 
     const target = document.querySelector(`.input__category-content[data-category="${categoryNum}"]`);
     if (target) {
-        // Remove hidden + add animation class in same sync block so browser uses 'from' keyframe
         target.classList.remove("hidden", "cat-enter-down", "cat-enter-up");
         target.classList.add(goingDown ? "cat-enter-down" : "cat-enter-up");
     }
+
+    // Direct view refresh calls (replaces DOM event coupling)
+    const catNum = Number(categoryNum);
+    refreshWindShell();
+    refreshFacadeElements();
+    updateFacadeResultCategory(catNum);
+    showFacadeResults(catNum);
+    restoreCollapseStateForCategory(catNum);
+    triggerFigureCheck();
 }
 
 // ============================

@@ -2,6 +2,8 @@
 // View Controls (Model/DC Ratio/Deflection)
 // ============================
 
+import { setViewMode as setFacadeViewMode } from './facadeView.js';
+
 let currentViewMode = "model"; // 'model', 'dc-ratio', 'deflection'
 
 // Function to switch view mode
@@ -16,12 +18,8 @@ function switchViewMode(mode) {
     // Update viewport visualization
     updateViewportDisplay(mode);
 
-    // Notify 3D viewport of mode change
-    window.dispatchEvent(
-        new CustomEvent('viewport-mode-changed', {
-            detail: { mode },
-        }),
-    );
+    // Notify facade view of mode change
+    setFacadeViewMode(mode);
 
     console.log(`View mode switched to: ${mode}`);
 }
@@ -99,11 +97,10 @@ function initViewControls() {
     });
 
     // Disable view buttons in wind mode (they're facade-only controls)
-    window.addEventListener('panel-mode-changed', (e) => {
-        const isWind = e.detail.mode === 'wind';
-        document.querySelectorAll('#view-mode-controls .floating__bar-btn').forEach(btn => {
-            btn.disabled = isWind;
-        });
+    // Note: Panel mode is determined by getCurrentPanelMode from inputPanel
+    const isWind = document.querySelector('.topbar__btn-mode.active')?.textContent?.trim().toLowerCase() === 'wind';
+    document.querySelectorAll('#view-mode-controls .floating__bar-btn').forEach(btn => {
+        btn.disabled = isWind;
     });
 
     // Start with model view (default)
@@ -174,5 +171,6 @@ export {
     initFilterPanel,
     getCurrentViewMode,
     switchViewMode,
-    updateFiguresIndicator
+    updateFiguresIndicator,
+    updateViewControlButtons
 };

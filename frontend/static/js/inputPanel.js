@@ -2,22 +2,14 @@
 // Panel Mode Switching (Wind vs Facade)
 // ============================
 
-// Import calc engine functions
 import { runWindCalc } from './calcEngine.js';
-import {
-    switchCategory,
-    switchTab,
-    createCategory,
-    categoryNames,
-    updateCategoryButtonTooltip,
-    initializeCategoryDragDrop,
-} from './category.js';
-import {
-    categoryIcons,
-    availableIcons,
-    reattachCategoryIcons,
-} from './categoryIcons.js';
+import { switchCategory, switchTab, createCategory, categoryNames, updateCategoryButtonTooltip, initializeCategoryDragDrop } from './category.js';
+import { categoryIcons, availableIcons, reattachCategoryIcons } from './categoryIcons.js';
 import { populateFrameSectionDropdowns } from './frameInput.js';
+import { showWindView, hideWindView } from './windView.js';
+import { showFacadeView, hideFacadeView } from './facadeView.js';
+import { triggerFigureCheck } from './figureChecker.js';
+import { updateViewControlButtons } from './viewControls.js';
 
 let currentPanelMode = "facade"; // 'wind' or 'facade'
 let savedFacadeContent = ""; // Store facade panel content when switching to wind
@@ -239,8 +231,25 @@ function switchPanelMode(mode) {
         // Update floating bar button states
         updateFloatingBarButtons(mode);
 
-        // Notify listeners that panel mode changed
-        window.dispatchEvent(new CustomEvent("panel-mode-changed", { detail: { mode } }));
+        // Direct view show/hide calls (replaces DOM event coupling)
+        if (mode === 'wind') {
+            hideFacadeView();
+            showWindView();
+            // Disable view controls in wind mode
+            document.querySelectorAll('#view-mode-controls .floating__bar-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+        } else {
+            hideWindView();
+            showFacadeView();
+            // Enable view controls in facade mode
+            document.querySelectorAll('#view-mode-controls .floating__bar-btn').forEach(btn => {
+                btn.disabled = false;
+            });
+        }
+
+        // Refresh figure checker on panel mode change
+        triggerFigureCheck();
     }, 150);
 }
 
@@ -432,8 +441,14 @@ function initPanelMode() {
     if (windBtn) windBtn.addEventListener('click', () => switchPanelMode('wind'));
     if (facadeBtn) facadeBtn.addEventListener('click', () => switchPanelMode('facade'));
 
-    // Dispatch initial mode event so listeners (like facadeView) know the current mode
-    window.dispatchEvent(new CustomEvent("panel-mode-changed", { detail: { mode: currentPanelMode } }));
+    // Initialize views based on current mode
+    if (currentPanelMode === 'wind') {
+        showWindView();
+        hideFacadeView();
+    } else {
+        showFacadeView();
+        hideWindView();
+    }
 }
 
 function getCurrentPanelMode() {

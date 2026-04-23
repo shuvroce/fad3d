@@ -327,12 +327,14 @@ async function _restoreProject(data) {
     _restoreGeneralInfo(data.generalInfo);
 
     // 3. Materials, alum sections, steel sections — update arrays via module refs
-    const [matMod, alumMod, steelMod, windMod, frameMod] = await Promise.all([
+    const [matMod, alumMod, steelMod, windMod, frameMod, windViewMod, facadeViewMod] = await Promise.all([
         import('./materialProp.js').catch(() => null),
         import('./alumSecProp.js').catch(() => null),
         import('./steelSecProp.js').catch(() => null),
         import('./inputPanel.js').catch(() => null),
         import('./frameInput.js').catch(() => null),
+        import('./windView.js').catch(() => null),
+        import('./facadeView.js').catch(() => null),
     ]);
     if (matMod) _restoreArray(matMod._materials, data.materials);
     if (alumMod) _restoreArray(alumMod._alumSections, data.alumSections);
@@ -369,6 +371,14 @@ async function _restoreProject(data) {
 
     // 6. Trigger recalculation for all categories and wind
     await _triggerRecalc();
+
+    // 7. Direct view refresh calls (replaces DOM event coupling)
+    if (windViewMod?.refreshWindShell) {
+        windViewMod.refreshWindShell();
+    }
+    if (facadeViewMod?.refreshFacadeElements) {
+        facadeViewMod.refreshFacadeElements();
+    }
 }
 
 // ============================

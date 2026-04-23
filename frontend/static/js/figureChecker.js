@@ -292,12 +292,6 @@ async function initFigureChecker() {
     // Fetch current figures directory from backend
     await _fetchFiguresDir();
 
-    // Auto-refresh on category switch
-    window.addEventListener("category-switched", () => triggerFigureCheck());
-
-    // Auto-refresh on panel mode change
-    window.addEventListener("panel-mode-changed", () => triggerFigureCheck());
-
     // Auto-refresh on input changes in categories (debounced via delegation)
     const inputContainer = document.getElementById("input-container");
     if (inputContainer) {

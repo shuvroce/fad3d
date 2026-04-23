@@ -1,25 +1,14 @@
 // ============================
 // Wind View - 3D Wind Visualization
 // Building dimensions from wind inputs + ASCE 7 C&C Zone visualization
+// Each view has its own Three.js environment (scene, camera, renderer, controls, nav cube)
 // ============================
 
 import * as THREE from 'three';
-import {
-    initSharedView,
-    getScene,
-    getCamera,
-    getRenderer,
-    getControls,
-    getConfig,
-    getWindConfig,
-    fitCameraToBuilding,
-    setAnimationCallback,
-    setViewMode,
-    saveCurrentCameraState,
-} from './viewShared.js';
+import { createViewBase, getViewInstance } from './viewBase.js';
+import { getConfig, updateConfig } from './buildingConfig.js';
 
-const VIEW_MODE = 'wind';
-
+let _view = null;
 let windShellGroup, labelsGroup;
 let _zoneMeshes = [];
 let _ccData = null;
@@ -27,8 +16,22 @@ let _windDir = null;
 let _windArrow = null;
 let _pressurePerimeterGroup = null;
 let _initialized = false;
+let _categoryCameraStates = new Map();
 
-// ---- Wind Shell Zone Config ----
+function _saveCameraState(catNum) {
+    if (!_view || isNaN(catNum)) return;
+    const pos = _view.camera.position.toArray();
+    const target = _view.controls.target.toArray();
+    _categoryCameraStates.set(catNum, { pos, target });
+}
+
+function _restoreCameraState(catNum) {
+    const state = _categoryCameraStates.get(catNum);
+    if (state && state.pos && state.target) {
+        _view.setCameraPosition(state.pos, state.target);
+    }
+}
+
 const ZONE = {
     z4: { color: 0xf3f5d5, label: 'Zone 4', opacity: 0.4 },
     z5: { color: 0xa4bbe0, label: 'Zone 5', opacity: 0.7 },
@@ -55,84 +58,137 @@ const _WALL_NORMALS = {
 // Public API
 // ============================
 
-async function initWindView() {
+function initWindView() {
     console.log('[WindView] initWindView called, _initialized:', _initialized);
-    if (_initialized) {
-        console.log('[WindView] Already initialized, skipping');
+    if (_initialized) return;
+
+    _view = createViewBase('wind', '#viewport-3d', '#nav-cube-wind');
+    if (!_view) {
+        console.warn('[WindView] Failed to create view base');
         return;
     }
 
-    try {
-        console.log('[WindView] Calling initSharedView...');
-        const shared = await initSharedView();
-        console.log('[WindView] initSharedView returned:', !!shared);
-        if (!shared) {
-            console.warn('[WindView] Shared view not ready');
-            return;
+    const { scene } = _view;
+
+    // Set initial camera position for wind view
+    _view.camera.position.set(-25, -30, 15);
+    _view.camera.lookAt(0, 0, _view.controls.target.z);
+    _view.controls.update();
+
+    windShellGroup = new THREE.Group();
+    windShellGroup.name = 'windShell';
+    windShellGroup.visible = false;
+
+    labelsGroup = new THREE.Group();
+    labelsGroup.name = 'windShellLabels';
+    windShellGroup.add(labelsGroup);
+
+    scene.add(windShellGroup);
+
+    _view.setAnimationCallback(_tickWindShell);
+    _view.fitCameraToBuilding();
+
+    _rebuildWindShell();
+    _setupDynamicInputListeners();
+    _handleInitialState();
+
+    window.addEventListener('wind-cc-updated', (e) => {
+        updateWindCCData(e.detail);
+    });
+
+    _initialized = true;
+    console.log('[WindView] Initialized successfully');
+}
+
+function showWindView() {
+    if (!_view || !windShellGroup) return;
+    _view.setVisible(true);
+    windShellGroup.visible = true;
+
+    _windDir = _windDir || '+X';
+    _syncDirButtons();
+    _updateFaceAppearance();
+    _updateLabels();
+    _updateWindArrow();
+    _updatePressurePerimeterAndLabels();
+
+    const activeCat = document.querySelector('.category__btn.active');
+    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
+    if (catNum !== null && _categoryCameraStates.has(catNum)) {
+        _restoreCameraState(catNum);
+    } else {
+        _view.fitCameraToBuilding();
+    }
+
+    const legend = document.getElementById('wind-zone-legend');
+    if (legend) legend.classList.add('visible');
+    const windSection = document.getElementById('filter-wind-section');
+    if (windSection) windSection.classList.add('visible');
+}
+
+function hideWindView() {
+    if (!_view || !windShellGroup) return;
+    windShellGroup.visible = false;
+    _windDir = null;
+    _syncDirButtons();
+    _updateFaceAppearance();
+    _updateWindArrow();
+    _updatePressurePerimeterAndLabels();
+
+    const legend = document.getElementById('wind-zone-legend');
+    if (legend) legend.classList.remove('visible');
+    const windSection = document.getElementById('filter-wind-section');
+    if (windSection) windSection.classList.remove('visible');
+}
+
+function refreshWindShell() {
+    if (!_initialized) return;
+
+    const activeCat = document.querySelector('.category__btn.active');
+    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
+
+    if (catNum !== null) {
+        if (_categoryCameraStates.has(catNum)) {
+            _restoreCameraState(catNum);
+        } else {
+            _view?.fitCameraToBuilding();
         }
+    }
 
-        const { scene } = shared;
-        console.log('[WindView] Got scene:', !!scene);
-
-        setViewMode(VIEW_MODE, true);
-        fitCameraToBuilding(VIEW_MODE);
-        saveCurrentCameraState();
-
-        windShellGroup = new THREE.Group();
-        windShellGroup.name = 'windShell';
-        windShellGroup.visible = false;
-
-        labelsGroup = new THREE.Group();
-        labelsGroup.name = 'windShellLabels';
-        windShellGroup.add(labelsGroup);
-
-        scene.add(windShellGroup);
-
-        _rebuildWindShell();
-
-        _setupEventListeners();
-        _handleInitialState();
-
-        _initialized = true;
-        console.log('[WindView] Initialized successfully');
-    } catch (e) {
-        console.error('[WindView] Initialization error:', e);
-        console.error(e.stack);
+    _rebuildWindShell();
+    if (windShellGroup.visible) {
+        _updateFaceAppearance();
+        _updateLabels();
+        _updateWindArrow();
+        _updatePressurePerimeterAndLabels();
     }
 }
 
 function updateWindBuilding(config = {}) {
-    const currentConfig = getConfig();
-    let changed = false;
-
-    if (config.width !== undefined && config.width > 0) {
-        currentConfig.width = config.width;
-        changed = true;
-    }
-    if (config.depth !== undefined && config.depth > 0) {
-        currentConfig.depth = config.depth;
-        changed = true;
-    }
-    if (config.floorHeight !== undefined && config.floorHeight > 0) {
-        currentConfig.floorHeight = config.floorHeight;
-        changed = true;
-    }
-    if (config.numFloors !== undefined && config.numFloors > 0) {
-        currentConfig.numFloors = config.numFloors;
-        changed = true;
-    }
-    if (config.totalHeight !== undefined && config.totalHeight > 0) {
-        currentConfig.height = config.totalHeight;
-        changed = true;
-    }
-
-    if (config.numFloors !== undefined || config.floorHeight !== undefined) {
-        currentConfig.height = currentConfig.numFloors * currentConfig.floorHeight;
-    }
+    const changed = updateConfig(config);
 
     if (changed) {
         _rebuildWindShell();
-        fitCameraToBuilding(VIEW_MODE);
+        _view?.fitCameraToBuilding();
+    }
+}
+
+function updateWindCCData(ccData) {
+    _ccData = ccData;
+    if (windShellGroup?.visible) {
+        _updateLabels();
+        _updatePressurePerimeterAndLabels();
+    }
+}
+
+function setWindDirection(dir) {
+    _windDir = dir;
+    if (windShellGroup?.visible) {
+        _syncDirButtons();
+        _updateFaceAppearance();
+        _updateLabels();
+        _updateWindArrow();
+        _updatePressurePerimeterAndLabels();
     }
 }
 
@@ -145,69 +201,8 @@ function _handleInitialState() {
     const currentMode = currentModeEl?.textContent?.trim().toLowerCase();
 
     if (currentMode === 'wind') {
-        windShellGroup.visible = true;
-        _windDir = '+X';
-        _syncDirButtons();
-        _updateFaceAppearance();
-        _updateLabels();
-        _updateWindArrow();
-        _updatePressurePerimeterAndLabels();
-
-        const legend = document.getElementById('wind-zone-legend');
-        if (legend) legend.classList.add('visible');
-        const windSection = document.getElementById('filter-wind-section');
-        if (windSection) windSection.classList.add('visible');
+        showWindView();
     }
-}
-
-function _setupEventListeners() {
-    setAnimationCallback(_tickWindShell);
-
-    window.addEventListener('panel-mode-changed', (e) => {
-        if (e.detail.mode !== 'wind') {
-            windShellGroup.visible = false;
-            _windDir = null;
-            _syncDirButtons();
-            _updateFaceAppearance();
-            _updateWindArrow();
-            _updatePressurePerimeterAndLabels();
-            return;
-        }
-
-        setViewMode(VIEW_MODE);
-        windShellGroup.visible = true;
-        const legend = document.getElementById('wind-zone-legend');
-        if (legend) legend.classList.add('visible');
-        const windSection = document.getElementById('filter-wind-section');
-        if (windSection) windSection.classList.add('visible');
-
-        _windDir = '+X';
-        _syncDirButtons();
-        _updateFaceAppearance();
-        _updateLabels();
-        _updateWindArrow();
-        _updatePressurePerimeterAndLabels();
-    });
-
-    window.addEventListener('wind-cc-updated', (e) => {
-        _ccData = e.detail;
-        _updateLabels();
-        _updatePressurePerimeterAndLabels();
-    });
-
-    document.querySelectorAll('.wind-dir-radio').forEach(radio => {
-        radio.addEventListener('change', () => {
-            if (radio.checked) {
-                _windDir = radio.value;
-                _updateFaceAppearance();
-                _updateLabels();
-                _updateWindArrow();
-                _updatePressurePerimeterAndLabels();
-            }
-        });
-    });
-
-    _setupDynamicInputListeners();
 }
 
 // ============================
@@ -230,7 +225,7 @@ function _setupDynamicInputListeners() {
         };
 
         const newConfig = {};
-        const config = getWindConfig();
+        const config = getConfig();
 
         const length = safeParseFloat(bLength?.value);
         if (length) newConfig.width = length;
@@ -248,9 +243,8 @@ function _setupDynamicInputListeners() {
         } else {
             const height = safeParseFloat(bHeight?.value);
             if (height) {
-                newConfig.totalHeight = height;
+                newConfig.height = height;
                 newConfig.numFloors = Math.max(1, Math.round(height / config.floorHeight));
-                newConfig.floorHeight = height / newConfig.numFloors;
             }
         }
 
@@ -289,13 +283,15 @@ function _rebuildWindShell() {
 
     if (!windShellGroup) return;
 
-    const scene = getScene();
+    if (!_view) return;
+    const scene = _view.scene;
+
     const toRemove = [];
     windShellGroup.children.forEach(c => { if (c !== labelsGroup) toRemove.push(c); });
     toRemove.forEach(c => { _disposeObject(c); windShellGroup.remove(c); });
 
-    const config = getWindConfig();
-    const { width: L, depth: B, totalHeight: H } = config;
+    const config = getConfig();
+    const { width: L, depth: B, height: H } = config;
     if (L <= 0.1 || B <= 0.1 || H <= 0.1) return;
 
     const a = _zoneA(L, B, H);
@@ -442,7 +438,7 @@ function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
 }
 
 function _buildFloorLines(halfW, halfD, H) {
-    const config = getWindConfig();
+    const config = getConfig();
     const { numFloors, floorHeight } = config;
     if (!numFloors || numFloors <= 1 || !floorHeight) return;
     const mat = new THREE.LineBasicMaterial({ color: 0x999999 });
@@ -463,7 +459,7 @@ function _buildFloorLines(halfW, halfD, H) {
 }
 
 function _buildFloorSlabs(halfW, halfD, H) {
-    const config = getWindConfig();
+    const config = getConfig();
     const { numFloors, floorHeight } = config;
     if (!numFloors || numFloors <= 1 || !floorHeight) return;
 
@@ -542,8 +538,8 @@ function _buildGroundShadow(halfW, halfD, H) {
 }
 
 function _buildDimensionLines(halfW, halfD, H) {
-    const config = getWindConfig();
-    const { width: L, depth: B, totalHeight: Ht } = config;
+    const config = getConfig();
+    const { width: L, depth: B, height: Ht } = config;
     const refDim = Math.min(L, B, Ht);
     const scaleMult = Math.max(0.6, refDim / 10);
     const off = Math.max(1.2, Math.min(L, B) * 0.12);
@@ -648,8 +644,8 @@ function _updateWindArrow() {
     }
     if (!_windDir || !windShellGroup?.visible) return;
 
-    const config = getWindConfig();
-    const { width: L, depth: B, totalHeight: Ht } = config;
+    const config = getConfig();
+    const { width: L, depth: B, height: Ht } = config;
     const halfW = L / 2; const halfD = B / 2;
     const arrowLen = Math.max(2, Math.min(L, B) * 0.35);
     const gap = Math.max(1.0, Math.min(L, B) * 0.12);
@@ -705,8 +701,8 @@ function _updateLabels() {
         labelsGroup.remove(s);
     }
 
-    const config = getWindConfig();
-    const { width: L, depth: B, totalHeight: H } = config;
+    const config = getConfig();
+    const { width: L, depth: B, height: H } = config;
     const refDim = Math.min(L, B, H);
     const scaleMult = refDim / 10;
 
@@ -858,7 +854,7 @@ function _updatePressurePerimeterAndLabels() {
     _pressurePerimeterGroup.name = 'pressurePerimeter';
     windShellGroup.add(_pressurePerimeterGroup);
 
-    const config = getWindConfig();
+    const config = getConfig();
     const ARROW_SPACING = config.floorHeight || 3;
     const BASE_ARROW_LEN = 1.5;
     const PRESSURE_LEN_SCALE = 1.0;
@@ -1035,9 +1031,9 @@ function _updatePressurePerimeterAndLabels() {
 const _camDir = new THREE.Vector3();
 
 function _tickWindShell() {
-    if (!windShellGroup?.visible || !labelsGroup) return;
+    if (!windShellGroup?.visible || !labelsGroup || !_view) return;
 
-    const camera = getCamera(VIEW_MODE);
+    const camera = _view.camera;
     if (!camera) return;
 
     camera.getWorldDirection(_camDir);
@@ -1064,4 +1060,14 @@ function _disposeObject(obj) {
     obj.children?.forEach(_disposeObject);
 }
 
-export { initWindView, updateWindBuilding };
+export {
+    initWindView,
+    showWindView,
+    hideWindView,
+    refreshWindShell,
+    updateWindBuilding,
+    updateWindCCData,
+    setWindDirection,
+    _saveCameraState as saveWindCameraState,
+    _restoreCameraState as restoreWindCameraState
+};

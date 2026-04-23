@@ -1,37 +1,42 @@
 // ============================
 // Facade View - 3D Facade Visualization
 // Static building wireframe (floor height only) + dynamic glass/frame/anchor per category
-// X = front (mullion spacing), Y = depth (facade normal), Z = up (floor height)
+// Each view has its own Three.js environment (scene, camera, renderer, controls, nav cube)
 // ============================
 
 import * as THREE from 'three';
-import {
-    initSharedView,
-    getScene,
-    getCamera,
-    getRenderer,
-    getControls,
-    getConfig,
-    fitCameraToBuilding,
-    setViewMode,
-    saveCurrentCameraState,
-    saveCategoryCameraState,
-    restoreCategoryCameraState,
-} from './viewShared.js';
-import { getCurrentPanelMode } from './inputPanel.js';
+import { createViewBase, getViewInstance } from './viewBase.js';
 import { getFacadeResultData } from './results.js';
-import { getCurrentViewMode } from './viewControls.js';
 
-const VIEW_MODE = 'facade';
-
-let buildingGroup, facadeElementsGroup;
-let _initialized = false;
-let _lastFloorHeight = null;
+const FACADE_WIDTH = 15;
+const FACADE_DEPTH = 10;
+const FACADE_NUM_FLOORS = 4;
 
 const FRAME_COLOR = 0x505050;
 const FRAME_DEPTH_M = 0.03;
 const FRAME_HEIGHT_M = 0.06;
 const GLASS_THICK_M = 0.006;
+
+let _view = null;
+let buildingGroup, facadeElementsGroup;
+let _initialized = false;
+let _lastFloorHeight = null;
+let _currentViewMode = 'model';
+let _categoryCameraStates = new Map();
+
+function _saveCameraState(catNum) {
+    if (!_view || isNaN(catNum)) return;
+    const pos = _view.camera.position.toArray();
+    const target = _view.controls.target.toArray();
+    _categoryCameraStates.set(catNum, { pos, target });
+}
+
+function _restoreCameraState(catNum) {
+    const state = _categoryCameraStates.get(catNum);
+    if (state && state.pos && state.target) {
+        _view.setCameraPosition(state.pos, state.target);
+    }
+}
 
 function _getGlassMaterial(glassType) {
     const colorMap = {
@@ -72,16 +77,21 @@ function _getGlassThicknessMM(catNum, glassType) {
 // Public API
 // ============================
 
-async function initFacadeView() {
+function initFacadeView() {
     if (_initialized) return;
 
-    const shared = await initSharedView();
-    if (!shared) return;
+    _view = createViewBase('facade', '#viewport-3d', '#nav-cube-facade');
+    if (!_view) {
+        console.warn('[FacadeView] Failed to create view base');
+        return;
+    }
 
-    const { scene } = shared;
-    setViewMode(VIEW_MODE, true);
-    fitCameraToBuilding(VIEW_MODE);
-    saveCurrentCameraState();
+    const { scene } = _view;
+
+    // Set initial camera position for facade view
+    _view.camera.position.set(-15, -25, 8);
+    _view.camera.lookAt(0, 0, _view.controls.target.z);
+    _view.controls.update();
 
     buildingGroup = new THREE.Group();
     buildingGroup.visible = false;
@@ -93,24 +103,56 @@ async function initFacadeView() {
     scene.add(facadeElementsGroup);
 
     _rebuildBuildingWireframe();
+    _view.fitCameraToBuilding();
+
     _setupEventListeners();
     _handleInitialState();
 
     _initialized = true;
 }
 
-function updateFacadeBuilding(config = {}) {
-    const currentConfig = getConfig();
-    if (config.floorHeight !== undefined && config.floorHeight > 0) {
-        currentConfig.floorHeight = config.floorHeight;
-        currentConfig.numFloors = Math.max(1, Math.round(currentConfig.height / currentConfig.floorHeight));
+function showFacadeView() {
+    if (!_view || !buildingGroup || !facadeElementsGroup) return;
+    _view.setVisible(true);
+    buildingGroup.visible = true;
+    facadeElementsGroup.visible = true;
+
+    const activeCat = document.querySelector('.category__btn.active');
+    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
+    if (catNum !== null && _categoryCameraStates.has(catNum)) {
+        _restoreCameraState(catNum);
+    } else {
+        _view.fitCameraToBuilding();
     }
-    _rebuildBuildingWireframe();
-    fitCameraToBuilding();
+
+    _updateFacadeElements();
+}
+
+function hideFacadeView() {
+    if (!_view || !buildingGroup || !facadeElementsGroup) return;
+    buildingGroup.visible = false;
+    facadeElementsGroup.visible = false;
 }
 
 function refreshFacadeElements() {
+    if (!_initialized) return;
     _updateFacadeElements();
+}
+
+function updateFacadeBuilding(config = {}) {
+    const changed = config.floorHeight !== undefined;
+    if (changed) {
+        _rebuildBuildingWireframe();
+        _view?.fitCameraToBuilding();
+    }
+    _updateFacadeElements();
+}
+
+function setViewMode(mode) {
+    _currentViewMode = mode;
+    if (facadeElementsGroup) {
+        _updateResultOverlay(mode);
+    }
 }
 
 // ============================
@@ -128,39 +170,6 @@ function _handleInitialState() {
 }
 
 function _setupEventListeners() {
-    window.addEventListener('panel-mode-changed', (e) => {
-        const mode = e.detail?.mode;
-        if (mode !== 'facade') {
-            buildingGroup.visible = false;
-            facadeElementsGroup.visible = false;
-            return;
-        }
-        setViewMode(VIEW_MODE);
-        buildingGroup.visible = true;
-        facadeElementsGroup.visible = true;
-        _updateFacadeElements();
-    });
-
-    window.addEventListener('viewport-mode-changed', (e) => {
-        _updateResultOverlay(e.detail.mode);
-    });
-
-    document.addEventListener('category-switched', (e) => {
-        const prevCatNum = _getActiveCategoryNum();
-        const newCatNum = e.detail?.categoryNum || prevCatNum;
-        saveCategoryCameraState(prevCatNum);
-        restoreCategoryCameraState(newCatNum);
-        _updateFacadeElements();
-    });
-
-    document.addEventListener('category-added', () => {
-        _updateFacadeElements();
-    });
-
-    document.addEventListener('category-deleted', () => {
-        _updateFacadeElements();
-    });
-
     document.addEventListener('input', _handleInputChange);
     document.addEventListener('change', _handleInputChange);
 
@@ -170,13 +179,6 @@ function _setupEventListeners() {
     if (floorHeightInput && floorHeightInput.value) {
         const fh = parseFloat(floorHeightInput.value);
         if (!isNaN(fh) && fh > 0) _lastFloorHeight = fh;
-    }
-
-    const currentMode = getCurrentPanelMode();
-    if (currentMode === 'facade') {
-        buildingGroup.visible = true;
-        facadeElementsGroup.visible = true;
-        _updateFacadeElements();
     }
 }
 
@@ -191,8 +193,6 @@ function _handleInputChange(e) {
         if (newFH !== _lastFloorHeight) {
             _lastFloorHeight = newFH;
             updateFacadeBuilding({ floorHeight: newFH / 1000 });
-            _updateFacadeElements();
-            _reapplyResultOverlay();
         }
     } else if (
         id.includes('general-') ||
@@ -208,17 +208,8 @@ let facadeUpdateTimer = null;
 function _debouncedUpdateFacadeElements() {
     clearTimeout(facadeUpdateTimer);
     facadeUpdateTimer = setTimeout(() => {
-        const panelMode = document.querySelector('.panel-mode-btn.active')?.dataset.mode;
-        if (panelMode === 'facade' || !panelMode) {
-            _updateFacadeElements();
-            _reapplyResultOverlay();
-        }
+        _updateFacadeElements();
     }, 150);
-}
-
-function _reapplyResultOverlay() {
-    const mode = getCurrentViewMode ? getCurrentViewMode() : 'model';
-    _updateResultOverlay(mode);
 }
 
 // ============================
@@ -226,15 +217,16 @@ function _reapplyResultOverlay() {
 // ============================
 
 function _rebuildBuildingWireframe() {
-    if (!buildingGroup) return;
+    if (!buildingGroup || !_view) return;
 
     while (buildingGroup.children.length > 0) {
         _disposeObject(buildingGroup.children[0]);
         buildingGroup.remove(buildingGroup.children[0]);
     }
 
-    const config = getConfig();
-    const { width, depth, floorHeight } = config;
+    const width = 15;
+    const depth = 10;
+    const floorHeight = _lastFloorHeight ? _lastFloorHeight / 1000 : 3.2;
     const numFloors = 4;
     const totalHeight = numFloors * floorHeight;
     const wireframeColor = 0x757575;
@@ -388,17 +380,32 @@ function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
 function _updateFacadeElements() {
     if (!facadeElementsGroup) return;
 
-    while (facadeElementsGroup.children.length > 0) {
-        _disposeObject(facadeElementsGroup.children[0]);
-        facadeElementsGroup.remove(facadeElementsGroup.children[0]);
-    }
-
     const activeCat = document.querySelector('.category__btn.active');
     if (!activeCat) return;
     const catNum = parseInt(activeCat.dataset.category);
     if (isNaN(catNum)) return;
 
+    while (facadeElementsGroup.children.length > 0) {
+        _disposeObject(facadeElementsGroup.children[0]);
+        facadeElementsGroup.remove(facadeElementsGroup.children[0]);
+    }
+
+    const floorHeightMM = _getInputValue(`cat${catNum}-general-floor_height`);
+    const newFH = floorHeightMM || 3200;
+    if (newFH !== _lastFloorHeight) {
+        _lastFloorHeight = newFH;
+        _rebuildBuildingWireframe();
+    }
+
+    const hasExistingState = _categoryCameraStates.has(catNum);
+    if (hasExistingState) {
+        _restoreCameraState(catNum);
+    } else {
+        _view?.fitCameraToBuilding();
+    }
+
     _buildCategoryFacade(catNum);
+    _updateResultOverlay(_currentViewMode);
 }
 
 function _buildCategoryFacade(catNum) {
@@ -417,8 +424,9 @@ function _buildCategoryFacade(catNum) {
 
     if (!spanLength || !verticalSpacingMM || spanLength <= 0) return;
 
-    const config = getConfig();
-    const { width, depth, numFloors } = config;
+    const width = FACADE_WIDTH;
+    const depth = FACADE_DEPTH;
+    const numFloors = FACADE_NUM_FLOORS;
     const floorHeight = floorHeightMM / 1000;
     const verticalSpacing = verticalSpacingMM / 1000;
     const halfW = width / 2;
@@ -565,7 +573,6 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
     const rightX = x + facadeWidth;
     const bottomZ = zStart;
     const topZ = zEnd;
-    const centerZ = (zStart + zEnd) / 2;
 
     const _addDimLine = (start, end, label) => {
         const dir = end.clone().sub(start).normalize();
@@ -592,12 +599,11 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
         _createDimLabelSprite(label, mid, scaleMult);
     };
 
-const mullionLen = zEnd - zStart;
-    const mullionLenMM = Math.round(mullionLen * 1000);
+    const mullionLen = zEnd - zStart;
     _addDimLine(
         new THREE.Vector3(leftX - 0.6, y, bottomZ),
         new THREE.Vector3(leftX - 0.6, y, topZ),
-        `${mullionLenMM}mm`
+        `${Math.round(mullionLen * 1000)}mm`
     );
 
     const midZ = bottomZ + verticalSpacing;
@@ -695,14 +701,15 @@ function _updateResultOverlay(mode) {
     const catNum = _getActiveCategoryNum();
     if (!catNum) return;
 
-    const resultData = getFacadeResultData(catNum);
+    const resultData = _getFacadeResultData(catNum);
     if (!resultData) return;
 
     const { glassResult, frameResult } = resultData;
-    const config = getConfig();
     const floorHeightMM = _getInputValue(`cat${catNum}-general-floor_height`) || 3200;
     const floorHeight = floorHeightMM / 1000;
-    const numFloors = config.numFloors;
+    const numFloors = FACADE_NUM_FLOORS;
+    const width = FACADE_WIDTH;
+    const depth = FACADE_DEPTH;
 
     const zoneEl = document.getElementById(`cat${catNum}-general-zone`);
     const zone = zoneEl ? zoneEl.value : 'zone4';
@@ -712,8 +719,8 @@ function _updateResultOverlay(mode) {
     const spanMeters = spanLength / 1000;
     const facadeWidth = spanMeters * 5;
 
-    const halfW = config.width / 2;
-    const halfD = config.depth / 2;
+    const halfW = width / 2;
+    const halfD = depth / 2;
 
     let xOffset;
     if (zone === 'zone5') {
@@ -831,4 +838,17 @@ function _disposeObject(obj) {
     }
 }
 
-export { initFacadeView, updateFacadeBuilding, refreshFacadeElements };
+function _getFacadeResultData(catNum) {
+    return getFacadeResultData ? getFacadeResultData(catNum) : null;
+}
+
+export {
+    initFacadeView,
+    showFacadeView,
+    hideFacadeView,
+    refreshFacadeElements,
+    updateFacadeBuilding,
+    setViewMode,
+    _saveCameraState,
+    _restoreCameraState
+};
