@@ -1782,19 +1782,22 @@ body.no-animations *::after {
 }
 
 .topbar__panel-btn {
-    padding: 4px 5px;
+    padding: 0.2rem 0.3rem;
     background-color: var(--bg-bullet);
+    border: 1px solid var(--border-header);
     border-radius: var(--radius-5);
     /* box-shadow: var(--shadow-box); */
+    display: flex;
+    gap: 0.3rem;
 }
 
 .topbar__btn-mode {
-    padding: 0.3rem 0.6rem;
+    padding: 0.2rem 0.5rem;
     border: none;
     background: transparent;
     color: var(--text-primary);
     font-size: 0.8rem;
-    transition: color 0.3s;
+    transition: none;
     border-radius: 0;
     display: inline-flex;
     align-items: center;
@@ -1802,7 +1805,7 @@ body.no-animations *::after {
 }
 
 .topbar__btn-mode:hover {
-    background-color: var(--bg-body);
+    background-color: var(--bg-primary);
     border-radius: var(--radius-5);
     /* color: var(--btn-primary-hover); */
 }
