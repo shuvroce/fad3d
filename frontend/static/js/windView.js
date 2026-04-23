@@ -276,6 +276,12 @@ function _setupDynamicInputListeners() {
         }
     });
 
+    document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('wind-dir-radio')) {
+            setWindDirection(e.target.value);
+        }
+    });
+
     updateFromInputs();
 }
 
