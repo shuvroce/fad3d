@@ -3974,13 +3974,17 @@ body.no-animations *::after {
 }
 
 .result__card-body {
-    /* padding: 0 0 0.25rem 0; */
+    padding: 0.25rem;
     /* border-top: 1px solid var(--border-primary); */
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     overflow: hidden;
     min-height: 0;
+}
+
+.result__card.collapsed .result__card-body {
+    padding-bottom: 0;
 }
 
 .result__item {
