@@ -12,7 +12,9 @@ const FACADE_WIDTH = 15;
 const FACADE_DEPTH = 10;
 const FACADE_NUM_FLOORS = 4;
 
-const FRAME_COLOR = 0x505050;
+const FRAME_COLOR       = 0x505050;
+const MULLION_COLOR     = 0x3a5f8a;
+const TRANSOM_COLOR     = 0x7a4f3a;
 const FRAME_DEPTH_M = 0.03;
 const FRAME_HEIGHT_M = 0.06;
 const GLASS_THICK_M = 0.006;
@@ -56,9 +58,10 @@ function _getGlassMaterial(glassType) {
     });
 }
 
-function _getFrameMaterial() {
+function _getFrameMaterial(type = 'frame') {
+    const color = type === 'mullion' ? MULLION_COLOR : type === 'transom' ? TRANSOM_COLOR : FRAME_COLOR;
     return new THREE.MeshPhongMaterial({
-        color: FRAME_COLOR,
+        color,
         transparent: false,
         opacity: 1.0,
         shininess: 30,
@@ -508,7 +511,7 @@ function _createGlassPanelGrid(x, y, z, w, h, spanMeters, verticalSpacing, glass
 }
 
 function _createMullionsSlabToSlab(x, y, zStart, zEnd, w, spanMeters, catNum) {
-    const frameMaterial = _getFrameMaterial();
+    const frameMaterial = _getFrameMaterial('mullion');
     const numMullions = 5;
     const mullionLen = zEnd - zStart;
 
@@ -523,7 +526,7 @@ function _createMullionsSlabToSlab(x, y, zStart, zEnd, w, spanMeters, catNum) {
 }
 
 function _createTransomsAtLevels(x, y, zStart, zEnd, w, spanMeters, verticalSpacing, catNum) {
-    const frameMaterial = _getFrameMaterial();
+    const frameMaterial = _getFrameMaterial('transom');
     const panelHeight = zEnd - zStart;
 
     const transomZ = [zStart, zEnd];
