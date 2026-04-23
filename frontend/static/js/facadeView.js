@@ -40,10 +40,10 @@ function _restoreCameraState(catNum) {
 
 function _getGlassMaterial(glassType) {
     const colorMap = {
-        'dgu': { color: 0x88ccff, opacity: 0.35 },
-        'sgu': { color: 0x88ccff, opacity: 0.35 },
-        'laminated': { color: 0x77bbee, opacity: 0.4 },
-        'tempered': { color: 0x99ddff, opacity: 0.3 },
+        'sgu':  { color: 0x99ddff, opacity: 0.3 },
+        'dgu':  { color: 0x88ccff, opacity: 0.35 },
+        'lgu':  { color: 0x66cc88, opacity: 0.4 },
+        'ldgu': { color: 0x55aa77, opacity: 0.42 },
     };
     const style = colorMap[glassType] || colorMap['dgu'];
     return new THREE.MeshPhongMaterial({
