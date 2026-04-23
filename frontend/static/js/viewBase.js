@@ -93,7 +93,7 @@ function createViewBase(viewId, containerSelector, navCubeContainerSelector = '#
         }
 
         if (navCube.scene && navCube.camera && navCube.renderer) {
-            _updateNavCubeOrientation(camera, controls);
+            _updateNavCubeOrientation(navCube, camera, controls);
             navCube.renderer.render(navCube.scene, navCube.camera);
         }
 
@@ -143,11 +143,18 @@ function createViewBase(viewId, containerSelector, navCubeContainerSelector = '#
         if (navContainer) {
             navContainer.classList.toggle('visible', visible);
         }
-        // Hide all other view renderers when showing this one
         if (visible) {
             _viewInstances.forEach((otherView, otherId) => {
-                if (otherId !== viewId && otherView.renderer && otherView.renderer.domElement) {
-                    otherView.renderer.domElement.style.display = 'none';
+                if (otherId !== viewId) {
+                    if (otherView.renderer && otherView.renderer.domElement) {
+                        otherView.renderer.domElement.style.display = 'none';
+                    }
+                    if (otherView.navCube && otherView.navCube.renderer) {
+                        const otherNavContainer = otherView.navCube.renderer.domElement.parentElement;
+                        if (otherNavContainer) {
+                            otherNavContainer.classList.remove('visible');
+                        }
+                    }
                 }
             });
             startAnimation();
@@ -340,13 +347,11 @@ function _createNavCube(container, navContainer, camera, controls) {
 function _handleNavCubeClick(event, camera, controls, navCube) {
     if (!navCube || !navCube.mesh) return;
 
-    const navContainer = document.getElementById('nav-cube-container');
-    if (!navContainer) return;
-
-    const navRenderer = navContainer.querySelector('canvas');
+    const navRenderer = navCube.renderer;
     if (!navRenderer) return;
 
-    const rect = navRenderer.getBoundingClientRect();
+    const canvas = navRenderer.domElement;
+    const rect = canvas.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
@@ -416,11 +421,8 @@ function _animateCameraToView(view, camera, controls) {
     update();
 }
 
-function _updateNavCubeOrientation(camera, controls) {
-    const navContainer = document.getElementById('nav-cube-container');
-    if (!navContainer || !navContainer.__navCubeCamera) return;
-
-    const navCamera = navContainer.__navCubeCamera;
+function _updateNavCubeOrientation(navCube, camera, controls) {
+    const navCamera = navCube.camera;
     const offset = camera.position.clone().sub(controls.target);
     const dir = offset.normalize();
     navCamera.position.set(dir.x * 3.84, dir.y * 3.84, dir.z * 3.84);
