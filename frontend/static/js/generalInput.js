@@ -31,7 +31,6 @@ function initGeneralInput() {
         hiddenInput.value = card.dataset.value;
         hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
     });
-    console.log('[GeneralInput] Initialized');
 }
 
 export { initGeneralInput, _computeGlassThk };

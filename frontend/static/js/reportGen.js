@@ -237,8 +237,6 @@ async function generateSummaryReport() {
 }
 
 function initReportGen() {
-    console.log('[ReportGen] Initializing...');
-
     const reportBtn = document.getElementById('report-btn');
     const summaryItem = document.querySelector('.report__dropdown-item');
 

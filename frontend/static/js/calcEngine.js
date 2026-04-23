@@ -484,7 +484,6 @@ function renumberCategoryTimers(oldToNewMap) {
 
 // Initialize calculation engine
 function initCalcEngine() {
-    console.log('[CalcEngine] Initializing...');
 }
 
 export { initCalcEngine, runWindCalc, runCategoryCalc, scheduleWindCalc, scheduleCategoryCalc, clearAllCategoryTimers, renumberCategoryTimers };

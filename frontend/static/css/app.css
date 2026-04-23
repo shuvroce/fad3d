@@ -3650,8 +3650,8 @@ body.no-animations *::after {
     position: fixed;
     bottom: 1rem;
     right: calc(var(--result-width) + 1rem);
-    width: 100px;
-    height: 130px;
+    /* width: 100px; */
+    /* height: 130px; */
     z-index: 9;
     overflow: hidden;
     display: none;
@@ -3673,7 +3673,8 @@ body.no-animations *::after {
 }
 
 #nav-cube-axis {
-    display: flex;
+    /* display: flex; */
+    display: none;
     gap: 0.5rem;
     padding: 2px 0 0;
     align-items: center;

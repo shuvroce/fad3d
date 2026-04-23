@@ -130,6 +130,14 @@ function showFacadeView() {
 
 function hideFacadeView() {
     if (!_view || !buildingGroup || !facadeElementsGroup) return;
+
+    // Save camera state before hiding
+    const activeCat = document.querySelector('.category__btn.active');
+    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
+    if (catNum !== null) {
+        _saveCameraState(catNum);
+    }
+
     buildingGroup.visible = false;
     facadeElementsGroup.visible = false;
 }

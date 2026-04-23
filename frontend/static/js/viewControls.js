@@ -20,8 +20,6 @@ function switchViewMode(mode) {
 
     // Notify facade view of mode change
     setFacadeViewMode(mode);
-
-    console.log(`View mode switched to: ${mode}`);
 }
 
 // Function to update view control button states
@@ -58,18 +56,6 @@ function updateViewportDisplay(mode) {
 
     // Add appropriate class for styling
     viewport.classList.add(`view-${mode}`);
-
-    switch (mode) {
-        case "model":
-            console.log("Displaying structural model");
-            break;
-        case "dc-ratio":
-            console.log("Displaying DC ratio visualization");
-            break;
-        case "deflection":
-            console.log("Displaying deflection visualization");
-            break;
-    }
 }
 
 function getCurrentViewMode() {

@@ -3,8 +3,6 @@
 // ES6 Module Orchestrator
 // ============================
 
-console.log('%c[FAD3D] main.js loaded - version 2.0', 'color: green; font-weight: bold; font-size: 14px;');
-
 // Import theme system
 import { initTheme, initTooltips } from './theme.js';
 
@@ -61,21 +59,13 @@ const _safeAsync = async (name, fn) => { try { await fn(); } catch (e) { console
 
 // Phase 1: Immediate initialization (before DOM ready)
 function initPhase1() {
-    console.log('[Main] Phase 1: Theme initialization');
     _safe('Theme', initTheme);
 }
 
 // Phase 2: Core UI initialization (order matters for dependencies)
 async function initPhase2() {
-    console.log('[Main] Phase 2: Core UI initialization');
-
     // Check if viewport container exists
     const viewport3d = document.getElementById('viewport-3d');
-    if (viewport3d) {
-        console.log('[Main] viewport-3d container found, size:', viewport3d.clientWidth, 'x', viewport3d.clientHeight);
-    } else {
-        console.error('[Main] viewport-3d container NOT FOUND');
-    }
 
     _safe('Tooltips', initTooltips);
     _safe('Left panel toggle', initializeLeftPanelToggle);
@@ -110,7 +100,6 @@ async function initPhase2() {
 
 // Phase 3: Input handlers (categories already initialized)
 async function initPhase3() {
-    console.log('[Main] Phase 3: Input handlers');
     _safe('Glass input', initGlassInput);
     _safe('Frame input', initFrameInput);
     _safe('Anchor input', initAnchorInput);
@@ -119,7 +108,6 @@ async function initPhase3() {
 
 // Phase 4: Modal system
 function initPhase4() {
-    console.log('[Main] Phase 4: Modal system');
     _safe('Modals', initModals);
     _safe('Floating bar modals', initFloatingBarModals);
     _safe('General info modal', initGeneralModal);
@@ -131,13 +119,11 @@ function initPhase4() {
 
 // Phase 5: Results panel
 function initPhase5() {
-    console.log('[Main] Phase 5: Results system');
     _safe('Result panel', initializeResultPanel);
 }
 
 // Phase 6: Calculation engine and report (after all inputs ready)
 function initPhase6() {
-    console.log('[Main] Phase 6: Calculation engine and report');
     _safe('Calculation engine', initCalcEngine);
     _safe('Report dropdown', initReportDropdown);
     _safe('Report generation', initReportGen);
@@ -161,7 +147,6 @@ if (document.readyState === 'loading') {
         // Delay phase 6 to ensure all DOM manipulation is complete
         window.addEventListener('load', () => {
             initPhase6();
-            console.log('[Main] ✓ All initialization phases complete');
         });
     });
 } else {
@@ -175,7 +160,6 @@ if (document.readyState === 'loading') {
         // Delay phase 6 slightly if DOM is already loaded
         setTimeout(() => {
             initPhase6();
-            console.log('[Main] ✓ All initialization phases complete');
         }, 0);
     })();
 }

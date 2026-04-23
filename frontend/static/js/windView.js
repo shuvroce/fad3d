@@ -59,7 +59,6 @@ const _WALL_NORMALS = {
 // ============================
 
 function initWindView() {
-    console.log('[WindView] initWindView called, _initialized:', _initialized);
     if (_initialized) return;
 
     _view = createViewBase('wind', '#viewport-3d', '#nav-cube-wind');
@@ -97,7 +96,6 @@ function initWindView() {
     });
 
     _initialized = true;
-    console.log('[WindView] Initialized successfully');
 }
 
 function showWindView() {
@@ -128,6 +126,14 @@ function showWindView() {
 
 function hideWindView() {
     if (!_view || !windShellGroup) return;
+
+    // Save camera state before hiding
+    const activeCat = document.querySelector('.category__btn.active');
+    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
+    if (catNum !== null) {
+        _saveCameraState(catNum);
+    }
+
     windShellGroup.visible = false;
     _windDir = null;
     _syncDirButtons();
