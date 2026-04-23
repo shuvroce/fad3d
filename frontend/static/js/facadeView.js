@@ -584,8 +584,15 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
     const geoEl = document.getElementById(`cat${catNum}-frame-geometry`);
     const mullTypeEl = document.getElementById(`cat${catNum}-frame-mullion-type`);
     const variant = `${geoEl?.value || 'regular'}-${mullTypeEl?.value || 'alu'}`;
+
     const mullionEl = document.getElementById(`cat${catNum}-frame-${variant}-mullion`);
-    const mullionLabel = mullionEl?.value || 'Mullion';
+    let mullionLabel = mullionEl?.value || 'Mullion';
+    if (mullTypeEl?.value === 'alu-steel') {
+        const steelEl = document.getElementById(`cat${catNum}-frame-${variant}-steel`);
+        const steelName = steelEl?.value || '';
+        if (steelName) mullionLabel = [mullionLabel, `+ ${steelName}`];
+    }
+
     const transomEl = document.getElementById(`cat${catNum}-frame-${variant}-transom`);
     const transomLabel = transomEl?.value || 'Transom';
 
@@ -699,7 +706,7 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
         const glass1CZ = (bottomZ + midZ) / 2 - 0.3;
 
 _addLeader(new THREE.Vector3(lastMullionX, y, zStart + (zEnd - zStart) / 2), mullionLabel, 1.0, 0.4);
-        _addLeader(new THREE.Vector3(bottomTransomCX, y, bottomTransomZ), transomLabel, 1.0, -0.4);
+        _addLeader(new THREE.Vector3(bottomTransomCX, y, bottomTransomZ), transomLabel, 1.0, -0.3);
         _addLeader(new THREE.Vector3(lastGlassCX, y, glass1CZ), glassLabel, 1.8, -0.4);
     }
 
@@ -718,13 +725,15 @@ _addLeader(new THREE.Vector3(lastMullionX, y, zStart + (zEnd - zStart) / 2), mul
 }
 
 function _createDimLabelSprite(text, position, scaleMult = 1) {
+    const lines = Array.isArray(text) ? text : [text];
     const fontSize = 13;
+    const lineH = 18;
     const tmpCanvas = document.createElement('canvas');
     const tmpCtx = tmpCanvas.getContext('2d');
     tmpCtx.font = `600 ${fontSize}px Arial`;
-    const textW = tmpCtx.measureText(text).width;
-    const W = Math.ceil(textW) + 6;
-    const H = 18;
+    const maxW = lines.reduce((w, l) => Math.max(w, tmpCtx.measureText(l).width), 0);
+    const W = Math.ceil(maxW) + 6;
+    const H = lines.length * lineH;
     const canvas = document.createElement('canvas');
     canvas.width = W;
     canvas.height = H;
@@ -733,7 +742,9 @@ function _createDimLabelSprite(text, position, scaleMult = 1) {
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, W / 2, H / 2);
+    lines.forEach((line, i) => {
+        ctx.fillText(line, W / 2, (i + 0.5) * lineH);
+    });
     const texture = new THREE.CanvasTexture(canvas);
     const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
     const sprite = new THREE.Sprite(mat);
