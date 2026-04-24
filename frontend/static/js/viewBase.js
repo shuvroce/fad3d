@@ -323,9 +323,19 @@ function _createNavCube(container, navContainer, camera, controls) {
 
     const cubeGeometry = new THREE.BoxGeometry(1.3, 1.3, 1.3);
 
-    const faceLabels = ['RIGHT', 'LEFT', 'TOP', 'BOTTOM', 'FRONT', 'BACK'];
-    const faceBg = ['#d6dce4', '#d6dce4', '#e8ecf0', '#b8c4ce', '#c8d4e0', '#c0cad4'];
-    const faceText = ['#2d3a4a', '#2d3a4a', '#1a2733', '#2d3a4a', '#2d3a4a', '#2d3a4a'];
+    const faceLabels = ['RIGHT (+Y)', 'LEFT (-Y)', 'TOP (+Z)', 'BOTTOM (-Z)', 'FRONT (+X)', 'BACK (+X)'];
+    const isDark = document.body.classList.contains('theme__dark');
+    const { faceBg, faceText, edgesColor } = isDark
+        ? {
+              faceBg: ['#2a2a3a', '#2a2a3a', '#333344', '#252535', '#2e2e40', '#282838'],
+              faceText: ['#b0b0c0', '#b0b0c0', '#a0a0b8', '#b0b0c0', '#a8a8bc', '#b0b0c0'],
+              edgesColor: 0x6a7080,
+          }
+        : {
+              faceBg: ['#d6dce4', '#d6dce4', '#e8ecf0', '#b8c4ce', '#c8d4e0', '#c0cad4'],
+              faceText: ['#2d3a4a', '#2d3a4a', '#1a2733', '#2d3a4a', '#2d3a4a', '#2d3a4a'],
+              edgesColor: 0x5a6a7a,
+          };
 
     const faceMaterials = faceLabels.map((label, i) =>
         new THREE.MeshBasicMaterial({
@@ -339,7 +349,7 @@ function _createNavCube(container, navContainer, camera, controls) {
     navCubeScene.add(navCube);
 
     const edgesGeometry = new THREE.EdgesGeometry(cubeGeometry);
-    const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x5a6a7a, linewidth: 1 });
+    const edgesMaterial = new THREE.LineBasicMaterial({ color: edgesColor, linewidth: 1 });
     const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
     navCube.add(edges);
 
@@ -353,7 +363,7 @@ function _createNavCube(container, navContainer, camera, controls) {
     navContainer.style.cursor = 'pointer';
     navCubeRenderer.domElement.style.cursor = 'pointer';
 
-    const navCubeWrapper = { scene: navCubeScene, camera: navCubeCamera, renderer: navCubeRenderer, mesh: navCube };
+    const navCubeWrapper = { scene: navCubeScene, camera: navCubeCamera, renderer: navCubeRenderer, mesh: navCube, edges };
 
     navContainer.addEventListener('click', (event) => {
         _handleNavCubeClick(event, camera, controls, navCubeWrapper);
@@ -533,6 +543,40 @@ function updateAllSkyDomes(isDark) {
     window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark } }));
 }
 
+function _updateNavCubeColors(navCubeWrapper, isDark) {
+    if (!navCubeWrapper?.mesh) return;
+
+    const faceLabels = ['RIGHT (+Y)', 'LEFT (-Y)', 'TOP (+Z)', 'BOTTOM (-Z)', 'FRONT (+X)', 'BACK (+X)'];
+    const { faceBg, faceText, edgesColor } = isDark
+        ? {
+              faceBg: ['#2a2a3a', '#2a2a3a', '#333344', '#252535', '#2e2e40', '#282838'],
+              faceText: ['#b0b0c0', '#b0b0c0', '#a0a0b8', '#b0b0c0', '#a8a8bc', '#b0b0c0'],
+              edgesColor: 0x6a7080,
+          }
+        : {
+              faceBg: ['#d6dce4', '#d6dce4', '#e8ecf0', '#b8c4ce', '#c8d4e0', '#c0cad4'],
+              faceText: ['#2d3a4a', '#2d3a4a', '#1a2733', '#2d3a4a', '#2d3a4a', '#2d3a4a'],
+              edgesColor: 0x5a6a7a,
+          };
+
+    navCubeWrapper.mesh.material.forEach((mat, i) => {
+        mat.map = _createFaceTexture(faceLabels[i], faceBg[i], faceText[i]);
+        mat.needsUpdate = true;
+    });
+
+    if (navCubeWrapper.edges) {
+        navCubeWrapper.edges.material.color.setHex(edgesColor);
+    }
+}
+
+function updateAllNavCubes(isDark) {
+    _viewInstances.forEach(instance => {
+        if (instance.navCube) {
+            _updateNavCubeColors(instance.navCube, isDark);
+        }
+    });
+}
+
 function disposeAll() {
     _viewInstances.forEach(instance => instance.dispose());
     _viewInstances.clear();
@@ -569,6 +613,7 @@ export {
     createViewBase,
     getViewInstance,
     updateAllSkyDomes,
+    updateAllNavCubes,
     disposeAll,
     isThemeDark,
     getThemeColors,

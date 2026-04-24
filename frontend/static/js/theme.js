@@ -2,7 +2,7 @@
 // Theme Toggle Functionality
 // ============================
 
-import { updateAllSkyDomes } from './viewBase.js';
+import { updateAllSkyDomes, updateAllNavCubes } from './viewBase.js';
 
 let _systemMediaQuery = null;
 
@@ -21,6 +21,7 @@ function _applyEffectiveDark(isDark) {
         moon.classList.toggle('hidden', isDark);
     }
     try { updateAllSkyDomes(isDark); } catch (e) { /* views may not exist yet */ }
+    try { updateAllNavCubes(isDark); } catch (e) { /* views may not exist yet */ }
 }
 
 /** Apply a theme value ('light' | 'dark' | 'system') without saving to localStorage. */
