@@ -456,4 +456,20 @@ function getWindInputsCache() {
     return cachedWindInputs;
 }
 
-export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, getCachedCategoryData, getWindInputsCache, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent };
+function prepareForCategoryRestore() {
+    currentPanelMode = 'facade';
+    const catbar = document.querySelector('.catbar');
+    const leftPanel = document.querySelector('.left__panel');
+    if (catbar) catbar.style.display = 'flex';
+    if (leftPanel) leftPanel.classList.remove('wind-mode');
+
+    // If we have saved facade content, restore it immediately
+    if (savedFacadeContent) {
+        const inputContainer = document.getElementById('input-container');
+        if (inputContainer) {
+            inputContainer.innerHTML = savedFacadeContent;
+        }
+    }
+}
+
+export { initPanelMode, initializeLeftPanelToggle, switchPanelMode, getCurrentPanelMode, getCachedCategoryData, getWindInputsCache, reattachCategoryEventListeners, cacheWindInputs, getWindInputsForSave, restoreCachedWindInputs, setWindInputsCache, savedFacadeContent, savedCatbarContent, prepareForCategoryRestore };

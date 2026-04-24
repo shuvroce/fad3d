@@ -445,13 +445,26 @@ function _restoreArray(target, source) {
 async function _restoreCategories(categories) {
     if (!categories || !categories.length) return;
 
-    const [catMod, iconMod, glassMod, frameMod, anchorMod] = await Promise.all([
+    const [catMod, iconMod, glassMod, frameMod, anchorMod, inputPanelMod] = await Promise.all([
         import('./category.js').catch(() => null),
         import('./categoryIcons.js').catch(() => null),
         import('./glassInput.js').catch(() => null),
         import('./frameInput.js').catch(() => null),
         import('./anchorInput.js').catch(() => null),
+        import('./inputPanel.js').catch(() => null),
     ]);
+
+    // Check if in wind mode - need to set up facade DOM without full mode switch
+    const isWindMode = inputPanelMod && inputPanelMod.getCurrentPanelMode
+        ? inputPanelMod.getCurrentPanelMode() === 'wind'
+        : false;
+
+    let restoreToWindMode = false;
+    if (isWindMode && inputPanelMod?.prepareForCategoryRestore) {
+        // Prepare facade DOM for category restore without full UI animation
+        await inputPanelMod.prepareForCategoryRestore();
+        restoreToWindMode = true;
+    }
 
     // Reset to a single fresh category
     if (catMod?.initializeCategories) {
@@ -526,6 +539,11 @@ async function _restoreCategories(categories) {
 
     // Activate category 1
     if (catMod?.switchCategory) catMod.switchCategory(1);
+
+    // Restore wind mode if we were in wind mode before
+    if (restoreToWindMode && inputPanelMod?.switchPanelMode) {
+        await inputPanelMod.switchPanelMode('wind');
+    }
 }
 
 async function _triggerRecalc() {
