@@ -2341,8 +2341,8 @@ body.no-animations *::after {
 }
 
 .figure__item-copy {
-    width: 16px;
-    height: 16px;
+    width: 13px;
+    height: 13px;
     flex-shrink: 0;
     padding: 0;
     background: none;
@@ -2363,6 +2363,10 @@ body.no-animations *::after {
 
 .figure__item-copy.copied svg path {
     stroke: var(--text-primary);
+}
+
+.figure__item-copy.copied svg rect {
+    display: none;
 }
 
 .figure__panel-list {
