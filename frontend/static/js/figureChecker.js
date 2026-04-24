@@ -202,7 +202,7 @@ function _renderFigurePanel(figures, total, found) {
                 const icon = fig.exists
                     ? `<svg class="figure__item-icon figure__item-icon--found" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`
                     : `<svg class="figure__item-icon figure__item-icon--missing" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
-                html += `<div class="figure__item">${icon}<span class="figure__item-name">${fig.name}</span></div>`;
+                html += `<div class="figure__item">${icon}<span class="figure__item-name">${fig.name}</span><button class="figure__item-copy" data-copy="${fig.name}" aria-label="Copy figure name"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M16 8V6.5A1.5 1.5 0 0 0 14.5 5h-9A1.5 1.5 0 0 0 4 6.5v9A1.5 1.5 0 0 0 5.5 17H7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>`;
             }
             html += `</div>`;
         }
@@ -239,6 +239,24 @@ function _renderFigurePanel(figures, total, found) {
             }
         });
     }
+
+    document.querySelectorAll(".figure__item-copy").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const name = btn.dataset.copy;
+            await navigator.clipboard.writeText(name);
+            btn.classList.add("copied");
+            btn.querySelector("svg rect").setAttribute("fill", "none");
+            btn.querySelector("svg rect").setAttribute("stroke", "currentColor");
+            btn.querySelector("svg path").setAttribute("d", "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
+            setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.querySelector("svg rect").setAttribute("fill", "none");
+                btn.querySelector("svg rect").setAttribute("stroke", "currentColor");
+                btn.querySelector("svg path").setAttribute("d", "M16 8V6.5A1.5 1.5 0 0 0 14.5 5h-9A1.5 1.5 0 0 0 4 6.5v9A1.5 1.5 0 0 0 5.5 17H7");
+            }, 1500);
+        });
+    });
 }
 
 function _updateIndicator(total, found) {

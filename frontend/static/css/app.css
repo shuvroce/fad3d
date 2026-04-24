@@ -2340,6 +2340,31 @@ body.no-animations *::after {
     text-overflow: ellipsis;
 }
 
+.figure__item-copy {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+}
+
+.figure__item-copy svg {
+    fill: none;
+    stroke: var(--text-secondary);
+}
+
+.figure__item-copy:hover svg {
+    stroke: var(--text-primary);
+}
+
+.figure__item-copy.copied svg path {
+    stroke: var(--text-primary);
+}
+
 .figure__panel-list {
     flex: 1;
     overflow-y: auto;

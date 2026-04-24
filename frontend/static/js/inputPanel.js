@@ -463,7 +463,6 @@ function prepareForCategoryRestore() {
     if (catbar) catbar.style.display = 'flex';
     if (leftPanel) leftPanel.classList.remove('wind-mode');
 
-    // If we have saved facade content, restore it immediately
     if (savedFacadeContent) {
         const inputContainer = document.getElementById('input-container');
         if (inputContainer) {
