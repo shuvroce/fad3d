@@ -16,19 +16,18 @@ let _windDir = null;
 let _windArrow = null;
 let _pressurePerimeterGroup = null;
 let _initialized = false;
-let _categoryCameraStates = new Map();
+let _windCameraState = null;
 
-function _saveCameraState(catNum) {
-    if (!_view || isNaN(catNum)) return;
+function _saveCameraState() {
+    if (!_view) return;
     const pos = _view.camera.position.toArray();
     const target = _view.controls.target.toArray();
-    _categoryCameraStates.set(catNum, { pos, target });
+    _windCameraState = { pos, target };
 }
 
-function _restoreCameraState(catNum) {
-    const state = _categoryCameraStates.get(catNum);
-    if (state && state.pos && state.target) {
-        _view.setCameraPosition(state.pos, state.target);
+function _restoreCameraState() {
+    if (_windCameraState && _windCameraState.pos && _windCameraState.target) {
+        _view.setCameraPosition(_windCameraState.pos, _windCameraState.target);
     }
 }
 
@@ -110,10 +109,8 @@ function showWindView() {
     _updateWindArrow();
     _updatePressurePerimeterAndLabels();
 
-    const activeCat = document.querySelector('.category__btn.active');
-    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
-    if (catNum !== null && _categoryCameraStates.has(catNum)) {
-        _restoreCameraState(catNum);
+    if (_windCameraState) {
+        _restoreCameraState();
     } else {
         _view.fitCameraToBuilding();
     }
@@ -127,12 +124,7 @@ function showWindView() {
 function hideWindView() {
     if (!_view || !windShellGroup) return;
 
-    // Save camera state before hiding
-    const activeCat = document.querySelector('.category__btn.active');
-    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
-    if (catNum !== null) {
-        _saveCameraState(catNum);
-    }
+    _saveCameraState();
 
     windShellGroup.visible = false;
     _windDir = null;
@@ -150,15 +142,10 @@ function hideWindView() {
 function refreshWindShell() {
     if (!_initialized) return;
 
-    const activeCat = document.querySelector('.category__btn.active');
-    const catNum = activeCat ? parseInt(activeCat.dataset.category) : null;
-
-    if (catNum !== null) {
-        if (_categoryCameraStates.has(catNum)) {
-            _restoreCameraState(catNum);
-        } else {
-            _view?.fitCameraToBuilding();
-        }
+    if (_windCameraState) {
+        _restoreCameraState();
+    } else {
+        _view?.fitCameraToBuilding();
     }
 
     _rebuildWindShell();

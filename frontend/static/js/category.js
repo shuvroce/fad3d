@@ -18,7 +18,7 @@ import { switchGlassType } from './glassInput.js';
 import { clearFacadeCache, showFacadeResults, clearCollapseStateForCategory, renumberCollapseState, restoreCollapseStateForCategory } from './results.js';
 import { updateFacadeResultCategory } from './resultPanel.js';
 import { clearAllCategoryTimers, renumberCategoryTimers } from './calcEngine.js';
-import { refreshWindShell, saveWindCameraState } from './windView.js';
+import { refreshWindShell } from './windView.js';
 import { refreshFacadeElements, _saveCameraState } from './facadeView.js';
 import { triggerFigureCheck } from './figureChecker.js';
 
@@ -35,7 +35,6 @@ function switchCategory(categoryNum) {
     const goingDown = currentNum === null || Number(categoryNum) > currentNum;
 
     if (currentNum !== null) {
-        saveWindCameraState(currentNum);
         _saveCameraState(currentNum);
     }
 
