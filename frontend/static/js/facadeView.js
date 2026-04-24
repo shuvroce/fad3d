@@ -220,7 +220,7 @@ function _debouncedUpdateFacadeElements() {
     clearTimeout(facadeUpdateTimer);
     facadeUpdateTimer = setTimeout(() => {
         _updateFacadeElements();
-    }, 150);
+    }, 400);
 }
 
 // ============================
