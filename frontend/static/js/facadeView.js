@@ -186,8 +186,8 @@ function _setupEventListeners() {
 
     window.addEventListener('theme-changed', (e) => {
         if (_initialized) {
-            _rebuildBuildingWireframe();
-            _updateFacadeElements();
+            _updateBuildingWireframeColors();
+            _updateFacadeElementColors();
         }
     });
 
@@ -391,6 +391,39 @@ function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const borderGeometry = new THREE.BufferGeometry().setFromPoints(borderPoints);
     const borderMaterial = new THREE.LineBasicMaterial({ color: colors.wireframe, transparent: true, opacity: 0.4 });
     buildingGroup.add(new THREE.Line(borderGeometry, borderMaterial));
+}
+
+function _updateBuildingWireframeColors() {
+    if (!buildingGroup) return;
+    const colors = getThemeColors();
+    buildingGroup.children.forEach((obj) => {
+        if (obj.material?.isLineBasicMaterial) {
+            obj.material.color.setHex(colors.wireframe);
+        }
+        if (obj.material?.isMeshPhongMaterial) {
+            const hex = obj.material.color.getHex();
+            if (hex === 0xdddddd || hex === 0x333344) {
+                obj.material.color.setHex(isThemeDark() ? 0x333344 : 0xdddddd);
+            } else if (hex === 0x1f211e || hex === 0x1a1a24) {
+                obj.material.color.setHex(isThemeDark() ? 0x1a1a24 : 0x1f211e);
+            }
+        }
+    });
+}
+
+function _updateFacadeElementColors() {
+    if (!facadeElementsGroup) return;
+    const colors = getThemeColors();
+    facadeElementsGroup.children.forEach((obj) => {
+        if (obj.material?.isLineBasicMaterial) {
+            const hex = obj.material.color.getHex();
+            if (hex === 0xa1a1a1 || hex === 0xaaaaaa || hex === 0x666666) {
+                obj.material.color.setHex(colors.dimension);
+            } else if (hex === 0x757575 || hex === 0x666666 || hex === 0x555555) {
+                obj.material.color.setHex(colors.wireframe);
+            }
+        }
+    });
 }
 
 // ============================

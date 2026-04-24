@@ -273,7 +273,7 @@ function _setupDynamicInputListeners() {
 
     window.addEventListener('theme-changed', () => {
         if (_initialized) {
-            _rebuildWindShell();
+            _updateWindColors();
         }
     });
 
@@ -283,6 +283,27 @@ function _setupDynamicInputListeners() {
 // ============================
 // Wind Shell Rebuild
 // ============================
+
+function _updateWindColors() {
+    if (!windShellGroup) return;
+    const colors = getThemeColors();
+    windShellGroup.children.forEach((obj) => {
+        if (obj.material?.isLineBasicMaterial) {
+            const hex = obj.material.color.getHex();
+            if (hex === 0x999999 || hex === 0xaaaaaa) {
+                obj.material.color.setHex(colors.grid);
+            } else if (hex === 0xa1a1a1 || hex === 0xaaaaaa || hex === 0x333333) {
+                obj.material.color.setHex(colors.dimension);
+            }
+        }
+        if (obj.material?.isMeshPhongMaterial) {
+            const hex = obj.material.color.getHex();
+            if (hex === 0xa0a0a0 || hex === 0x666666) {
+                obj.material.color.setHex(colors.wireframe);
+            }
+        }
+    });
+}
 
 function _rebuildWindShell() {
     _zoneMeshes = [];
