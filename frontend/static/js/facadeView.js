@@ -411,8 +411,6 @@ function _updateFacadeElements() {
     const hasExistingState = _categoryCameraStates.has(catNum);
     if (hasExistingState) {
         _restoreCameraState(catNum);
-    } else {
-        _view?.fitCameraToBuilding();
     }
 
     _buildCategoryFacade(catNum);
