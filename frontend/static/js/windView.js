@@ -105,9 +105,11 @@ function showWindView() {
     _windDir = _windDir || '+X';
     _syncDirButtons();
     _updateFaceAppearance();
-    _updateLabels();
-    _updateWindArrow();
-    _updatePressurePerimeterAndLabels();
+    requestAnimationFrame(() => {
+        _updateLabels();
+        _updateWindArrow();
+        _updatePressurePerimeterAndLabels();
+    });
 
     if (_windCameraState) {
         _restoreCameraState();
