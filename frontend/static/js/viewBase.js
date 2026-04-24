@@ -233,13 +233,13 @@ function _createSkyDome(isDark = false) {
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
 
     if (isDark) {
-        gradient.addColorStop(0, '#0a0a14');
-        gradient.addColorStop(0.3, '#12121f');
-        gradient.addColorStop(0.45, '#181825');
-        gradient.addColorStop(0.5, '#1a1a28');
-        gradient.addColorStop(0.55, '#181825');
-        gradient.addColorStop(0.7, '#141420');
-        gradient.addColorStop(1, '#101018');
+        gradient.addColorStop(0, '#000000');
+        gradient.addColorStop(0.3, '#000000');
+        gradient.addColorStop(0.45, '#000104');
+        gradient.addColorStop(0.5, '#000104');
+        gradient.addColorStop(0.55, '#000107');
+        gradient.addColorStop(0.7, '#000107');
+        gradient.addColorStop(1, '#000107');
     } else {
         gradient.addColorStop(0, '#86a4df');
         gradient.addColorStop(0.3, '#adc2ed');
@@ -277,13 +277,13 @@ function _updateSkyDomeColor(skyMesh, isDark) {
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
 
     if (isDark) {
-        gradient.addColorStop(0, '#0a0a14');
-        gradient.addColorStop(0.3, '#12121f');
-        gradient.addColorStop(0.45, '#181825');
-        gradient.addColorStop(0.5, '#1a1a28');
-        gradient.addColorStop(0.55, '#181825');
-        gradient.addColorStop(0.7, '#141420');
-        gradient.addColorStop(1, '#101018');
+        gradient.addColorStop(0, '#000000');
+        gradient.addColorStop(0.3, '#000000');
+        gradient.addColorStop(0.45, '#000104');
+        gradient.addColorStop(0.5, '#000104');
+        gradient.addColorStop(0.55, '#000107');
+        gradient.addColorStop(0.7, '#000107');
+        gradient.addColorStop(1, '#000107');
     } else {
         gradient.addColorStop(0, '#86a4df');
         gradient.addColorStop(0.3, '#adc2ed');
@@ -530,6 +530,7 @@ function updateAllSkyDomes(isDark) {
             _updateSkyDomeColor(instance.skyDome, isDark);
         }
     });
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark } }));
 }
 
 function disposeAll() {
@@ -537,9 +538,38 @@ function disposeAll() {
     _viewInstances.clear();
 }
 
+function isThemeDark() {
+    return document.body.classList.contains('theme__dark');
+}
+
+function getThemeColors() {
+    if (isThemeDark()) {
+        return {
+            label: '#707070',
+            labelBg: '#000000',
+            dimension: 0x707070,
+            arrow: 0x707070,
+            wireframe: 0x666666,
+            floor: 0x555555,
+            grid: 0x444444,
+        };
+    }
+    return {
+        label: '#000000',
+        labelBg: '#ffffff',
+        dimension: 0x333333,
+        arrow: 0x333333,
+        wireframe: 0xcccccc,
+        floor: 0xcccccc,
+        grid: 0xcccccc,
+    };
+}
+
 export {
     createViewBase,
     getViewInstance,
     updateAllSkyDomes,
-    disposeAll
+    disposeAll,
+    isThemeDark,
+    getThemeColors,
 };

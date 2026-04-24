@@ -5,7 +5,7 @@
 // ============================
 
 import * as THREE from 'three';
-import { createViewBase, getViewInstance } from './viewBase.js';
+import { createViewBase, getViewInstance, getThemeColors, isThemeDark } from './viewBase.js';
 import { getConfig, updateConfig } from './buildingConfig.js';
 
 let _view = null;
@@ -271,6 +271,12 @@ function _setupDynamicInputListeners() {
         }
     });
 
+    window.addEventListener('theme-changed', () => {
+        if (_initialized) {
+            _rebuildWindShell();
+        }
+    });
+
     updateFromInputs();
 }
 
@@ -392,7 +398,8 @@ function _addZone(zoneId, w, d, pos, rot, faceId, isRoof = false) {
 }
 
 function _buildZoneEdgeLines(halfW, halfD, H, ax, ay) {
-    const lineMat = new THREE.LineBasicMaterial({ color: 0x999999 });
+    const colors = getThemeColors();
+    const lineMat = new THREE.LineBasicMaterial({ color: colors.grid });
 
     const wallLineSegs = [
         [[-halfW + ax, -halfD, 0], [-halfW + ax, -halfD, H]],
@@ -442,7 +449,8 @@ function _buildFloorLines(halfW, halfD, H) {
     const config = getConfig();
     const { numFloors, floorHeight } = config;
     if (!numFloors || numFloors <= 1 || !floorHeight) return;
-    const mat = new THREE.LineBasicMaterial({ color: 0x999999 });
+    const colors = getThemeColors();
+    const mat = new THREE.LineBasicMaterial({ color: colors.grid });
     for (let f = 1; f < numFloors; f++) {
         const z = f * floorHeight;
         if (z >= H - 0.01) continue;
@@ -463,10 +471,11 @@ function _buildFloorSlabs(halfW, halfD, H) {
     const config = getConfig();
     const { numFloors, floorHeight } = config;
     if (!numFloors || numFloors <= 1 || !floorHeight) return;
+    const colors = getThemeColors();
 
     const slabGeo = new THREE.PlaneGeometry(2 * halfW, 2 * halfD);
     const slabMat = new THREE.MeshPhongMaterial({
-        color: 0xa0a0a0,
+        color: colors.wireframe,
         transparent: true,
         opacity: 0.08,
         side: THREE.DoubleSide,
@@ -572,7 +581,8 @@ function _buildDimensionLines(halfW, halfD, H) {
 }
 
 function _addDimAnnotation(start, end, leaders, labelText, scaleMult) {
-    const mat = new THREE.LineBasicMaterial({ color: 0xa1a1a1 });
+    const colors = getThemeColors();
+    const mat = new THREE.LineBasicMaterial({ color: colors.dimension });
 
     const extLen = 0.2 * scaleMult;
     const dir = end.clone().sub(start).normalize();
@@ -614,10 +624,11 @@ function _makeDimLabel(text, scaleMult = 1) {
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
+    const colors = getThemeColors();
     ctx.fillStyle = 'rgba(8,8,8,0.72)';
     ctx.beginPath(); ctx.roundRect(1, 1, W - 2, H - 2, 4); ctx.fill();
     ctx.font = `600 ${fontSize}px Arial`;
-    ctx.fillStyle = 'rgba(208, 208, 208, 0.88)';
+    ctx.fillStyle = colors.label;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(text, W / 2, H / 2);
     const texture = new THREE.CanvasTexture(canvas);
@@ -802,7 +813,8 @@ function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     ctx.fill();
 
     ctx.font = `600 ${fontSize}px Arial`;
-    ctx.fillStyle = 'rgba(200,200,200,0.92)';
+    const colors = getThemeColors();
+    ctx.fillStyle = colors.label;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(pressureLine, (W + swatchW) / 2, H / 2);

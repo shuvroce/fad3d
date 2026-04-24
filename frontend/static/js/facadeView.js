@@ -5,7 +5,7 @@
 // ============================
 
 import * as THREE from 'three';
-import { createViewBase, getViewInstance } from './viewBase.js';
+import { createViewBase, getViewInstance, isThemeDark, getThemeColors } from './viewBase.js';
 import { getFacadeResultData } from './results.js';
 
 const FACADE_WIDTH = 15;
@@ -184,6 +184,13 @@ function _setupEventListeners() {
     document.addEventListener('input', _handleInputChange);
     document.addEventListener('change', _handleInputChange);
 
+    window.addEventListener('theme-changed', (e) => {
+        if (_initialized) {
+            _rebuildBuildingWireframe();
+            _updateFacadeElements();
+        }
+    });
+
     const activeCat = document.querySelector('.category__btn.active');
     const catNum = activeCat ? parseInt(activeCat.dataset.category) : 1;
     const floorHeightInput = document.getElementById(`cat${catNum}-general-floor_height`);
@@ -240,8 +247,9 @@ function _rebuildBuildingWireframe() {
     const floorHeight = _lastFloorHeight ? _lastFloorHeight / 1000 : 3.2;
     const numFloors = 4;
     const totalHeight = numFloors * floorHeight;
-    const wireframeColor = 0x757575;
-    const floorColor = 0x999999;
+    const colors = getThemeColors();
+    const wireframeColor = colors.wireframe;
+    const floorColor = colors.floor;
     const halfW = width / 2;
     const halfD = depth / 2;
 
@@ -347,15 +355,16 @@ function _createTransparentWalls(width, depth, height) {
 function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
     const halfW = width / 2;
     const halfD = depth / 2;
+    const colors = getThemeColors();
     const transparentMaterial = new THREE.MeshPhongMaterial({
-        color: 0xdddddd,
+        color: isThemeDark() ? 0x333344 : 0xdddddd,
         transparent: true,
         opacity: 0.12,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
     const solidMaterial = new THREE.MeshPhongMaterial({
-        color: 0x1f211e,
+        color: isThemeDark() ? 0x1a1a24 : 0x1f211e,
         transparent: true,
         opacity: 0.03,
         side: THREE.DoubleSide,
@@ -380,7 +389,7 @@ function _createTransparentSlabs(width, depth, numFloors, floorHeight) {
         new THREE.Vector3(-halfW, -halfD, 0.01),
     ];
     const borderGeometry = new THREE.BufferGeometry().setFromPoints(borderPoints);
-    const borderMaterial = new THREE.LineBasicMaterial({ color: 0x757575, transparent: true, opacity: 0.4 });
+    const borderMaterial = new THREE.LineBasicMaterial({ color: colors.wireframe, transparent: true, opacity: 0.4 });
     buildingGroup.add(new THREE.Line(borderGeometry, borderMaterial));
 }
 
@@ -575,7 +584,8 @@ function _createAnchorsAtLevel(x, y, z, w, h, spanMeters, catNum) {
 
 function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, verticalSpacing, catNum, facadeType, row, glassType) {
     const scaleMult = 0.8;
-    const dimColor = 0xa1a1a1;
+    const colors = getThemeColors();
+    const dimColor = colors.dimension;
     const mat = new THREE.LineBasicMaterial({ color: dimColor });
 
     const glassLabel = glassType ? glassType.toUpperCase() : 'Glass';
@@ -675,7 +685,7 @@ function _createDimensionLabels(x, y, zStart, zEnd, facadeWidth, spanMeters, ver
     };
 
     if (row.start === 1) {
-        const arrowColor = 0x666666;
+        const arrowColor = colors.arrow;
         const arrowMat = new THREE.LineBasicMaterial({ color: arrowColor });
 
         const _addLeader = (toPos, label, labelOffsetX = 1.2, labelOffsetZ = 0) => {
@@ -736,8 +746,9 @@ function _createDimLabelSprite(text, position, scaleMult = 1) {
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext('2d');
+    const colors = getThemeColors();
     ctx.font = `600 ${fontSize}px Arial`;
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = colors.label;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     lines.forEach((line, i) => {
@@ -862,7 +873,8 @@ function _createTextSprite(text, x, y, z, scale, color, catNum, isResultOverlay 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.font = 'bold 28px Arial';
-    ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    const colors = getThemeColors();
+    ctx.fillStyle = isResultOverlay ? colors.label : '#' + color.toString(16).padStart(6, '0');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);

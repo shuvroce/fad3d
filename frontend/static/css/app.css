@@ -42,7 +42,7 @@
     --bg-bullet: #ebebed;
 
     /* Light Theme - Text Colors */
-    --text-primary: #333;
+    --text-primary: #1e1e1e;
     --text-secondary: #555;
     --text-heading: #333;
     --text-link: #001d39;
@@ -58,7 +58,7 @@
     --border-tertiary: #eee;
     --border-input: #e9e8e8;
     --border-code: #e9e8e8;
-    --border-header: #dadada;
+    --border-header: #d0d0d0;
 
     /* Light Theme - Shadow Colors */
     --shadow-nav: rgba(0, 0, 0, 0.1);
@@ -107,7 +107,7 @@
 body.theme__dark {
     /* Dark Theme - Background Colors */
     --bg-body: #010409;
-    --bg-primary: #171717;
+    --bg-primary: #252525;
     --bg-secondary: #141414;
     --bg-hover: #21262d;
     --bg-preview: #1c2010;
@@ -119,8 +119,8 @@ body.theme__dark {
     --bg-bullet: #2f3640;
 
     /* Dark Theme - Text Colors */
-    --text-primary: #e6edf3;
-    --text-secondary: #c1c1c1;
+    --text-primary: #fafdff;
+    --text-secondary: #d3d3d3;
     --text-heading: #e6edf3;
     --text-link: #58a6ff;
     --text-code: #e6edf3;
@@ -130,12 +130,12 @@ body.theme__dark {
     --text-label: #6e7681;
 
     /* Dark Theme - Border Colors */
-    --border-primary: #292929;
+    --border-primary: #3b3b3b;
     --border-secondary: #21262d;
     --border-tertiary: #30363d;
     --border-input: #404040;
     --border-code: #21262d;
-    --border-header: #292929;
+    --border-header: #454444;
 
     /* Dark Theme - Shadow Colors */
     --shadow-nav: rgba(0, 0, 0, 0.4);
@@ -169,7 +169,7 @@ body.theme__dark {
     --btn-danger: #da3633;
     --btn-danger-hover: #b62824;
 
-    --btn-selected: #584b31;
+    --btn-selected: #7b6c4e;
 
     --logo-image: var(--logo-image-dark);
     --logo-filter: brightness(0) invert(1);
@@ -1346,7 +1346,7 @@ body.no-animations *::after {
     height: 20px;
     stroke: var(--text-primary);
     stroke-width: 1.6;
-    fill: none;
+    fill: var(--text-primary);
     stroke-linecap: round;
     stroke-linejoin: round;
     padding: 0.2rem;
@@ -1784,7 +1784,7 @@ body.no-animations *::after {
 .topbar__panel-btn {
     padding: 0.2rem 0.3rem;
     background-color: var(--bg-bullet);
-    border: 1px solid var(--border-header);
+    border: 1px solid var(--border-primary);
     border-radius: var(--radius-5);
     /* box-shadow: var(--shadow-box); */
     display: flex;
@@ -2280,7 +2280,8 @@ body.no-animations *::after {
     font-size: 0.65rem;
     color: var(--text-secondary);
     cursor: default;
-    user-select: all;
+    /* user-select: all; */
+    width: 15rem;
 }
 
 .figure__panel-dir-icon {
@@ -2349,20 +2350,22 @@ body.no-animations *::after {
     border: none;
     cursor: pointer;
     opacity: 0.4;
-    transition: opacity 0.15s;
+    transition: opacity 0.15s, color 0.15s;
+    color: var(--text-secondary);
 }
 
 .figure__item-copy svg {
     fill: none;
-    stroke: var(--text-secondary);
+    stroke: currentColor;
 }
 
-.figure__item-copy:hover svg {
-    stroke: var(--text-primary);
+.figure__item-copy:hover {
+    color: var(--text-primary);
+    opacity: 1;
 }
 
 .figure__item-copy.copied svg path {
-    stroke: var(--text-primary);
+    stroke: currentColor;
 }
 
 .figure__item-copy.copied svg rect {
@@ -3690,7 +3693,7 @@ body.no-animations *::after {
     flex-direction: column;
     align-items: center;
     transition: right 0.2s ease;
-    background: rgba(255,255,255,0.06);
+    /* background: rgba(255,255,255,0.06); */
     border-radius: var(--radius-2);
     cursor: pointer;
 }
