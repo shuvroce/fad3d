@@ -35,7 +35,7 @@ function createViewBase(viewId, containerSelector, navCubeContainerSelector = '#
 
     const scene = new THREE.Scene();
 
-    const skyDome = _createSkyDome();
+    const skyDome = _createSkyDome(document.body.classList.contains('theme__dark'));
     skyDome.rotation.x = Math.PI / 2;
     scene.add(skyDome);
 
@@ -193,6 +193,7 @@ function createViewBase(viewId, containerSelector, navCubeContainerSelector = '#
         camera,
         renderer,
         controls,
+        skyDome,
         fitCameraToBuilding,
         setCameraPosition,
         setVisible,
@@ -222,7 +223,7 @@ function createViewBase(viewId, containerSelector, navCubeContainerSelector = '#
     return instance;
 }
 
-function _createSkyDome() {
+function _createSkyDome(isDark = false) {
     const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
     const canvas = document.createElement('canvas');
     canvas.width = 2;
@@ -230,13 +231,24 @@ function _createSkyDome() {
     const ctx = canvas.getContext('2d');
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#86a4df');
-    gradient.addColorStop(0.3, '#adc2ed');
-    gradient.addColorStop(0.45, '#adc0e7');
-    gradient.addColorStop(0.5, '#adb3c0');
-    gradient.addColorStop(0.55, '#abb3bc');
-    gradient.addColorStop(0.7, '#b0b6bc');
-    gradient.addColorStop(1, '#bababa');
+
+    if (isDark) {
+        gradient.addColorStop(0, '#0a0a14');
+        gradient.addColorStop(0.3, '#12121f');
+        gradient.addColorStop(0.45, '#181825');
+        gradient.addColorStop(0.5, '#1a1a28');
+        gradient.addColorStop(0.55, '#181825');
+        gradient.addColorStop(0.7, '#141420');
+        gradient.addColorStop(1, '#101018');
+    } else {
+        gradient.addColorStop(0, '#86a4df');
+        gradient.addColorStop(0.3, '#adc2ed');
+        gradient.addColorStop(0.45, '#adc0e7');
+        gradient.addColorStop(0.5, '#adb3c0');
+        gradient.addColorStop(0.55, '#abb3bc');
+        gradient.addColorStop(0.7, '#b0b6bc');
+        gradient.addColorStop(1, '#bababa');
+    }
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 2, 512);
@@ -253,6 +265,42 @@ function _createSkyDome() {
     const sky = new THREE.Mesh(skyGeometry, skyMaterial);
     sky.userData.isSkyDome = true;
     return sky;
+}
+
+function _updateSkyDomeColor(skyMesh, isDark) {
+    if (!skyMesh) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 2;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+
+    if (isDark) {
+        gradient.addColorStop(0, '#0a0a14');
+        gradient.addColorStop(0.3, '#12121f');
+        gradient.addColorStop(0.45, '#181825');
+        gradient.addColorStop(0.5, '#1a1a28');
+        gradient.addColorStop(0.55, '#181825');
+        gradient.addColorStop(0.7, '#141420');
+        gradient.addColorStop(1, '#101018');
+    } else {
+        gradient.addColorStop(0, '#86a4df');
+        gradient.addColorStop(0.3, '#adc2ed');
+        gradient.addColorStop(0.45, '#adc0e7');
+        gradient.addColorStop(0.5, '#adb3c0');
+        gradient.addColorStop(0.55, '#abb3bc');
+        gradient.addColorStop(0.7, '#b0b6bc');
+        gradient.addColorStop(1, '#bababa');
+    }
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 2, 512);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    skyMesh.material.map = texture;
+    skyMesh.material.needsUpdate = true;
 }
 
 function _createNavCube(container, navContainer, camera, controls) {
@@ -476,6 +524,14 @@ function getViewInstance(viewId) {
     return _viewInstances.get(viewId);
 }
 
+function updateAllSkyDomes(isDark) {
+    _viewInstances.forEach(instance => {
+        if (instance.skyDome) {
+            _updateSkyDomeColor(instance.skyDome, isDark);
+        }
+    });
+}
+
 function disposeAll() {
     _viewInstances.forEach(instance => instance.dispose());
     _viewInstances.clear();
@@ -484,5 +540,6 @@ function disposeAll() {
 export {
     createViewBase,
     getViewInstance,
+    updateAllSkyDomes,
     disposeAll
 };
