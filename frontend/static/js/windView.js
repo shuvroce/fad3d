@@ -646,7 +646,7 @@ function _makeDimLabel(text, scaleMult = 1) {
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
     const colors = getThemeColors();
-    ctx.fillStyle = 'rgba(8,8,8,0.72)';
+    ctx.fillStyle = colors.labelBg;
     ctx.beginPath(); ctx.roundRect(1, 1, W - 2, H - 2, 4); ctx.fill();
     ctx.font = `600 ${fontSize}px Arial`;
     ctx.fillStyle = colors.label;
@@ -811,30 +811,29 @@ function _makeLabel(zoneId, pressureLine, scaleMult = 1, windward = null) {
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext('2d');
-
-    ctx.fillStyle = 'rgba(10,10,10,0.80)';
+    
+    const colors = getThemeColors();
+    ctx.fillStyle = colors.labelBg;
     ctx.beginPath();
     ctx.roundRect(2, 2, W - 4, H - 4, 7);
     ctx.fill();
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.30)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.roundRect(2, 2, W - 4, H - 4, 7);
-    ctx.stroke();
 
     let swatchColor;
     if (windward === true)       swatchColor = '#d4d4d4';
     else if (windward === false) swatchColor = '#555555';
     else                         swatchColor = '#' + ZONE[zoneId].color.toString(16).padStart(6, '0');
 
-    ctx.fillStyle = swatchColor;
+    // ctx.fillStyle = swatchColor;
     ctx.beginPath();
     ctx.roundRect(2, 2, swatchW, H - 4, [7, 0, 0, 7]);
-    ctx.fill();
+    // ctx.fill();
 
-    ctx.font = `600 ${fontSize}px Arial`;
-    const colors = getThemeColors();
+    ctx.font = `700 ${fontSize}px Arial`;
+    // const colors = getThemeColors();
     ctx.fillStyle = colors.label;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

@@ -1000,6 +1000,7 @@ summary {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    filter: var(--logo-filter);
 }
 
 .logo-upload__controls {
@@ -3648,7 +3649,7 @@ body.no-animations *::after {
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--text-muted, #3a4149);
+    color: var(--text-secondary);
     margin-bottom: 0.3rem;
     text-align: center;
 }

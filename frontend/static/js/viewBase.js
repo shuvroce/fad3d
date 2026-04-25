@@ -323,7 +323,7 @@ function _createNavCube(container, navContainer, camera, controls) {
 
     const cubeGeometry = new THREE.BoxGeometry(1.3, 1.3, 1.3);
 
-    const faceLabels = ['RIGHT (+Y)', 'LEFT (-Y)', 'TOP (+Z)', 'BOTTOM (-Z)', 'FRONT (+X)', 'BACK (+X)'];
+    const faceLabels = ['RIGHT (+Y)', 'LEFT (-Y)', 'TOP (+Z)', 'BOTTOM (-Z)', 'FRONT (+X)', 'BACK (-X)'];
     const isDark = document.body.classList.contains('theme__dark');
     const { faceBg, faceText, edgesColor } = isDark
         ? {
@@ -546,7 +546,7 @@ function updateAllSkyDomes(isDark) {
 function _updateNavCubeColors(navCubeWrapper, isDark) {
     if (!navCubeWrapper?.mesh) return;
 
-    const faceLabels = ['RIGHT (+Y)', 'LEFT (-Y)', 'TOP (+Z)', 'BOTTOM (-Z)', 'FRONT (+X)', 'BACK (+X)'];
+    const faceLabels = ['RIGHT (+Y)', 'LEFT (-Y)', 'TOP (+Z)', 'BOTTOM (-Z)', 'FRONT (+X)', 'BACK (-X)'];
     const { faceBg, faceText, edgesColor } = isDark
         ? {
               faceBg: ['#2a2a3a', '#2a2a3a', '#333344', '#252535', '#2e2e40', '#282838'],
@@ -589,23 +589,23 @@ function isThemeDark() {
 function getThemeColors() {
     if (isThemeDark()) {
         return {
-            label: '#707070',
-            labelBg: '#000000',
-            dimension: 0x707070,
-            arrow: 0x707070,
-            wireframe: 0x666666,
-            floor: 0x555555,
-            grid: 0x444444,
+            label: '#646464',
+            labelBg: '#000000a8',
+            dimension: 0x494949,
+            arrow: 0x494949,
+            wireframe: 0x494949,
+            floor: 0x494949,
+            grid: 0x494949,
         };
     }
     return {
-        label: '#000000',
-        labelBg: '#ffffff',
-        dimension: 0x333333,
-        arrow: 0x333333,
-        wireframe: 0xcccccc,
-        floor: 0xcccccc,
-        grid: 0xcccccc,
+        label: '#161616',
+        labelBg: '#ffffffa8',
+        dimension: 0x979797,
+        arrow: 0x979797,
+        wireframe: 0x979797,
+        floor: 0x979797,
+        grid: 0x979797,
     };
 }
 
