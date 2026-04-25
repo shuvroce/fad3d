@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { createViewBase, getViewInstance, isThemeDark, getThemeColors } from './viewBase.js';
 import { getFacadeResultData } from './results.js';
+import { getConfig } from './buildingConfig.js';
 
 const FACADE_WIDTH = 15;
 const FACADE_DEPTH = 10;
@@ -837,6 +838,7 @@ function _updateResultOverlay(mode) {
     if (zone === 'zone5') {
         xOffset = -halfW;
     } else {
+        const config = getConfig();
         xOffset = -halfW + (config.width - facadeWidth) / 2;
     }
 
@@ -846,71 +848,145 @@ function _updateResultOverlay(mode) {
         endFloor = numFloors;
     } else if (facadeType === 'cont') {
         startFloor = 1;
-        endFloor = 2;
+        endFloor = 3;
     } else {
         startFloor = 3;
         endFloor = 3;
     }
 
+    let rows;
+    if (facadeType === 'cont') {
+        rows = [{ start: 1, end: 2 }, { start: 2, end: 3 }];
+    } else {
+        rows = [{ start: startFloor, end: endFloor }];
+    }
     const y = -halfD;
+    const numMullions = 5;
+    const verticalSpacing = floorHeight;
 
-    if (mode === 'dc-ratio') {
-        const glassDc = glassResult?.stress_ratio ?? null;
-        const frameDcMul = frameResult?.mul_dc ?? null;
-        const frameDcTran = frameResult?.tran_dc ?? null;
+    for (const row of rows) {
+        const z = row.start * floorHeight;
+        const zEnd = row.end * floorHeight;
+        const transomZ = [z];
+        const panelHeight = zEnd - z;
+        const numMiddle = Math.floor((panelHeight - 0.01) / verticalSpacing);
+        for (let i = 1; i <= numMiddle; i++) {
+            transomZ.push(z + i * verticalSpacing);
+        }
+        transomZ.push(zEnd);
+        transomZ.sort((a, b) => a - b);
 
-        if (glassDc !== null) {
-            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
-            const labelColor = glassDc <= 1.0 ? 0x00aa00 : 0xff0000;
-            _createTextSprite(`DC: ${glassDc.toFixed(2)}`, xOffset + facadeWidth / 2, y - 0.8, centerZ, 0.5, labelColor, catNum, true);
-        }
-        if (frameDcMul !== null) {
-            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
-            const labelColor = frameDcMul <= 1.0 ? 0x00aa00 : 0xff0000;
-            _createTextSprite(`FM: ${frameDcMul.toFixed(2)}`, xOffset + facadeWidth / 2, y - 1.3, centerZ, 0.4, labelColor, catNum, true);
-        }
-        if (frameDcTran !== null) {
-            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
-            const labelColor = frameDcTran <= 1.0 ? 0x00aa00 : 0xff0000;
-            _createTextSprite(`FT: ${frameDcTran.toFixed(2)}`, xOffset + facadeWidth / 2, y - 1.8, centerZ, 0.4, labelColor, catNum, true);
-        }
-    } else if (mode === 'deflection') {
-        const glassDef = glassResult?.deflection ?? null;
-        const glassDefRatio = glassResult?.def_ratio ?? null;
-        const frameDefMul = frameResult?.mul_def ?? null;
-        const frameDefTran = frameResult?.tran_def_wind ?? null;
+        if (mode === 'dc-ratio') {
+            const glassDc = glassResult?.stress_ratio ?? null;
+            const frameDcMul = frameResult?.mul_dc ?? null;
+            const frameDcTran = frameResult?.tran_dc ?? null;
 
-        if (glassDef !== null) {
-            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
-            const labelColor = (glassDefRatio !== null && glassDefRatio <= 1.0) ? 0x00aa00 : 0xff8800;
-            _createTextSprite(`d: ${glassDef.toFixed(1)}mm`, xOffset + facadeWidth / 2, y - 0.8, centerZ, 0.45, labelColor, catNum, true);
-        }
-        if (frameDefMul !== null) {
-            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
-            _createTextSprite(`FM: ${frameDefMul.toFixed(1)}mm`, xOffset + facadeWidth / 2, y - 1.3, centerZ, 0.4, 0xff8800, catNum, true);
-        }
-        if (frameDefTran !== null) {
-            const centerZ = (startFloor + endFloor) / 2 * floorHeight;
-            _createTextSprite(`FT: ${frameDefTran.toFixed(1)}mm`, xOffset + facadeWidth / 2, y - 1.8, centerZ, 0.4, 0xff8800, catNum, true);
+            if (glassDc !== null) {
+                const labelColor = glassDc <= 1.0 ? 0x00aa00 : 0xff0000;
+                const text = glassDc.toFixed(2);
+                for (let i = 0; i < numMullions; i++) {
+                    for (let j = 0; j < transomZ.length - 1; j++) {
+                        const panelCX = (i + 0.5) * spanMeters;
+                        const panelCZ = (transomZ[j] + transomZ[j + 1]) / 2;
+                        _createTextSprite(text, xOffset + panelCX, y - 0.02, panelCZ, 0.4, labelColor, catNum, true);
+                    }
+                }
+            }
+
+            if (frameDcMul !== null) {
+                const labelColor = frameDcMul <= 1.0 ? 0x00aa00 : 0xff0000;
+                const text = frameDcMul.toFixed(2);
+                for (let i = 0; i <= numMullions; i++) {
+                    const mx = i * spanMeters;
+                    const mullionCenterZ = (z + zEnd) / 2;
+                    _createTextSprite(text, xOffset + mx, y - 0.02, mullionCenterZ, 0.35, labelColor, catNum, true, true);
+                }
+            }
+
+            if (frameDcTran !== null) {
+                const labelColor = frameDcTran <= 1.0 ? 0x00aa00 : 0xff0000;
+                const text = frameDcTran.toFixed(2);
+                for (const tz of transomZ) {
+                    _createTextSprite(text, xOffset + facadeWidth / 2, y - 0.02, tz, 0.35, labelColor, catNum, true);
+                }
+            }
+        } else if (mode === 'deflection') {
+            const glassDef = glassResult?.deflection ?? null;
+            const glassDefRatio = glassResult?.def_ratio ?? null;
+            const frameDefMul = frameResult?.mul_def ?? null;
+            const frameDefTran = frameResult?.tran_def_wind ?? null;
+
+            if (glassDef !== null) {
+                const labelColor = (glassDefRatio !== null && glassDefRatio <= 1.0) ? 0x00aa00 : 0xff0000;
+                const text = Number(glassDef.toFixed(1)).toString();
+                for (let i = 0; i < numMullions; i++) {
+                    for (let j = 0; j < transomZ.length - 1; j++) {
+                        const panelCX = (i + 0.5) * spanMeters;
+                        const panelCZ = (transomZ[j] + transomZ[j + 1]) / 2;
+                        _createTextSprite(text, xOffset + panelCX, y - 0.02, panelCZ, 0.4, labelColor, catNum, true);
+                    }
+                }
+            }
+
+            if (frameDefMul !== null) {
+                const mulAllowDef = frameResult?.mul_allow_def ?? null;
+                const mulDefRatio = mulAllowDef ? frameDefMul / mulAllowDef : null;
+                const labelColor = (mulDefRatio !== null && mulDefRatio <= 1.0) ? 0x00aa00 : 0xff0000;
+                const text = Number(frameDefMul.toFixed(1)).toString();
+                for (let i = 0; i <= numMullions; i++) {
+                    const mx = i * spanMeters;
+                    const mullionCenterZ = (z + zEnd) / 2;
+                    _createTextSprite(text, xOffset + mx, y - 0.02, mullionCenterZ, 0.35, labelColor, catNum, true, true);
+                }
+            }
+
+            if (frameDefTran !== null) {
+                const tranAllowDef = frameResult?.tran_allow_def ?? null;
+                const tranDefRatio = tranAllowDef ? frameDefTran / tranAllowDef : null;
+                const labelColor = (tranDefRatio !== null && tranDefRatio <= 1.0) ? 0x00aa00 : 0xff0000;
+                const text = Number(frameDefTran.toFixed(1)).toString();
+                for (const tz of transomZ) {
+                    _createTextSprite(text, xOffset + facadeWidth / 2, y - 0.02, tz, 0.35, labelColor, catNum, true);
+                }
+            }
         }
     }
 }
 
-function _createTextSprite(text, x, y, z, scale, color, catNum, isResultOverlay = false) {
+function _createTextSprite(text, x, y, z, scale, color, catNum, isResultOverlay = false, rotate90 = false) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 256;
-    canvas.height = 64;
 
-    ctx.fillStyle = 'transparent';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (rotate90) {
+        canvas.width = 35;
+        canvas.height = 60;
+    } else {
+        canvas.width = 60;
+        canvas.height = 35;
+    }
 
-    ctx.font = 'bold 28px Arial';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    const radius = 8;
+    const pad = 4;
+    ctx.beginPath();
+    ctx.roundRect(pad, pad, canvas.width - pad * 2, canvas.height - pad * 2, radius);
+    ctx.fill();
+
+    ctx.font = 'normal 14px Arial';
     const colors = getThemeColors();
-    ctx.fillStyle = isResultOverlay ? colors.label : '#' + color.toString(16).padStart(6, '0');
+    ctx.fillStyle = color ? '#' + color.toString(16).padStart(6, '0') : colors.label;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    if (rotate90) {
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+    } else {
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    }
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;
@@ -918,7 +994,13 @@ function _createTextSprite(text, x, y, z, scale, color, catNum, isResultOverlay 
     const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
     const sprite = new THREE.Sprite(material);
     sprite.position.set(x, y, z);
-    sprite.scale.set(scale * 4, scale, 1);
+
+    if (rotate90) {
+        sprite.scale.set(scale * 0.8, scale * 2, 1);
+    } else {
+        sprite.scale.set(scale * 2, scale * 0.8, 1);
+    }
+
     sprite.userData = { type: isResultOverlay ? 'result-overlay' : 'label', category: catNum, isResultOverlay };
     facadeElementsGroup.add(sprite);
 }
