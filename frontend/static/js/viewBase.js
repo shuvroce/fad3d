@@ -235,11 +235,11 @@ function _createSkyDome(isDark = false) {
     if (isDark) {
         gradient.addColorStop(0, '#000000');
         gradient.addColorStop(0.3, '#000000');
-        gradient.addColorStop(0.45, '#000104');
-        gradient.addColorStop(0.5, '#000104');
-        gradient.addColorStop(0.55, '#000107');
-        gradient.addColorStop(0.7, '#000107');
-        gradient.addColorStop(1, '#000107');
+        gradient.addColorStop(0.45, '#000000');
+        gradient.addColorStop(0.5, '#000000');
+        gradient.addColorStop(0.55, '#000000');
+        gradient.addColorStop(0.7, '#000000');
+        gradient.addColorStop(1, '#000000');
     } else {
         gradient.addColorStop(0, '#86a4df');
         gradient.addColorStop(0.3, '#adc2ed');
@@ -279,11 +279,11 @@ function _updateSkyDomeColor(skyMesh, isDark) {
     if (isDark) {
         gradient.addColorStop(0, '#000000');
         gradient.addColorStop(0.3, '#000000');
-        gradient.addColorStop(0.45, '#000104');
-        gradient.addColorStop(0.5, '#000104');
-        gradient.addColorStop(0.55, '#000107');
-        gradient.addColorStop(0.7, '#000107');
-        gradient.addColorStop(1, '#000107');
+        gradient.addColorStop(0.45, '#000000');
+        gradient.addColorStop(0.5, '#000000');
+        gradient.addColorStop(0.55, '#000000');
+        gradient.addColorStop(0.7, '#000000');
+        gradient.addColorStop(1, '#000000');
     } else {
         gradient.addColorStop(0, '#86a4df');
         gradient.addColorStop(0.3, '#adc2ed');
