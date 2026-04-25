@@ -3415,7 +3415,7 @@ body.no-animations *::after {
     border: 1.5px solid var(--border-input);
     border-radius: var(--radius-2);
     background: var(--bg-primary);
-    color: var(--text-secondary);
+    color: var(--text-primary);
     cursor: pointer;
     transition: var(--transition);
     font-size: 0.7rem;
@@ -3424,8 +3424,8 @@ body.no-animations *::after {
 }
 
 .type-radio__card:hover {
-    border-color: var(--border-secondary);
-    color: var(--text-primary);
+    /* border-color: var(--border-secondary); */
+    color: var(--text-secondary);
     background: var(--bg-secondary);
 }
 
@@ -3828,7 +3828,7 @@ body.no-animations *::after {
     background: transparent;
     border: none;
     color: var(--text-primary);
-    border-radius: 0;
+    border-radius: var(--radius-1);
     font-weight: 500;
     cursor: pointer;
     /* border-bottom: 2px solid transparent; */
