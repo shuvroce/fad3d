@@ -542,7 +542,7 @@ function _createGlassPanelGrid(x, y, z, w, h, spanMeters, verticalSpacing, glass
             const panelCX = (i + 0.5) * spanMeters;
             const panelCZ = (transomZ[j] + transomZ[j + 1]) / 2;
 
-            const panelGeom = new THREE.BoxGeometry(panelW * 0.95, glassThickM, panelH * 0.95);
+            const panelGeom = new THREE.BoxGeometry(panelW * 0.98, glassThickM, panelH * 0.98);
             const panel = new THREE.Mesh(panelGeom, glassMaterial);
             panel.position.set(x + panelCX, y, panelCZ);
             panel.userData = { type: 'glass', category: catNum };
@@ -569,6 +569,7 @@ function _createMullionsSlabToSlab(x, y, zStart, zEnd, w, spanMeters, catNum) {
 function _createTransomsAtLevels(x, y, zStart, zEnd, w, spanMeters, verticalSpacing, catNum) {
     const frameMaterial = _getFrameMaterial('transom');
     const panelHeight = zEnd - zStart;
+    const numMullions = 5;
 
     const transomZ = [zStart, zEnd];
     const numMiddle = Math.floor((panelHeight - 0.01) / verticalSpacing);
@@ -578,11 +579,14 @@ function _createTransomsAtLevels(x, y, zStart, zEnd, w, spanMeters, verticalSpac
     transomZ.sort((a, b) => a - b);
 
     for (const tz of transomZ) {
-        const tGeom = new THREE.BoxGeometry(w, FRAME_DEPTH_M, FRAME_HEIGHT_M);
-        const tMesh = new THREE.Mesh(tGeom, frameMaterial);
-        tMesh.position.set(x + w / 2, y, tz);
-        tMesh.userData = { type: 'transom', category: catNum };
-        facadeElementsGroup.add(tMesh);
+        for (let i = 0; i < numMullions; i++) {
+            const mx = i * spanMeters;
+            const tGeom = new THREE.BoxGeometry(spanMeters, FRAME_DEPTH_M, FRAME_HEIGHT_M);
+            const tMesh = new THREE.Mesh(tGeom, frameMaterial);
+            tMesh.position.set(x + mx + spanMeters / 2, y, tz);
+            tMesh.userData = { type: 'transom', category: catNum };
+            facadeElementsGroup.add(tMesh);
+        }
     }
 }
 
@@ -850,8 +854,8 @@ function _updateResultOverlay(mode) {
         startFloor = 1;
         endFloor = 3;
     } else {
-        startFloor = 3;
-        endFloor = 3;
+        startFloor = 1;
+        endFloor = 2;
     }
 
     let rows;
@@ -862,7 +866,8 @@ function _updateResultOverlay(mode) {
     }
     const y = -halfD;
     const numMullions = 5;
-    const verticalSpacing = floorHeight;
+    const verticalSpacingMM = _getInputValue(`cat${catNum}-general-vertical_spacing`);
+    const verticalSpacing = (verticalSpacingMM || floorHeightMM) / 1000;
 
     for (const row of rows) {
         const z = row.start * floorHeight;
@@ -877,76 +882,76 @@ function _updateResultOverlay(mode) {
         transomZ.sort((a, b) => a - b);
 
         if (mode === 'dc-ratio') {
+            const labelColor = 0x000000;
+            const fontScale = 0.35;
             const glassDc = glassResult?.stress_ratio ?? null;
             const frameDcMul = frameResult?.mul_dc ?? null;
             const frameDcTran = frameResult?.tran_dc ?? null;
 
             if (glassDc !== null) {
-                const labelColor = glassDc <= 1.0 ? 0x00aa00 : 0xff0000;
                 const text = glassDc.toFixed(2);
                 for (let i = 0; i < numMullions; i++) {
                     for (let j = 0; j < transomZ.length - 1; j++) {
                         const panelCX = (i + 0.5) * spanMeters;
                         const panelCZ = (transomZ[j] + transomZ[j + 1]) / 2;
-                        _createTextSprite(text, xOffset + panelCX, y - 0.02, panelCZ, 0.4, labelColor, catNum, true);
+                        _createTextSprite(text, xOffset + panelCX, y - 0.02, panelCZ, fontScale, labelColor, catNum, true);
                     }
                 }
             }
 
             if (frameDcMul !== null) {
-                const labelColor = frameDcMul <= 1.0 ? 0x00aa00 : 0xff0000;
                 const text = frameDcMul.toFixed(2);
                 for (let i = 0; i <= numMullions; i++) {
                     const mx = i * spanMeters;
                     const mullionCenterZ = (z + zEnd) / 2;
-                    _createTextSprite(text, xOffset + mx, y - 0.02, mullionCenterZ, 0.35, labelColor, catNum, true, true);
+                    _createTextSprite(text, xOffset + mx + 0.15, y - 0.02, mullionCenterZ, fontScale, labelColor, catNum, true, true);
                 }
             }
 
             if (frameDcTran !== null) {
-                const labelColor = frameDcTran <= 1.0 ? 0x00aa00 : 0xff0000;
                 const text = frameDcTran.toFixed(2);
-                for (const tz of transomZ) {
-                    _createTextSprite(text, xOffset + facadeWidth / 2, y - 0.02, tz, 0.35, labelColor, catNum, true);
+                for (let i = 0; i < numMullions; i++) {
+                    for (const tz of transomZ) {
+                        const transomCX = xOffset + (i + 0.5) * spanMeters;
+                        _createTextSprite(text, transomCX, y - 0.02, tz + 0.15, fontScale, labelColor, catNum, true);
+                    }
                 }
             }
         } else if (mode === 'deflection') {
+            const labelColor = 0x000000;
+            const fontScale = 0.35;
             const glassDef = glassResult?.deflection ?? null;
             const glassDefRatio = glassResult?.def_ratio ?? null;
             const frameDefMul = frameResult?.mul_def ?? null;
             const frameDefTran = frameResult?.tran_def_wind ?? null;
 
             if (glassDef !== null) {
-                const labelColor = (glassDefRatio !== null && glassDefRatio <= 1.0) ? 0x00aa00 : 0xff0000;
                 const text = Number(glassDef.toFixed(1)).toString();
                 for (let i = 0; i < numMullions; i++) {
                     for (let j = 0; j < transomZ.length - 1; j++) {
                         const panelCX = (i + 0.5) * spanMeters;
                         const panelCZ = (transomZ[j] + transomZ[j + 1]) / 2;
-                        _createTextSprite(text, xOffset + panelCX, y - 0.02, panelCZ, 0.4, labelColor, catNum, true);
+                        _createTextSprite(text, xOffset + panelCX, y - 0.02, panelCZ, fontScale, labelColor, catNum, true);
                     }
                 }
             }
 
             if (frameDefMul !== null) {
-                const mulAllowDef = frameResult?.mul_allow_def ?? null;
-                const mulDefRatio = mulAllowDef ? frameDefMul / mulAllowDef : null;
-                const labelColor = (mulDefRatio !== null && mulDefRatio <= 1.0) ? 0x00aa00 : 0xff0000;
                 const text = Number(frameDefMul.toFixed(1)).toString();
                 for (let i = 0; i <= numMullions; i++) {
                     const mx = i * spanMeters;
                     const mullionCenterZ = (z + zEnd) / 2;
-                    _createTextSprite(text, xOffset + mx, y - 0.02, mullionCenterZ, 0.35, labelColor, catNum, true, true);
+                    _createTextSprite(text, xOffset + mx, y - 0.02, mullionCenterZ, fontScale, labelColor, catNum, true, true);
                 }
             }
 
             if (frameDefTran !== null) {
-                const tranAllowDef = frameResult?.tran_allow_def ?? null;
-                const tranDefRatio = tranAllowDef ? frameDefTran / tranAllowDef : null;
-                const labelColor = (tranDefRatio !== null && tranDefRatio <= 1.0) ? 0x00aa00 : 0xff0000;
                 const text = Number(frameDefTran.toFixed(1)).toString();
-                for (const tz of transomZ) {
-                    _createTextSprite(text, xOffset + facadeWidth / 2, y - 0.02, tz, 0.35, labelColor, catNum, true);
+                for (let i = 0; i < numMullions; i++) {
+                    for (const tz of transomZ) {
+                        const transomCX = xOffset + (i + 0.5) * spanMeters;
+                        _createTextSprite(text, transomCX, y - 0.02, tz, fontScale, labelColor, catNum, true);
+                    }
                 }
             }
         }
@@ -965,14 +970,14 @@ function _createTextSprite(text, x, y, z, scale, color, catNum, isResultOverlay 
         canvas.height = 35;
     }
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.001)';
     const radius = 8;
     const pad = 4;
     ctx.beginPath();
     ctx.roundRect(pad, pad, canvas.width - pad * 2, canvas.height - pad * 2, radius);
     ctx.fill();
 
-    ctx.font = 'normal 14px Arial';
+    ctx.font = '14px Arial';
     const colors = getThemeColors();
     ctx.fillStyle = color ? '#' + color.toString(16).padStart(6, '0') : colors.label;
     ctx.textAlign = 'center';
