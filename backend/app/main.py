@@ -35,7 +35,7 @@ BACKEND_DIR = os.path.join(ROOT_DIR, "backend")
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(FRONTEND_DIR, "templates"))
+templates = Jinja2Templates(directory=os.path.join(FRONTEND_DIR, "templates", "app"))
 
 
 def _fmt_filter(v, dp=2):
