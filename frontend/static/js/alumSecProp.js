@@ -6,6 +6,7 @@ import { openModal, closeModal } from './floatingBar.js';
 import { _materials, populateSecGradeOptions, animateDefineForm } from './materialProp.js';
 
 const ALUMINUM_PREDEFINED = {
+    'M 100x60x2.5': { grade: '', d: '100', b: '60', tw: '2.5', tf: '4.66', j: '513921.8',   a: '1018.6', ix: '1313971.8',  iy: '513921.8',  y: '55.4',  x: '30',   plasticX: '18.0', plasticY: '45.1', phiMn: '4.54' },
     'M 125x60x2.5': { grade: '', d: '125', b: '60', tw: '2.5', tf: '4.66', j: '1583468.5',  a: '1143.6', ix: '2304351.5',  iy: '617307.5',  y: '69.3',  x: '30',   plasticX: '27.9', plasticY: '52',   phiMn: '6.5' },
     'M 125x60x3':   { grade: '', d: '125', b: '60', tw: '3',   tf: '4.66', j: '1797727.0',  a: '1267.6', ix: '2462171.3',  iy: '707902.2',  y: '68.8',  x: '30',   plasticX: '29.5', plasticY: '49',   phiMn: '7.2' },
     'M 140x60x2.5': { grade: '', d: '140', b: '60', tw: '2.5', tf: '4.67', j: '1822610.8',  a: '1218.6', ix: '3065620.3',  iy: '679338.9',  y: '77.6',  x: '30',   plasticX: '33.5', plasticY: '56.1', phiMn: '7.6' },

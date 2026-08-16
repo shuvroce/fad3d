@@ -22,26 +22,39 @@
         <div class="topbar__left">
             <div class="topbar__logo-badge" aria-label="Facade Report" role="img"></div>
             <div class="topbar__header-btn">
-                <button class="topbar__icon-btn" type="button" data-title="Dashboard" aria-label="Dashboard" id="dashboard-btn">
+                <button class="topbar__icon-btn" type="button" data-title="Dashboard" aria-label="Dashboard"
+                    id="dashboard-btn">
                     <!-- Dashboard -->
-                    <svg class="topbar__icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-dashboard"></use></svg>
+                    <svg class="topbar__icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-dashboard"></use>
+                    </svg>
                 </button>
-                <button class="topbar__icon-btn" type="button" data-title="Load Project" aria-label="Load Project" id="load-btn">
+                <button class="topbar__icon-btn" type="button" data-title="Load Project" aria-label="Load Project"
+                    id="load-btn">
                     <!-- Load Project -->
-                    <svg class="topbar__icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-load"></use></svg>
+                    <svg class="topbar__icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-load"></use>
+                    </svg>
                 </button>
-                <button class="topbar__icon-btn" type="button" data-title="Download Project" aria-label="Download Project" id="download-btn">
+                <button class="topbar__icon-btn" type="button" data-title="Download Project"
+                    aria-label="Download Project" id="download-btn">
                     <!-- Download Project -->
-                    <svg class="topbar__icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-download"></use></svg>
+                    <svg class="topbar__icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-download"></use>
+                    </svg>
                 </button>
             </div>
             <input type="file" id="yaml-file-input" accept=".fad,application/json" hidden />
 
             <div class="topbar__panel-btn">
-                <button class="topbar__btn-mode"><svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-wind"></use></svg>
+                <button class="topbar__btn-mode"><svg class="floating__bar-icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-wind"></use>
+                    </svg>
                     Wind
                 </button>
-                <button class="topbar__btn-mode active"><svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-facade"></use></svg>
+                <button class="topbar__btn-mode active"><svg class="floating__bar-icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-facade"></use>
+                    </svg>
                     Facade
                 </button>
             </div>
@@ -63,34 +76,47 @@
 
             <div class="topbar__right-header-btn">
                 <div class="topbar__support-wrap" id="support-wrap">
-                    <button class="topbar__header-icon-btn" type="button" aria-label="Support" id="support-btn" aria-haspopup="true" aria-expanded="false">
-                        <svg class="topbar__icon-svg" aria-hidden="true"><use href="/static/assets/icons.svg#icon-support"></use></svg>
+                    <button class="topbar__header-icon-btn" type="button" aria-label="Support" id="support-btn"
+                        aria-haspopup="true" aria-expanded="false">
+                        <svg class="topbar__icon-svg" aria-hidden="true">
+                            <use href="/static/assets/icons.svg#icon-support"></use>
+                        </svg>
                         <p>Support</p>
                     </button>
                     <div class="topbar__support-submenu" id="support-submenu" hidden>
                         <button class="topbar__support-submenu-btn" id="feedback-modal-btn">
-                            <svg aria-hidden="true"><use href="/static/assets/icons.svg#icon-feedback"></use></svg>
+                            <svg aria-hidden="true">
+                                <use href="/static/assets/icons.svg#icon-feedback"></use>
+                            </svg>
                             Send Feedback
                         </button>
                         <button class="topbar__support-submenu-btn" id="contact-modal-btn">
-                            <svg aria-hidden="true"><use href="/static/assets/icons.svg#icon-contact"></use></svg>
+                            <svg aria-hidden="true">
+                                <use href="/static/assets/icons.svg#icon-contact"></use>
+                            </svg>
                             Contact Us
                         </button>
                     </div>
                 </div>
 
                 <button class="topbar__header-icon-btn" type="button" aria-label="Help" id="help-btn">
-                    <svg class="topbar__icon-svg" aria-hidden="true"><use href="/static/assets/icons.svg#icon-help"></use></svg>
+                    <svg class="topbar__icon-svg" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-help"></use>
+                    </svg>
                     <p>Help</p>
                 </button>
 
                 <button class="topbar__header-icon-btn" type="button" aria-label="Learn" id="">
-                    <svg class="topbar__icon-svg" aria-hidden="true"><use href="/static/assets/icons.svg#icon-learn"></use></svg>
+                    <svg class="topbar__icon-svg" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-learn"></use>
+                    </svg>
                     <p>Learn</p>
                 </button>
 
                 <button class="topbar__header-icon-btn" type="button" aria-label="Setting" id="settings-btn">
-                    <svg class="topbar__icon-svg" aria-hidden="true"><use href="/static/assets/icons.svg#icon-setting"></use></svg>
+                    <svg class="topbar__icon-svg" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-setting"></use>
+                    </svg>
                     <p>Setting</p>
                 </button>
             </div>
@@ -99,8 +125,11 @@
                 <button class="topbar__btn-report" id="report-btn" type="button" aria-label="Generate Report">
                     Report
                 </button>
-                <button class="topbar__btn-report-sub" id="report-dropdown-toggle" type="button" aria-label="Report options" aria-expanded="false" aria-haspopup="true">
-                    <svg class="topbar__icon-svg report__chevron" aria-hidden="true"><use href="/static/assets/icons.svg#icon-chevron-down"></use></svg>
+                <button class="topbar__btn-report-sub" id="report-dropdown-toggle" type="button"
+                    aria-label="Report options" aria-expanded="false" aria-haspopup="true">
+                    <svg class="topbar__icon-svg report__chevron" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-chevron-down"></use>
+                    </svg>
                 </button>
                 <ul class="report__dropdown" id="report-dropdown" role="menu">
                     <li role="none">
@@ -117,8 +146,12 @@
 
             <div class="">
                 <button class="theme__toggle" id="theme__toggle" aria-label="Toggle dark mode" data-title="Theme">
-                    <svg id="theme-icon-sun" class="theme__icon sun hidden" aria-hidden="true"><use href="/static/assets/icons.svg#icon-sun"></use></svg>
-                    <svg id="theme-icon-moon" class="theme__icon moon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-moon"></use></svg>
+                    <svg id="theme-icon-sun" class="theme__icon sun hidden" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-sun"></use>
+                    </svg>
+                    <svg id="theme-icon-moon" class="theme__icon moon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-moon"></use>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -128,33 +161,52 @@
         <div class="floating__bar-left">
             <div class="floating__bar-left-button">
                 <button class="floating__bar-btn" id="general-modal-btn">
-                    <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-general"></use></svg>
+                    <svg class="floating__bar-icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-general"></use>
+                    </svg>
                     General
                 </button>
                 <div class="floating__bar-define-wrap" id="define-wrap">
                     <button class="floating__bar-btn" id="define-modal-btn">
-                        <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-define"></use></svg>
+                        <svg class="floating__bar-icon" aria-hidden="true">
+                            <use href="/static/assets/icons.svg#icon-define"></use>
+                        </svg>
                         Define
-                        <svg class="floating__bar-chevron" aria-hidden="true"><use href="/static/assets/icons.svg#icon-chevron-down"></use></svg>
+                        <svg class="floating__bar-chevron" aria-hidden="true">
+                            <use href="/static/assets/icons.svg#icon-chevron-down"></use>
+                        </svg>
                     </button>
                     <div class="floating__bar-submenu" id="define-submenu" hidden>
                         <button class="floating__bar-submenu-btn" id="material-modal-btn">
-                            <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-material"></use></svg>
+                            <svg class="floating__bar-icon" aria-hidden="true">
+                                <use href="/static/assets/icons.svg#icon-material"></use>
+                            </svg>
                             Material
                         </button>
-                        <div class="floating__bar-submenu-item floating__bar-submenu-item--nested" id="section-submenu-wrap">
-                            <button class="floating__bar-submenu-btn floating__bar-submenu-btn--nested" id="section-submenu-trigger">
-                                <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-section"></use>></svg>
+                        <div class="floating__bar-submenu-item floating__bar-submenu-item--nested"
+                            id="section-submenu-wrap">
+                            <button class="floating__bar-submenu-btn floating__bar-submenu-btn--nested"
+                                id="section-submenu-trigger">
+                                <svg class="floating__bar-icon" aria-hidden="true">
+                                    <use href="/static/assets/icons.svg#icon-section"></use>>
+                                </svg>
                                 Section
-                                <svg class="floating__bar-chevron floating__bar-chevron--right" aria-hidden="true"><use href="/static/assets/icons.svg#icon-chevron-right"></use></svg>
+                                <svg class="floating__bar-chevron floating__bar-chevron--right" aria-hidden="true">
+                                    <use href="/static/assets/icons.svg#icon-chevron-right"></use>
+                                </svg>
                             </button>
-                            <div class="floating__bar-submenu floating__bar-submenu--nested" id="section-submenu" hidden>
+                            <div class="floating__bar-submenu floating__bar-submenu--nested" id="section-submenu"
+                                hidden>
                                 <button class="floating__bar-submenu-btn" id="section-alum-btn">
-                                    <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-aluminum"></use></svg>
+                                    <svg class="floating__bar-icon" aria-hidden="true">
+                                        <use href="/static/assets/icons.svg#icon-aluminum"></use>
+                                    </svg>
                                     Aluminum
                                 </button>
                                 <button class="floating__bar-submenu-btn" id="section-steel-btn">
-                                    <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-steel"></use></svg>
+                                    <svg class="floating__bar-icon" aria-hidden="true">
+                                        <use href="/static/assets/icons.svg#icon-steel"></use>
+                                    </svg>
                                     Steel
                                 </button>
                             </div>
@@ -169,7 +221,9 @@
             <div class="filter__wrap" id="filter-wrap">
                 <div class="floating__bar-right-view">
                     <button class="floating__bar-btn floating__bar-btn--filter" id="filter-btn" data-title="Filter">
-                        <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-setting"></use></svg>
+                        <svg class="floating__bar-icon" aria-hidden="true">
+                            <use href="/static/assets/icons.svg#icon-setting"></use>
+                        </svg>
                     </button>
                 </div>
                 <div class="filter__panel" id="filter-panel">
@@ -199,15 +253,21 @@
             </div>
             <div class="floating__bar-right-view" id="view-mode-controls">
                 <button class="floating__bar-btn active">
-                    <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-modelview"></use></svg>
+                    <svg class="floating__bar-icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-modelview"></use>
+                    </svg>
                     Model
                 </button>
                 <button class="floating__bar-btn">
-                    <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-dc"></use></svg>
+                    <svg class="floating__bar-icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-dc"></use>
+                    </svg>
                     DC Ratio
                 </button>
                 <button class="floating__bar-btn">
-                    <svg class="floating__bar-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-deflection"></use></svg>
+                    <svg class="floating__bar-icon" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-deflection"></use>
+                    </svg>
                     Deflection
                 </button>
             </div>
@@ -215,7 +275,9 @@
                 <button class="floating__bar-btn floating__bar-btn--figures" id="figures-btn">
                     <span class="figures__indicator" id="figures-indicator"></span>
                     Figures
-                    <svg class="floating__bar-chevron figures__chevron" aria-hidden="true"><use href="/static/assets/icons.svg#icon-chevron-down"></use></svg>
+                    <svg class="floating__bar-chevron figures__chevron" aria-hidden="true">
+                        <use href="/static/assets/icons.svg#icon-chevron-down"></use>
+                    </svg>
                 </button>
             </div>
             <div class="figure__panel" id="figure-panel">
@@ -231,7 +293,9 @@
             </div>
             <button class="catbar__btn add" id="cat-add" type="button" data-title="Add Category"
                 aria-label="Add Category">
-                <svg class="catbar__icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-add"></use></svg>
+                <svg class="catbar__icon" aria-hidden="true">
+                    <use href="/static/assets/icons.svg#icon-add"></use>
+                </svg>
             </button>
         </div>
 
@@ -241,7 +305,9 @@
             </div>
             <button class="left__panel-toggle-left" type="button" aria-label="Collapse left panel"
                 data-title="Collapse left panel">
-                <svg class="panel__toggle-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-chevron-left"></use></svg>
+                <svg class="panel__toggle-icon" aria-hidden="true">
+                    <use href="/static/assets/icons.svg#icon-chevron-left"></use>
+                </svg>
             </button>
         </div>
     </section>
@@ -250,18 +316,25 @@
         <div id="viewport-3d"></div>
         <div class="wind-zone-legend" id="wind-zone-legend" aria-hidden="true">
             <div class="wind-zone-legend__title">C&amp;C Wind Zones</div>
-            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch" style="background:#a4bbe0"></span>Zone 5 — Wall Edge</div>
-            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch" style="background:#f3f5d5"></span>Zone 4 — Wall Mid</div>
-            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch" style="background:#f59099"></span>Zone 3 — Roof Corner</div>
-            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch" style="background:#eab8ff"></span>Zone 2 — Roof Edge</div>
-            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch" style="background:#f3f5d5"></span>Zone 1 — Roof Mid</div>
+            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch"
+                    style="background:#a4bbe0"></span>Zone 5 — Wall Edge</div>
+            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch"
+                    style="background:#f3f5d5"></span>Zone 4 — Wall Mid</div>
+            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch"
+                    style="background:#f59099"></span>Zone 3 — Roof Corner</div>
+            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch"
+                    style="background:#eab8ff"></span>Zone 2 — Roof Edge</div>
+            <div class="wind-zone-legend__item"><span class="wind-zone-legend__swatch"
+                    style="background:#f3f5d5"></span>Zone 1 — Roof Mid</div>
         </div>
     </section>
 
     <section class="right__panel">
         <button class="right__panel-toggle-right" type="button" aria-label="Collapse right panel"
             data-title="Collapse right panel">
-            <svg class="panel__toggle-icon" aria-hidden="true"><use href="/static/assets/icons.svg#icon-chevron-right"></use></svg>
+            <svg class="panel__toggle-icon" aria-hidden="true">
+                <use href="/static/assets/icons.svg#icon-chevron-right"></use>
+            </svg>
         </button>
         <div class="result__box">
             <h2 class="result__heading">Design Summary</h2>
