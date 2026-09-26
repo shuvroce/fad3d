@@ -1,4 +1,4 @@
-# FAD-3D — Facade Analysis & Design
+# FAD-3D - Facade Analysis & Design
 
 Single-page web application for facade engineering analysis: wind load calculation,
 glass / frame / connection / anchorage design checks, interactive 3D viewport,
