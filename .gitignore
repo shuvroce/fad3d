@@ -24,6 +24,7 @@ env/
 .idea/
 *.sublime-project
 *.sublime-workspace
+AGENTS.md
 
 # OS junk
 .DS_Store
